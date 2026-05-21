@@ -6,11 +6,11 @@ namespace ApiIveco.Models
     public class VeiculoComponente
     {
         [FirestoreProperty]
-        public int Id { get; set; }
+        public string Id { get; set; }
         [FirestoreProperty]
         public string fk_Veiculo_Vin { get; set; }
         [FirestoreProperty]
-        public int fk_LoteMateriaPrima_Id { get; set; }
+        public string fk_LoteMateriaPrima_Id { get; set; }
         [FirestoreProperty]
         public string NomePeca { get; set; }
     }

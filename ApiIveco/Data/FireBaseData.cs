@@ -40,5 +40,9 @@ namespace ApiIveco.Data
             Db = builder.Build();
         }
 
+        public static implicit operator FireBaseData(FirestoreDb v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

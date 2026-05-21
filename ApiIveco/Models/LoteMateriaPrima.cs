@@ -6,7 +6,7 @@ namespace ApiIveco.Models
     public class LoteMateriaPrima
     {
         [FirestoreProperty]
-        public int Id { get; set; }
+        public string Id { get; set; }
         [FirestoreProperty]
         public string TipoMaterial { get; set; }
         [FirestoreProperty]
@@ -16,7 +16,7 @@ namespace ApiIveco.Models
         [FirestoreProperty]
         public Double PegadaCarbonoPorKg { get; set; }
         [FirestoreProperty]
-        public int fk_Fornecedor_Id { get; set; }
+        public string fk_Fornecedor_Id { get; set; }
 
     }
 
