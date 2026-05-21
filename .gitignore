@@ -24,8 +24,7 @@ x86/
 # Credenciais e Segredos (Específico do seu projeto)
 # ==========================================
 # Ignora a chave do banco em qualquer pasta
-**/firebase-adminsdk.json
-chave_Banco/
+**ApiIveco/chave_Banco/firebase-admin.json
 
 # Ignora configurações locais que possam ter senhas de banco de dados
 appsettings.Development.json
