@@ -7,6 +7,8 @@
 [Ll]ogs/
 [Dd]ebug/
 [Rr]elease/
+[Pp]ublish/
+[Oo]ut/
 x64/
 x86/
 
@@ -14,6 +16,8 @@ x86/
 # Arquivos do Visual Studio e IDEs
 # ==========================================
 .vs/
+.vscode/
+.idea/
 *.user
 *.suo
 *.userosscache
@@ -21,10 +25,25 @@ x86/
 *.userprefs
 
 # ==========================================
+# Dependências (.NET / NuGet)
+# ==========================================
+packages/
+*.nupkg
+
+# ==========================================
 # Credenciais e Segredos (Específico do seu projeto)
 # ==========================================
-# Ignora a chave do banco em qualquer pasta
-**ApiIveco/chave_Banco/firebase-admin.json
+# Ignora qualquer chave JSON do Firebase pelo nome do arquivo
+*firebase-key.json
+*firebase-admin.json
+
+# Garante que qualquer arquivo JSON dentro das pastas de chaves seja ignorado
+**/chave_Banco/*.json
+**/chave_Api/*.json
+
+# Caminhos exatos (apenas por garantia extra)
+ApiIveco/chave_Banco/firebase-admin.json
+ApiIveco/chave_Api/firebase-key.json
 
 # Ignora configurações locais que possam ter senhas de banco de dados
 appsettings.Development.json
