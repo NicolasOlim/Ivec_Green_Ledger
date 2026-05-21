@@ -148,6 +148,18 @@ namespace ApiIveco.Service
             return veiculo;
         }
 
+        public async Task<Veiculo> ObterVeiculoPorVin(string vin)
+        {
+            // Pega a lista completa de veículos usando o método que você já tem
+            var veiculos = await ListarVeiculo();
+
+            // Procura na lista o veículo que tem o VIN exato (ignorando letras maiúsculas/minúsculas)
+            // Se não encontrar, ele retorna "null" automaticamente
+            var veiculoEncontrado = veiculos.FirstOrDefault(v => v.Vin.Equals(vin, StringComparison.OrdinalIgnoreCase));
+
+            return veiculoEncontrado;
+        }
+
         // O contador ainda funciona com "int" para poder somar + 1 matematicamente no banco.
         // A conversão para string ocorre apenas na hora de aplicar à model e criar o documento acima.
         private async Task<int> GerarProximoId(string nomeContador)
