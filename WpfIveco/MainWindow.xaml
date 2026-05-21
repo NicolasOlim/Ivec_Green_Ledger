@@ -5,8 +5,322 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfIveco"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="WPF Ultra Premium" Height="720" Width="1150"
+        WindowStyle="None" 
+        AllowsTransparency="True" 
+        Background="Transparent"
+        WindowStartupLocation="CenterScreen"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        FontFamily="Segoe UI Variable, Segoe UI, Helvetica Neue, sans-serif">
 
-    </Grid>
+    <Window.Resources>
+        <SolidColorBrush x:Key="OledBlack" Color="#000000"/>
+        <SolidColorBrush x:Key="ElevatedGray1" Color="#1C1C1E"/>
+        <SolidColorBrush x:Key="ElevatedGray2" Color="#2C2C2E"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#8E8E93"/>
+        <SolidColorBrush x:Key="AppleBlue" Color="#0A84FF"/>
+        <SolidColorBrush x:Key="AppleGreen" Color="#30D158"/>
+
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="Padding" Value="14,10"/>
+            <Setter Property="Margin" Value="0,4"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="12">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ActiveMenuButtonStyle" BasedOn="{StaticResource MenuButtonStyle}" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+        </Style>
+
+        <Style x:Key="PremiumCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource ElevatedGray1}"/>
+            <Setter Property="CornerRadius" Value="24"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="BorderBrush">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#3A3A3C" Offset="0"/>
+                        <GradientStop Color="#1C1C1E" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="50" ShadowDepth="15" Direction="270" Color="Black" Opacity="0.3"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                        <TranslateTransform Y="0"/>
+                    </TransformGroup>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)" To="1.015" Duration="0:0:0.4">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" To="1.015" Duration="0:0:0.4">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[1].(TranslateTransform.Y)" To="-4" Duration="0:0:0.4">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)" To="1" Duration="0:0:0.5">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" To="1" Duration="0:0:0.5">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[1].(TranslateTransform.Y)" To="0" Duration="0:0:0.5">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Border Background="{StaticResource OledBlack}" CornerRadius="30" BorderBrush="#2C2C2E" BorderThickness="1" Margin="20">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="60" ShadowDepth="20" Direction="270" Color="Black" Opacity="0.8"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="Transparent" Padding="20,24,20,24">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Top" Margin="8,0,0,30">
+                        <Button Width="12" Height="12" Margin="0,0,8,0" Cursor="Hand" Click="CloseButton_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Ellipse Fill="#FF5F56"/>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                        <Button Width="12" Height="12" Margin="0,0,8,0" Cursor="Hand" Click="MinimizeButton_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Ellipse Fill="#FFBD2E"/>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                        <Button Width="12" Height="12" Cursor="Hand" Click="MaximizeButton_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Ellipse Fill="#27C93F"/>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Margin="0,20,0,0">
+                        <TextBlock Text="MENU PRINCIPAL" Foreground="{StaticResource TextSecondary}" FontSize="11" FontWeight="SemiBold" Margin="14,0,0,16" Opacity="0.7"/>
+
+                        <Button Style="{StaticResource ActiveMenuButtonStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE80F;" FontSize="15" Margin="0,0,14,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Dashboard" FontSize="14.5" VerticalAlignment="Center" FontWeight="Medium"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource MenuButtonStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE70F;" FontSize="15" Margin="0,0,14,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Projetos" FontSize="14.5" VerticalAlignment="Center" FontWeight="Regular"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource MenuButtonStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" FontSize="15" Margin="0,0,14,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Análises" FontSize="14.5" VerticalAlignment="Center" FontWeight="Regular"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource MenuButtonStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" FontSize="15" Margin="0,0,14,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Ajustes" FontSize="14.5" VerticalAlignment="Center" FontWeight="Regular"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <Border Grid.Row="2" Background="{StaticResource ElevatedGray1}" CornerRadius="16" Padding="12" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="36" Height="36">
+                                <Ellipse.Fill>
+                                    <ImageBrush ImageSource="https://ui-avatars.com/api/?name=User&amp;background=0A84FF&amp;color=fff&amp;rounded=true" Stretch="UniformToFill"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Usuário Iveco" Foreground="{StaticResource TextPrimary}" FontSize="14" FontWeight="Medium"/>
+                                <TextBlock Text="Workspace" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Column="1" Background="Transparent" Margin="20,30,40,40">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,40">
+                    <TextBlock Text="Overview" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Border Background="{StaticResource ElevatedGray1}" CornerRadius="18" Padding="16,10" Margin="0,0,16,0" Width="240" BorderThickness="1" BorderBrush="#2C2C2E">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE721;" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="14"/>
+                                <TextBlock Text="Search..." Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" FontSize="14" Opacity="0.7"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="{StaticResource ElevatedGray1}" CornerRadius="18" Width="40" Height="40" BorderThickness="1" BorderBrush="#2C2C2E" Cursor="Hand">
+                            <Grid>
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEA8F;" Foreground="{StaticResource TextPrimary}" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Ellipse Width="8" Height="8" Fill="#FF453A" Margin="12,-12,0,0"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="180"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,12,24" ClipToBounds="True">
+                        <Grid>
+                            <Path Data="M 0,140 C 60,120 100,150 160,80 C 220,10 260,60 400,20" Stroke="{StaticResource AppleGreen}" StrokeThickness="2.5" Stretch="Fill" Margin="-10,80,-10,-20">
+                                <Path.Effect>
+                                    <DropShadowEffect BlurRadius="25" ShadowDepth="0" Color="#30D158" Opacity="0.4"/>
+                                </Path.Effect>
+                            </Path>
+                            <Path Data="M 0,140 C 60,120 100,150 160,80 C 220,10 260,60 400,20 L 400,200 L 0,200 Z" Fill="#0A30D158" Stretch="Fill" Margin="-10,80,-10,-20"/>
+
+                            <StackPanel Margin="30">
+                                <TextBlock Text="Total Revenue" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
+                                <TextBlock Text="$ 124,563" Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                    <Border Background="#1A30D158" CornerRadius="6" Padding="8,4">
+                                        <TextBlock Text="+14.2%" Foreground="{StaticResource AppleGreen}" FontSize="12.5" FontWeight="SemiBold"/>
+                                    </Border>
+                                    <TextBlock Text="from last month" Foreground="{StaticResource TextSecondary}" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.8"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource PremiumCardStyle}" Margin="12,0,0,24" ClipToBounds="True">
+                        <Grid>
+                            <Path Data="M 0,80 C 60,120 120,20 180,80 C 240,140 280,40 400,60" Stroke="{StaticResource AppleBlue}" StrokeThickness="2.5" Stretch="Fill" Margin="-10,80,-10,-20">
+                                <Path.Effect>
+                                    <DropShadowEffect BlurRadius="25" ShadowDepth="0" Color="#0A84FF" Opacity="0.4"/>
+                                </Path.Effect>
+                            </Path>
+                            <Path Data="M 0,80 C 60,120 120,20 180,80 C 240,140 280,40 400,60 L 400,200 L 0,200 Z" Fill="#0A0A84FF" Stretch="Fill" Margin="-10,80,-10,-20"/>
+
+                            <StackPanel Margin="30">
+                                <TextBlock Text="Active Users" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
+                                <TextBlock Text="3,842" Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                    <Border Background="#1A0A84FF" CornerRadius="6" Padding="8,4">
+                                        <TextBlock Text="+5.8%" Foreground="{StaticResource AppleBlue}" FontSize="12.5" FontWeight="SemiBold"/>
+                                    </Border>
+                                    <TextBlock Text="from last month" Foreground="{StaticResource TextSecondary}" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.8"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource PremiumCardStyle}">
+                        <Grid>
+                            <Grid Margin="30" VerticalAlignment="Top">
+                                <TextBlock Text="Performance" Foreground="{StaticResource TextPrimary}" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Left"/>
+
+                                <Border Background="#121213" CornerRadius="8" HorizontalAlignment="Right" Padding="4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Padding="16,6" CornerRadius="6" Background="Transparent" Cursor="Hand">
+                                            <TextBlock Text="1W" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="Medium"/>
+                                        </Border>
+                                        <Border Padding="16,6" CornerRadius="6" Background="{StaticResource ElevatedGray2}" Cursor="Hand">
+                                            <TextBlock Text="1M" Foreground="{StaticResource TextPrimary}" FontSize="12" FontWeight="SemiBold"/>
+                                        </Border>
+                                        <Border Padding="16,6" CornerRadius="6" Background="Transparent" Cursor="Hand">
+                                            <TextBlock Text="1Y" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="Medium"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,40,0,0" Opacity="0.5">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" Foreground="{StaticResource TextSecondary}" FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,16"/>
+                                <TextBlock Text="Waiting for LiveCharts2 rendering engine..." Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
 </Window>
