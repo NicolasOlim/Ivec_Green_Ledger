@@ -48,11 +48,6 @@
             </Setter>
         </Style>
 
-        <Style x:Key="ActiveMenuButtonStyle" BasedOn="{StaticResource MenuButtonStyle}" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-        </Style>
-
         <Style x:Key="PremiumCardStyle" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource ElevatedGray1}"/>
             <Setter Property="CornerRadius" Value="24"/>
@@ -172,25 +167,68 @@
                     <StackPanel Grid.Row="1" Margin="0,20,0,0">
                         <TextBlock Text="MENU PRINCIPAL" Foreground="{StaticResource TextSecondary}" FontSize="11" FontWeight="SemiBold" Margin="14,0,0,16" Opacity="0.7"/>
 
-                        <Button Style="{StaticResource ActiveMenuButtonStyle}">
+                        <Button Command="{Binding MudarAbaCommand}" CommandParameter="Dashboard">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding AbaAtiva}" Value="Dashboard">
+                                            <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE80F;" FontSize="15" Margin="0,0,14,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Dashboard" FontSize="14.5" VerticalAlignment="Center" FontWeight="Medium"/>
                             </StackPanel>
                         </Button>
-                        <Button Style="{StaticResource MenuButtonStyle}">
+
+                        <Button Command="{Binding MudarAbaCommand}" CommandParameter="Projetos">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding AbaAtiva}" Value="Projetos">
+                                            <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE70F;" FontSize="15" Margin="0,0,14,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Projetos" FontSize="14.5" VerticalAlignment="Center" FontWeight="Regular"/>
                             </StackPanel>
                         </Button>
-                        <Button Style="{StaticResource MenuButtonStyle}">
+
+                        <Button Command="{Binding MudarAbaCommand}" CommandParameter="Analises">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding AbaAtiva}" Value="Analises">
+                                            <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" FontSize="15" Margin="0,0,14,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Análises" FontSize="14.5" VerticalAlignment="Center" FontWeight="Regular"/>
                             </StackPanel>
                         </Button>
-                        <Button Style="{StaticResource MenuButtonStyle}">
+
+                        <Button Command="{Binding MudarAbaCommand}" CommandParameter="Ajustes">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding AbaAtiva}" Value="Ajustes">
+                                            <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" FontSize="15" Margin="0,0,14,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Ajustes" FontSize="14.5" VerticalAlignment="Center" FontWeight="Regular"/>
@@ -215,115 +253,165 @@
             </Border>
 
             <Grid Grid.Column="1" Background="Transparent" Margin="20,30,40,40">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0" Margin="0,0,0,40">
-                    <TextBlock Text="Overview API" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0"/>
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding AbaAtiva}" Value="Dashboard">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <Border Background="{StaticResource ElevatedGray1}" CornerRadius="18" Padding="16,10" Margin="0,0,16,0" Width="240" BorderThickness="1" BorderBrush="#2C2C2E">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE721;" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="14"/>
-                                <TextBlock Text="Search..." Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" FontSize="14" Opacity="0.7"/>
-                            </StackPanel>
-                        </Border>
-                        <Border Background="{StaticResource ElevatedGray1}" CornerRadius="18" Width="40" Height="40" BorderThickness="1" BorderBrush="#2C2C2E" Cursor="Hand">
-                            <Grid>
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEA8F;" Foreground="{StaticResource TextPrimary}" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                <Ellipse Width="8" Height="8" Fill="#FF453A" Margin="12,-12,0,0"/>
-                            </Grid>
-                        </Border>
-                    </StackPanel>
-                </Grid>
-
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="180"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,12,24" ClipToBounds="True">
-                        <Grid>
-                            <Path Data="M 0,140 C 60,120 100,150 160,80 C 220,10 260,60 400,20" Stroke="{StaticResource AppleGreen}" StrokeThickness="2.5" Stretch="Fill" Margin="-10,80,-10,-20">
-                                <Path.Effect>
-                                    <DropShadowEffect BlurRadius="25" ShadowDepth="0" Color="#30D158" Opacity="0.4"/>
-                                </Path.Effect>
-                            </Path>
-                            <Path Data="M 0,140 C 60,120 100,150 160,80 C 220,10 260,60 400,20 L 400,200 L 0,200 Z" Fill="#0A30D158" Stretch="Fill" Margin="-10,80,-10,-20"/>
+                    <Grid Grid.Row="0" Margin="0,0,0,40">
+                        <TextBlock Text="Overview API" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0"/>
 
-                            <StackPanel Margin="30">
-                                <TextBlock Text="Total de Veículos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
-
-                                <TextBlock Text="{Binding TotalVeiculos}" Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
-
-                                <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-                                    <Border Background="#1A30D158" CornerRadius="6" Padding="8,4">
-                                        <TextBlock Text="Ao Vivo" Foreground="{StaticResource AppleGreen}" FontSize="12.5" FontWeight="SemiBold"/>
-                                    </Border>
-                                    <TextBlock Text="dados do Firebase" Foreground="{StaticResource TextSecondary}" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.8"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Border Background="{StaticResource ElevatedGray1}" CornerRadius="18" Padding="16,10" Margin="0,0,16,0" Width="240" BorderThickness="1" BorderBrush="#2C2C2E">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE721;" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="14"/>
+                                    <TextBlock Text="Search..." Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" FontSize="14" Opacity="0.7"/>
                                 </StackPanel>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
+                            </Border>
+                            <Border Background="{StaticResource ElevatedGray1}" CornerRadius="18" Width="40" Height="40" BorderThickness="1" BorderBrush="#2C2C2E" Cursor="Hand">
+                                <Grid>
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEA8F;" Foreground="{StaticResource TextPrimary}" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <Ellipse Width="8" Height="8" Fill="#FF453A" Margin="12,-12,0,0"/>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
 
-                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource PremiumCardStyle}" Margin="12,0,0,24" ClipToBounds="True">
-                        <Grid>
-                            <Path Data="M 0,80 C 60,120 120,20 180,80 C 240,140 280,40 400,60" Stroke="{StaticResource AppleBlue}" StrokeThickness="2.5" Stretch="Fill" Margin="-10,80,-10,-20">
-                                <Path.Effect>
-                                    <DropShadowEffect BlurRadius="25" ShadowDepth="0" Color="#0A84FF" Opacity="0.4"/>
-                                </Path.Effect>
-                            </Path>
-                            <Path Data="M 0,80 C 60,120 120,20 180,80 C 240,140 280,40 400,60 L 400,200 L 0,200 Z" Fill="#0A0A84FF" Stretch="Fill" Margin="-10,80,-10,-20"/>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="180"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                            <StackPanel Margin="30">
-                                <TextBlock Text="Fornecedores Ativos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
+                        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,12,24" ClipToBounds="True">
+                            <Grid>
+                                <Path Data="M 0,140 C 60,120 100,150 160,80 C 220,10 260,60 400,20" Stroke="{StaticResource AppleGreen}" StrokeThickness="2.5" Stretch="Fill" Margin="-10,80,-10,-20">
+                                    <Path.Effect>
+                                        <DropShadowEffect BlurRadius="25" ShadowDepth="0" Color="#30D158" Opacity="0.4"/>
+                                    </Path.Effect>
+                                </Path>
+                                <Path Data="M 0,140 C 60,120 100,150 160,80 C 220,10 260,60 400,20 L 400,200 L 0,200 Z" Fill="#0A30D158" Stretch="Fill" Margin="-10,80,-10,-20"/>
 
-                                <TextBlock Text="{Binding TotalFornecedores}" Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
-
-                                <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-                                    <Border Background="#1A0A84FF" CornerRadius="6" Padding="8,4">
-                                        <TextBlock Text="Ao Vivo" Foreground="{StaticResource AppleBlue}" FontSize="12.5" FontWeight="SemiBold"/>
-                                    </Border>
-                                    <TextBlock Text="dados do Firebase" Foreground="{StaticResource TextSecondary}" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.8"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-
-                    <Border Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource PremiumCardStyle}">
-                        <Grid>
-                            <Grid Margin="30" VerticalAlignment="Top">
-                                <TextBlock Text="Performance" Foreground="{StaticResource TextPrimary}" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Left"/>
-
-                                <Border Background="#121213" CornerRadius="8" HorizontalAlignment="Right" Padding="4">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Border Padding="16,6" CornerRadius="6" Background="Transparent" Cursor="Hand">
-                                            <TextBlock Text="1W" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="Medium"/>
+                                <StackPanel Margin="30">
+                                    <TextBlock Text="Total de Veículos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
+                                    <TextBlock Text="{Binding TotalVeiculos}" Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                        <Border Background="#1A30D158" CornerRadius="6" Padding="8,4">
+                                            <TextBlock Text="Ao Vivo" Foreground="{StaticResource AppleGreen}" FontSize="12.5" FontWeight="SemiBold"/>
                                         </Border>
-                                        <Border Padding="16,6" CornerRadius="6" Background="{StaticResource ElevatedGray2}" Cursor="Hand">
-                                            <TextBlock Text="1M" Foreground="{StaticResource TextPrimary}" FontSize="12" FontWeight="SemiBold"/>
-                                        </Border>
-                                        <Border Padding="16,6" CornerRadius="6" Background="Transparent" Cursor="Hand">
-                                            <TextBlock Text="1Y" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="Medium"/>
-                                        </Border>
+                                        <TextBlock Text="dados do Firebase" Foreground="{StaticResource TextSecondary}" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.8"/>
                                     </StackPanel>
-                                </Border>
+                                </StackPanel>
                             </Grid>
+                        </Border>
 
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,40,0,0" Opacity="0.5">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" Foreground="{StaticResource TextSecondary}" FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,16"/>
-                                <TextBlock Text="Waiting for LiveCharts2 rendering engine..." Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
+                        <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource PremiumCardStyle}" Margin="12,0,0,24" ClipToBounds="True">
+                            <Grid>
+                                <Path Data="M 0,80 C 60,120 120,20 180,80 C 240,140 280,40 400,60" Stroke="{StaticResource AppleBlue}" StrokeThickness="2.5" Stretch="Fill" Margin="-10,80,-10,-20">
+                                    <Path.Effect>
+                                        <DropShadowEffect BlurRadius="25" ShadowDepth="0" Color="#0A84FF" Opacity="0.4"/>
+                                    </Path.Effect>
+                                </Path>
+                                <Path Data="M 0,80 C 60,120 120,20 180,80 C 240,140 280,40 400,60 L 400,200 L 0,200 Z" Fill="#0A0A84FF" Stretch="Fill" Margin="-10,80,-10,-20"/>
+
+                                <StackPanel Margin="30">
+                                    <TextBlock Text="Fornecedores Ativos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
+                                    <TextBlock Text="{Binding TotalFornecedores}" Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                        <Border Background="#1A0A84FF" CornerRadius="6" Padding="8,4">
+                                            <TextBlock Text="Ao Vivo" Foreground="{StaticResource AppleBlue}" FontSize="12.5" FontWeight="SemiBold"/>
+                                        </Border>
+                                        <TextBlock Text="dados do Firebase" Foreground="{StaticResource TextSecondary}" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.8"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource PremiumCardStyle}">
+                            <Grid>
+                                <Grid Margin="30" VerticalAlignment="Top">
+                                    <TextBlock Text="Performance" Foreground="{StaticResource TextPrimary}" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Left"/>
+                                </Grid>
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,40,0,0" Opacity="0.5">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" Foreground="{StaticResource TextSecondary}" FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,16"/>
+                                    <TextBlock Text="Waiting for LiveCharts2 rendering engine..." Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
                 </Grid>
+
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding AbaAtiva}" Value="Projetos">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE70F;" Foreground="{StaticResource AppleBlue}" FontSize="80" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                        <TextBlock Text="Gestão de Projetos" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Esta secção encontra-se em desenvolvimento." Foreground="{StaticResource TextSecondary}" FontSize="16" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Grid>
+
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding AbaAtiva}" Value="Analises">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" Foreground="{StaticResource AppleGreen}" FontSize="80" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                        <TextBlock Text="Análises e Gráficos" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Os gráficos LiveCharts2 serão carregados aqui." Foreground="{StaticResource TextSecondary}" FontSize="16" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Grid>
+
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding AbaAtiva}" Value="Ajustes">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" Foreground="#FFBD2E" FontSize="80" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                        <TextBlock Text="Ajustes do Sistema" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Configurações de integração com a API Iveco." Foreground="{StaticResource TextSecondary}" FontSize="16" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Grid>
+
             </Grid>
         </Grid>
     </Border>

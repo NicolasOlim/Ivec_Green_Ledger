@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Windows; // Necessário para o MessageBox
+using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using WpfIveco.Models;
 
@@ -14,7 +15,7 @@ namespace WpfIveco.ViewModels
         private readonly HttpClient _httpClient;
         private readonly DispatcherTimer _timer;
 
-        // Alterei o texto inicial para sabermos se o Binding está a funcionar
+        // --- VARIÁVEIS DA TELA (BINDINGS) ---
         private string _totalVeiculos = "A carregar...";
         public string TotalVeiculos
         {
@@ -29,22 +30,45 @@ namespace WpfIveco.ViewModels
             set { _totalFornecedores = value; OnPropertyChanged(); }
         }
 
+        // --- LÓGICA DE NAVEGAÇÃO DO MENU ---
+        private string _abaAtiva = "Dashboard";
+        public string AbaAtiva
+        {
+            get => _abaAtiva;
+            set { _abaAtiva = value; OnPropertyChanged(); }
+        }
+
+        public ICommand MudarAbaCommand { get; }
+
         public MainViewModel()
         {
-            // 1. TRUQUE MÁGICO: Ignorar erros de certificado HTTPS no localhost
+            // Inicializa o Comando de Mudar Aba
+            MudarAbaCommand = new RelayCommand(MudarAba);
+
+            // Ignora erros de certificado HTTPS no localhost
             var handler = new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
             };
 
             _httpClient = new HttpClient(handler);
-            _httpClient.BaseAddress = new Uri("https://localhost:44353/");
+            _httpClient.BaseAddress = new Uri("https://localhost:44353/"); // Porta da sua API
 
+            // Primeira chamada à API
             _ = CarregarDadosDaApiAsync();
 
+            // Temporizador: Atualiza a cada 10 segundos
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(10) };
             _timer.Tick += async (sender, args) => await CarregarDadosDaApiAsync();
             _timer.Start();
+        }
+
+        private void MudarAba(object parametro)
+        {
+            if (parametro is string nomeDaAba)
+            {
+                AbaAtiva = nomeDaAba;
+            }
         }
 
         private async Task CarregarDadosDaApiAsync()
@@ -81,7 +105,6 @@ namespace WpfIveco.ViewModels
             }
             catch (Exception ex)
             {
-                // 2. FORÇAR A MOSTRAR O ERRO NA TELA!
                 MessageBox.Show($"Ocorreu um erro ao conectar com a API:\n\n{ex.Message}", "Erro de Comunicação", MessageBoxButton.OK, MessageBoxImage.Error);
                 TotalVeiculos = "Falha";
                 TotalFornecedores = "Falha";

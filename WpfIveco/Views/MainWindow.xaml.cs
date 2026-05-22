@@ -1,71 +1,38 @@
-﻿using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+﻿using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WpfIveco.ViewModels;
 
 namespace WpfIveco
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
 
-            // Conecta a tela (XAML) ao cérebro (ViewModel)
+            // LIGA O XAML AO SEU MOTOR LÓGICO
             DataContext = new MainViewModel();
         }
 
-        /// <summary>
-        /// Permite que o usuário arraste a janela ao clicar e segurar
-        /// no fundo ou nas áreas vazias da interface.
-        /// </summary>
+        // --- MÉTODOS DE CONTROLO DA JANELA ---
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ButtonState == MouseButtonState.Pressed)
-            {
-                DragMove();
-            }
+            if (e.ChangedButton == MouseButton.Left) DragMove();
         }
 
-        /// <summary>
-        /// Fecha a aplicação (Botão Vermelho)
-        /// </summary>
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
         }
 
-        /// <summary>
-        /// Minimiza a aplicação (Botão Amarelo)
-        /// </summary>
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
         }
 
-        /// <summary>
-        /// Maximiza ou restaura a aplicação (Botão Verde)
-        /// </summary>
         private void MaximizeButton_Click(object sender, RoutedEventArgs e)
         {
-            if (WindowState == WindowState.Normal)
-            {
-                WindowState = WindowState.Maximized;
-            }
-            else
-            {
-                WindowState = WindowState.Normal;
-            }
+            WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
         }
     }
 }
