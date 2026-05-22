@@ -260,7 +260,9 @@
 
                             <StackPanel Margin="30">
                                 <TextBlock Text="Total de Veículos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
-                                <TextBlock x:Name="TxtTotalVeiculos" Text="..." Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
+
+                                <TextBlock Text="{Binding TotalVeiculos}" Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
+
                                 <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
                                     <Border Background="#1A30D158" CornerRadius="6" Padding="8,4">
                                         <TextBlock Text="Ao Vivo" Foreground="{StaticResource AppleGreen}" FontSize="12.5" FontWeight="SemiBold"/>
@@ -282,7 +284,9 @@
 
                             <StackPanel Margin="30">
                                 <TextBlock Text="Fornecedores Ativos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
-                                <TextBlock x:Name="TxtTotalFornecedores" Text="..." Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
+
+                                <TextBlock Text="{Binding TotalFornecedores}" Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
+
                                 <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
                                     <Border Background="#1A0A84FF" CornerRadius="6" Padding="8,4">
                                         <TextBlock Text="Ao Vivo" Foreground="{StaticResource AppleBlue}" FontSize="12.5" FontWeight="SemiBold"/>
