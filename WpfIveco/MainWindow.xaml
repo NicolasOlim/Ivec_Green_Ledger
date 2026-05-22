@@ -221,7 +221,7 @@
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0" Margin="0,0,0,40">
-                    <TextBlock Text="Overview" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0"/>
+                    <TextBlock Text="Overview API" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0"/>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                         <Border Background="{StaticResource ElevatedGray1}" CornerRadius="18" Padding="16,10" Margin="0,0,16,0" Width="240" BorderThickness="1" BorderBrush="#2C2C2E">
@@ -259,13 +259,13 @@
                             <Path Data="M 0,140 C 60,120 100,150 160,80 C 220,10 260,60 400,20 L 400,200 L 0,200 Z" Fill="#0A30D158" Stretch="Fill" Margin="-10,80,-10,-20"/>
 
                             <StackPanel Margin="30">
-                                <TextBlock Text="Total Revenue" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
-                                <TextBlock Text="$ 124,563" Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                                <TextBlock Text="Total de Veículos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
+                                <TextBlock x:Name="TxtTotalVeiculos" Text="..." Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
                                 <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
                                     <Border Background="#1A30D158" CornerRadius="6" Padding="8,4">
-                                        <TextBlock Text="+14.2%" Foreground="{StaticResource AppleGreen}" FontSize="12.5" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Ao Vivo" Foreground="{StaticResource AppleGreen}" FontSize="12.5" FontWeight="SemiBold"/>
                                     </Border>
-                                    <TextBlock Text="from last month" Foreground="{StaticResource TextSecondary}" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.8"/>
+                                    <TextBlock Text="dados do Firebase" Foreground="{StaticResource TextSecondary}" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.8"/>
                                 </StackPanel>
                             </StackPanel>
                         </Grid>
@@ -281,13 +281,13 @@
                             <Path Data="M 0,80 C 60,120 120,20 180,80 C 240,140 280,40 400,60 L 400,200 L 0,200 Z" Fill="#0A0A84FF" Stretch="Fill" Margin="-10,80,-10,-20"/>
 
                             <StackPanel Margin="30">
-                                <TextBlock Text="Active Users" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
-                                <TextBlock Text="3,842" Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                                <TextBlock Text="Fornecedores Ativos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium"/>
+                                <TextBlock x:Name="TxtTotalFornecedores" Text="..." Foreground="{StaticResource TextPrimary}" FontSize="42" FontWeight="SemiBold" Margin="0,6,0,0"/>
                                 <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
                                     <Border Background="#1A0A84FF" CornerRadius="6" Padding="8,4">
-                                        <TextBlock Text="+5.8%" Foreground="{StaticResource AppleBlue}" FontSize="12.5" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Ao Vivo" Foreground="{StaticResource AppleBlue}" FontSize="12.5" FontWeight="SemiBold"/>
                                     </Border>
-                                    <TextBlock Text="from last month" Foreground="{StaticResource TextSecondary}" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.8"/>
+                                    <TextBlock Text="dados do Firebase" Foreground="{StaticResource TextSecondary}" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.8"/>
                                 </StackPanel>
                             </StackPanel>
                         </Grid>
