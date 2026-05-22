@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ApiIveco.Controllers
 {
-    [Route("api/[controller]")] // Rota base: api/dados
+    [Route("api/[controller]")]
     [ApiController]
     public class DadosController : ControllerBase
     {
@@ -46,7 +46,7 @@ namespace ApiIveco.Controllers
                 if (veiculo == null)
                     return NotFound(new { Erro = "Não encontrado", Mensagem = $"Nenhum veículo encontrado com o VIN: {vin}" });
 
-                return Ok(new { mensagem = "Veículo encontrado: ", veiculo });
+                return Ok(new { mensagem = "Veículo encontrado", veiculo });
             }
             catch (Exception ex) { return TratarErro(ex, "Erro ao obter veículo"); }
         }
@@ -54,7 +54,7 @@ namespace ApiIveco.Controllers
         [HttpPost("veiculos")]
         public async Task<IActionResult> PostVeiculo([FromBody] Veiculo veiculo)
         {
-            if (veiculo == null) return BadRequest(new { Erro = "Dados inválidos", Mensagem = "Requisicao nula." });
+            if (veiculo == null) return BadRequest(new { Erro = "Dados inválidos", Mensagem = "Requisição nula." });
             if (string.IsNullOrWhiteSpace(veiculo.Vin)) return BadRequest(new { Erro = "Campo Obrigatório", Mensagem = "VIN vazio." });
 
             try
@@ -91,9 +91,8 @@ namespace ApiIveco.Controllers
         {
             try
             {
-                // var fornecedores = await _dadosService.ListarFornecedores();
-                // return Ok(fornecedores);
-                return Ok("Método de listar fornecedores em construção no Service.");
+                var fornecedores = await _dadosService.ListarFornecedor();
+                return Ok(fornecedores);
             }
             catch (Exception ex) { return TratarErro(ex, "Erro ao listar fornecedores"); }
         }
@@ -104,8 +103,8 @@ namespace ApiIveco.Controllers
             if (fornecedor == null) return BadRequest("Dados do fornecedor não podem ser nulos.");
             try
             {
-                // await _dadosService.CriarFornecedor(fornecedor); 
-                return Ok(new { mensagem = "Fornecedor registrado com sucesso!" });
+                var criado = await _dadosService.CriarFornecedor(fornecedor);
+                return Ok(new { mensagem = "Fornecedor registrado com sucesso!", fornecedor = criado });
             }
             catch (Exception ex) { return TratarErro(ex, "Erro ao criar fornecedor"); }
         }
@@ -115,23 +114,22 @@ namespace ApiIveco.Controllers
         {
             try
             {
-                // await _dadosService.ExcluirFornecedor(id);
+                await _dadosService.ExcluirFornecedor(id);
                 return Ok(new { mensagem = "Fornecedor Deletado com Sucesso" });
             }
             catch (Exception ex) { return TratarErro(ex, "Erro ao deletar fornecedor"); }
         }
 
         // ==========================================
-        // 3. LOTES
+        // 3. LOTES DE MATÉRIA PRIMA
         // ==========================================
         [HttpGet("lotes")]
         public async Task<IActionResult> GetLotes()
         {
             try
             {
-                // var lotes = await _dadosService.ListarLotes();
-                // return Ok(lotes);
-                return Ok("Método de listar lotes em construção no Service.");
+                var lotes = await _dadosService.ListarLoteMateriaPrima();
+                return Ok(lotes);
             }
             catch (Exception ex) { return TratarErro(ex, "Erro ao listar lotes"); }
         }
@@ -142,8 +140,8 @@ namespace ApiIveco.Controllers
             if (lote == null) return BadRequest("Dados do lote não podem ser nulos.");
             try
             {
-                // await _dadosService.CriarLote(lote); 
-                return Ok(new { mensagem = "Lote registrado com sucesso!" });
+                var criado = await _dadosService.CriarLoteMateriaPrima(lote);
+                return Ok(new { mensagem = "Lote registrado com sucesso!", lote = criado });
             }
             catch (Exception ex) { return TratarErro(ex, "Erro ao criar lote"); }
         }
@@ -153,23 +151,22 @@ namespace ApiIveco.Controllers
         {
             try
             {
-                // await _dadosService.ExcluirLote(id);
+                await _dadosService.ExcluirLoteMateriaPrima(id);
                 return Ok(new { mensagem = "Lote Deletado com Sucesso" });
             }
             catch (Exception ex) { return TratarErro(ex, "Erro ao deletar lote"); }
         }
 
         // ==========================================
-        // 4. COMPONENTES
+        // 4. COMPONENTES DO VEÍCULO
         // ==========================================
         [HttpGet("componentes")]
         public async Task<IActionResult> GetComponentes()
         {
             try
             {
-                // var componentes = await _dadosService.ListarComponentes();
-                // return Ok(componentes);
-                return Ok("Método de listar componentes em construção no Service.");
+                var componentes = await _dadosService.ListarVeiculoComponente();
+                return Ok(componentes);
             }
             catch (Exception ex) { return TratarErro(ex, "Erro ao listar componentes"); }
         }
@@ -180,8 +177,8 @@ namespace ApiIveco.Controllers
             if (componente == null) return BadRequest("Dados do componente não podem ser nulos.");
             try
             {
-                // await _dadosService.CriarComponente(componente); 
-                return Ok(new { mensagem = "Componente registrado com sucesso!" });
+                var criado = await _dadosService.CriarVeiculoComponente(componente);
+                return Ok(new { mensagem = "Componente registrado com sucesso!", componente = criado });
             }
             catch (Exception ex) { return TratarErro(ex, "Erro ao criar componente"); }
         }
@@ -191,7 +188,7 @@ namespace ApiIveco.Controllers
         {
             try
             {
-                // await _dadosService.ExcluirComponente(id);
+                await _dadosService.ExcluirVeiculoComponente(id);
                 return Ok(new { mensagem = "Componente Deletado com Sucesso" });
             }
             catch (Exception ex) { return TratarErro(ex, "Erro ao deletar componente"); }

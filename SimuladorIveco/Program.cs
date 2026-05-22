@@ -62,20 +62,21 @@ namespace ApiIveco.ConsoleApp
 
             return new Fornecedor
             {
-                Id = _random.Next(1, 1000),
+                Id = _random.Next(1, 1000).ToString(), // <-- ADICIONADO .ToString()
                 Nome = nomes[_random.Next(nomes.Length)],
                 Localizacao = locais[_random.Next(locais.Length)],
                 Cnpj = $"{_random.Next(10, 99)}.{_random.Next(100, 999)}.{_random.Next(100, 999)}/0001-{_random.Next(10, 99)}"
             };
         }
 
-        static LoteMateriaPrima GerarLoteAleatorio(int fornecedorId)
+        // <-- ATENÇÃO: O parâmetro fornecedorId agora é string
+        static LoteMateriaPrima GerarLoteAleatorio(string fornecedorId)
         {
             string[] materiais = { "Bobina de Aço", "Tinta Automotiva", "Borracha", "Plástico Injetado", "Fios de Cobre" };
 
             return new LoteMateriaPrima
             {
-                Id = _random.Next(1000, 9999),
+                Id = _random.Next(1000, 9999).ToString(), // <-- ADICIONADO .ToString()
                 TipoMaterial = materiais[_random.Next(materiais.Length)],
                 DataProducao = DateTime.UtcNow.AddDays(-_random.Next(1, 30)),
                 QuantidadeKg = Math.Round(_random.NextDouble() * 5000 + 100, 2),
@@ -84,6 +85,19 @@ namespace ApiIveco.ConsoleApp
             };
         }
 
+        // <-- ATENÇÃO: O parâmetro loteId agora é string
+        static VeiculoComponente GerarComponenteAleatorio(string vin, string loteId)
+        {
+            string[] pecas = { "Porta Esquerda", "Chassi", "Motor", "Eixo Traseiro", "Painel Frontal", "Cabine" };
+
+            return new VeiculoComponente
+            {
+                Id = _random.Next(10000, 99999).ToString(), // <-- ADICIONADO .ToString()
+                fk_Veiculo_Vin = vin,
+                fk_LoteMateriaPrima_Id = loteId,
+                NomePeca = pecas[_random.Next(pecas.Length)]
+            };
+        }
         static Veiculo GerarVeiculoAleatorio()
         {
             string[] modelos = { "Iveco S-Way", "Iveco Tector", "Iveco Daily", "Iveco Hi-Way" };
@@ -100,18 +114,6 @@ namespace ApiIveco.ConsoleApp
             };
         }
 
-        static VeiculoComponente GerarComponenteAleatorio(string vin, int loteId)
-        {
-            string[] pecas = { "Porta Esquerda", "Chassi", "Motor", "Eixo Traseiro", "Painel Frontal", "Cabine" };
-
-            return new VeiculoComponente
-            {
-                Id = _random.Next(10000, 99999),
-                fk_Veiculo_Vin = vin,
-                fk_LoteMateriaPrima_Id = loteId,
-                NomePeca = pecas[_random.Next(pecas.Length)]
-            };
-        }
 
         // --- MÉTODO DE ENVIO HTTP ---
 
