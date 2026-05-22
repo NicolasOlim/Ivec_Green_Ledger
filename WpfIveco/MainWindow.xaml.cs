@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfIveco.ViewModels;
 
 namespace WpfIveco
 {
@@ -19,6 +20,9 @@ namespace WpfIveco
         public MainWindow()
         {
             InitializeComponent();
+
+            // Conecta a tela (XAML) ao cérebro (ViewModel)
+            DataContext = new MainViewModel();
         }
 
         /// <summary>
