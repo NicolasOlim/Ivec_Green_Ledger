@@ -32,7 +32,7 @@ namespace WpfIveco.ViewModels
         {
             _httpClient = new HttpClient();
             // ATENÇÃO: Troque pela porta correta da sua API
-            _httpClient.BaseAddress = new Uri("https://localhost:7193/");
+            _httpClient.BaseAddress = new Uri("https://localhost:44353/");
 
             _ = CarregarDadosDaApiAsync();
 
