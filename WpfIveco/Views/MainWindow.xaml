@@ -197,7 +197,7 @@
                             </Button.Style>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE70F;" FontSize="15" Margin="0,0,14,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="Projetos" FontSize="14.5" VerticalAlignment="Center" FontWeight="Regular"/>
+                                <TextBlock Text="Chão de Fábrica" FontSize="14.5" VerticalAlignment="Center" FontWeight="Regular"/>
                             </StackPanel>
                         </Button>
 
@@ -369,11 +369,105 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE70F;" Foreground="{StaticResource AppleBlue}" FontSize="80" HorizontalAlignment="Center" Margin="0,0,0,20"/>
-                        <TextBlock Text="Gestão de Projetos" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                        <TextBlock Text="Esta secção encontra-se em desenvolvimento." Foreground="{StaticResource TextSecondary}" FontSize="16" HorizontalAlignment="Center" Margin="0,10,0,0"/>
-                    </StackPanel>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,30">
+                        <TextBlock Text="Chão de Fábrica" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" VerticalAlignment="Center"/>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Border Background="{StaticResource ElevatedGray1}" CornerRadius="12" Padding="12,8" BorderThickness="1" BorderBrush="{StaticResource ElevatedGray2}" Width="300">
+                                <Grid>
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE721;" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="14"/>
+                                    <TextBox Text="{Binding PesquisaVin, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" BorderThickness="0" Foreground="{StaticResource TextPrimary}" Margin="24,0,0,0" VerticalAlignment="Center" FontSize="14" CaretBrush="{StaticResource TextPrimary}"/>
+                                    <TextBlock Text="Pesquisar por VIN..." Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="24,0,0,0" IsHitTestVisible="False">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding PesquisaVin}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </Border>
+                            <Button Command="{Binding PesquisarVinCommand}" Margin="10,0,0,0" Padding="16,10" Background="{StaticResource AppleBlue}" Foreground="White" BorderThickness="0" Cursor="Hand">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="12">
+                                            <TextBlock Text="Rastrear" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="24">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="Últimos Lotes de Matéria-Prima Recebidos" Foreground="{StaticResource TextPrimary}" FontSize="18" FontWeight="Medium" Margin="0,0,0,20"/>
+
+                            <StackPanel Grid.Row="1">
+                                <Grid Margin="0,0,0,12" Opacity="0.6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="1*"/>
+                                        <ColumnDefinition Width="1.5*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="ID DO LOTE" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="1" Text="MATERIAL" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="2" Text="QTD (KG)" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="3" Text="PEGADA DE CARBONO" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <Rectangle Height="1" Fill="{StaticResource ElevatedGray2}" Margin="0,0,0,12"/>
+
+                                <Grid Margin="0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="1*"/>
+                                        <ColumnDefinition Width="1.5*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="LOTE-8472" Foreground="{StaticResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="Bobina de Aço" Foreground="{StaticResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="4500.5" Foreground="{StaticResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
+                                    <Border Grid.Column="3" Background="#1A30D158" CornerRadius="6" Padding="10,6" HorizontalAlignment="Right">
+                                        <TextBlock Text="0.8 kg CO2/kg" Foreground="{StaticResource AppleGreen}" FontSize="12" FontWeight="SemiBold"/>
+                                    </Border>
+                                </Grid>
+
+                                <Rectangle Height="1" Fill="{StaticResource ElevatedGray2}" Margin="0,8"/>
+
+                                <Grid Margin="0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="1*"/>
+                                        <ColumnDefinition Width="1.5*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="LOTE-9123" Foreground="{StaticResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="Borracha" Foreground="{StaticResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="800.0" Foreground="{StaticResource TextPrimary}" FontSize="14" VerticalAlignment="Center"/>
+                                    <Border Grid.Column="3" Background="#1AFF453A" CornerRadius="6" Padding="10,6" HorizontalAlignment="Right">
+                                        <TextBlock Text="4.2 kg CO2/kg" Foreground="#FF453A" FontSize="12" FontWeight="SemiBold"/>
+                                    </Border>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
                 </Grid>
 
                 <Grid>
@@ -387,11 +481,53 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" Foreground="{StaticResource AppleGreen}" FontSize="80" HorizontalAlignment="Center" Margin="0,0,0,20"/>
-                        <TextBlock Text="Análises e Gráficos" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                        <TextBlock Text="Os gráficos LiveCharts2 serão carregados aqui." Foreground="{StaticResource TextSecondary}" FontSize="16" HorizontalAlignment="Center" Margin="0,10,0,0"/>
-                    </StackPanel>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Métricas de Sustentabilidade" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" Margin="0,0,0,30"/>
+
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource PremiumCardStyle}" Margin="0,0,0,20" Padding="20">
+                            <Grid>
+                                <TextBlock Text="Evolução da Pegada de Carbono Média" Foreground="{StaticResource TextPrimary}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Top"/>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.4">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" FontSize="40" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}"/>
+                                    <TextBlock Text="[Gráfico de Linhas LiveCharts2 aqui]" FontSize="14" Margin="0,10,0,0" Foreground="{StaticResource TextSecondary}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="20">
+                            <Grid>
+                                <TextBlock Text="Top Fornecedores" Foreground="{StaticResource TextPrimary}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Top"/>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.4">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEB05;" FontSize="40" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}"/>
+                                    <TextBlock Text="[Gráfico Circular aqui]" FontSize="14" Margin="0,10,0,0" Foreground="{StaticResource TextSecondary}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource PremiumCardStyle}" Margin="10,0,0,0" Padding="20">
+                            <Grid>
+                                <TextBlock Text="Volume de Produção" Foreground="{StaticResource TextPrimary}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Top"/>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.4">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE11C;" FontSize="40" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}"/>
+                                    <TextBlock Text="[Gráfico de Barras aqui]" FontSize="14" Margin="0,10,0,0" Foreground="{StaticResource TextSecondary}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
                 </Grid>
 
                 <Grid>
@@ -405,10 +541,71 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" Foreground="#FFBD2E" FontSize="80" HorizontalAlignment="Center" Margin="0,0,0,20"/>
-                        <TextBlock Text="Ajustes do Sistema" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                        <TextBlock Text="Configurações de integração com a API Iveco." Foreground="{StaticResource TextSecondary}" FontSize="16" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Ajustes do Sistema" Foreground="{StaticResource TextPrimary}" FontSize="34" FontWeight="SemiBold" Margin="0,0,0,30"/>
+
+                    <StackPanel Grid.Row="1">
+                        <Border Style="{StaticResource PremiumCardStyle}" Padding="24" Margin="0,0,0,20">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Estado do Simulador" Foreground="{StaticResource TextPrimary}" FontSize="18" FontWeight="Medium"/>
+                                    <TextBlock Text="Inicia ou pausa a geração aleatória de veículos e lotes." Foreground="{StaticResource TextSecondary}" FontSize="14" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <Button Grid.Column="1" Command="{Binding LigarDesligarSimuladorCommand}" Width="120" Height="40" Background="{StaticResource ElevatedGray2}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Cursor="Hand">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                                <TextBlock Text="{Binding StatusSimulador}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource PremiumCardStyle}" Padding="24" Margin="0,0,0,20">
+                            <StackPanel>
+                                <TextBlock Text="Conexão com a API" Foreground="{StaticResource TextPrimary}" FontSize="18" FontWeight="Medium"/>
+                                <TextBlock Text="O endereço base para onde os dados são enviados e consumidos." Foreground="{StaticResource TextSecondary}" FontSize="14" Margin="0,4,0,16"/>
+
+                                <Border Background="{StaticResource OledBlack}" CornerRadius="8" Padding="12" BorderThickness="1" BorderBrush="{StaticResource ElevatedGray2}">
+                                    <TextBox Text="{Binding ApiUrlConfig}" Background="Transparent" BorderThickness="0" Foreground="{StaticResource TextPrimary}" FontSize="14"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource PremiumCardStyle}" Padding="24">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Limpar Histórico Local" Foreground="#FF453A" FontSize="18" FontWeight="Medium"/>
+                                    <TextBlock Text="Apaga todos os dados guardados no ficheiro SQLite local (dados_gerados.db)." Foreground="{StaticResource TextSecondary}" FontSize="14" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <Button Grid.Column="1" Command="{Binding LimparBaseDadosCommand}" Width="120" Height="40" Background="#1AFF453A" Foreground="#FF453A" BorderThickness="0" Cursor="Hand">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                                <TextBlock Text="Limpar Tudo" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </Grid>
+                        </Border>
                     </StackPanel>
                 </Grid>
 

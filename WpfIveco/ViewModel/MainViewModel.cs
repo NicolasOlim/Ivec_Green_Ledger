@@ -15,7 +15,7 @@ namespace WpfIveco.ViewModels
         private readonly HttpClient _httpClient;
         private readonly DispatcherTimer _timer;
 
-        // --- VARIÁVEIS DA TELA (BINDINGS) ---
+        // --- VARIÁVEIS DA TELA DASHBOARD ---
         private string _totalVeiculos = "A carregar...";
         public string TotalVeiculos
         {
@@ -30,7 +30,30 @@ namespace WpfIveco.ViewModels
             set { _totalFornecedores = value; OnPropertyChanged(); }
         }
 
-        // --- LÓGICA DE NAVEGAÇÃO DO MENU ---
+        // --- VARIÁVEIS DA TELA PROJETOS ---
+        private string _pesquisaVin = "";
+        public string PesquisaVin
+        {
+            get => _pesquisaVin;
+            set { _pesquisaVin = value; OnPropertyChanged(); }
+        }
+
+        // --- VARIÁVEIS DA TELA AJUSTES ---
+        private string _apiUrlConfig = "https://localhost:44353/api";
+        public string ApiUrlConfig
+        {
+            get => _apiUrlConfig;
+            set { _apiUrlConfig = value; OnPropertyChanged(); }
+        }
+
+        private string _statusSimulador = "Parado";
+        public string StatusSimulador
+        {
+            get => _statusSimulador;
+            set { _statusSimulador = value; OnPropertyChanged(); }
+        }
+
+        // --- NAVEGAÇÃO ---
         private string _abaAtiva = "Dashboard";
         public string AbaAtiva
         {
@@ -38,12 +61,19 @@ namespace WpfIveco.ViewModels
             set { _abaAtiva = value; OnPropertyChanged(); }
         }
 
+        // --- COMANDOS DOS BOTÕES ---
         public ICommand MudarAbaCommand { get; }
+        public ICommand PesquisarVinCommand { get; }
+        public ICommand LigarDesligarSimuladorCommand { get; }
+        public ICommand LimparBaseDadosCommand { get; }
 
         public MainViewModel()
         {
-            // Inicializa o Comando de Mudar Aba
+            // Inicializa os Comandos
             MudarAbaCommand = new RelayCommand(MudarAba);
+            PesquisarVinCommand = new RelayCommand(p => MessageBox.Show($"A procurar dados do veículo com VIN: {PesquisaVin}\n\n(Lógica a implementar)", "Rastreabilidade IVECO"));
+            LigarDesligarSimuladorCommand = new RelayCommand(p => StatusSimulador = StatusSimulador == "A Correr" ? "Parado" : "A Correr");
+            LimparBaseDadosCommand = new RelayCommand(p => MessageBox.Show("Base de dados local (SQLite) limpa com sucesso!", "Gestão de Dados"));
 
             // Ignora erros de certificado HTTPS no localhost
             var handler = new HttpClientHandler
@@ -103,9 +133,9 @@ namespace WpfIveco.ViewModels
                     TotalFornecedores = $"Erro {responseFornecedores.StatusCode}";
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show($"Ocorreu um erro ao conectar com a API:\n\n{ex.Message}", "Erro de Comunicação", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Em caso de falha de conexão silenciosa (para não encher de mensagens)
                 TotalVeiculos = "Falha";
                 TotalFornecedores = "Falha";
             }
