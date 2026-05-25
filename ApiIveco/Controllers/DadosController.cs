@@ -20,9 +20,15 @@ namespace ApiIveco.Controllers
             _dadosService = dadosService;
         }
 
-        // ==========================================
-        // 1. VEÍCULOS
-        // ==========================================
+
+        /// <summary>
+        /// Retorna a lista completa de veiculos cadastrados no banco de dados.
+        /// </summary>
+        /// <returns>Uma lista contendo todos os veiculos.</returns>
+        /// <response code="200">Retorna a lista de veiculos com sucesso.</response>
+        /// <response code="400">Se houver algum problema com os parâmetros de consulta.</response>
+        /// <response code="404">Se a coleção de veiculos não for encontrada.</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor (ex: falha no Firebase).</response>
         [HttpGet("veiculos")]
         public async Task<IActionResult> GetVeiculos()
         {
@@ -34,6 +40,16 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao listar veículos"); }
         }
 
+
+        /// <summary>
+        /// Busca um veiculo específico pelo seu VIN.
+        /// </summary>
+        /// <param name="id">O identificador único do veiculo (String).</param>
+        /// <returns>Os detalhes do veiculo correspondente ao ID informado.</returns>
+        /// <response code="200">Retorna o veiculo encontrado com sucesso.</response>
+        /// <response code="400">Se o ID fornecido for nulo ou vazio.</response>
+        /// <response code="404">Se nenhum veiculo for encontrado com o ID especificado.</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor.</response>
         [HttpGet("veiculos/{vin}")]
         public async Task<IActionResult> GetVeiculoByVin(string vin)
         {
@@ -51,6 +67,15 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao obter veículo"); }
         }
 
+
+        /// <summary>
+        /// Cria e salva um novo veiculo no banco de dados.
+        /// </summary>
+        /// <param name="jogo">O objeto JSON contendo os dados do veiculo a ser criado.</param>
+        /// <returns>O veiculo recém-criado junto com a rota para acessá-lo.</returns>
+        /// <response code="201">Retorna o veiculo criado e o cabeçalho Location com a URI de acesso.</response>
+        /// <response code="400">Se os dados enviados forem nulos ou o nome do veiculo estiver vazio.</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar salvar.</response>
         [HttpPost("veiculos")]
         public async Task<IActionResult> PostVeiculo([FromBody] Veiculo veiculo)
         {
@@ -69,6 +94,14 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao criar veículo"); }
         }
 
+        /// <summary>
+        /// Exclui um veiculo do banco de dados.
+        /// </summary>
+        /// <param name="id">O VIN do veiculo que será excluído.</param>
+        /// <returns>Uma mensagem de sucesso confirmando a exclusão.</returns>
+        /// <response code="200">Se o veiculo for excluído com sucesso.</response>
+        /// <response code="404">Se o veiculo com o ID especificado não for encontrado.</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar excluir.</response>
         [HttpDelete("veiculos/{vin}")]
         public async Task<IActionResult> DeleteVeiculo(string vin)
         {
@@ -83,9 +116,15 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao deletar veículo"); }
         }
 
-        // ==========================================
-        // 2. FORNECEDORES
-        // ==========================================
+
+        /// <summary>
+        /// Retorna a lista completa de fornecedores cadastrados no banco de dados.
+        /// </summary>
+        /// <returns>Uma lista contendo todos os fornecedores.</returns>
+        /// <response code="200">Retorna a lista de fornecedores com sucesso.</response>
+        /// <response code="400">Se houver algum problema com os parâmetros de consulta.</response>
+        /// <response code="404">Se a coleção de fornecedores não for encontrada.</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor (ex: falha no Firebase).</response>
         [HttpGet("fornecedores")]
         public async Task<IActionResult> GetFornecedores()
         {
@@ -97,6 +136,15 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao listar fornecedores"); }
         }
 
+
+        /// <summary>
+        /// Cria e salva um novo fornecedor no banco de dados.
+        /// </summary>
+        /// <param name="jogo">O objeto JSON contendo os dados do fornecedor a ser criado.</param>
+        /// <returns>O fornecedor recém-criado junto com a rota para acessá-lo.</returns>
+        /// <response code="201">Retorna o fornecedor criado e o cabeçalho Location com a URI de acesso.</response>
+        /// <response code="400">Se os dados enviados forem nulos ou o nome do fornecedor estiver vazio.</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar salvar.</response>
         [HttpPost("fornecedores")]
         public async Task<IActionResult> PostFornecedor([FromBody] Fornecedor fornecedor)
         {
@@ -108,7 +156,14 @@ namespace ApiIveco.Controllers
             }
             catch (Exception ex) { return TratarErro(ex, "Erro ao criar fornecedor"); }
         }
-
+        /// <summary>
+        /// Exclui um fornecedores do banco de dados.
+        /// </summary>
+        /// <param name="id">O ID do fornencedores que será excluído.</param>
+        /// <returns>Uma mensagem de sucesso confirmando a exclusão.</returns>
+        /// <response code="200">Se o fornecedores for excluído com sucesso.</response>
+        /// <response code="404">Se o fornecedores com o ID especificado não for encontrado.</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar excluir.</response>
         [HttpDelete("fornecedores/{id}")]
         public async Task<IActionResult> DeleteFornecedor(string id)
         {
@@ -120,9 +175,15 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao deletar fornecedor"); }
         }
 
-        // ==========================================
-        // 3. LOTES DE MATÉRIA PRIMA
-        // ==========================================
+
+        /// <summary>
+        /// Retorna a lista completa de lotes cadastrados no banco de dados.
+        /// </summary>
+        /// <returns>Uma lista contendo todos os lotes.</returns>
+        /// <response code="200">Retorna a lista de lotes com sucesso.</response>
+        /// <response code="400">Se houver algum problema com os parâmetros de consulta.</response>
+        /// <response code="404">Se a coleção de lotes não for encontrada.</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor (ex: falha no Firebase).</response>
         [HttpGet("lotes")]
         public async Task<IActionResult> GetLotes()
         {
@@ -134,6 +195,14 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao listar lotes"); }
         }
 
+        /// <summary>
+        /// Cria e salva um novo lote no banco de dados.
+        /// </summary>
+        /// <param name="jogo">O objeto JSON contendo os dados do lote a ser criado.</param>
+        /// <returns>O lote recém-criado junto com a rota para acessá-lo.</returns>
+        /// <response code="201">Retorna o lote criado e o cabeçalho Location com a URI de acesso.</response>
+        /// <response code="400">Se os dados enviados forem nulos ou o nome do lote estiver vazio.</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar salvar.</response>
         [HttpPost("lotes")]
         public async Task<IActionResult> PostLote([FromBody] LoteMateriaPrima lote)
         {
@@ -146,6 +215,14 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao criar lote"); }
         }
 
+        /// <summary>
+        /// Exclui um lote do banco de dados.
+        /// </summary>
+        /// <param name="id">O ID do lote que será excluído.</param>
+        /// <returns>Uma mensagem de sucesso confirmando a exclusão.</returns>
+        /// <response code="200">Se o lote for excluído com sucesso.</response>
+        /// <response code="404">Se o lote com o ID especificado não for encontrado.</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar excluir.</response>
         [HttpDelete("lotes/{id}")]
         public async Task<IActionResult> DeleteLote(string id)
         {
@@ -157,9 +234,15 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao deletar lote"); }
         }
 
-        // ==========================================
-        // 4. COMPONENTES DO VEÍCULO
-        // ==========================================
+
+        /// <summary>
+        /// Retorna a lista completa de componentes cadastrados no banco de dados.
+        /// </summary>
+        /// <returns>Uma lista contendo todos os componentes.</returns>
+        /// <response code="200">Retorna a lista de componentes com sucesso.</response>
+        /// <response code="400">Se houver algum problema com os parâmetros de consulta.</response>
+        /// <response code="404">Se a coleção de componentes não for encontrada.</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor (ex: falha no Firebase).</response>
         [HttpGet("componentes")]
         public async Task<IActionResult> GetComponentes()
         {
@@ -171,6 +254,14 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao listar componentes"); }
         }
 
+        /// <summary>
+        /// Cria e salva um novo componente no banco de dados.
+        /// </summary>
+        /// <param name="jogo">O objeto JSON contendo os dados do componente a ser criado.</param>
+        /// <returns>O componente recém-criado junto com a rota para acessá-lo.</returns>
+        /// <response code="201">Retorna o componente criado e o cabeçalho Location com a URI de acesso.</response>
+        /// <response code="400">Se os dados enviados forem nulos ou o nome do componente estiver vazio.</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar salvar.</response>
         [HttpPost("componentes")]
         public async Task<IActionResult> PostComponente([FromBody] VeiculoComponente componente)
         {
@@ -183,6 +274,14 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao criar componente"); }
         }
 
+        /// <summary>
+        /// Exclui um componente do banco de dados.
+        /// </summary>
+        /// <param name="id">O ID do componente que será excluído.</param>
+        /// <returns>Uma mensagem de sucesso confirmando a exclusão.</returns>
+        /// <response code="200">Se o componente for excluído com sucesso.</response>
+        /// <response code="404">Se o componente com o ID especificado não for encontrado.</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar excluir.</response>
         [HttpDelete("componentes/{id}")]
         public async Task<IActionResult> DeleteComponente(string id)
         {
