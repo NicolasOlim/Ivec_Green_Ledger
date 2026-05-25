@@ -2,14 +2,22 @@ using ApiIveco.Data;
 using ApiIveco.Service;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    // Localiza o ficheiro XML gerado pelo .csproj
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
 
+    // Diz ao Swagger para usar este ficheiro XML
+    options.IncludeXmlComments(xmlPath);
+});
 // Injeção de Dependências
 builder.Services.AddScoped<DadosService>();
 builder.Services.AddHttpClient<DadosService>();
@@ -40,16 +48,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build(); // Chamado apenas UMA vez aqui
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
+
+app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "API Iveco V1");
-        options.RoutePrefix = string.Empty;
     });
-}
 
 app.UseHttpsRedirection();
 
