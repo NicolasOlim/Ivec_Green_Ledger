@@ -69,3 +69,33 @@ Para mitigar a perda de dados, contornar os gargalos locais criados pelo Git e e
 1. **Descarte do Banco Local**: O banco de dados SQLite local foi completamente descontinuado devido à corrupção e histórico quebrado.
 2. **Adoção do Firebase Firestore**: Implementamos a persistência de dados em nuvem utilizando o **Firebase Firestore**. Toda a árvore de dados foi reestruturada para o modelo NoSQL orientado a documentos.
 3. **Segurança e Isolamento por API**: Para evitar que chaves privadas de serviços em nuvem ficassem vulneráveis ou expostas diretamente no cliente Desktop (WPF), isolamos a conexão do Firebase dentro do projeto `ApiIveco`, protegida por autenticação via conta de serviço em arquivo `.json`.
+
+
+## Metodologia e Desenvolvimento (Comunicação e Protocolos de Rede)
+
+Para sustentar um ecossistema distribuído onde múltiplos clientes realizam requisições simultâneas, a camada de Back-End (`ApiIveco`) foi desenvolvida utilizando o paradigma de **Programação Assíncrona** nativo do .NET 8, baseado no padrão `async/await`.
+
+#### Funcionamento do Thread Pool do Servidor:
+Quando o `SimuladorIveco` (injetando milhares de registros de telemetria) e a interface visual `WpfIveco` (solicitando atualizações para os gráficos) realizam requisições HTTP **concorrentemente**, o servidor gerencia o fluxo sem sofrer com gargalos de travamento:
+
+* **Devolução de Threads:** Ao iniciar uma operação de I/O (como salvar ou buscar um documento no banco de dados remoto Firebase Firestore), a thread que estava tratando aquela requisição HTTP é devolvida instantaneamente ao *Thread Pool* da aplicação.
+* **Entrada e saída:** O servidor não fica parado esperando a resposta da nuvem do Google Cloud. Ele continua livre para responder a novas requisições vindas da fábrica ou do dashboard.
+* **Retorno Eficiente:** Assim que o Firebase responde informando que a gravação ou leitura foi concluída, o .NET designa a próxima thread disponível para finalizar a resposta HTTP, enviando o JSON de volta ao cliente.
+
+Este mecanismo garante que a interface desktop (`WpfIveco`) permaneça fluida, responsiva e com taxas de atualização em tempo real, sem congelamentos de tela enquanto aguarda o processamento de grandes volumes de dados enviados pelo simulador.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Simulador as ⚙️ SimuladorIveco / WpfIveco
+    participant API as 🖥️ ApiIveco (.NET Core)
+    participant Pool as 🧵 Thread Pool
+    participant DB as ☁️ Firebase Firestore
+
+    Simulador->>API: HTTP POST / GET (Requisição Assíncrona)
+    API->>Pool: Aloca Thread X para processar
+    Pool->>DB: Dispara chamada gRPC (Operação Assíncrona de I/O)
+    Note over Pool: Thread X é liberada de imediato<br/>para atender outros clients!
+    DB-->>API: Operação Concluída (Callback)
+    API->>Pool: Aloca Thread Y (ou qualquer disponível)
+    Pool-->>Simulador: Retorna Resposta HTTP JSON (Status 200 OK)
