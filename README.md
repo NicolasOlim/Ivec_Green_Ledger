@@ -6,10 +6,19 @@
 #### Orientado por: Fred Aguiar
 
 #### Colaboradores:
+
+
 https://github.com/aliceandradee
+
+
 https://github.com/erick190813
+
+
 https://github.com/NicolasOlim
+
+
 https://github.com/vnxtry
+
 
 
 ## 🛠️ Tecnologias e Stack
