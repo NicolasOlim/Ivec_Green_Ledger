@@ -6,61 +6,67 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1. FORÇAR A PORTA DO GOOGLE CLOUD RUN
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// 2. CONFIGURAÇÃO SEGURA DO SWAGGER
 builder.Services.AddSwaggerGen(options =>
 {
-    // Localiza o ficheiro XML gerado pelo .csproj
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
-
-    // Diz ao Swagger para usar este ficheiro XML
-    options.IncludeXmlComments(xmlPath);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
 });
-// Injeção de Dependências
+
 builder.Services.AddScoped<DadosService>();
 builder.Services.AddHttpClient<DadosService>();
 builder.Services.AddScoped<FireBaseData>();
 
-// Configuração do Firebase
-var caminhoChave = Path.Combine(Directory.GetCurrentDirectory(), "chave_API/firebase-key.json");
-var credential = GoogleCredential.FromFile(caminhoChave);
+// 3. CONFIGURAÇÃO SEGURA DO FIREBASE (Caminho compatível com Linux e Windows)
+var caminhoChave = Path.Combine(AppContext.BaseDirectory, "chave_API", "firebase-key.json");
 
-var firestoreData = new FirestoreDbBuilder
+if (File.Exists(caminhoChave))
 {
-    ProjectId = "green-leadger",
-    Credential = credential,
-}.Build();
+    var credential = GoogleCredential.FromFile(caminhoChave);
+    var firestoreData = new FirestoreDbBuilder
+    {
+        ProjectId = "green-leadger",
+        Credential = credential,
+    }.Build();
+    builder.Services.AddSingleton(firestoreData);
+}
+else
+{
+    // A API não vai "quebrar", mas vai emitir este alerta no log do Google Cloud
+    Console.WriteLine($"[AVISO CRÍTICO] O arquivo do Firebase não foi encontrado no servidor em: {caminhoChave}");
+}
 
-builder.Services.AddSingleton(firestoreData);
-
-// Configuração do CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("PermitirTudo", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
     });
 });
 
-var app = builder.Build(); // Chamado apenas UMA vez aqui
-
+var app = builder.Build();
 
 app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "API Iveco V1");
-    });
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "API Iveco V1");
+});
 
 app.UseHttpsRedirection();
-
 app.UseCors("PermitirTudo");
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
