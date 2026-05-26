@@ -96,7 +96,11 @@ Diferente do modelo puramente relacional inicial (SQLite), os dados agora são m
 
 ## 🚨 Migração de Infraestrutura (Incidentes de Git & Firebase)
 
-Durante o ciclo de desenvolvimento do projeto, a equipa de engenharia enfrentou um **incidente crítico de controlo de versão (Git)** ao tentar sincronizar e subir um novo conjunto de alterações com refatorações complexas de código. Esse conflito gerou uma dessincronização severa no histórico de commits e corrompeu a árvore de rastreamento local das migrações do banco de dados relacional anterior. Sabendo disso deixamos o nosso git antigo e com as versões que estavam sendo trabalhadas anteriormente para consulta: https://github.com/NicolasOlim/Implementacao-do-MVVM-no-Projeto-Iveco.git
+Durante o ciclo de desenvolvimento do projeto, a equipa de engenharia enfrentou um **incidente crítico de controlo de versão (Git)** ao tentar sincronizar e subir um novo conjunto de alterações com refatorações complexas de código. Esse conflito gerou uma dessincronização severa no histórico de commits e corrompeu a árvore de rastreamento local das migrações do banco de dados relacional anterior. Sabendo disso deixamos o nosso git antigo e com as versões que estavam sendo trabalhadas anteriormente para consulta: 
+
+
+https://github.com/NicolasOlim/Implementacao-do-MVVM-no-Projeto-Iveco.git
+
 
 ### A Solução e Transição para Nuvem:
 Para mitigar a perda de dados, contornar os gargalos locais criados pelo Git e evoluir a infraestrutura para um cenário de produção robusto e moderno, tomamos as seguintes decisões de arquitetura:
