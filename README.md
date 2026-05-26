@@ -13,7 +13,7 @@
 
 #### Orientado por: Fred Aguiar
 
-👥 Equipe de Desenvolvimento
+                                                                                                                                          👥 Equipe de Desenvolvimento
 
 <p align="center"> <strong>Colaboradores:</strong><br> <a href="https://github.com/aliceandradee">🧑‍💻 Alice Andrade</a> | <a href="https://github.com/erick190813">🧑‍💻 Erick Santos</a> | <a href="https://github.com/NicolasOlim">🧑‍💻 Nicolas Olim</a> | <a href="https://github.com/vnxtry">🧑‍💻 Vinicius Auusto</a> </p>
 
