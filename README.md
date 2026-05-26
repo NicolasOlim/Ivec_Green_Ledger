@@ -45,8 +45,8 @@ graph TD
     end
 
 ```
+---
     
-
 ## 📊 Diagramas e Modelagem
 
 Para facilitar o entendimento da arquitetura, consulte a evolução e os fluxos de modelagem do projeto:
@@ -99,3 +99,5 @@ sequenceDiagram
     DB-->>API: Operação Concluída (Callback)
     API->>Pool: Aloca Thread Y (ou qualquer disponível)
     Pool-->>Simulador: Retorna Resposta HTTP JSON (Status 200 OK)
+```
+---
