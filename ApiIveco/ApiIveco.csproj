@@ -8,17 +8,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Content Remove="chave_API/firebase-key %283%29.json" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Google.Cloud.Firestore" Version="4.2.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="chave_API/firebase-key.json">
+		<Content Update="chave_API/firebase-key.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
+			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
+		</Content>
 	</ItemGroup>
 </Project>

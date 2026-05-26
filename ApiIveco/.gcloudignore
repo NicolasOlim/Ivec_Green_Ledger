@@ -1,0 +1,5 @@
+.gcloudignore
+.git
+.gitignore
+!chave_API/
+!chave_API/firebase-key.json
