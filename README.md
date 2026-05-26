@@ -13,19 +13,9 @@
 
 #### Orientado por: Fred Aguiar
 
-#### Colaboradores:
+👥 Equipe de Desenvolvimento
 
-
-https://github.com/aliceandradee
-
-
-https://github.com/erick190813
-
-
-https://github.com/NicolasOlim
-
-
-https://github.com/vnxtry
+<p align="center"> <strong>Colaboradores:</strong><br> <a href="https://github.com/aliceandradee">🧑‍💻 Alice Andrade</a> | <a href="https://github.com/erick190813">🧑‍💻 Erick Santos</a> | <a href="https://github.com/NicolasOlim">🧑‍💻 Nicolas Olim</a> | <a href="https://github.com/vnxtry">🧑‍💻 Vinicius Auusto</a> </p>
 
 
 
