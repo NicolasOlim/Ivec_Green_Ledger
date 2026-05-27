@@ -1,27 +1,23 @@
 # 📦🍃 Sistema de Rastreamento Inteligente
 
-# Trabalho de Conclusão de Curso - Desenvolvimento de Sistemas
 
-![EXEMPLO DE IMAGEM: banner_do_projeto.png](imagens/Iveco_greenLogo.png)
+
+
+
+### Trabalho de Conclusão de Curso - Desenvolvimento de Sistemas
+
+<div align="center">
+<img src="imagens/Iveco_greenLogo.png" alt="Descrição" width="600"/>
+</div>
 
 ### Escola De Programação e Robótica - SENAI 
 
 
 #### Orientado por: Fred Aguiar
 
-#### Colaboradores:
+  👥 Equipe de Desenvolvimento
 
-
-https://github.com/aliceandradee
-
-
-https://github.com/erick190813
-
-
-https://github.com/NicolasOlim
-
-
-https://github.com/vnxtry
+<p align="center"> <strong>Colaboradores:</strong><br> <a href="https://github.com/aliceandradee">🧑‍💻 Alice Andrade</a> | <a href="https://github.com/erick190813">🧑‍💻 Erick Santos</a> | <a href="https://github.com/NicolasOlim">🧑‍💻 Nicolas Olim</a> | <a href="https://github.com/vnxtry">🧑‍💻 Vinicius Auusto</a> </p>
 
 
 
@@ -143,4 +139,39 @@ sequenceDiagram
     API->>Pool: Aloca Thread Y (ou qualquer disponível)
     Pool-->>Simulador: Retorna Resposta HTTP JSON (Status 200 OK)
 ```
+---
+
+
+## Conhecendo cada camada do projeto
+
+### 🗂️ Camada de serviços intermediários - API (ApiIveco)
+
+<div align="center">
+<img src="imagens/API.jpeg" alt="Descrição" width="600"/>
+</div>
+
+A ApiIveco atua como o núcleo inteligente e centralizador de dados de todo o ecossistema. Desenvolvida sob o ecossistema .NET 8 com o ecossistema ASP.NET Core Web API, ela adota o estilo arquitetural REST (Representational State Transfer), utilizando o protocolo HTTP/HTTPS e payloads em formato JSON para a comunicação entre sistemas. A principal justificativa para a implementação desta camada intermediária é o desacoplamento e a segurança da informação: em vez de expor as regras de negócio e as credenciais confidenciais de nuvem diretamente nas pontas (clientes), a API encapsula o acesso ao banco de dados e expõe apenas portas controladas (endpoints). Adicionalmente, a API desempenha um papel fundamental na governança dos dados ao integrar o SDK oficial do Google Cloud para a comunicação com o Firebase Firestore. As requisições recebidas passam por processos de validação de dados nas entidades antes de dispararem os métodos assíncronos de persistência em nuvem. Para garantir a transparência no desenvolvimento e facilitar a integração contínua entre os colaboradores, a aplicação conta com a documentação automatizada via Swagger (OpenAPI), fornecendo uma interface interativa onde todos os endpoints de consulta, inserção e agregação podem ser validados e testados em tempo real.
+
+---
+
+### 🗂️ Camada da interface - WPF (WpvIveco)
+
+<div align="center">
+<img src="imagens/WPF.jpeg" alt="Descrição" width="600"/>
+</div>
+
+A camada WpfIveco foi desenvolvido utilizando  WPF e estruturado rigorosamente sob o padrão de projeto architectural MVVM. O objetivo  dessa abordagem é a completa separação entre a interface gráfica com o utilizador (View escrita em XAML) e a lógica de apresentação (ViewModel escrita em C#). Essa arquitetura elimina o uso de códigos complexos diretamente no arquivo de eventos da tela, delegando a atualização da interface aos mecanismos nativos de Data Binding e à implementação da interface INotifyPropertyChanged, que notifica a tela reativamente a cada nova alteração de estado.
+
+---
+
+### 🗂️ Camada da simulação - Sensores (SimuladorIveco)
+
+<div align="center">
+<img src="imagens/sensores.jpeg" alt="Descrição" width="600"/>
+</div>
+
+A camada SimuladorIveco foi projetado como uma aplicação em modo console dedicada a reproduzir o comportamento de sensores industriais de linha de produção e sistemas de telemetria automotiva. Em um ambiente real, sensores IoTbaseados em hardware (como leitores de RFID, balanças dinâmicas e scanners automáticos de chassi) enviam informações contínuas sobre as propriedades físicas dos materiais e o andamento da montagem. Para emular esse fluxo constante e massivo sem depender de maquinário físico, este módulo utilitário gera cargas de dados contendo o peso líquido das cargas, tipos de insumos e números de chassi válidos.
+
+A comunicação desse fluxo é feita de forma assíncrona, onde o simulador atua como um cliente emissor que dispara requisições do tipo HTTP POST contra a API. Para garantir a resiliência dos testes e simular cenários de oscilação de rede, o utilitário armazena o histórico das leituras localmente em um banco de dados leve SQLite (dados_gerados.db). Isso assegura que, mesmo sob altas taxas de concorrência ou quedas temporárias de conexão com a API, nenhuma métrica gerada pelos "sensores" seja perdida, servindo como uma ferramenta indispensável para os testes, concorrência e validação da escalabilidade da persistência em nuvem.
+
 ---
