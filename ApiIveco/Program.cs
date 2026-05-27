@@ -1,71 +1,64 @@
-using ApiIveco.Data;
+using ApiIveco.Data; // Certifique-se de ter os usings corretos no topo
 using ApiIveco.Service;
-using Google.Apis.Auth.OAuth2;
-using Google.Cloud.Firestore;
-using System.Reflection;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. FORÇAR A PORTA DO GOOGLE CLOUD RUN
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+// ========================================================
+// 1. CORREÇÃO DO ERRO DO CONSTRUTOR (INJEÇÃO DE DEPENDÊNCIA)
+// ========================================================
 
-// Add services to the container.
+// Remova qualquer linha que diga "AddHttpClient<DadosService>()" e use estas:
+builder.Services.AddSingleton<FireBaseData>(); // Regista a ligação ao Firebase
+builder.Services.AddScoped<DadosService>();    // Regista o seu serviço corretamente
+builder.Services.AddHttpClient();              // Permite chamadas à internet genéricas
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
-// 2. CONFIGURAÇÃO SEGURA DO SWAGGER
-builder.Services.AddSwaggerGen(options =>
-{
-    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
-    if (File.Exists(xmlPath))
-    {
-        options.IncludeXmlComments(xmlPath);
-    }
-});
-
-builder.Services.AddScoped<DadosService>();
-builder.Services.AddHttpClient<DadosService>();
-builder.Services.AddScoped<FireBaseData>();
-
-// 3. CONFIGURAÇÃO SEGURA DO FIREBASE (Caminho compatível com Linux e Windows)
-var caminhoChave = Path.Combine(AppContext.BaseDirectory, "chave_API", "firebase-key.json");
-
-if (File.Exists(caminhoChave))
-{
-    var credential = GoogleCredential.FromFile(caminhoChave);
-    var firestoreData = new FirestoreDbBuilder
-    {
-        ProjectId = "green-leadger",
-        Credential = credential,
-    }.Build();
-    builder.Services.AddSingleton(firestoreData);
-}
-else
-{
-    // A API não vai "quebrar", mas vai emitir este alerta no log do Google Cloud
-    Console.WriteLine($"[AVISO CRÍTICO] O arquivo do Firebase não foi encontrado no servidor em: {caminhoChave}");
-}
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("PermitirTudo", policy =>
-    {
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-    });
-});
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI(options =>
+// ========================================================
+// 2. ESCONDER ERROS DO SWAGGER E MOSTRAR SÓ NOS LOGS
+// ========================================================
+// Este bloco captura QUALQUER crash antes de chegar ao Swagger
+app.UseExceptionHandler(errorApp =>
 {
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "API Iveco V1");
+    errorApp.Run(async context =>
+    {
+        var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+        var exception = exceptionHandlerPathFeature?.Error;
+
+        // 1. Escreve o erro real APENAS na consola preta (Log)
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"\n[ERRO CRÍTICO NO BACKEND]: {exception?.Message}\n");
+        Console.ResetColor();
+
+        // 2. Devolve um JSON limpo e amigável para o Swagger e para o WPF
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new
+        {
+            Erro = "Falha Interna do Servidor",
+            Mensagem = "Ocorreu um erro interno. Por favor, verifique a consola da API para ler os logs."
+        });
+    });
 });
 
+// Removemos a página de erro do desenvolvedor para garantir que o HTML nunca aparece
+// if (app.Environment.IsDevelopment())
+// {
+//     app.UseDeveloperExceptionPage(); <- APAGUE OU COMENTE ISTO SE EXISTIR!
+// }
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseHttpsRedirection();
-app.UseCors("PermitirTudo");
 app.UseAuthorization();
 app.MapControllers();
 

@@ -20,7 +20,6 @@ namespace ApiIveco.Controllers
             _dadosService = dadosService;
         }
 
-
         /// <summary>
         /// Retorna a lista completa de veiculos cadastrados no banco de dados.
         /// </summary>
@@ -40,11 +39,10 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao listar veículos"); }
         }
 
-
         /// <summary>
         /// Busca um veiculo específico pelo seu VIN.
         /// </summary>
-        /// <param name="id">O identificador único do veiculo (String).</param>
+        /// <param name="vin">O identificador único do veiculo (String).</param>
         /// <returns>Os detalhes do veiculo correspondente ao ID informado.</returns>
         /// <response code="200">Retorna o veiculo encontrado com sucesso.</response>
         /// <response code="400">Se o ID fornecido for nulo ou vazio.</response>
@@ -67,11 +65,10 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao obter veículo"); }
         }
 
-
         /// <summary>
         /// Cria e salva um novo veiculo no banco de dados.
         /// </summary>
-        /// <param name="jogo">O objeto JSON contendo os dados do veiculo a ser criado.</param>
+        /// <param name="veiculo">O objeto JSON contendo os dados do veiculo a ser criado.</param>
         /// <returns>O veiculo recém-criado junto com a rota para acessá-lo.</returns>
         /// <response code="201">Retorna o veiculo criado e o cabeçalho Location com a URI de acesso.</response>
         /// <response code="400">Se os dados enviados forem nulos ou o nome do veiculo estiver vazio.</response>
@@ -97,7 +94,7 @@ namespace ApiIveco.Controllers
         /// <summary>
         /// Exclui um veiculo do banco de dados.
         /// </summary>
-        /// <param name="id">O VIN do veiculo que será excluído.</param>
+        /// <param name="vin">O VIN do veiculo que será excluído.</param>
         /// <returns>Uma mensagem de sucesso confirmando a exclusão.</returns>
         /// <response code="200">Se o veiculo for excluído com sucesso.</response>
         /// <response code="404">Se o veiculo com o ID especificado não for encontrado.</response>
@@ -136,11 +133,40 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao listar fornecedores"); }
         }
 
+        /// <summary>
+        /// Busca o nome e endereço de uma empresa na Receita Federal via BrasilAPI.
+        /// </summary>
+        /// <param name="cnpj">O CNPJ da empresa a ser buscada (com ou sem pontuação).</param>
+        /// <returns>Os dados do fornecedor formatados e prontos para cadastro.</returns>
+        /// <response code="200">Retorna os dados da empresa localizados com sucesso.</response>
+        /// <response code="400">Se o CNPJ fornecido for nulo ou vazio.</response>
+        /// <response code="404">Se o CNPJ não for encontrado na base da Receita Federal.</response>
+        /// <response code="500">Se ocorrer um erro interno na comunicação com a BrasilAPI.</response>
+        [HttpGet("fornecedores/buscar-cnpj/{cnpj}")]
+        public async Task<IActionResult> GetFornecedorCnpj(string cnpj)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(cnpj))
+                    return BadRequest(new { Erro = "CNPJ obrigatório", Mensagem = "Digite o CNPJ da empresa." });
+
+                var proveedores = await _dadosService.BuscarFornecedorPorCnpjAsync(cnpj);
+
+                if (proveedores == null)
+                    return NotFound(new { Erro = "Não encontrado", Mensagem = "CNPJ não encontrado na base da Receita Federal." });
+
+                return Ok(new { mensagem = "Fornecedor localizado com sucesso!", fornecedor = proveedores });
+            }
+            catch (Exception ex)
+            {
+                return TratarErro(ex, "Erro ao buscar CNPJ na BrasilAPI");
+            }
+        }
 
         /// <summary>
         /// Cria e salva um novo fornecedor no banco de dados.
         /// </summary>
-        /// <param name="jogo">O objeto JSON contendo os dados do fornecedor a ser criado.</param>
+        /// <param name="fornecedor">O objeto JSON contendo os dados do fornecedor a ser criado.</param>
         /// <returns>O fornecedor recém-criado junto com a rota para acessá-lo.</returns>
         /// <response code="201">Retorna o fornecedor criado e o cabeçalho Location com a URI de acesso.</response>
         /// <response code="400">Se os dados enviados forem nulos ou o nome do fornecedor estiver vazio.</response>
@@ -156,6 +182,7 @@ namespace ApiIveco.Controllers
             }
             catch (Exception ex) { return TratarErro(ex, "Erro ao criar fornecedor"); }
         }
+
         /// <summary>
         /// Exclui um fornecedores do banco de dados.
         /// </summary>
@@ -198,7 +225,7 @@ namespace ApiIveco.Controllers
         /// <summary>
         /// Cria e salva um novo lote no banco de dados.
         /// </summary>
-        /// <param name="jogo">O objeto JSON contendo os dados do lote a ser criado.</param>
+        /// <param name="lote">O objeto JSON contendo os dados do lote a ser criado.</param>
         /// <returns>O lote recém-criado junto com a rota para acessá-lo.</returns>
         /// <response code="201">Retorna o lote criado e o cabeçalho Location com a URI de acesso.</response>
         /// <response code="400">Se os dados enviados forem nulos ou o nome do lote estiver vazio.</response>
@@ -257,7 +284,7 @@ namespace ApiIveco.Controllers
         /// <summary>
         /// Cria e salva um novo componente no banco de dados.
         /// </summary>
-        /// <param name="jogo">O objeto JSON contendo os dados do componente a ser criado.</param>
+        /// <param name="componente">O objeto JSON contendo os dados do componente a ser criado.</param>
         /// <returns>O componente recém-criado junto com a rota para acessá-lo.</returns>
         /// <response code="201">Retorna o componente criado e o cabeçalho Location com a URI de acesso.</response>
         /// <response code="400">Se os dados enviados forem nulos ou o nome do componente estiver vazio.</response>
