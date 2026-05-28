@@ -72,7 +72,7 @@ namespace WpfIveco.ViewModels
             SalvarFornecedorCommand = new RelayCommand(async p => await SalvarFornecedorAsync());
 
             var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true };
-            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:44353/") };
+            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:7221/") };
 
             // Carga inicial 
             _ = CarregarDadosDaApiAsync();
