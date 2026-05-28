@@ -1,28 +1,55 @@
-using ApiIveco.Data; // Certifique-se de ter os usings corretos no topo
+using ApiIveco.Data;
 using ApiIveco.Service;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.OpenApi.Models; // <-- NECESSÁRIO PARA O OPENAPI/SWAGGER
+using System.Reflection;        // <-- NECESSÁRIO PARA LER O FICHEIRO XML
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ========================================================
 // 1. CORREÇÃO DO ERRO DO CONSTRUTOR (INJEÇÃO DE DEPENDÊNCIA)
 // ========================================================
-
-// Remova qualquer linha que diga "AddHttpClient<DadosService>()" e use estas:
-builder.Services.AddSingleton<FireBaseData>(); // Regista a ligação ao Firebase
-builder.Services.AddScoped<DadosService>();    // Regista o seu serviço corretamente
-builder.Services.AddHttpClient();              // Permite chamadas à internet genéricas
+builder.Services.AddSingleton<FireBaseData>();
+builder.Services.AddScoped<DadosService>();
+builder.Services.AddHttpClient();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// ========================================================
+// 3. CONFIGURAÇÃO AVANÇADA DO SWAGGER (DOCUMENTAÇÃO)
+// ========================================================
+builder.Services.AddSwaggerGen(options =>
+{
+    // Informações da página inicial do Swagger
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "API Iveco Green Ledger",
+        Version = "v1",
+        Description = "API de Backend para a gestão de Veículos, Fornecedores e Rastreabilidade do projeto Iveco Green Ledger.",
+        Contact = new OpenApiContact
+        {
+            Name = "Equipa de Desenvolvimento",
+            Email = "suporte@ivecogreenledger.com"
+        }
+    });
+
+    // Configuração para ler os comentários /// (Summary) do código
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+
+    // Verifica se o ficheiro existe para não crashar caso te esqueças do Passo 2
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+});
 
 var app = builder.Build();
 
 // ========================================================
 // 2. ESCONDER ERROS DO SWAGGER E MOSTRAR SÓ NOS LOGS
 // ========================================================
-// Este bloco captura QUALQUER crash antes de chegar ao Swagger
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
@@ -30,12 +57,10 @@ app.UseExceptionHandler(errorApp =>
         var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
         var exception = exceptionHandlerPathFeature?.Error;
 
-        // 1. Escreve o erro real APENAS na consola preta (Log)
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine($"\n[ERRO CRÍTICO NO BACKEND]: {exception?.Message}\n");
         Console.ResetColor();
 
-        // 2. Devolve um JSON limpo e amigável para o Swagger e para o WPF
         context.Response.StatusCode = 500;
         context.Response.ContentType = "application/json";
         await context.Response.WriteAsJsonAsync(new
@@ -46,16 +71,15 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
-// Removemos a página de erro do desenvolvedor para garantir que o HTML nunca aparece
-// if (app.Environment.IsDevelopment())
-// {
-//     app.UseDeveloperExceptionPage(); <- APAGUE OU COMENTE ISTO SE EXISTIR!
-// }
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    // Personaliza a interface do Swagger UI
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "API Iveco v1");
+        // options.RoutePrefix = string.Empty; // <- Descomenta isto se quiseres que o Swagger abra logo no http://localhost:44353/ (sem ter que escrever /swagger)
+    });
 }
 
 app.UseHttpsRedirection();
