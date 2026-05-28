@@ -78,6 +78,61 @@ namespace ApiIveco.Service
                 return null;
             }
         }
+
+        // ==========================================
+        // MÉTODO EXTERNO: DESCODIFICAR VIN (NHTSA) COM VALIDAÇÃO IVECO
+        // ==========================================
+        public async Task<Veiculo> BuscarEValidarVinIvecoAsync(string vin)
+        {
+            try
+            {
+                // Limpa o VIN para garantir que não tem espaços
+                var vinLimpo = vin.Trim().ToUpper();
+
+                // URL oficial da API do Governo Americano
+                var url = $"https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/{vinLimpo}?format=json";
+
+                using var client = new HttpClient();
+                var response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var data = JsonSerializer.Deserialize<NhtsaResponse>(json);
+
+                    if (data != null && data.Results != null)
+                    {
+                        // 1. Procura a Marca (Make)
+                        var marca = data.Results.FirstOrDefault(r => r.Variable == "Make")?.Value;
+
+                        // VALIDAÇÃO CRÍTICA: Se não for Iveco, rejeita imediatamente!
+                        if (string.IsNullOrEmpty(marca) || !marca.ToUpper().Contains("IVECO"))
+                        {
+                            throw new Exception($"VIN inválido para este sistema. A marca detetada foi: {marca ?? "Desconhecida"}. Apenas veículos IVECO são permitidos.");
+                        }
+
+                        // Se for Iveco, extraímos o Modelo 
+                        var modelo = data.Results.FirstOrDefault(r => r.Variable == "Model")?.Value;
+
+                        // Retorna os dados formatados (Agora preenche tudo e não dá erro de validação!)
+                        return new Veiculo
+                        {
+                            Vin = vinLimpo,
+                            // Se a API americana não souber o modelo exato, colocamos um genérico
+                            Modelo = string.IsNullOrWhiteSpace(modelo) ? "Iveco Não Especificado" : modelo,
+                            DataMontagem = DateTime.UtcNow // Regista a data e hora atual
+                        };
+                    }
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                // Deixa o erro subir para o Controller para mostrar a mensagem ao utilizador
+                throw;
+            }
+        }
+
         // ==========================================
         // MÉTODOS FIREBASE: FORNECEDORES
         // ==========================================

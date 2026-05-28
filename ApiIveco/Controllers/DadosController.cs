@@ -113,6 +113,36 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao deletar veículo"); }
         }
 
+        /// <summary>
+        /// Descodifica um VIN e valida se pertence obrigatoriamente à marca IVECO.
+        /// </summary>
+        [HttpGet("veiculos/validar-vin/{vin}")]
+        public async Task<IActionResult> ValidarVinIveco(string vin)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(vin) || vin.Length != 17)
+                    return BadRequest(new { Erro = "VIN Inválido", Mensagem = "O VIN deve conter exatamente 17 caracteres." });
+
+                var veiculoIveco = await _dadosService.BuscarEValidarVinIvecoAsync(vin);
+
+                if (veiculoIveco == null)
+                    return NotFound(new { Erro = "Não encontrado", Mensagem = "Não foi possível descodificar os dados deste VIN." });
+
+                return Ok(new { mensagem = "Veículo IVECO validado com sucesso!", veiculo = veiculoIveco });
+            }
+            catch (Exception ex)
+            {
+                // Se a exceção for o nosso bloqueio de marca, retornamos um erro 403 (Proibido)
+                if (ex.Message.Contains("Apenas veículos IVECO são permitidos"))
+                {
+                    return StatusCode(403, new { Erro = "Marca não autorizada", Mensagem = ex.Message });
+                }
+
+                return TratarErro(ex, "Erro ao validar VIN na NHTSA");
+            }
+        }
+
 
         /// <summary>
         /// Retorna a lista completa de fornecedores cadastrados no banco de dados.

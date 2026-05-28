@@ -64,15 +64,17 @@ namespace WpfIveco.ViewModels
         {
             // Inicialização dos Comandos
             MudarAbaCommand = new RelayCommand(MudarAba);
-            PesquisarVinCommand = new RelayCommand(p => MessageBox.Show($"A procurar dados do veículo com VIN: {PesquisaVin}\n\n(Lógica de rastreabilidade completa em desenvolvimento)", "Rastreabilidade IVECO"));
             LigarDesligarSimuladorCommand = new RelayCommand(p => StatusSimulador = StatusSimulador == "A Correr" ? "Parado" : "A Correr");
             LimparBaseDadosCommand = new RelayCommand(p => MessageBox.Show("Base de dados local (SQLite) limpa com sucesso!", "Gestão de Dados"));
+
+            // AQUI LIGAMOS O BOTÃO AO NOSSO NOVO MÉTODO DO VIN
+            PesquisarVinCommand = new RelayCommand(async p => await PesquisarVinAsync());
 
             ConsultarCnpjCommand = new RelayCommand(async p => await BuscarPorCnpjAsync());
             SalvarFornecedorCommand = new RelayCommand(async p => await SalvarFornecedorAsync());
 
             var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true };
-            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:7221/") };
+            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:44353/") };
 
             // Carga inicial 
             _ = CarregarDadosDaApiAsync();
@@ -120,6 +122,77 @@ namespace WpfIveco.ViewModels
             }
         }
 
+        // ==========================================
+        // NOVO MÉTODO: PESQUISAR, VALIDAR E GUARDAR VIN IVECO
+        // ==========================================
+        private async Task PesquisarVinAsync()
+        {
+            if (string.IsNullOrWhiteSpace(PesquisaVin) || PesquisaVin.Length != 17)
+            {
+                MessageBox.Show("⚠️ Por favor, introduza um VIN válido de 17 caracteres.",
+                                "VIN Inválido", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                // PASSO 1: Validar se é um IVECO autêntico
+                var respostaApi = await _httpClient.GetAsync($"api/dados/veiculos/validar-vin/{PesquisaVin}");
+                var json = await respostaApi.Content.ReadAsStringAsync();
+
+                if (respostaApi.IsSuccessStatusCode)
+                {
+                    // É um IVECO! Vamos converter o JSON da resposta para a nossa classe VeiculoModel
+                    using var doc = JsonDocument.Parse(json);
+                    var veiculoElement = doc.RootElement.GetProperty("veiculo");
+
+                    var opcoes = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var veiculoCompleto = JsonSerializer.Deserialize<VeiculoModel>(veiculoElement.GetRawText(), opcoes);
+
+                    // PASSO 2: Guardar no Firebase (Agora enviamos Vin, Modelo e DataMontagem!)
+                    var respostaGuardar = await _httpClient.PostAsJsonAsync("api/dados/veiculos", veiculoCompleto);
+
+                    if (respostaGuardar.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show($"✅ Sucesso!\n\nVeículo ({veiculoCompleto.Modelo}) validado e guardado no Firebase!",
+                                        "Veículo Registado", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        PesquisaVin = "";
+                        _ = CarregarDadosDaApiAsync(); // Atualiza os números no Dashboard
+                    }
+                    else if (respostaGuardar.StatusCode == System.Net.HttpStatusCode.Conflict)
+                    {
+                        MessageBox.Show($"⚠️ O veículo IVECO ({veiculoCompleto.Vin}) é autêntico, mas já estava registado no Firebase.",
+                                        "Veículo Duplicado", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                    else
+                    {
+                        var erroJson = await respostaGuardar.Content.ReadAsStringAsync();
+                        MessageBox.Show($"❌ Erro ao guardar no Firebase: HTTP {respostaGuardar.StatusCode}\nDetalhes: {erroJson}",
+                                        "Erro ao Guardar", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                else if (respostaApi.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    // Erro 403 (Bloqueio de Marca)
+                    using var doc = JsonDocument.Parse(json);
+                    var mensagemErro = doc.RootElement.GetProperty("mensagem").GetString();
+
+                    MessageBox.Show($"❌ BLOQUEIO DE SEGURANÇA:\n\n{mensagemErro}",
+                                    "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                else
+                {
+                    MessageBox.Show($"❌ Erro {respostaApi.StatusCode} ao consultar o VIN.",
+                                    "Falha", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro de comunicação com a API:\n{ex.Message}",
+                                "Erro Critico", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
         private async Task BuscarPorCnpjAsync()
         {
             if (string.IsNullOrWhiteSpace(CnpjBusca))
@@ -133,7 +206,6 @@ namespace WpfIveco.ViewModels
             MensagemCadastro = "A consultar a Receita Federal...";
             try
             {
-                // Agora o frontend bate na rota correta de buscar-cnpj criada no controller
                 var response = await _httpClient.GetAsync($"api/dados/fornecedores/buscar-cnpj/{cnpjLimpo}");
                 if (response.IsSuccessStatusCode)
                 {
@@ -148,7 +220,6 @@ namespace WpfIveco.ViewModels
                 }
                 else
                 {
-                    // BLINDAGEM: Agora o ecrã vai mostrar o Código do Erro (Ex: HTTP 500, HTTP 404, etc)
                     NomeFornecedorEncontrado = "";
                     LocalizacaoFornecedorEncontrado = "";
                     MensagemCadastro = $"❌ Erro {response.StatusCode}: Verifica a consola da API preta!";
