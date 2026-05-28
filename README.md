@@ -19,6 +19,30 @@
 
 <p align="center"> <strong>Colaboradores:</strong><br> <a href="https://github.com/aliceandradee">🧑‍💻 Alice Andrade</a> | <a href="https://github.com/erick190813">🧑‍💻 Erick Santos</a> | <a href="https://github.com/NicolasOlim">🧑‍💻 Nicolas Olim</a> | <a href="https://github.com/vnxtry">🧑‍💻 Vinicius Auusto</a> </p>
 
+# Proposta de Valor: Sistema de Rastreamento Inteligente (Projeto Iveco)
+
+**Contexto:** Solução tecnológica voltada para a rastreabilidade logística e a transparência ambiental na cadeia de suprimentos da indústria automotiva pesada.
+
+---
+
+## 🎯 Principais Pilares de Valor
+
+### 📦 1. Gerenciamento e Rastreabilidade Logística
+* **Monitoramento em Tempo Real:** Capacidade de catalogar insumos e rastrear a produção instantaneamente.
+* **Controle de Suprimentos:** Gestão integrada que atende à complexidade logística da manufatura de veículos industriais.
+
+### 🌱 2. Sustentabilidade e Conformidade ESG
+* **Cálculo da Pegada de Carbono:** Automação no cálculo da emissão de gases de efeito estufa para a frota.
+* **Alinhamento a Diretrizes:** Facilita o atendimento aos rigorosos requisitos de conformidade e auditoria estabelecidos pelas políticas Ambientais, Sociais e de Governança Corporativa (ESG).
+
+### ⚙️ 3. Infraestrutura de Alta Performance e Resiliência
+* **Arquitetura Distribuída:** Solução escalável, migrada para um ecossistema em nuvem (NoSQL) e estruturada para suportar a demanda de uma produção em escala industrial.
+* **Processamento Concorrente:** Absorve alta demanda de telemetria e sensores IoT sem interrupções (Thread Pool e fluxo assíncrono), garantindo integridade e resposta ágil às linhas de produção.
+
+### 📊 4. Ferramenta Estratégica de Monitoramento
+* **Inteligência de Dados:** Atua como o núcleo de governança e painel de controle administrativo das operações logísticas (Dashboards ricos e interativos).
+* **Comprovação Ecológica:** Estruturada para atuar como prova estratégica de responsabilidade ecológica e eficiência da operação.
+
 
 
 ## 🛠️ Tecnologias e Stack
