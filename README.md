@@ -178,24 +178,27 @@ A ApiIveco atua como o núcleo inteligente e centralizador de dados de todo o ec
 
 ---
 
-### 🗂️ Camada da interface - WPF (WpvIveco)
+### 🗂️ Camada da Interface Gráfica - WPF (WpfIveco)
 
 <div align="center">
-<img src="imagens/WPF.jpeg" alt="Descrição" width="600"/>
+<img src="imagens/WPF.jpeg" alt="Interface Gráfica Iveco Green Ledger" width="600"/>
 </div>
 
-A camada WpfIveco foi desenvolvido utilizando  WPF e estruturado rigorosamente sob o padrão de projeto architectural MVVM. O objetivo  dessa abordagem é a completa separação entre a interface gráfica com o utilizador (View escrita em XAML) e a lógica de apresentação (ViewModel escrita em C#). Essa arquitetura elimina o uso de códigos complexos diretamente no arquivo de eventos da tela, delegando a atualização da interface aos mecanismos nativos de Data Binding e à implementação da interface INotifyPropertyChanged, que notifica a tela reativamente a cada nova alteração de estado.
+A camada **WpfIveco** foi desenvolvida utilizando a tecnologia Windows Presentation Foundation (WPF) e estruturada rigorosamente sob o padrão de projeto arquitetural **MVVM (Model-View-ViewModel)**. O objetivo primordial dessa abordagem é a completa separação de responsabilidades entre a interface gráfica com o usuário (View escrita em XAML) e a lógica de apresentação e regras de negócio (ViewModel escrita em C#). 
 
+Essa arquitetura elimina a dependência de códigos complexos e acoplados diretamente no arquivo de eventos da tela (*code-behind*), delegando a renderização e o controle de dados aos mecanismos nativos de **Data Binding** bidirecional e à implementação da interface `INotifyPropertyChanged`. Dessa forma, a interface reage e se atualiza automaticamente a cada alteração de estado no domínio da aplicação.
+
+#### 🚀 Detalhamento Técnico e Implementações Avançadas
+
+* **Padrão MVVM Puro e Data Binding:** A interface utiliza intensamente o motor de binding do WPF para conectar propriedades da `ViewModel` (como indicadores de `TotalVeiculos`, `MediaCarbono` e inputs de `CnpjBusca`) diretamente aos componentes visuais[cite: 1]. Isso garante que a UI seja apenas um reflexo do estado atual dos dados[cite: 1].
+* **Renderização Dinâmica de Coleções (ItemsControl):** Na aba de rastreabilidade, a exibição de dados estáticos foi substituída por um componente inteligente `ItemsControl`[cite: 1]. Ele consome a coleção observável `ListaVeiculos`, mapeando automaticamente propriedades do banco de dados (como `{Binding Modelo}`, `{Binding Vin}` e `{Binding DataMontagem}`) para dentro de um `DataTemplate` customizado, gerando cards de forma dinâmica conforme o banco é atualizado[cite: 1].
+* **State Management e Navegação Declarativa:** O roteamento entre os módulos do sistema (Dashboard, Gestão de Fornecedores, Análises ESG e Configurações) descarta o uso tradicional de múltiplas janelas (Windows) ou frames de navegação complexos. Em vez disso, utiliza um sistema inteligente de `DataTriggers` que escuta a propriedade `AbaAtiva` e altera a visibilidade (`Visibility`) das `Grids` conteinerizadas[cite: 1]. A transição é despachada via `ICommand` (`MudarAbaCommand`)[cite: 1].
+* **Arquitetura Orientada a Comandos (Command Pattern):** Interações do utilizador (cliques, submissões de formulário) não acionam eventos de clique convencionais (`Click=""`). Tudo é controlado via comandos injetáveis, como:
+  * `ConsultarCnpjCommand`: Para integração via API com a Receita Federal[cite: 1].
+  * `PesquisarVinCommand`: Para busca de ativos (Gêmeos Digitais) na rede[cite: 1].
+  * `SalvarFornecedorCommand`: Para registo de novos nós permissionados[cite: 1].
+* **Design System Customizado e UI/UX Premium:** A aplicação adota uma estética *Dark Mode* moderna e imersiva. Para alcançar esse resultado, a moldura padrão do Windows foi removida (`WindowStyle="None"`, `AllowsTransparency="True"`) e os controlos de janela foram recriados do zero[cite: 1]. O projeto conta com um dicionário de recursos rico, definindo `Styles` globais (como `PremiumCardStyle` e `PremiumTextBoxStyle`) que padronizam cores institucionais, sombras em tempo real (`DropShadowEffect`), bordas fluidas (`CornerRadius`) e iconografia vetorial via *Segoe MDL2 Assets*[cite: 1].
+* **Ferramentas de Teste Integradas na UI:** A interface foi projetada para suportar monitorização de testes de carga, incluindo um painel de configurações (`Ajustes`) que permite acionar um "Simulador de Chão de Fábrica (Mock IoT)" via `LigarDesligarSimuladorCommand`, gerando telemetria em tempo real para os bancos de dados em nuvem[cite: 1].
 ---
 
-### 🗂️ Camada da simulação - Sensores (SimuladorIveco)
 
-<div align="center">
-<img src="imagens/sensores.jpeg" alt="Descrição" width="600"/>
-</div>
-
-A camada SimuladorIveco foi projetado como uma aplicação em modo console dedicada a reproduzir o comportamento de sensores industriais de linha de produção e sistemas de telemetria automotiva. Em um ambiente real, sensores IoTbaseados em hardware (como leitores de RFID, balanças dinâmicas e scanners automáticos de chassi) enviam informações contínuas sobre as propriedades físicas dos materiais e o andamento da montagem. Para emular esse fluxo constante e massivo sem depender de maquinário físico, este módulo utilitário gera cargas de dados contendo o peso líquido das cargas, tipos de insumos e números de chassi válidos.
-
-A comunicação desse fluxo é feita de forma assíncrona, onde o simulador atua como um cliente emissor que dispara requisições do tipo HTTP POST contra a API. Para garantir a resiliência dos testes e simular cenários de oscilação de rede, o utilitário armazena o histórico das leituras localmente em um banco de dados leve SQLite (dados_gerados.db). Isso assegura que, mesmo sob altas taxas de concorrência ou quedas temporárias de conexão com a API, nenhuma métrica gerada pelos "sensores" seja perdida, servindo como uma ferramenta indispensável para os testes, concorrência e validação da escalabilidade da persistência em nuvem.
-
----
