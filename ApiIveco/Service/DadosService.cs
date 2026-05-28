@@ -263,6 +263,68 @@ namespace ApiIveco.Service
             return veiculos;
         }
 
+        /// <summary>
+        /// Busca peças reais no Mercado Livre para um determinado VIN e associa ao veículo.
+        /// </summary>
+        public async Task<List<VeiculoComponente>> GerarComponentesParaVeiculoAsync(string vin)
+        {
+            var componentes = new List<VeiculoComponente>();
+
+            using (var httpClient = new HttpClient())
+            {
+                // Pesquisa 5 peças reais de caminhão Iveco no Mercado Livre (Brasil)
+                string url = "https://api.mercadolibre.com/sites/MLB/search?q=peca+caminhao+iveco&limit=5";
+
+                try
+                {
+                    // Faz a requisição à API do Mercado Livre
+                    var response = await httpClient.GetAsync(url);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var jsonResult = await response.Content.ReadAsStringAsync();
+                        using var doc = JsonDocument.Parse(jsonResult);
+
+                        // Entra na lista de resultados da pesquisa
+                        var resultados = doc.RootElement.GetProperty("results");
+
+                        foreach (var item in resultados.EnumerateArray())
+                        {
+                            // Cria a peça baseada nos dados REAIS do anúncio
+                            var novaPeca = new VeiculoComponente
+                            {
+                                // Gera um ID único para o nosso banco juntando o ID do anúncio com um Guid
+                                Id = item.GetProperty("id").GetString() + "-" + Guid.NewGuid().ToString().Substring(0, 5),
+
+                                // Pega o Título real do anúncio no Mercado Livre
+                                NomePeca = item.GetProperty("title").GetString(),
+
+                                fk_Veiculo_Vin = vin,
+
+                                // Associa a um lote fictício para manter a integridade da sua arquitetura
+                                fk_LoteMateriaPrima_Id = "LOTE-ML-" + DateTime.Now.ToString("yyyyMMdd")
+                            };
+
+                            componentes.Add(novaPeca);
+
+                            // AQUI: Se você tem um método para salvar direto no Firebase, chame-o!
+                            // await CriarVeiculoComponente(novaPeca); 
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception($"Erro ao buscar no Mercado Livre. Status: {response.StatusCode}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erro na integração com o Mercado Livre: " + ex.Message);
+                    throw;
+                }
+            }
+
+            return componentes;
+        }
         public async Task<Veiculo> CriarVeiculo(Veiculo veiculo)
         {
             if (string.IsNullOrEmpty(veiculo.Vin)) throw new ArgumentException("O veículo deve possuir um VIN válido.");

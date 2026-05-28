@@ -12,5 +12,13 @@ namespace WpfIveco.Models
     public class FornecedorModel
     {
         public string Id { get; set; }
+        public string Cnpj { get; internal set; }
+        public string Nome { get; internal set; }
+        public string Localizacao { get; internal set; }
+    }
+    public class PecaModel
+    {
+        public string NomePeca { get; set; }
+        public string VinAssociado { get; set; }
     }
 }

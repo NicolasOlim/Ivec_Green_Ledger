@@ -10,49 +10,51 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using WpfIveco.Models;
+using WpfIveco.ViewModels;
 
-namespace WpfIveco.ViewModels
+namespace WpfIveco.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
         private readonly DispatcherTimer _timer;
 
-        // --- VARIÁVEIS DA TELA DASHBOARD ---
-        private string _totalVeiculos = "A carregar...";
-        public string TotalVeiculos { get => _totalVeiculos; set { _totalVeiculos = value; OnPropertyChanged(); } }
+        // ==========================================
+        // VARIÁVEIS - NAVEGAÇÃO E SISTEMA
+        // ==========================================
+        private string _abaAtiva = "Dashboard";
+        public string AbaAtiva { get => _abaAtiva; set { _abaAtiva = value; OnPropertyChanged(); } }
 
-        private string _totalFornecedores = "A carregar...";
-        public string TotalFornecedores { get => _totalFornecedores; set { _totalFornecedores = value; OnPropertyChanged(); } }
-
-        // --- VARIÁVEIS DA TELA CHÃO DE FÁBRICA / PROJETOS (RASTREABILIDADE) ---
-        private string _pesquisaVin = "";
-        public string PesquisaVin { get => _pesquisaVin; set { _pesquisaVin = value; OnPropertyChanged(); } }
-
-        // Nova lista que vai alimentar a interface gráfica
-        private ObservableCollection<VeiculoModel> _listaVeiculos = new ObservableCollection<VeiculoModel>();
-        public ObservableCollection<VeiculoModel> ListaVeiculos
-        {
-            get => _listaVeiculos;
-            set { _listaVeiculos = value; OnPropertyChanged(); }
-        }
-
-        // Controla se a mensagem "Nenhum veículo" aparece ou não
-        private bool _listaVazia = true;
-        public bool ListaVazia
-        {
-            get => _listaVazia;
-            set { _listaVazia = value; OnPropertyChanged(); }
-        }
-
-        // --- VARIÁVEIS DA TELA AJUSTES ---
         private string _apiUrlConfig = "https://localhost:44353/api";
         public string ApiUrlConfig { get => _apiUrlConfig; set { _apiUrlConfig = value; OnPropertyChanged(); } }
 
-        private string _statusSimulador = "Parado";
+        private string _statusSimulador = "Desativado";
         public string StatusSimulador { get => _statusSimulador; set { _statusSimulador = value; OnPropertyChanged(); } }
 
-        // --- VARIÁVEIS DA TELA CADASTRO (BRASILAPI) ---
+        // ==========================================
+        // VARIÁVEIS - DASHBOARD
+        // ==========================================
+        private string _totalVeiculos = "0";
+        public string TotalVeiculos { get => _totalVeiculos; set { _totalVeiculos = value; OnPropertyChanged(); } }
+
+        private string _totalFornecedores = "0";
+        public string TotalFornecedores { get => _totalFornecedores; set { _totalFornecedores = value; OnPropertyChanged(); } }
+
+        private string _mediaCarbono = "1.24K";
+        public string MediaCarbono { get => _mediaCarbono; set { _mediaCarbono = value; OnPropertyChanged(); } }
+
+        // ==========================================
+        // VARIÁVEIS - RASTREABILIDADE (VEÍCULOS)
+        // ==========================================
+        private string _pesquisaVin = "";
+        public string PesquisaVin { get => _pesquisaVin; set { _pesquisaVin = value; OnPropertyChanged(); } }
+
+        private ObservableCollection<VeiculoModel> _listaVeiculos = new ObservableCollection<VeiculoModel>();
+        public ObservableCollection<VeiculoModel> ListaVeiculos { get => _listaVeiculos; set { _listaVeiculos = value; OnPropertyChanged(); } }
+
+        // ==========================================
+        // VARIÁVEIS - FORNECEDORES (CADASTRO)
+        // ==========================================
         private string _cnpjBusca = "";
         public string CnpjBusca { get => _cnpjBusca; set { _cnpjBusca = value; OnPropertyChanged(); } }
 
@@ -62,89 +64,126 @@ namespace WpfIveco.ViewModels
         private string _localizacaoFornecedorEncontrado = "";
         public string LocalizacaoFornecedorEncontrado { get => _localizacaoFornecedorEncontrado; set { _localizacaoFornecedorEncontrado = value; OnPropertyChanged(); } }
 
-        private string _mensagemCadastro = "Insira o CNPJ da empresa e clique em Consultar.";
+        private string _mensagemCadastro = "";
         public string MensagemCadastro { get => _mensagemCadastro; set { _mensagemCadastro = value; OnPropertyChanged(); } }
 
-        // --- NAVEGAÇÃO ---
-        private string _abaAtiva = "Dashboard";
-        public string AbaAtiva { get => _abaAtiva; set { _abaAtiva = value; OnPropertyChanged(); } }
+        // ==========================================
+        // VARIÁVEIS - PEÇAS E COMPONENTES (NOVO)
+        // ==========================================
+        private string _novaPecaVin = "";
+        public string NovaPecaVin { get => _novaPecaVin; set { _novaPecaVin = value; OnPropertyChanged(); } }
 
-        // --- COMANDOS DOS BOTÕES ---
+        private string _novaPecaNome = "";
+        public string NovaPecaNome { get => _novaPecaNome; set { _novaPecaNome = value; OnPropertyChanged(); } }
+
+        private ObservableCollection<PecaModel> _listaPecas = new ObservableCollection<PecaModel>();
+        public ObservableCollection<PecaModel> ListaPecas { get => _listaPecas; set { _listaPecas = value; OnPropertyChanged(); } }
+
+
+        // ==========================================
+        // COMANDOS (BOTÕES)
+        // ==========================================
         public ICommand MudarAbaCommand { get; }
-        public ICommand PesquisarVinCommand { get; }
         public ICommand LigarDesligarSimuladorCommand { get; }
-        public ICommand LimparBaseDadosCommand { get; }
+        public ICommand PesquisarVinCommand { get; }
         public ICommand ConsultarCnpjCommand { get; }
         public ICommand SalvarFornecedorCommand { get; }
+        public ICommand AdicionarPecaManualCommand { get; } // NOVO COMANDO
 
+        // ==========================================
+        // CONSTRUTOR
+        // ==========================================
         public MainViewModel()
         {
-            MudarAbaCommand = new RelayCommand(MudarAba);
-            LigarDesligarSimuladorCommand = new RelayCommand(p => StatusSimulador = StatusSimulador == "A Correr" ? "Parado" : "A Correr");
-            LimparBaseDadosCommand = new RelayCommand(p => MessageBox.Show("Base de dados local limpa com sucesso!", "Gestão de Dados"));
+            // Inicialização de Comandos Básicos
+            MudarAbaCommand = new RelayCommand(p => AbaAtiva = p as string);
+            LigarDesligarSimuladorCommand = new RelayCommand(p => StatusSimulador = StatusSimulador == "Ativo" ? "Desativado" : "Ativo");
 
+            // Inicialização de Comandos de API
             PesquisarVinCommand = new RelayCommand(async p => await PesquisarVinAsync());
             ConsultarCnpjCommand = new RelayCommand(async p => await BuscarPorCnpjAsync());
             SalvarFornecedorCommand = new RelayCommand(async p => await SalvarFornecedorAsync());
 
-            var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true };
-            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:44353/") };
+            // -------------------------------------------------------------
+            // LÓGICA DE ADICIONAR PEÇA MANUALMENTE
+            // -------------------------------------------------------------
+            AdicionarPecaManualCommand = new RelayCommand(p =>
+            {
+                if (string.IsNullOrWhiteSpace(NovaPecaNome) || string.IsNullOrWhiteSpace(NovaPecaVin))
+                {
+                    MessageBox.Show("⚠️ Por favor, preencha o VIN e o Nome da Peça.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
+                if (NovaPecaVin.Length != 17)
+                {
+                    MessageBox.Show("⚠️ O chassi (VIN) deve conter exatamente 17 caracteres.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // 1. Adiciona à lista visual no painel (atualiza o ecrã na hora)
+                ListaPecas.Insert(0, new PecaModel
+                {
+                    NomePeca = NovaPecaNome,
+                    VinAssociado = NovaPecaVin
+                });
+
+                // 2. Limpa os campos para poder digitar a próxima
+                NovaPecaNome = "";
+                NovaPecaVin = "";
+
+                MessageBox.Show("✅ Peça registada localmente no Ledger com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+            });
+            // -------------------------------------------------------------
+
+            // Configuração HTTP (Ignorar erro de certificado SSL em ambiente de desenvolvimento)
+            var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true };
+            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:44353/") }; // VERIFIQUE A SUA PORTA DA API AQUI
+
+            // Carregamento inicial de dados
             _ = CarregarDadosDaApiAsync();
 
-            _timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(5) };
-            _timer.Tick += async (sender, args) => await CarregarDadosDaApiAsync();
+            // Atualização automática a cada 2 minutos (Polling)
+            _timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(2) };
+            _timer.Tick += async (s, e) => await CarregarDadosDaApiAsync();
             _timer.Start();
         }
 
-        private void MudarAba(object parametro)
-        {
-            if (parametro is string nomeDaAba) AbaAtiva = nomeDaAba;
-        }
-
+        // ==========================================
+        // MÉTODOS DE COMUNICAÇÃO COM A API
+        // ==========================================
         private async Task CarregarDadosDaApiAsync()
         {
             try
             {
-                var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var opcoes = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-                // CARREGAR VEÍCULOS
+                // Atualizar lista de veículos e contador
                 var responseVeiculos = await _httpClient.GetAsync("api/dados/veiculos");
                 if (responseVeiculos.IsSuccessStatusCode)
                 {
                     var json = await responseVeiculos.Content.ReadAsStringAsync();
-                    var veiculos = JsonSerializer.Deserialize<List<VeiculoModel>>(json, jsonOptions);
+                    var veiculos = JsonSerializer.Deserialize<List<VeiculoModel>>(json, opcoes);
 
-                    TotalVeiculos = veiculos?.Count.ToString() ?? "0";
-
-                    // === NOVIDADE: ALIMENTAR A LISTA NA TELA DE RASTREABILIDADE ===
-                    if (veiculos != null && veiculos.Count > 0)
+                    if (veiculos != null)
                     {
                         ListaVeiculos = new ObservableCollection<VeiculoModel>(veiculos);
-                        ListaVazia = false;
-                    }
-                    else
-                    {
-                        ListaVeiculos.Clear();
-                        ListaVazia = true;
+                        TotalVeiculos = veiculos.Count.ToString();
                     }
                 }
-                else { TotalVeiculos = $"Erro {responseVeiculos.StatusCode}"; }
 
-                // CARREGAR FORNECEDORES
+                // Atualizar contador de fornecedores
                 var responseFornecedores = await _httpClient.GetAsync("api/dados/fornecedores");
                 if (responseFornecedores.IsSuccessStatusCode)
                 {
                     var json = await responseFornecedores.Content.ReadAsStringAsync();
-                    var fornecedores = JsonSerializer.Deserialize<List<FornecedorModel>>(json, jsonOptions);
+                    var fornecedores = JsonSerializer.Deserialize<List<FornecedorModel>>(json, opcoes);
                     TotalFornecedores = fornecedores?.Count.ToString() ?? "0";
                 }
-                else { TotalFornecedores = $"Erro {responseFornecedores.StatusCode}"; }
             }
-            catch (Exception)
+            catch
             {
-                TotalVeiculos = "Falha de Conexão";
-                TotalFornecedores = "Falha de Conexão";
+                /* Em caso de falha de conexão oculta o erro do utilizador para não incomodar no timer */
             }
         }
 
@@ -152,68 +191,56 @@ namespace WpfIveco.ViewModels
         {
             if (string.IsNullOrWhiteSpace(PesquisaVin) || PesquisaVin.Length != 17)
             {
-                MessageBox.Show("⚠️ Por favor, introduza um VIN válido de 17 caracteres.", "VIN Inválido", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("⚠️ Introduza um VIN válido com 17 caracteres.", "Erro de Validação", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             try
             {
-                var respostaApi = await _httpClient.GetAsync($"api/dados/veiculos/validar-vin/{PesquisaVin}");
-                var json = await respostaApi.Content.ReadAsStringAsync();
+                var response = await _httpClient.GetAsync($"api/dados/veiculos/validar-vin/{PesquisaVin}");
 
-                if (respostaApi.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
+                    var json = await response.Content.ReadAsStringAsync();
                     using var doc = JsonDocument.Parse(json);
-                    var veiculoElement = doc.RootElement.GetProperty("veiculo");
+                    var veiculoJson = doc.RootElement.GetProperty("veiculo").GetRawText();
 
-                    var opcoes = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                    var veiculoCompleto = JsonSerializer.Deserialize<VeiculoModel>(veiculoElement.GetRawText(), opcoes);
+                    var content = new StringContent(veiculoJson, System.Text.Encoding.UTF8, "application/json");
+                    var resSalvar = await _httpClient.PostAsync("api/dados/veiculos", content);
 
-                    var respostaGuardar = await _httpClient.PostAsJsonAsync("api/dados/veiculos", veiculoCompleto);
-
-                    if (respostaGuardar.IsSuccessStatusCode)
+                    if (resSalvar.IsSuccessStatusCode)
                     {
-                        MessageBox.Show($"✅ Sucesso!\n\nVeículo ({veiculoCompleto.Modelo}) validado e guardado no Firebase!", "Veículo Registado", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("✅ Veículo IVECO rastreado e guardado no Ledger!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
                         PesquisaVin = "";
-                        _ = CarregarDadosDaApiAsync(); // Atualiza a lista na hora!
+                        _ = CarregarDadosDaApiAsync(); // Atualiza a tabela na hora
                     }
-                    else if (respostaGuardar.StatusCode == System.Net.HttpStatusCode.Conflict)
+                    else if (resSalvar.StatusCode == System.Net.HttpStatusCode.Conflict)
                     {
-                        MessageBox.Show($"⚠️ O veículo IVECO ({veiculoCompleto.Vin}) é autêntico, mas já estava registado no Firebase.", "Veículo Duplicado", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show("⚠️ Veículo autêntico, mas já estava registado no sistema.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
-                    else
-                    {
-                        var erroJson = await respostaGuardar.Content.ReadAsStringAsync();
-                        MessageBox.Show($"❌ Erro ao guardar no Firebase: HTTP {respostaGuardar.StatusCode}\nDetalhes: {erroJson}", "Erro ao Guardar", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
-                else if (respostaApi.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                {
-                    using var doc = JsonDocument.Parse(json);
-                    var mensagemErro = doc.RootElement.GetProperty("mensagem").GetString();
-                    MessageBox.Show($"❌ BLOQUEIO DE SEGURANÇA:\n\n{mensagemErro}", "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 else
                 {
-                    MessageBox.Show($"❌ Erro {respostaApi.StatusCode} ao consultar o VIN.", "Falha", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("❌ Este número de VIN não pertence a um veículo Iveco válido ou ocorreu um erro.", "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro de comunicação com a API:\n{ex.Message}", "Erro Critico", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Falha de comunicação: {ex.Message}", "Erro Crítico", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private async Task BuscarPorCnpjAsync()
         {
-            if (string.IsNullOrWhiteSpace(CnpjBusca))
+            var cnpjLimpo = new string(CnpjBusca.Where(char.IsDigit).ToArray());
+            if (cnpjLimpo.Length != 14)
             {
-                MensagemCadastro = "⚠️ Digite o CNPJ para pesquisar.";
+                MensagemCadastro = "⚠️ O CNPJ necessita de 14 números.";
                 return;
             }
 
-            var cnpjLimpo = new string(CnpjBusca.Where(char.IsDigit).ToArray());
             MensagemCadastro = "A consultar a Receita Federal...";
+
             try
             {
                 var response = await _httpClient.GetAsync($"api/dados/fornecedores/buscar-cnpj/{cnpjLimpo}");
@@ -225,35 +252,35 @@ namespace WpfIveco.ViewModels
 
                     NomeFornecedorEncontrado = fornecedor.GetProperty("nome").GetString();
                     LocalizacaoFornecedorEncontrado = fornecedor.GetProperty("localizacao").GetString();
-                    MensagemCadastro = "✅ Empresa localizada com sucesso!";
+                    MensagemCadastro = "✅ Empresa localizada e qualificada.";
                 }
                 else
                 {
+                    MensagemCadastro = "❌ CNPJ não encontrado na base de dados.";
                     NomeFornecedorEncontrado = "";
                     LocalizacaoFornecedorEncontrado = "";
-                    MensagemCadastro = $"❌ Erro {response.StatusCode}: Verifica a consola da API preta!";
                 }
             }
-            catch (Exception ex) { MensagemCadastro = $"Erro na comunicação com a API: {ex.Message}"; }
+            catch (Exception ex)
+            {
+                MensagemCadastro = $"Erro de API: {ex.Message}";
+            }
         }
 
         private async Task SalvarFornecedorAsync()
         {
             if (string.IsNullOrWhiteSpace(NomeFornecedorEncontrado))
             {
-                MensagemCadastro = "⚠️ Consulte um CNPJ válido antes de guardar!";
+                MensagemCadastro = "⚠️ Efetue a consulta primeiro.";
                 return;
             }
 
-            MensagemCadastro = "A guardar no Firebase...";
             var cnpjLimpo = new string(CnpjBusca.Where(char.IsDigit).ToArray());
-
-            var novoFornecedor = new
+            var novoFornecedor = new FornecedorModel
             {
-                Id = "GeradoPelaAPI",
+                Cnpj = cnpjLimpo,
                 Nome = NomeFornecedorEncontrado,
-                Localizacao = LocalizacaoFornecedorEncontrado,
-                Cnpj = cnpjLimpo
+                Localizacao = LocalizacaoFornecedorEncontrado
             };
 
             try
@@ -261,15 +288,23 @@ namespace WpfIveco.ViewModels
                 var response = await _httpClient.PostAsJsonAsync("api/dados/fornecedores", novoFornecedor);
                 if (response.IsSuccessStatusCode)
                 {
-                    MensagemCadastro = "✅ Fornecedor guardado com sucesso!";
+                    MensagemCadastro = "✅ Fornecedor registado com sucesso no Ledger!";
                     CnpjBusca = "";
                     NomeFornecedorEncontrado = "";
                     LocalizacaoFornecedorEncontrado = "";
-                    _ = CarregarDadosDaApiAsync();
+                    _ = CarregarDadosDaApiAsync(); // Atualiza contador
                 }
-                else { MensagemCadastro = $"Erro ao guardar (Limite do Firebase?): HTTP {response.StatusCode}"; }
+                else
+                {
+                    MensagemCadastro = $"❌ Erro ao guardar fornecedor (HTTP {response.StatusCode}).";
+                }
             }
-            catch (Exception ex) { MensagemCadastro = $"Erro ao guardar: {ex.Message}"; }
+            catch (Exception ex)
+            {
+                MensagemCadastro = $"Erro: {ex.Message}";
+            }
         }
     }
+
+   
 }
