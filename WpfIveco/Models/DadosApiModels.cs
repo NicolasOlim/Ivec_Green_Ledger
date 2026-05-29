@@ -21,4 +21,14 @@ namespace WpfIveco.Models
         public string NomePeca { get; set; }
         public string VinAssociado { get; set; }
     }
+    namespace WpfIveco.Models
+    {
+        public class VeiculoComponenteApi
+        {
+            public string Id { get; set; }
+            public string NomePeca { get; set; }
+            public string Fk_Veiculo_Vin { get; set; }
+            public string Fk_LoteMateriaPrima_Id { get; set; }
+        }
+    }
 }

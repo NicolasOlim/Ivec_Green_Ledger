@@ -350,6 +350,8 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao deletar componente"); }
         }
 
+
+
         // ==========================================
         // MÉTODO AUXILIAR DE TRATAMENTO DE ERROS
         // ==========================================
