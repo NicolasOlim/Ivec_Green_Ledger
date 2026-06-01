@@ -105,65 +105,23 @@ graph TD
 
 ```
 ---
-    
+
 ## 📊 Diagramas e Modelagem
 
-Para facilitar o entendimento da arquitetura, consulte a evolução e os fluxos de modelagem do projeto:
+Para facilitar o entendimento da arquitetura e da evolução do ecossistema **Iveco Green Ledger**, consulte os diagramas abaixo que mapeiam tanto o estágio inicial relacional (legado do protótipo) quanto a nova estrutura otimizada para nuvem.
 
-### Modelo Conceitual e Fluxo de Dados (NoSQL)
-O fluxo de persistência opera de forma assíncrona, onde os clients se comunicam com a API centralizada, que por sua vez gerencia o estado das coleções na nuvem de maneira isolada.
+### 📐 1. Modelagem Relacional Original (SQLite)
 
-### Modelo Lógico / Estrutura de Documentos
-Diferente do modelo puramente relacional inicial (SQLite), os dados agora são mapeados em documentos NoSQL expansíveis, mantendo IDs de amarração lógica para garantir integridade analítica e cálculos corretos de pegada de carbono.
+Estes diagramas representam a primeira fase de modelagem do projeto, estruturada sobre um banco de dados relacional clássico.
+
+#### Modelo Conceitual (Diagrama Entidade-Relacionamento - DER)
+Representação de alto nível que identifica as entidades de negócio da Iveco, seus atributos identificadores e as respectivas cardinalidades operacionais.
+
+
+
 
 ---
 
-## 🚨 Migração de Infraestrutura (Incidentes de Git & Firebase)
-
-Durante o ciclo de desenvolvimento do projeto, a equipa de engenharia enfrentou um **incidente crítico de controlo de versão (Git)** ao tentar sincronizar e subir um novo conjunto de alterações com refatorações complexas de código. Esse conflito gerou uma dessincronização severa no histórico de commits e corrompeu a árvore de rastreamento local das migrações do banco de dados relacional anterior. Sabendo disso deixamos o nosso git antigo e com as versões que estavam sendo trabalhadas anteriormente para consulta: 
-
-
-https://github.com/NicolasOlim/Implementacao-do-MVVM-no-Projeto-Iveco.git
-
-
-### A Solução e Transição para Nuvem:
-Para mitigar a perda de dados, contornar os gargalos locais criados pelo Git e evoluir a infraestrutura para um cenário de produção robusto e moderno, tomamos as seguintes decisões de arquitetura:
-
-1. **Descarte do Banco Local**: O banco de dados SQLite local foi completamente descontinuado devido à corrupção e histórico quebrado.
-2. **Adoção do Firebase Firestore**: Implementamos a persistência de dados em nuvem utilizando o **Firebase Firestore**. Toda a árvore de dados foi reestruturada para o modelo NoSQL orientado a documentos.
-3. **Segurança e Isolamento por API**: Para evitar que chaves privadas de serviços em nuvem ficassem vulneráveis ou expostas diretamente no cliente Desktop (WPF), isolamos a conexão do Firebase dentro do projeto `ApiIveco`, protegida por autenticação via conta de serviço em arquivo `.json`.
-
-
-## Metodologia e Desenvolvimento (Comunicação e Protocolos de Rede)
-
-Para sustentar um ecossistema distribuído onde múltiplos clientes realizam requisições simultâneas, a camada de Back-End (`ApiIveco`) foi desenvolvida utilizando o paradigma de **Programação Assíncrona** nativo do .NET 8, baseado no padrão `async/await`.
-
-#### Funcionamento do Thread Pool do Servidor:
-Quando o `SimuladorIveco` (injetando milhares de registros de telemetria) e a interface visual `WpfIveco` (solicitando atualizações para os gráficos) realizam requisições HTTP **concorrentemente**, o servidor gerencia o fluxo sem sofrer com gargalos de travamento:
-
-* **Devolução de Threads:** Ao iniciar uma operação de I/O (como salvar ou buscar um documento no banco de dados remoto Firebase Firestore), a thread que estava tratando aquela requisição HTTP é devolvida instantaneamente ao *Thread Pool* da aplicação.
-* **Entrada e saída:** O servidor não fica parado esperando a resposta da nuvem do Google Cloud. Ele continua livre para responder a novas requisições vindas da fábrica ou do dashboard.
-* **Retorno Eficiente:** Assim que o Firebase responde informando que a gravação ou leitura foi concluída, o .NET designa a próxima thread disponível para finalizar a resposta HTTP, enviando o JSON de volta ao cliente.
-
-Este mecanismo garante que a interface desktop (`WpfIveco`) permaneça fluida, responsiva e com taxas de atualização em tempo real, sem congelamentos de tela enquanto aguarda o processamento de grandes volumes de dados enviados pelo simulador.
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Simulador as ⚙️ SimuladorIveco / WpfIveco
-    participant API as 🖥️ ApiIveco (.NET Core)
-    participant Pool as 🧵 Thread Pool
-    participant DB as ☁️ Firebase Firestore
-
-    Simulador->>API: HTTP POST / GET (Requisição Assíncrona)
-    API->>Pool: Aloca Thread X para processar
-    Pool->>DB: Dispara chamada gRPC (Operação Assíncrona de I/O)
-    Note over Pool: Thread X é liberada de imediato<br/>para atender outros clients!
-    DB-->>API: Operação Concluída (Callback)
-    API->>Pool: Aloca Thread Y (ou qualquer disponível)
-    Pool-->>Simulador: Retorna Resposta HTTP JSON (Status 200 OK)
-```
----
 
 
 ## Conhecendo cada camada do projeto
