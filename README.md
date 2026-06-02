@@ -105,65 +105,136 @@ graph TD
 
 ```
 ---
-    
+
 ## 📊 Diagramas e Modelagem
 
-Para facilitar o entendimento da arquitetura, consulte a evolução e os fluxos de modelagem do projeto:
+Para facilitar o entendimento da arquitetura e da evolução do ecossistema **Iveco Green Ledger**, consulte os diagramas abaixo que mapeiam tanto o estágio inicial relacional (legado do protótipo) quanto a nova estrutura otimizada para nuvem.
 
-### Modelo Conceitual e Fluxo de Dados (NoSQL)
-O fluxo de persistência opera de forma assíncrona, onde os clients se comunicam com a API centralizada, que por sua vez gerencia o estado das coleções na nuvem de maneira isolada.
+### 📐 1. Modelagem Relacional Original (SQLite)
 
-### Modelo Lógico / Estrutura de Documentos
-Diferente do modelo puramente relacional inicial (SQLite), os dados agora são mapeados em documentos NoSQL expansíveis, mantendo IDs de amarração lógica para garantir integridade analítica e cálculos corretos de pegada de carbono.
+Estes diagramas representam a primeira fase de modelagem do projeto, estruturada sobre um banco de dados relacional clássico.
+
+#### Modelo Conceitual (Diagrama Entidade-Relacionamento - DER)
+Representação de alto nível que identifica as entidades de negócio da Iveco, seus atributos identificadores e as respectivas cardinalidades operacionais.
+
+<div align="center">
+<img src="imagens/Diagrama - DER.png" alt="Descrição" width="600"/>
+</div>
+
+#### Modelo Lógico (Diagrama Entidade-Relacionamento - DER)
+Estrutura de tabelas, chaves primárias (PK) e chaves estrangeiras (FK).
+
+<div align="center">
+<img src="imagens/modelo lógico.png" alt="Descrição" width="600"/>
+</div>
 
 ---
 
-## 🚨 Migração de Infraestrutura (Incidentes de Git & Firebase)
+<a id="dicionario-de-dados"></a>
+## 🗄️ Dicionário de Dados
 
-Durante o ciclo de desenvolvimento do projeto, a equipa de engenharia enfrentou um **incidente crítico de controlo de versão (Git)** ao tentar sincronizar e subir um novo conjunto de alterações com refatorações complexas de código. Esse conflito gerou uma dessincronização severa no histórico de commits e corrompeu a árvore de rastreamento local das migrações do banco de dados relacional anterior. Sabendo disso deixamos o nosso git antigo e com as versões que estavam sendo trabalhadas anteriormente para consulta: 
+Abaixo está o detalhamento técnico de cada tabela e seus respectivos campos.
 
+### 1. Tabela `Fornecedor`
+Armazena as informações das empresas fornecedoras de matérias-primas.
 
-https://github.com/NicolasOlim/Implementacao-do-MVVM-no-Projeto-Iveco.git
+| Coluna | Tipo | Restrições | Descrição |
+| :--- | :--- | :--- | :--- |
+| `Id` | `INTEGER` | `PRIMARY KEY, AUTOINCREMENT` | Identificador único do fornecedor. |
+| `Nome` | `VARCHAR(255)` | `NOT NULL` | Razão social ou nome fantasia do fornecedor. |
+| `Cnpj` | `VARCHAR(18)` | `NOT NULL, UNIQUE` | Cadastro Nacional da Pessoa Jurídica (ex: 00.000.000/0000-00). |
+| `Localizacao` | `VARCHAR(255)` | `NULL` | Endereço físico ou região do fornecedor. |
 
+### 2. Tabela `LoteMateriaPrima`
+Registra os lotes de materiais entregues pelos fornecedores e sua respectiva pegada de carbono.
 
-### A Solução e Transição para Nuvem:
-Para mitigar a perda de dados, contornar os gargalos locais criados pelo Git e evoluir a infraestrutura para um cenário de produção robusto e moderno, tomamos as seguintes decisões de arquitetura:
+| Coluna | Tipo | Restrições | Descrição |
+| :--- | :--- | :--- | :--- |
+| `Id` | `INTEGER` | `PRIMARY KEY, AUTOINCREMENT` | Identificador único do lote. |
+| `FornecedorId` | `INTEGER` | `NOT NULL, FK` | Referência ao `Id` do Fornecedor correspondente. |
+| `TipoMaterial` | `VARCHAR(50)` | `NOT NULL` | Categoria ou nome da matéria-prima (ex: Aço, Plástico, Borracha). |
+| `DataProducao` | `DATETIME` | `NOT NULL` | Data de produção ou recebimento do lote. |
+| `QuantidadeKg` | `DECIMAL(10, 2)` | `NOT NULL` | Peso total do lote em quilogramas (kg). |
+| `PegadaCarbonoPorKg`| `DECIMAL(10, 4)` | `NOT NULL` | Índice de emissão de carbono por quilo do material. |
 
-1. **Descarte do Banco Local**: O banco de dados SQLite local foi completamente descontinuado devido à corrupção e histórico quebrado.
-2. **Adoção do Firebase Firestore**: Implementamos a persistência de dados em nuvem utilizando o **Firebase Firestore**. Toda a árvore de dados foi reestruturada para o modelo NoSQL orientado a documentos.
-3. **Segurança e Isolamento por API**: Para evitar que chaves privadas de serviços em nuvem ficassem vulneráveis ou expostas diretamente no cliente Desktop (WPF), isolamos a conexão do Firebase dentro do projeto `ApiIveco`, protegida por autenticação via conta de serviço em arquivo `.json`.
+### 3. Tabela `Veiculo`
+Cadastro de veículos finalizados ou em montagem.
 
+| Coluna | Tipo | Restrições | Descrição |
+| :--- | :--- | :--- | :--- |
+| `Vin` | `VARCHAR(17)` | `PRIMARY KEY` | Chassi ou *Vehicle Identification Number* (Padrão internacional de 17 caracteres). |
+| `Modelo` | `VARCHAR(100)` | `NOT NULL` | Modelo comercial do veículo. |
+| `DataMontagem` | `DATETIME` | `NOT NULL` | Data exata da montagem do veículo. |
 
-## Metodologia e Desenvolvimento (Comunicação e Protocolos de Rede)
+### 4. Tabela `VeiculoComponente`
+Tabela associativa que vincula os veículos aos lotes de matéria-prima, garantindo rastreabilidade peça por peça.
 
-Para sustentar um ecossistema distribuído onde múltiplos clientes realizam requisições simultâneas, a camada de Back-End (`ApiIveco`) foi desenvolvida utilizando o paradigma de **Programação Assíncrona** nativo do .NET 8, baseado no padrão `async/await`.
+| Coluna | Tipo | Restrições | Descrição |
+| :--- | :--- | :--- | :--- |
+| `Id` | `INTEGER` | `PRIMARY KEY, AUTOINCREMENT` | Identificador único do registro de montagem da peça. |
+| `VeiculoVin` | `VARCHAR(17)` | `NOT NULL, FK` | Referência ao chassi (`Vin`) do veículo. Possui `ON DELETE CASCADE`. |
+| `LoteMateriaPrimaId`| `INTEGER` | `NOT NULL, FK` | Referência ao `Id` do lote que originou a peça. |
+| `NomePeca` | `VARCHAR(100)` | `NOT NULL` | Nome específico do componente (ex: Eixo Dianteiro, Bloco do Motor). |
 
-#### Funcionamento do Thread Pool do Servidor:
-Quando o `SimuladorIveco` (injetando milhares de registros de telemetria) e a interface visual `WpfIveco` (solicitando atualizações para os gráficos) realizam requisições HTTP **concorrentemente**, o servidor gerencia o fluxo sem sofrer com gargalos de travamento:
-
-* **Devolução de Threads:** Ao iniciar uma operação de I/O (como salvar ou buscar um documento no banco de dados remoto Firebase Firestore), a thread que estava tratando aquela requisição HTTP é devolvida instantaneamente ao *Thread Pool* da aplicação.
-* **Entrada e saída:** O servidor não fica parado esperando a resposta da nuvem do Google Cloud. Ele continua livre para responder a novas requisições vindas da fábrica ou do dashboard.
-* **Retorno Eficiente:** Assim que o Firebase responde informando que a gravação ou leitura foi concluída, o .NET designa a próxima thread disponível para finalizar a resposta HTTP, enviando o JSON de volta ao cliente.
-
-Este mecanismo garante que a interface desktop (`WpfIveco`) permaneça fluida, responsiva e com taxas de atualização em tempo real, sem congelamentos de tela enquanto aguarda o processamento de grandes volumes de dados enviados pelo simulador.
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Simulador as ⚙️ SimuladorIveco / WpfIveco
-    participant API as 🖥️ ApiIveco (.NET Core)
-    participant Pool as 🧵 Thread Pool
-    participant DB as ☁️ Firebase Firestore
-
-    Simulador->>API: HTTP POST / GET (Requisição Assíncrona)
-    API->>Pool: Aloca Thread X para processar
-    Pool->>DB: Dispara chamada gRPC (Operação Assíncrona de I/O)
-    Note over Pool: Thread X é liberada de imediato<br/>para atender outros clients!
-    DB-->>API: Operação Concluída (Callback)
-    API->>Pool: Aloca Thread Y (ou qualquer disponível)
-    Pool-->>Simulador: Retorna Resposta HTTP JSON (Status 200 OK)
-```
 ---
+
+<a id="relacionamentos"></a>
+## 🔗 Relacionamentos
+
+* **`Fornecedor` 1 ↔ N `LoteMateriaPrima`**: Um fornecedor pode entregar múltiplos lotes de matéria-prima, mas um lote específico vem de apenas um fornecedor.
+* **`Veiculo` 1 ↔ N `VeiculoComponente`**: Um veículo possui vários componentes rastreáveis instalados. Se o registro do veículo for excluído, todos os seus componentes associados serão removidos em cascata (`ON DELETE CASCADE`).
+* **`LoteMateriaPrima` 1 ↔ N `VeiculoComponente`**: Um lote de matéria-prima gera diversas peças (componentes), que podem ser instaladas em vários veículos.
+
+---
+
+<a id="script-sql"></a>
+## 💻 Script SQL (SQLite)
+
+Para criar a estrutura em seu banco de dados SQLite, execute o script abaixo:
+
+```sql
+PRAGMA foreign_keys = ON;
+
+-- 1. Tabela Fornecedor
+CREATE TABLE Fornecedor (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Nome VARCHAR(255) NOT NULL,
+    Cnpj VARCHAR(18) NOT NULL UNIQUE,
+    Localizacao VARCHAR(255)
+);
+
+-- 2. Tabela LoteMateriaPrima
+CREATE TABLE LoteMateriaPrima (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    FornecedorId INTEGER NOT NULL,
+    TipoMaterial VARCHAR(50) NOT NULL,
+    DataProducao DATETIME NOT NULL,
+    QuantidadeKg DECIMAL(10, 2) NOT NULL,
+    PegadaCarbonoPorKg DECIMAL(10, 4) NOT NULL,
+    CONSTRAINT FK_Lote_Fornecedor FOREIGN KEY (FornecedorId) 
+        REFERENCES Fornecedor(Id)
+);
+
+-- 3. Tabela Veiculo
+CREATE TABLE Veiculo (
+    Vin VARCHAR(17) PRIMARY KEY,
+    Modelo VARCHAR(100) NOT NULL,
+    DataMontagem DATETIME NOT NULL
+);
+
+-- 4. Tabela VeiculoComponente (Tabela Associativa / Peças do Caminhão)
+CREATE TABLE VeiculoComponente (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    VeiculoVin VARCHAR(17) NOT NULL,
+    LoteMateriaPrimaId INTEGER NOT NULL,
+    NomePeca VARCHAR(100) NOT NULL,
+    CONSTRAINT FK_Componente_Veiculo FOREIGN KEY (VeiculoVin) 
+        REFERENCES Veiculo(Vin) ON DELETE CASCADE,
+    CONSTRAINT FK_Componente_Lote FOREIGN KEY (LoteMateriaPrimaId) 
+        REFERENCES LoteMateriaPrima(Id)
+);
+ ```
+
 
 
 ## Conhecendo cada camada do projeto
@@ -201,4 +272,6 @@ Essa arquitetura elimina a dependência de códigos complexos e acoplados direta
 * **Ferramentas de Teste Integradas na UI:** A interface foi projetada para suportar monitorização de testes de carga, incluindo um painel de configurações (`Ajustes`) que permite acionar um "Simulador de Chão de Fábrica (Mock IoT)" via `LigarDesligarSimuladorCommand`, gerando telemetria em tempo real para os bancos de dados em nuvem[cite: 1].
 ---
 
+## API' s Públicas utilizadas no projeto
 
+BrasilAPI: é uma comunidade de desenvolvedores no Brasil e que nasceu com um propósito claro de simplificar o acesso a dados públicos nacionais, centralizando diversas consultas que antes eram espalhadas por sites governamentais instáveis, lentos ou de difícil integração
