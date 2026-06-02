@@ -9,6 +9,7 @@
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         FontFamily="Segoe UI Variable, Segoe UI, Helvetica Neue, sans-serif">
 
     <Window.Resources>
@@ -239,7 +240,7 @@
                     <StackPanel Grid.Row="2">
                         <TextBlock Text="NAVEGAÇÃO" Foreground="{StaticResource TextTertiary}" FontSize="11" FontWeight="Bold" Margin="14,0,0,10"/>
 
-                        <Button Command="{Binding MudarAbaCommand}" CommandParameter="Dashboard">
+                        <Button Command="{Binding MudarAbaCommand}" CommandParameter="Dashboard" Click="Button_Click_1">
                             <Button.Style>
                                 <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
                                     <Style.Triggers>
@@ -307,7 +308,6 @@
                             </StackPanel>
                         </Button>
 
-                        <!-- NOVO BOTÃO: PEÇAS E COMPONENTES -->
                         <Button Command="{Binding MudarAbaCommand}" CommandParameter="Pecas">
                             <Button.Style>
                                 <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
@@ -357,7 +357,7 @@
                 </Grid>
             </Border>
 
-            <ScrollViewer Grid.Column="1" Margin="0,0,0,0" Padding="40">
+            <ScrollViewer Margin="270,-10,10,10" Padding="40" Grid.ColumnSpan="2">
                 <Grid>
 
                     <Grid>
@@ -437,8 +437,29 @@
 
                             <Border Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="24" MinHeight="350">
                                 <Grid>
-                                    <TextBlock Text="Emissões da Cadeia (YTD)" Style="{StaticResource H2}"/>
-                                    <TextBlock Text="Módulo de Gráfico Interativo Aqui" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" VerticalAlignment="Center" FontStyle="Italic"/>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Text="Emissões da Cadeia (YTD)" Style="{StaticResource H2}"/>
+
+                                    <lvc:CartesianChart Grid.Row="1" Series="{Binding EmissoesSeries}" Margin="0,15,0,0" LegendLocation="Top">
+                                        <lvc:CartesianChart.AxisX>
+                                            <lvc:Axis Labels="{Binding MesesLabels}" Foreground="{StaticResource TextSecondary}">
+                                                <lvc:Axis.Separator>
+                                                    <lvc:Separator Step="1" StrokeThickness="0" />
+                                                </lvc:Axis.Separator>
+                                            </lvc:Axis>
+                                        </lvc:CartesianChart.AxisX>
+                                        <lvc:CartesianChart.AxisY>
+                                            <lvc:Axis Title="Ton CO2" Foreground="{StaticResource TextSecondary}">
+                                                <lvc:Axis.Separator>
+                                                    <lvc:Separator Stroke="{StaticResource ElevatedGray3}" StrokeDashArray="4" />
+                                                </lvc:Axis.Separator>
+                                            </lvc:Axis>
+                                        </lvc:CartesianChart.AxisY>
+                                    </lvc:CartesianChart>
                                 </Grid>
                             </Border>
 
@@ -741,7 +762,6 @@
                         </Grid>
                     </Grid>
 
-                    <!-- NOVA ABA: PEÇAS E COMPONENTES -->
                     <Grid>
                         <Grid.Style>
                             <Style TargetType="Grid">
@@ -764,7 +784,6 @@
                             <TextBlock Style="{StaticResource Subtitle}" Text="Adicione peças manualmente e associe ao Chassi (VIN) de um veículo no Ledger."/>
                         </StackPanel>
 
-                        <!-- Formulário de Adição Manual -->
                         <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="24" Margin="0,0,0,20">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -792,7 +811,6 @@
                             </Grid>
                         </Border>
 
-                        <!-- Lista de Peças Adicionadas -->
                         <Border Grid.Row="2" Style="{StaticResource PremiumCardStyle}" Padding="24" MinHeight="300">
                             <Grid>
                                 <Grid.RowDefinitions>
