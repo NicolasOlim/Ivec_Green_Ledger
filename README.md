@@ -272,4 +272,6 @@ Essa arquitetura elimina a dependência de códigos complexos e acoplados direta
 * **Ferramentas de Teste Integradas na UI:** A interface foi projetada para suportar monitorização de testes de carga, incluindo um painel de configurações (`Ajustes`) que permite acionar um "Simulador de Chão de Fábrica (Mock IoT)" via `LigarDesligarSimuladorCommand`, gerando telemetria em tempo real para os bancos de dados em nuvem[cite: 1].
 ---
 
+## API' s Públicas utilizadas no projeto
 
+BrasilAPI: é uma comunidade de desenvolvedores no Brasil e que nasceu com um propósito claro de simplificar o acesso a dados públicos nacionais, centralizando diversas consultas que antes eram espalhadas por sites governamentais instáveis, lentos ou de difícil integração
