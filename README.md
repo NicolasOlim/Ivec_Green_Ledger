@@ -117,10 +117,123 @@ Estes diagramas representam a primeira fase de modelagem do projeto, estruturada
 #### Modelo Conceitual (Diagrama Entidade-Relacionamento - DER)
 Representação de alto nível que identifica as entidades de negócio da Iveco, seus atributos identificadores e as respectivas cardinalidades operacionais.
 
+<div align="center">
+<img src="imagens/Diagrama - DER.png" alt="Descrição" width="600"/>
+</div>
 
+#### Modelo Lógico (Diagrama Entidade-Relacionamento - DER)
+Estrutura de tabelas, chaves primárias (PK) e chaves estrangeiras (FK).
 
+<div align="center">
+<img src="imagens/modelo lógico.png" alt="Descrição" width="600"/>
+</div>
 
 ---
+
+<a id="dicionario-de-dados"></a>
+## 🗄️ Dicionário de Dados
+
+Abaixo está o detalhamento técnico de cada tabela e seus respectivos campos.
+
+### 1. Tabela `Fornecedor`
+Armazena as informações das empresas fornecedoras de matérias-primas.
+
+| Coluna | Tipo | Restrições | Descrição |
+| :--- | :--- | :--- | :--- |
+| `Id` | `INTEGER` | `PRIMARY KEY, AUTOINCREMENT` | Identificador único do fornecedor. |
+| `Nome` | `VARCHAR(255)` | `NOT NULL` | Razão social ou nome fantasia do fornecedor. |
+| `Cnpj` | `VARCHAR(18)` | `NOT NULL, UNIQUE` | Cadastro Nacional da Pessoa Jurídica (ex: 00.000.000/0000-00). |
+| `Localizacao` | `VARCHAR(255)` | `NULL` | Endereço físico ou região do fornecedor. |
+
+### 2. Tabela `LoteMateriaPrima`
+Registra os lotes de materiais entregues pelos fornecedores e sua respectiva pegada de carbono.
+
+| Coluna | Tipo | Restrições | Descrição |
+| :--- | :--- | :--- | :--- |
+| `Id` | `INTEGER` | `PRIMARY KEY, AUTOINCREMENT` | Identificador único do lote. |
+| `FornecedorId` | `INTEGER` | `NOT NULL, FK` | Referência ao `Id` do Fornecedor correspondente. |
+| `TipoMaterial` | `VARCHAR(50)` | `NOT NULL` | Categoria ou nome da matéria-prima (ex: Aço, Plástico, Borracha). |
+| `DataProducao` | `DATETIME` | `NOT NULL` | Data de produção ou recebimento do lote. |
+| `QuantidadeKg` | `DECIMAL(10, 2)` | `NOT NULL` | Peso total do lote em quilogramas (kg). |
+| `PegadaCarbonoPorKg`| `DECIMAL(10, 4)` | `NOT NULL` | Índice de emissão de carbono por quilo do material. |
+
+### 3. Tabela `Veiculo`
+Cadastro de veículos finalizados ou em montagem.
+
+| Coluna | Tipo | Restrições | Descrição |
+| :--- | :--- | :--- | :--- |
+| `Vin` | `VARCHAR(17)` | `PRIMARY KEY` | Chassi ou *Vehicle Identification Number* (Padrão internacional de 17 caracteres). |
+| `Modelo` | `VARCHAR(100)` | `NOT NULL` | Modelo comercial do veículo. |
+| `DataMontagem` | `DATETIME` | `NOT NULL` | Data exata da montagem do veículo. |
+
+### 4. Tabela `VeiculoComponente`
+Tabela associativa que vincula os veículos aos lotes de matéria-prima, garantindo rastreabilidade peça por peça.
+
+| Coluna | Tipo | Restrições | Descrição |
+| :--- | :--- | :--- | :--- |
+| `Id` | `INTEGER` | `PRIMARY KEY, AUTOINCREMENT` | Identificador único do registro de montagem da peça. |
+| `VeiculoVin` | `VARCHAR(17)` | `NOT NULL, FK` | Referência ao chassi (`Vin`) do veículo. Possui `ON DELETE CASCADE`. |
+| `LoteMateriaPrimaId`| `INTEGER` | `NOT NULL, FK` | Referência ao `Id` do lote que originou a peça. |
+| `NomePeca` | `VARCHAR(100)` | `NOT NULL` | Nome específico do componente (ex: Eixo Dianteiro, Bloco do Motor). |
+
+---
+
+<a id="relacionamentos"></a>
+## 🔗 Relacionamentos
+
+* **`Fornecedor` 1 ↔ N `LoteMateriaPrima`**: Um fornecedor pode entregar múltiplos lotes de matéria-prima, mas um lote específico vem de apenas um fornecedor.
+* **`Veiculo` 1 ↔ N `VeiculoComponente`**: Um veículo possui vários componentes rastreáveis instalados. Se o registro do veículo for excluído, todos os seus componentes associados serão removidos em cascata (`ON DELETE CASCADE`).
+* **`LoteMateriaPrima` 1 ↔ N `VeiculoComponente`**: Um lote de matéria-prima gera diversas peças (componentes), que podem ser instaladas em vários veículos.
+
+---
+
+<a id="script-sql"></a>
+## 💻 Script SQL (SQLite)
+
+Para criar a estrutura em seu banco de dados SQLite, execute o script abaixo:
+
+```sql
+PRAGMA foreign_keys = ON;
+
+-- 1. Tabela Fornecedor
+CREATE TABLE Fornecedor (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Nome VARCHAR(255) NOT NULL,
+    Cnpj VARCHAR(18) NOT NULL UNIQUE,
+    Localizacao VARCHAR(255)
+);
+
+-- 2. Tabela LoteMateriaPrima
+CREATE TABLE LoteMateriaPrima (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    FornecedorId INTEGER NOT NULL,
+    TipoMaterial VARCHAR(50) NOT NULL,
+    DataProducao DATETIME NOT NULL,
+    QuantidadeKg DECIMAL(10, 2) NOT NULL,
+    PegadaCarbonoPorKg DECIMAL(10, 4) NOT NULL,
+    CONSTRAINT FK_Lote_Fornecedor FOREIGN KEY (FornecedorId) 
+        REFERENCES Fornecedor(Id)
+);
+
+-- 3. Tabela Veiculo
+CREATE TABLE Veiculo (
+    Vin VARCHAR(17) PRIMARY KEY,
+    Modelo VARCHAR(100) NOT NULL,
+    DataMontagem DATETIME NOT NULL
+);
+
+-- 4. Tabela VeiculoComponente (Tabela Associativa / Peças do Caminhão)
+CREATE TABLE VeiculoComponente (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    VeiculoVin VARCHAR(17) NOT NULL,
+    LoteMateriaPrimaId INTEGER NOT NULL,
+    NomePeca VARCHAR(100) NOT NULL,
+    CONSTRAINT FK_Componente_Veiculo FOREIGN KEY (VeiculoVin) 
+        REFERENCES Veiculo(Vin) ON DELETE CASCADE,
+    CONSTRAINT FK_Componente_Lote FOREIGN KEY (LoteMateriaPrimaId) 
+        REFERENCES LoteMateriaPrima(Id)
+);
+ ```
 
 
 
