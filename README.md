@@ -1,9 +1,5 @@
 # 📦🍃 Sistema de Rastreamento Inteligente
 
-
-
-
-
 ### Trabalho de Conclusão de Curso - Desenvolvimento de Sistemas
 
 <div align="center">
@@ -308,8 +304,35 @@ Essa arquitetura elimina a dependência de códigos complexos e acoplados direta
 * **Ferramentas de Teste Integradas na UI:** A interface foi projetada para suportar monitorização de testes de carga, incluindo um painel de configurações (`Ajustes`) que permite acionar um "Simulador de Chão de Fábrica (Mock IoT)" via `LigarDesligarSimuladorCommand`, gerando telemetria em tempo real para os bancos de dados em nuvem.
 ---
 ### 🗂️ Camada da View Model - WPF (WpfIveco)
-<div align="center">
-<img src="imagens/API Externa.jpeg" alt="Interface Gráfica Iveco Green Ledger" width="600"/>
-</div>
+
+Como dito anteriormente foi utilizado o padrão de projeto arquitetural MVVM. A escolha dessa abordagem baseia-se na metodologia de ensino adotada em sala de aula,na qual trabalhamos em nossos projetos práticos e definido pelo pelo educador Fred Aguiar como o modelo ideal para a estruturação do projeto técnico. Dessa forma, aplicamos na prática os conceitos de arquitetura aprendidos durante o curso técnico em Desenvolvimento de Sistemas.
+
+O funcionamento do fluxo de dados e controle dentro da aplicação baseia-se em um ciclo fechado e reativo dividido em quatro etapas principais de interação, descritas a seguir:
+
+---
+
+```mermaid
+graph LR
+    View -- 1. Data Binding & Commands --> ViewModel
+    ViewModel -- 2. Atualiza Estado / Notifica UI --> View
+    ViewModel -- 3. Manipula Entidades --> Model
+    Model -- 4. Envia Dados --> ViewModel
+```
+
+---
+
+#### Arquitetura do Front-End
+
+**Interação e Disparo da UI: View → ViewModel (Data Binding & Commands)**
+O ciclo operacional inicia-se na camada da View, desenvolvida na nossa MainWindow.xaml, onde acontece a lógica da nossa inteface/parte visual. Quando o operador realiza uma ação, como por exemplo clicar no botão para cadastrar uma peça ou pesquisar um chassi (VIN), a View não aciona um manipulador de eventos convencional no arquivo de código oculto, sendo assim a interação é despachada diretamente para a ViewModel por meio do ecossistema WPF trabalhadas em aula:
+
+* Data Binding: Vinculação direta das propriedades dos componentes visuais (como o texto digitado em um TextBox) a propriedades em memória da ViewModel.
+
+* Commands: Encapsulamento da intenção do usuário através da interface ICommand (implementada pela classe utilitária RelayCommand), que mapeia delegates assíncronos (como AdicionarPecaManualCommand) para execução imediata no back-end.
+
+**Sincronização Reativa: ViewModel → View (Atualiza Estado / Notifica UI)**
+Após processar as requisições e/ou receber novas informações da API intermediária, a ViewModel (MainViewModel.cs) atualiza seu estado interno em memória. Para que a interface reflita essas mudanças instantaneamente (como exibir uma mensagem de erro ou renderizar um novo card no ItemsControl), a classe implementa a interface nativa INotifyPropertyChanged.
+
+Toda vez que o valor de uma propriedade é alterado dentro do bloco set, o método OnPropertyChanged é disparado. Onde será notificado de volta para a View, informando ao motor de renderização do WPF que o estado mudou. A UI reage redesenhando os componentes necessários em tempo real, sem a necessidade de atualizar ou reiniciar a tela do usuário.
 
 
