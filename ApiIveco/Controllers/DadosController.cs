@@ -351,6 +351,92 @@ namespace ApiIveco.Controllers
         }
 
 
+        /// <summary>
+        /// Cadastra um novo usuário no sistema (Firebase).
+        /// </summary>
+        /// <remarks>
+        /// Exemplo de requisição:
+        /// 
+        ///     POST /api/auth/cadastrar
+        ///     {
+        ///        "nome": "João Admin",
+        ///        "email": "joao@iveco.com",
+        ///        "senha": "senha_segura",
+        ///        "perfil": "Admin"
+        ///     }
+        ///     
+        /// Obs: Se o campo "perfil" não for enviado, o sistema atribuirá "Usuario" por padrão.
+        /// </remarks>
+        /// <param name="usuario">O objeto JSON contendo os dados do usuário a ser cadastrado.</param>
+        /// <returns>O usuário recém-criado com a senha omitida por segurança.</returns>
+        /// <response code="200">Retorna o usuário cadastrado com sucesso.</response>
+        /// <response code="400">Se o e-mail ou a senha estiverem nulos, vazios ou inválidos.</response>
+        /// <response code="500">Se ocorrer um erro no banco (ex: E-mail já existente no Firebase).</response>
+        [HttpPost("cadastrar")]
+        public async Task<IActionResult> Cadastrar([FromBody] ApiIveco.Models.Usuario usuario)
+        {
+            if (string.IsNullOrWhiteSpace(usuario.Email) || string.IsNullOrWhiteSpace(usuario.Senha))
+                return BadRequest(new { Erro = "Dados Inválidos", Mensagem = "E-mail e senha são obrigatórios." });
+
+            try
+            {
+                // Se não enviar perfil, vira "Usuario" padrão. Se enviar "Admin", vira Admin.
+                if (string.IsNullOrWhiteSpace(usuario.Acesso))
+                    usuario.Acesso = "Usuario";
+
+                var criado = await _dadosService.CadastrarUsuario(usuario);
+
+                // Oculta a senha antes de devolver a resposta por segurança
+                criado.Senha = "";
+                return Ok(new { mensagem = "Usuário cadastrado com sucesso!", usuario = criado });
+            }
+            catch (Exception ex)
+            {
+                return TratarErro(ex, "Falha no Cadastro");
+            }
+        }
+
+        /// <summary>
+        /// Autentica um usuário existente no sistema utilizando E-mail e Senha.
+        /// </summary>
+        /// <remarks>
+        /// Exemplo de requisição:
+        /// 
+        ///     POST /api/auth/login
+        ///     {
+        ///        "email": "joao@iveco.com",
+        ///        "senha": "senha_segura"
+        ///     }
+        /// </remarks>
+        /// <param name="credenciais">Objeto JSON contendo as credenciais de acesso (Email e Senha).</param>
+        /// <returns>Os dados do usuário autenticado, incluindo o seu Perfil (Admin/Usuario).</returns>
+        /// <response code="200">Login efetuado com sucesso. Retorna os dados da sessão.</response>
+        /// <response code="400">Se os dados enviados forem inválidos (falta de e-mail ou senha).</response>
+        /// <response code="401">Se as credenciais estiverem incorretas (E-mail não encontrado ou senha errada).</response>
+        /// <response code="500">Se ocorrer um erro interno no servidor de autenticação.</response>
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] Usuario credenciais)
+        {
+            if (string.IsNullOrWhiteSpace(credenciais.Email) || string.IsNullOrWhiteSpace(credenciais.Senha))
+                return BadRequest(new { Erro = "Dados Inválidos", Mensagem = "Informe e-mail e senha." });
+
+            try
+            {
+                var usuario = await _dadosService.FazerLogin(credenciais.Email, credenciais.Senha);
+
+                if (usuario == null)
+                    return Unauthorized(new { Erro = "Acesso Negado", Mensagem = "E-mail ou senha incorretos." });
+
+                // Limpa a senha antes de enviar para o Front
+                usuario.Senha = "";
+
+                return Ok(new { mensagem = "Login efetuado com sucesso!", usuario });
+            }
+            catch (Exception ex)
+            {
+                return TratarErro(ex, "Erro no Login");
+            }
+        }
 
         // ==========================================
         // MÉTODO AUXILIAR DE TRATAMENTO DE ERROS

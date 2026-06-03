@@ -17,7 +17,8 @@ namespace WpfIveco
         // --- MÉTODOS DE CONTROLO DA JANELA ---
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left) DragMove();
+            if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
+                this.DragMove();
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -32,7 +33,10 @@ namespace WpfIveco
 
         private void MaximizeButton_Click(object sender, RoutedEventArgs e)
         {
-            WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+            if (this.WindowState == WindowState.Normal)
+                this.WindowState = WindowState.Maximized;
+            else
+                this.WindowState = WindowState.Normal;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -44,5 +48,7 @@ namespace WpfIveco
         {
 
         }
+
+
     }
 }

@@ -24,6 +24,43 @@ namespace WpfIveco.ViewModel
         private readonly DispatcherTimer _timer;
 
         // ==========================================
+        // VARIÁVEIS - SISTEMA DE LOGIN / SESSÃO
+        // ==========================================
+        private bool _isLoggedIn = false;
+        public bool IsLoggedIn { get => _isLoggedIn; set { _isLoggedIn = value; OnPropertyChanged(); } }
+
+        private bool _isAdmin = false;
+        public bool IsAdmin { get => _isAdmin; set { _isAdmin = value; OnPropertyChanged(); } }
+
+        // Variável para alternar entre a Tela de Login e a de Cadastro
+        private bool _modoCadastro = false;
+        public bool ModoCadastro { get => _modoCadastro; set { _modoCadastro = value; OnPropertyChanged(); } }
+
+        private string _loginEmail = "";
+        public string LoginEmail { get => _loginEmail; set { _loginEmail = value; OnPropertyChanged(); } }
+
+        private string _loginSenha = "";
+        public string LoginSenha { get => _loginSenha; set { _loginSenha = value; OnPropertyChanged(); } }
+
+        // Variáveis exclusivas para o momento do Cadastro
+        private string _cadastroNome = "";
+        public string CadastroNome { get => _cadastroNome; set { _cadastroNome = value; OnPropertyChanged(); } }
+
+        private string _cadastroPerfil = "Usuario"; // Padrão
+        public string CadastroPerfil { get => _cadastroPerfil; set { _cadastroPerfil = value; OnPropertyChanged(); } }
+
+        private string _nomeUsuario = "Visitante";
+        public string NomeUsuario { get => _nomeUsuario; set { _nomeUsuario = value; OnPropertyChanged(); } }
+
+        private string _perfilUsuario = "Sessão não iniciada";
+        public string PerfilUsuario { get => _perfilUsuario; set { _perfilUsuario = value; OnPropertyChanged(); } }
+
+        public ICommand FazerLoginCommand { get; }
+        public ICommand FazerCadastroCommand { get; }
+        public ICommand FazerLogoutCommand { get; }
+        public ICommand AlternarModoAuthCommand { get; }
+
+        // ==========================================
         // VARIÁVEIS - NAVEGAÇÃO E SISTEMA
         // ==========================================
         private string _abaAtiva = "Dashboard";
@@ -48,7 +85,7 @@ namespace WpfIveco.ViewModel
         public string MediaCarbono { get => _mediaCarbono; set { _mediaCarbono = value; OnPropertyChanged(); } }
 
         // ==========================================
-        // VARIÁVEIS - RASTREABILIDADE (VEÍCULOS)
+        // VARIÁVEIS - RASTREABILIDADE / FORNECEDORES / PEÇAS
         // ==========================================
         private string _pesquisaVin = "";
         public string PesquisaVin { get => _pesquisaVin; set { _pesquisaVin = value; OnPropertyChanged(); } }
@@ -56,9 +93,6 @@ namespace WpfIveco.ViewModel
         private ObservableCollection<VeiculoModel> _listaVeiculos = new ObservableCollection<VeiculoModel>();
         public ObservableCollection<VeiculoModel> ListaVeiculos { get => _listaVeiculos; set { _listaVeiculos = value; OnPropertyChanged(); } }
 
-        // ==========================================
-        // VARIÁVEIS - FORNECEDORES (CADASTRO)
-        // ==========================================
         private string _cnpjBusca = "";
         public string CnpjBusca { get => _cnpjBusca; set { _cnpjBusca = value; OnPropertyChanged(); } }
 
@@ -71,9 +105,6 @@ namespace WpfIveco.ViewModel
         private string _mensagemCadastro = "";
         public string MensagemCadastro { get => _mensagemCadastro; set { _mensagemCadastro = value; OnPropertyChanged(); } }
 
-        // ==========================================
-        // VARIÁVEIS - PEÇAS E COMPONENTES
-        // ==========================================
         private string _novaPecaVin = "";
         public string NovaPecaVin { get => _novaPecaVin; set { _novaPecaVin = value; OnPropertyChanged(); } }
 
@@ -83,9 +114,6 @@ namespace WpfIveco.ViewModel
         private ObservableCollection<PecaModel> _listaPecas = new ObservableCollection<PecaModel>();
         public ObservableCollection<PecaModel> ListaPecas { get => _listaPecas; set { _listaPecas = value; OnPropertyChanged(); } }
 
-        // ==========================================
-        // COMANDOS (BOTÕES)
-        // ==========================================
         public ICommand MudarAbaCommand { get; }
         public ICommand LigarDesligarSimuladorCommand { get; }
         public ICommand PesquisarVinCommand { get; }
@@ -93,9 +121,6 @@ namespace WpfIveco.ViewModel
         public ICommand SalvarFornecedorCommand { get; }
         public ICommand AdicionarPecaManualCommand { get; }
 
-        // ==========================================
-        // VARIÁVEIS - GRÁFICOS (DASHBOARD)
-        // ==========================================
         private SeriesCollection _emissoesSeries;
         public SeriesCollection EmissoesSeries { get => _emissoesSeries; set { _emissoesSeries = value; OnPropertyChanged(); } }
 
@@ -107,6 +132,9 @@ namespace WpfIveco.ViewModel
         // ==========================================
         public MainViewModel()
         {
+            var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true };
+            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:44353/") };
+
             MudarAbaCommand = new RelayCommand(p => AbaAtiva = p as string);
             LigarDesligarSimuladorCommand = new RelayCommand(p => StatusSimulador = StatusSimulador == "Ativo" ? "Desativado" : "Ativo");
 
@@ -115,70 +143,42 @@ namespace WpfIveco.ViewModel
             SalvarFornecedorCommand = new RelayCommand(async p => await SalvarFornecedorAsync());
 
             // -------------------------------------------------------------
-            // INICIALIZA O GRÁFICO VAZIO (ESPERANDO A API)
+            // COMANDOS DE AUTENTICAÇÃO (LOGIN E CADASTRO)
             // -------------------------------------------------------------
-            EmissoesSeries = new SeriesCollection
-            {
-                new LineSeries
-                {
-                    Title = "Escopo 1 (Fábrica)",
-                    Values = new ChartValues<double>(), // Começa vazio
-                    Stroke = new SolidColorBrush(Color.FromRgb(10, 132, 255)),
-                    Fill = new SolidColorBrush(Color.FromArgb(50, 10, 132, 255)),
-                    PointGeometrySize = 10
-                },
-                new LineSeries
-                {
-                    Title = "Escopo 3 (Cadeia)",
-                    Values = new ChartValues<double>(), // Começa vazio
-                    Stroke = new SolidColorBrush(Color.FromRgb(48, 209, 88)),
-                    Fill = new SolidColorBrush(Color.FromArgb(50, 48, 209, 88)),
-                    PointGeometrySize = 10
-                }
-            };
+            AlternarModoAuthCommand = new RelayCommand(p => ModoCadastro = !ModoCadastro);
 
-            AdicionarPecaManualCommand = new RelayCommand(async p =>
+            FazerLoginCommand = new RelayCommand(async p =>
             {
-                if (string.IsNullOrWhiteSpace(NovaPecaNome) || string.IsNullOrWhiteSpace(NovaPecaVin))
+                if (string.IsNullOrWhiteSpace(LoginEmail) || string.IsNullOrWhiteSpace(LoginSenha))
                 {
-                    MessageBox.Show("⚠️ Por favor, preencha o VIN e o Nome da Peça.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Preencha o e-mail e a senha.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                if (NovaPecaVin.Length != 17)
-                {
-                    MessageBox.Show("⚠️ O chassi (VIN) deve conter exatamente 17 caracteres.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                var novaPecaParaApi = new
-                {
-                    Id = Guid.NewGuid().ToString().Substring(0, 8),
-                    NomePeca = NovaPecaNome,
-                    Fk_Veiculo_Vin = NovaPecaVin,
-                    Fk_LoteMateriaPrima_Id = "LOTE-MANUAL-" + DateTime.Now.ToString("yyyyMMdd")
-                };
-
+                var credenciais = new { Email = LoginEmail, Senha = LoginSenha };
                 try
                 {
-                    var response = await _httpClient.PostAsJsonAsync("api/dados/componentes", novaPecaParaApi);
-
+                    var response = await _httpClient.PostAsJsonAsync("api/dados/login", credenciais);
                     if (response.IsSuccessStatusCode)
                     {
-                        ListaPecas.Insert(0, new PecaModel
-                        {
-                            NomePeca = NovaPecaNome,
-                            VinAssociado = NovaPecaVin
-                        });
+                        var json = await response.Content.ReadAsStringAsync();
+                        using var doc = JsonDocument.Parse(json);
+                        var userJson = doc.RootElement.GetProperty("usuario");
 
-                        NovaPecaNome = "";
-                        NovaPecaVin = "";
-                        MessageBox.Show("✅ Peça registada no Firebase com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                        NomeUsuario = userJson.GetProperty("nome").GetString();
+                        PerfilUsuario = userJson.GetProperty("acesso").GetString();
+                        IsAdmin = (PerfilUsuario == "Admin");
+
+                        IsLoggedIn = true;
+                        LoginSenha = ""; // Limpa por segurança
+
+                        _ = CarregarDadosDaApiAsync();
+                        _timer.Start();
                     }
                     else
                     {
-                        var erroJson = await response.Content.ReadAsStringAsync();
-                        MessageBox.Show($"❌ Erro ao guardar no Firebase: HTTP {response.StatusCode}\nDetalhes: {erroJson}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                        // A API retorna Unauthorized (401) se a senha estiver incorreta ou email não existir
+                        MessageBox.Show("❌ Conta não encontrada ou Senha incorreta.\nVerifique as suas credenciais ou crie uma nova conta.", "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
                 catch (Exception ex)
@@ -187,14 +187,81 @@ namespace WpfIveco.ViewModel
                 }
             });
 
-            var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true };
-            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:44353/") };
+            FazerCadastroCommand = new RelayCommand(async p =>
+            {
+                if (string.IsNullOrWhiteSpace(CadastroNome) || string.IsNullOrWhiteSpace(LoginEmail) || string.IsNullOrWhiteSpace(LoginSenha))
+                {
+                    MessageBox.Show("Preencha todos os campos para criar a conta.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
-            _ = CarregarDadosDaApiAsync();
+                // Cria o payload que a API espera
+                var novoUser = new
+                {
+                    Nome = CadastroNome,
+                    Email = LoginEmail,
+                    Senha = LoginSenha,
+                    Acesso = CadastroPerfil
+                };
+
+                try
+                {
+                    var response = await _httpClient.PostAsJsonAsync("api/dados/cadastrar", novoUser); ;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("✅ Conta criada com sucesso! Já pode fazer login.", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                        ModoCadastro = false; // Volta para a tela de Login
+                        CadastroNome = "";
+                        LoginSenha = "";
+                    }
+                    else
+                    {
+                        var erroJson = await response.Content.ReadAsStringAsync();
+                        MessageBox.Show($"❌ Erro ao criar conta.\nDetalhes: {erroJson}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Falha de comunicação com a API:\n{ex.Message}", "Erro Crítico", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            });
+
+            FazerLogoutCommand = new RelayCommand(p =>
+            {
+                IsLoggedIn = false;
+                IsAdmin = false;
+                NomeUsuario = "Visitante";
+                PerfilUsuario = "Sessão não iniciada";
+                LoginEmail = "";
+                AbaAtiva = "Dashboard";
+                _timer.Stop();
+            });
+
+            // Inicializa Gráfico Vazio
+            EmissoesSeries = new SeriesCollection {
+                new LineSeries { Title = "Escopo 1 (Fábrica)", Values = new ChartValues<double>(), Stroke = new SolidColorBrush(Color.FromRgb(10, 132, 255)), Fill = new SolidColorBrush(Color.FromArgb(50, 10, 132, 255)), PointGeometrySize = 10 },
+                new LineSeries { Title = "Escopo 3 (Cadeia)", Values = new ChartValues<double>(), Stroke = new SolidColorBrush(Color.FromRgb(48, 209, 88)), Fill = new SolidColorBrush(Color.FromArgb(50, 48, 209, 88)), PointGeometrySize = 10 }
+            };
+
+            AdicionarPecaManualCommand = new RelayCommand(async p =>
+            {
+                if (string.IsNullOrWhiteSpace(NovaPecaNome) || string.IsNullOrWhiteSpace(NovaPecaVin)) return;
+                var novaPecaParaApi = new { Id = Guid.NewGuid().ToString().Substring(0, 8), NomePeca = NovaPecaNome, Fk_Veiculo_Vin = NovaPecaVin, Fk_LoteMateriaPrima_Id = "LOTE-MANUAL-" + DateTime.Now.ToString("yyyyMMdd") };
+                try
+                {
+                    var response = await _httpClient.PostAsJsonAsync("api/dados/componentes", novaPecaParaApi);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        ListaPecas.Insert(0, new PecaModel { NomePeca = NovaPecaNome, VinAssociado = NovaPecaVin });
+                        NovaPecaNome = ""; NovaPecaVin = "";
+                        MessageBox.Show("✅ Peça registada no Firebase com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+                catch (Exception ex) { MessageBox.Show(ex.Message); }
+            });
 
             _timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(2) };
             _timer.Tick += async (s, e) => await CarregarDadosDaApiAsync();
-            _timer.Start();
         }
 
         // ==========================================
@@ -211,13 +278,10 @@ namespace WpfIveco.ViewModel
                 {
                     var json = await responseVeiculos.Content.ReadAsStringAsync();
                     var veiculos = JsonSerializer.Deserialize<List<VeiculoModel>>(json, opcoes);
-
                     if (veiculos != null)
                     {
                         ListaVeiculos = new ObservableCollection<VeiculoModel>(veiculos);
                         TotalVeiculos = veiculos.Count.ToString();
-
-                        // ===== AQUI ENVIAMOS OS DADOS REAIS PARA O GRÁFICO =====
                         AtualizarGraficoComDadosReais(veiculos);
                     }
                 }
@@ -235,15 +299,9 @@ namespace WpfIveco.ViewModel
                 {
                     var json = await responseComponentes.Content.ReadAsStringAsync();
                     var componentesApi = JsonSerializer.Deserialize<List<VeiculoComponenteApi>>(json, opcoes);
-
                     if (componentesApi != null)
                     {
-                        var listaMapeada = componentesApi.Select(c => new PecaModel
-                        {
-                            NomePeca = c.NomePeca,
-                            VinAssociado = c.Fk_Veiculo_Vin
-                        }).Reverse().ToList();
-
+                        var listaMapeada = componentesApi.Select(c => new PecaModel { NomePeca = c.NomePeca, VinAssociado = c.Fk_Veiculo_Vin }).Reverse().ToList();
                         ListaPecas = new ObservableCollection<PecaModel>(listaMapeada);
                     }
                 }
@@ -251,63 +309,28 @@ namespace WpfIveco.ViewModel
             catch { }
         }
 
-        // ==========================================
-        // NOVO MÉTODO: ATUALIZA O GRÁFICO COM DADOS DO FIREBASE
-        // ==========================================
         private void AtualizarGraficoComDadosReais(List<VeiculoModel> veiculos)
         {
-            // 1. Gerar os últimos 6 meses a partir de hoje
             var ultimosMeses = new List<DateTime>();
-            for (int i = 5; i >= 0; i--)
-            {
-                ultimosMeses.Add(DateTime.Now.AddMonths(-i));
-            }
-
-            // Atualiza os rótulos do eixo X (Ex: Jan, Fev, Mar...)
+            for (int i = 5; i >= 0; i--) ultimosMeses.Add(DateTime.Now.AddMonths(-i));
             MesesLabels = ultimosMeses.Select(m => m.ToString("MMM")).ToArray();
 
             var valoresEscopo1 = new ChartValues<double>();
             var valoresEscopo3 = new ChartValues<double>();
 
-            // Base mínima de emissões para o gráfico não ficar completamente no chão
-            double baseEscopo1 = 120.0;
-            double baseEscopo3 = 250.0;
+            double baseEscopo1 = 120.0; double baseEscopo3 = 250.0;
 
             foreach (var mes in ultimosMeses)
             {
                 int veiculosNoMes = 0;
-                try
-                {
-                    // Tenta contar os veículos reais registrados neste mês específico
-                    veiculosNoMes = veiculos.Count(v =>
-                        Convert.ToDateTime(v.DataMontagem).Year == mes.Year &&
-                        Convert.ToDateTime(v.DataMontagem).Month == mes.Month);
-                }
-                catch
-                {
-                    // Se o modelo não tiver a data preenchida, usamos uma distribuição para ter visualização
-                    veiculosNoMes = veiculos.Count / 6;
-                }
-
-                // Cálculo Dinâmico: 
-                // Cada veículo detectado na API adiciona x toneladas de CO2
+                try { veiculosNoMes = veiculos.Count(v => Convert.ToDateTime(v.DataMontagem).Year == mes.Year && Convert.ToDateTime(v.DataMontagem).Month == mes.Month); }
+                catch { veiculosNoMes = veiculos.Count / 6; }
                 valoresEscopo1.Add(Math.Round(baseEscopo1 + (veiculosNoMes * 1.8), 1));
                 valoresEscopo3.Add(Math.Round(baseEscopo3 + (veiculosNoMes * 3.5), 1));
             }
 
-            // Atualiza as séries na Interface
-            if (EmissoesSeries.Count == 2)
-            {
-                EmissoesSeries[0].Values = valoresEscopo1;
-                EmissoesSeries[1].Values = valoresEscopo3;
-            }
-
-            // Atualiza o Card de Média de Carbono dinamicamente
-            if (veiculos.Count > 0)
-            {
-                double mediaPegada = (valoresEscopo1.Sum() + valoresEscopo3.Sum()) / veiculos.Count;
-                MediaCarbono = $"{mediaPegada:F1}K";
-            }
+            if (EmissoesSeries.Count == 2) { EmissoesSeries[0].Values = valoresEscopo1; EmissoesSeries[1].Values = valoresEscopo3; }
+            if (veiculos.Count > 0) MediaCarbono = $"{((valoresEscopo1.Sum() + valoresEscopo3.Sum()) / veiculos.Count):F1}K";
         }
 
         // ==========================================

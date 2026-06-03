@@ -364,5 +364,42 @@ namespace ApiIveco.Service
                 return proximoId;
             });
         }
+
+        // ==========================================
+        // MÉTODOS DE AUTENTICAÇÃO (USUÁRIOS)
+        // ==========================================
+        public async Task<Usuario> CadastrarUsuario(Usuario novoUsuario)
+        {
+            // 1. Usamos "Usuarios" (plural) para bater certo com o FazerLogin!
+            var usuariosRef = _firestoreDb.Db.Collection("Usuarios");
+            var query = await usuariosRef.WhereEqualTo("Email", novoUsuario.Email).GetSnapshotAsync();
+
+            if (query.Documents.Count > 0)
+                throw new Exception("Já existe um usuário cadastrado com este e-mail.");
+
+            // 2. AQUI ESTÁ A MÁGICA DO SEU CONTADOR
+            // Chama o seu método gerador e cria a "gaveta" contador_usuario no Firebase
+            int novoId = await GerarProximoId("contador_usuario");
+            novoUsuario.Id = novoId.ToString(); // Converte o número 1, 2, 3... para texto
+
+            novoUsuario.DataCriacao = DateTime.UtcNow;
+
+            DocumentReference docRef = usuariosRef.Document(novoUsuario.Id);
+            await docRef.SetAsync(novoUsuario);
+
+            return novoUsuario;
+        }
+
+        public async Task<Usuario> FazerLogin(string email, string senha)
+        {
+            // CORREÇÃO: Foi adicionado o ".Db" logo após o _firestoreDb
+            var usuariosRef = _firestoreDb.Db.Collection("Usuarios");
+            var query = await usuariosRef.WhereEqualTo("Email", email).WhereEqualTo("Senha", senha).GetSnapshotAsync();
+
+            if (query.Documents.Count == 0)
+                return null; // Usuário ou senha incorretos
+
+            return query.Documents[0].ConvertTo<Usuario>();
+        }
     }
-}
+ }
