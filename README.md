@@ -234,10 +234,46 @@ CREATE TABLE VeiculoComponente (
         REFERENCES LoteMateriaPrima(Id)
 );
  ```
+---
 
+## Conhecendo cada camada do projeto:
 
+## API' s Públicas utilizadas no projeto
 
-## Conhecendo cada camada do projeto
+**BrasilAPI:** É uma comunidade de desenvolvedores no Brasil e que nasceu com um propósito claro de simplificar o acesso a dados públicos nacionais, centralizando diversas consultas que antes eram espalhadas por sites governamentais instáveis, lentos ou de difícil integração. 
+
+#### 🛠️ Pilares Arquiteturais e Diferenciais Técnicos
+
+O sucesso e a confiabilidade da Brasil API na integração de sistemas industriais — como o ecossistema *Iveco Green Ledger* — fundamentam-se em três pilares principais:
+
+1. **Abstração de Protocolos e Autenticação:** Diferente de outras soluções comerciais, a plataforma dispensa o uso de chaves privadas (*API Keys*) ou tokens de portador (*Bearer Tokens*) para a maioria de seus endpoints básicos, eliminando o acoplamento de credenciais no código-fonte e agilizando as chamadas assíncronas no Back-End.
+2. **Camada Inteligente de Cache (Alta Disponibilidade):** Portais de órgãos públicos sofrem frequentemente com picos de tráfego ou janelas de manutenção. A Brasil API mitiga esse gargalo implementando estratégias severas de *caching* em servidores de borda (*Edge Computing*, através da infraestrutura da Vercel). Isso garante que, mesmo se o microsserviço de origem estiver temporariamente fora do ar, a API consiga responder à requisição utilizando uma imagem de dados recentemente validada.
+3. **Gratuidade e Escalabilidade Horizontal:** Por ser mantida de forma colaborativa pela comunidade de engenharia de software brasileira, a API é dimensionada para suportar milhões de requisições diárias sem custos operacionais para os desenvolvedores parceiros, tornando-se uma ferramenta viável para testes de estresse e homologação de projetos escolares e industriais.
+
+---
+
+**NHTSA Response:** Elas funcionam via requisições HTTP normais e retornam respostas estruturadas em formatos como JSON, XML ou CSV.
+
+#### 🛠️ Pilares Arquiteturais e Diferenciais Técnicos
+
+O sucesso e a confiabilidade da NHTSA API na integração de sistemas industriais — como o ecossistema *Iveco Green Ledger* — fundamentam-se em três pilares principais:
+
+1. **Decodificação Normativa Global (Padrão ISO 3779):** A API baseia-se na estrutura internacional do VIN (*Vehicle Identification Number*), que divide os 17 caracteres do chassi em três seções: o WMI (Identificador do Fabricante Mundial), o VDS (Seção de Descrição do Veículo) e o VIS (Seção de Indicador do Veículo). A plataforma dispensa o uso de chaves privadas (*API Keys*) para consultas públicas, permitindo que o Back-End faça chamadas assíncronas diretas para isolar e extrair os metadados de engenharia em tempo real.
+2. **Camada Inteligente de Cache (Alta Disponibilidade):** Por lidar com frotas e homologações globais, os servidores da NHTSA são estruturados para responder com baixíssima latência. O ecossistema mitiga gargalos de requisições repetitivas na linha de montagem ou no simulador implementando indexação massiva em servidores de borda (*Edge Computing*). Isso garante que consultas sobre chassis semelhantes (mesmo lote ou modelo Iveco) obtenham respostas quase instantâneas, blindando a aplicação contra quedas de conexão transatlântica.
+3. **Gratuidade e Escalabilidade Governamental:** Por ser mantida por um órgão federal de segurança viária norte-americano, a infraestrutura da API é dimensionada para suportar milhões de requisições de auditoria industrial diariamente sem custos operacionais ou limites severos de *rate limiting* para os desenvolvedores parceiros. Isso a torna uma ferramenta extremamente viável para testes de estresse, simulações de IoT em larga escala e homologação acadêmica.
+
+   ---
+
+**API Mercado Livre:** Elas funcionam via requisições HTTP normais e retornam respostas estruturadas em formatos como JSON, XML ou CSV.
+
+#### 🛠️ Pilares Arquiteturais e Diferenciais Técnicos
+
+O sucesso e a confiabilidade da API do Mercado Livre na integração de sistemas industriais — como o ecossistema *Iveco Green Ledger* — fundamentam-se em três pilares principais:
+
+1. **Abstração de Catálogos e Indexação Universal (EAN/GTIN):** A API baseia-se na estrutura global de identificação de mercadorias, mapeando os componentes através de códigos universais de produto ou números originais de fábrica. Para consultas de leitura pública de catálogo e categorias, a plataforma dispensa fluxos complexos de autenticação em chamadas iniciais, permitindo que o Back-End faça requisições assíncronas diretas para coletar metadados comerciais e agilizar o fluxo de dados.
+2. **Infraestrutura Cloud-Native e Baixa Latência (Alta Disponibilidade):** Por sustentar operações críticas de e-commerce transacional em todo o continente, os servidores do Mercado Livre utilizam arquiteturas distribuídas e escaláveis na nuvem. O ecossistema mitiga gargalos de requisições repetitivas na linha de suprimentos implementando espelhamento massivo de banco de dados e servidores de borda (*Edge Computing*). Isso garante que consultas por componentes estruturais (como "Eixo Dianteiro" ou "Bloco do Motor") obtenham respostas em milissegundos, blindando a aplicação contra quedas e latências de rede.
+3. **Escalabilidade Industrial e Amplo Rate Limiting:** Sendo estruturada para suportar picos massivos de tráfego, a infraestrutura da API oferece margens amplas de requisições diárias. O sistema conta com políticas claras de limites operacionais (*rate-limiting*) que protegem o servidor, permitindo que o `SimuladorIveco` ou o dashboard WPF realizem varreduras e coletas analíticas em larga escala sem interrupções de serviço, tornando-a ideal para simulações fabris e homologação de projetos acadêmicos.
+
 
 ### 🗂️ Camada de serviços intermediários - API (ApiIveco)
 
@@ -261,17 +297,15 @@ Essa arquitetura elimina a dependência de códigos complexos e acoplados direta
 
 #### 🚀 Detalhamento Técnico e Implementações Avançadas
 
-* **Padrão MVVM Puro e Data Binding:** A interface utiliza intensamente o motor de binding do WPF para conectar propriedades da `ViewModel` (como indicadores de `TotalVeiculos`, `MediaCarbono` e inputs de `CnpjBusca`) diretamente aos componentes visuais[cite: 1]. Isso garante que a UI seja apenas um reflexo do estado atual dos dados[cite: 1].
-* **Renderização Dinâmica de Coleções (ItemsControl):** Na aba de rastreabilidade, a exibição de dados estáticos foi substituída por um componente inteligente `ItemsControl`[cite: 1]. Ele consome a coleção observável `ListaVeiculos`, mapeando automaticamente propriedades do banco de dados (como `{Binding Modelo}`, `{Binding Vin}` e `{Binding DataMontagem}`) para dentro de um `DataTemplate` customizado, gerando cards de forma dinâmica conforme o banco é atualizado[cite: 1].
-* **State Management e Navegação Declarativa:** O roteamento entre os módulos do sistema (Dashboard, Gestão de Fornecedores, Análises ESG e Configurações) descarta o uso tradicional de múltiplas janelas (Windows) ou frames de navegação complexos. Em vez disso, utiliza um sistema inteligente de `DataTriggers` que escuta a propriedade `AbaAtiva` e altera a visibilidade (`Visibility`) das `Grids` conteinerizadas[cite: 1]. A transição é despachada via `ICommand` (`MudarAbaCommand`)[cite: 1].
+* **Padrão MVVM Puro e Data Binding:** A interface utiliza intensamente o motor de binding do WPF para conectar propriedades da `ViewModel` (como indicadores de `TotalVeiculos`, `MediaCarbono` e inputs de `CnpjBusca`) diretamente aos componentes visuais. Isso garante que a UI seja apenas um reflexo do estado atual dos dados.
+* **Renderização Dinâmica de Coleções (ItemsControl):** Na aba de rastreabilidade, a exibição de dados estáticos foi substituída por um componente inteligente `ItemsControl`. Ele consome a coleção observável `ListaVeiculos`, mapeando automaticamente propriedades do banco de dados (como `{Binding Modelo}`, `{Binding Vin}` e `{Binding DataMontagem}`) para dentro de um `DataTemplate` customizado, gerando cards de forma dinâmica conforme o banco é atualizado.
+* **State Management e Navegação Declarativa:** O roteamento entre os módulos do sistema (Dashboard, Gestão de Fornecedores, Análises ESG e Configurações) descarta o uso tradicional de múltiplas janelas (Windows) ou frames de navegação complexos. Em vez disso, utiliza um sistema inteligente de `DataTriggers` que escuta a propriedade `AbaAtiva` e altera a visibilidade (`Visibility`) das `Grids` conteinerizadas. A transição é despachada via `ICommand` (`MudarAbaCommand`).
 * **Arquitetura Orientada a Comandos (Command Pattern):** Interações do utilizador (cliques, submissões de formulário) não acionam eventos de clique convencionais (`Click=""`). Tudo é controlado via comandos injetáveis, como:
-  * `ConsultarCnpjCommand`: Para integração via API com a Receita Federal[cite: 1].
-  * `PesquisarVinCommand`: Para busca de ativos (Gêmeos Digitais) na rede[cite: 1].
-  * `SalvarFornecedorCommand`: Para registo de novos nós permissionados[cite: 1].
-* **Design System Customizado e UI/UX Premium:** A aplicação adota uma estética *Dark Mode* moderna e imersiva. Para alcançar esse resultado, a moldura padrão do Windows foi removida (`WindowStyle="None"`, `AllowsTransparency="True"`) e os controlos de janela foram recriados do zero[cite: 1]. O projeto conta com um dicionário de recursos rico, definindo `Styles` globais (como `PremiumCardStyle` e `PremiumTextBoxStyle`) que padronizam cores institucionais, sombras em tempo real (`DropShadowEffect`), bordas fluidas (`CornerRadius`) e iconografia vetorial via *Segoe MDL2 Assets*[cite: 1].
-* **Ferramentas de Teste Integradas na UI:** A interface foi projetada para suportar monitorização de testes de carga, incluindo um painel de configurações (`Ajustes`) que permite acionar um "Simulador de Chão de Fábrica (Mock IoT)" via `LigarDesligarSimuladorCommand`, gerando telemetria em tempo real para os bancos de dados em nuvem[cite: 1].
+  * `ConsultarCnpjCommand`: Para integração via API com a Receita Federal.
+  * `PesquisarVinCommand`: Para busca de ativos (Gêmeos Digitais) na rede.
+  * `SalvarFornecedorCommand`: Para registo de novos nós permissionados.
+* **Design System Customizado e UI/UX Premium:** A aplicação adota uma estética *Dark Mode* moderna e imersiva. Para alcançar esse resultado, a moldura padrão do Windows foi removida (`WindowStyle="None"`, `AllowsTransparency="True"`) e os controlos de janela foram recriados do zero. O projeto conta com um dicionário de recursos rico, definindo `Styles` globais (como `PremiumCardStyle` e `PremiumTextBoxStyle`) que padronizam cores institucionais, sombras em tempo real (`DropShadowEffect`), bordas fluidas (`CornerRadius`) e iconografia vetorial via *Segoe MDL2 Assets*.
+* **Ferramentas de Teste Integradas na UI:** A interface foi projetada para suportar monitorização de testes de carga, incluindo um painel de configurações (`Ajustes`) que permite acionar um "Simulador de Chão de Fábrica (Mock IoT)" via `LigarDesligarSimuladorCommand`, gerando telemetria em tempo real para os bancos de dados em nuvem.
 ---
 
-## API' s Públicas utilizadas no projeto
 
-BrasilAPI: é uma comunidade de desenvolvedores no Brasil e que nasceu com um propósito claro de simplificar o acesso a dados públicos nacionais, centralizando diversas consultas que antes eram espalhadas por sites governamentais instáveis, lentos ou de difícil integração
