@@ -389,7 +389,7 @@
                     </Grid>
                 </Border>
 
-                <ScrollViewer Margin="-43,248,323,-248" Padding="40" Grid.ColumnSpan="2">
+                <ScrollViewer Grid.Column="1" Padding="40" VerticalScrollBarVisibility="Auto">
                     <Grid>
 
                         <Grid>
