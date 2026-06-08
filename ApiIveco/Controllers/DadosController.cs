@@ -31,6 +31,7 @@ namespace ApiIveco.Controllers
         /// <response code="400">Se houver algum problema com os parâmetros de consulta.</response>
         /// <response code="404">Se a coleção de veiculos não for encontrada.</response>
         /// <response code="500">Se ocorrer um erro interno no servidor (ex: falha no Firebase).</response>
+        [Tags("Veículos")]
         [HttpGet("veiculos")]
         public async Task<IActionResult> GetVeiculos()
         {
@@ -51,6 +52,7 @@ namespace ApiIveco.Controllers
         /// <response code="400">Se o ID fornecido for nulo ou vazio.</response>
         /// <response code="404">Se nenhum veiculo for encontrado com o ID especificado.</response>
         /// <response code="500">Se ocorrer um erro interno no servidor.</response>
+        [Tags("Veículos")]
         [HttpGet("veiculos/{vin}")]
         public async Task<IActionResult> GetVeiculoByVin(string vin)
         {
@@ -74,6 +76,7 @@ namespace ApiIveco.Controllers
         /// Gera um relatório em PDF de todos os veículos cadastrados.
         /// </summary>
         /// <returns>Um arquivo PDF.</returns>
+        [Tags("Veículos")]
         [HttpGet("relatorios/veiculos/pdf")]
         public async Task<IActionResult> GerarRelatorioVeiculosPdf()
         {
@@ -156,6 +159,7 @@ namespace ApiIveco.Controllers
         /// <response code="201">Retorna o veiculo criado e o cabeçalho Location com a URI de acesso.</response>
         /// <response code="400">Se os dados enviados forem nulos ou o nome do veiculo estiver vazio.</response>
         /// <response code="500">Se ocorrer um erro interno no servidor ao tentar salvar.</response>
+        [Tags("Veículos")]
         [HttpPost("veiculos")]
         public async Task<IActionResult> PostVeiculo([FromBody] Veiculo veiculo)
         {
@@ -181,6 +185,7 @@ namespace ApiIveco.Controllers
         /// </summary>
         /// <param name="vin">O VIN do veículo a ser atualizado.</param>
         /// <param name="veiculo">Objeto JSON com os dados novos.</param>
+        [Tags("Veículos")]
         [HttpPut("veiculos/{vin}")]
         public async Task<IActionResult> PutVeiculo(string vin, [FromBody] Veiculo veiculo)
         {
@@ -213,6 +218,7 @@ namespace ApiIveco.Controllers
         /// <response code="200">Se o veiculo for excluído com sucesso.</response>
         /// <response code="404">Se o veiculo com o ID especificado não for encontrado.</response>
         /// <response code="500">Se ocorrer um erro interno no servidor ao tentar excluir.</response>
+        [Tags("Veículos")]
         [HttpDelete("veiculos/{vin}")]
         public async Task<IActionResult> DeleteVeiculo(string vin)
         {
@@ -230,6 +236,7 @@ namespace ApiIveco.Controllers
         /// <summary>
         /// Descodifica um VIN e valida se pertence obrigatoriamente à marca IVECO.
         /// </summary>
+        [Tags("Veículos")]
         [HttpGet("veiculos/validar-vin/{vin}")]
         public async Task<IActionResult> ValidarVinIveco(string vin)
         {
@@ -266,6 +273,7 @@ namespace ApiIveco.Controllers
         /// <response code="400">Se houver algum problema com os parâmetros de consulta.</response>
         /// <response code="404">Se a coleção de fornecedores não for encontrada.</response>
         /// <response code="500">Se ocorrer um erro interno no servidor (ex: falha no Firebase).</response>
+        [Tags("Fornecedores")]
         [HttpGet("fornecedores")]
         public async Task<IActionResult> GetFornecedores()
         {
@@ -286,6 +294,7 @@ namespace ApiIveco.Controllers
         /// <response code="400">Se o CNPJ fornecido for nulo ou vazio.</response>
         /// <response code="404">Se o CNPJ não for encontrado na base da Receita Federal.</response>
         /// <response code="500">Se ocorrer um erro interno na comunicação com a BrasilAPI.</response>
+        [Tags("Fornecedores")]
         [HttpGet("fornecedores/buscar-cnpj/{cnpj}")]
         public async Task<IActionResult> GetFornecedorCnpj(string cnpj)
         {
@@ -315,6 +324,7 @@ namespace ApiIveco.Controllers
         /// <response code="201">Retorna o fornecedor criado e o cabeçalho Location com a URI de acesso.</response>
         /// <response code="400">Se os dados enviados forem nulos ou o nome do fornecedor estiver vazio.</response>
         /// <response code="500">Se ocorrer um erro interno no servidor ao tentar salvar.</response>
+        [Tags("Fornecedores")]
         [HttpPost("fornecedores")]
         public async Task<IActionResult> PostFornecedor([FromBody] Fornecedor fornecedor)
         {
@@ -335,6 +345,7 @@ namespace ApiIveco.Controllers
         /// <response code="200">Se o fornecedores for excluído com sucesso.</response>
         /// <response code="404">Se o fornecedores com o ID especificado não for encontrado.</response>
         /// <response code="500">Se ocorrer um erro interno no servidor ao tentar excluir.</response>
+        [Tags("Fornecedores")]
         [HttpDelete("fornecedores/{id}")]
         public async Task<IActionResult> DeleteFornecedor(string id)
         {
@@ -355,6 +366,7 @@ namespace ApiIveco.Controllers
         /// <response code="400">Se houver algum problema com os parâmetros de consulta.</response>
         /// <response code="404">Se a coleção de lotes não for encontrada.</response>
         /// <response code="500">Se ocorrer um erro interno no servidor (ex: falha no Firebase).</response>
+        [Tags("Lotes e Componentes")]
         [HttpGet("lotes")]
         public async Task<IActionResult> GetLotes()
         {
@@ -374,6 +386,7 @@ namespace ApiIveco.Controllers
         /// <response code="201">Retorna o lote criado e o cabeçalho Location com a URI de acesso.</response>
         /// <response code="400">Se os dados enviados forem nulos ou o nome do lote estiver vazio.</response>
         /// <response code="500">Se ocorrer um erro interno no servidor ao tentar salvar.</response>
+        [Tags("Lotes e Componentes")]
         [HttpPost("lotes")]
         public async Task<IActionResult> PostLote([FromBody] LoteMateriaPrima lote)
         {
@@ -394,6 +407,7 @@ namespace ApiIveco.Controllers
         /// <response code="200">Se o lote for excluído com sucesso.</response>
         /// <response code="404">Se o lote com o ID especificado não for encontrado.</response>
         /// <response code="500">Se ocorrer um erro interno no servidor ao tentar excluir.</response>
+        [Tags("Lotes e Componentes")]
         [HttpDelete("lotes/{id}")]
         public async Task<IActionResult> DeleteLote(string id)
         {
@@ -414,6 +428,7 @@ namespace ApiIveco.Controllers
         /// <response code="400">Se houver algum problema com os parâmetros de consulta.</response>
         /// <response code="404">Se a coleção de componentes não for encontrada.</response>
         /// <response code="500">Se ocorrer um erro interno no servidor (ex: falha no Firebase).</response>
+        [Tags("Lotes e Componentes")]
         [HttpGet("componentes")]
         public async Task<IActionResult> GetComponentes()
         {
@@ -433,6 +448,7 @@ namespace ApiIveco.Controllers
         /// <response code="201">Retorna o componente criado e o cabeçalho Location com a URI de acesso.</response>
         /// <response code="400">Se os dados enviados forem nulos ou o nome do componente estiver vazio.</response>
         /// <response code="500">Se ocorrer um erro interno no servidor ao tentar salvar.</response>
+        [Tags("Lotes e Componentes")]
         [HttpPost("componentes")]
         public async Task<IActionResult> PostComponente([FromBody] VeiculoComponente componente)
         {
@@ -453,6 +469,7 @@ namespace ApiIveco.Controllers
         /// <response code="200">Se o componente for excluído com sucesso.</response>
         /// <response code="404">Se o componente com o ID especificado não for encontrado.</response>
         /// <response code="500">Se ocorrer um erro interno no servidor ao tentar excluir.</response>
+        [Tags("Lotes e Componentes")]
         [HttpDelete("componentes/{id}")]
         public async Task<IActionResult> DeleteComponente(string id)
         {
@@ -486,6 +503,7 @@ namespace ApiIveco.Controllers
         /// <response code="200">Retorna o usuário cadastrado com sucesso.</response>
         /// <response code="400">Se o e-mail ou a senha estiverem nulos, vazios ou inválidos.</response>
         /// <response code="500">Se ocorrer um erro no banco (ex: E-mail já existente no Firebase).</response>
+        [Tags("Autenticação")]
         [HttpPost("cadastrar")]
         public async Task<IActionResult> Cadastrar([FromBody] ApiIveco.Models.Usuario usuario)
         {
@@ -528,6 +546,7 @@ namespace ApiIveco.Controllers
         /// <response code="400">Se os dados enviados forem inválidos (falta de e-mail ou senha).</response>
         /// <response code="401">Se as credenciais estiverem incorretas (E-mail não encontrado ou senha errada).</response>
         /// <response code="500">Se ocorrer um erro interno no servidor de autenticação.</response>
+        [Tags("Autenticação")]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest credenciais)
         {
