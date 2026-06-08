@@ -390,6 +390,27 @@ namespace ApiIveco.Service
             return novoUsuario;
         }
 
+        // Em ApiIveco/Service/DadosService.cs
+
+        public async Task<Veiculo> AtualizarVeiculo(string vin, Veiculo veiculoAtualizado)
+        {
+            if (string.IsNullOrEmpty(vin)) throw new ArgumentException("O VIN não pode ser nulo ou vazio.");
+
+            DocumentReference docRef = _firestoreDb.Db.Collection(_collectionVeiculo).Document(vin);
+            DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+
+            // Verifica se o veículo existe antes de atualizar
+            if (!snapshot.Exists) return null;
+
+            // Mantém a integridade da chave primária (o VIN original da URL)
+            veiculoAtualizado.Vin = vin;
+
+            // MergeAll mescla os dados novos com os existentes (faz o papel de um PUT/PATCH)
+            await docRef.SetAsync(veiculoAtualizado, SetOptions.MergeAll);
+
+            return veiculoAtualizado;
+        }
+
         public async Task<Usuario> FazerLogin(string email, string senha)
         {
             // CORREÇÃO: Foi adicionado o ".Db" logo após o _firestoreDb

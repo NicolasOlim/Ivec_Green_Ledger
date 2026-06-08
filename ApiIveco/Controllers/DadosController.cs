@@ -6,6 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace ApiIveco.Controllers
 {
@@ -65,6 +68,86 @@ namespace ApiIveco.Controllers
             catch (Exception ex) { return TratarErro(ex, "Erro ao obter veículo"); }
         }
 
+        // Em ApiIveco/Controllers/DadosController.cs
+
+        /// <summary>
+        /// Gera um relatório em PDF de todos os veículos cadastrados.
+        /// </summary>
+        /// <returns>Um arquivo PDF.</returns>
+        [HttpGet("relatorios/veiculos/pdf")]
+        public async Task<IActionResult> GerarRelatorioVeiculosPdf()
+        {
+            try
+            {
+                // Configuração obrigatória do QuestPDF para projetos gratuitos/pessoais
+                QuestPDF.Settings.License = LicenseType.Community;
+
+                // 1. Busca os dados reais do banco
+                var veiculos = await _dadosService.ListarVeiculo();
+
+                // 2. Desenha a estrutura do documento
+                var document = Document.Create(container =>
+                {
+                    container.Page(page =>
+                    {
+                        page.Size(PageSizes.A4);
+                        page.Margin(2, Unit.Centimetre);
+                        page.PageColor(Colors.White);
+                        page.DefaultTextStyle(x => x.FontSize(11));
+
+                        // -- Cabeçalho
+                        page.Header().Text("Relatório de Veículos - Iveco")
+                            .SemiBold().FontSize(20).FontColor(Colors.Green.Darken2);
+
+                        // -- Conteúdo (Tabela)
+                        page.Content().PaddingVertical(1, Unit.Centimetre).Table(table =>
+                        {
+                            // Define 3 colunas iguais
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn(); // Coluna VIN
+                                columns.RelativeColumn(); // Coluna Modelo
+                                columns.RelativeColumn(); // Coluna Data
+                            });
+
+                            // Cabeçalho da tabela
+                            table.Header(header =>
+                            {
+                                header.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten1).PaddingBottom(5).Text("VIN").SemiBold();
+                                header.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten1).PaddingBottom(5).Text("Modelo").SemiBold();
+                                header.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten1).PaddingBottom(5).Text("Data de Montagem").SemiBold();
+                            });
+
+                            // Preenche as linhas da tabela iterando sobre a lista
+                            foreach (var v in veiculos)
+                            {
+                                table.Cell().PaddingVertical(5).Text(v.Vin);
+                                table.Cell().PaddingVertical(5).Text(v.Modelo);
+                                table.Cell().PaddingVertical(5).Text(v.DataMontagem?.ToString("dd/MM/yyyy HH:mm") ?? "N/A");
+                            }
+                        });
+
+                        // -- Rodapé
+                        page.Footer().AlignCenter().Text(x =>
+                        {
+                            x.Span("Página ");
+                            x.CurrentPageNumber();
+                            x.Span(" de ");
+                            x.TotalPages();
+                        });
+                    });
+                });
+
+                // 3. Gera o arquivo em memória e o devolve como download (application/pdf)
+                byte[] pdfBytes = document.GeneratePdf();
+                return File(pdfBytes, "application/pdf", "Relatorio_Veiculos.pdf");
+            }
+            catch (Exception ex)
+            {
+                return TratarErro(ex, "Erro ao gerar relatório em PDF");
+            }
+        }
+
         /// <summary>
         /// Cria e salva um novo veiculo no banco de dados.
         /// </summary>
@@ -89,6 +172,37 @@ namespace ApiIveco.Controllers
                 return Ok(new { mensagem = "Veículo registrado com sucesso!", veiculo = criado });
             }
             catch (Exception ex) { return TratarErro(ex, "Erro ao criar veículo"); }
+        }
+
+        // Em ApiIveco/Controllers/DadosController.cs
+
+        /// <summary>
+        /// Atualiza os dados de um veículo existente.
+        /// </summary>
+        /// <param name="vin">O VIN do veículo a ser atualizado.</param>
+        /// <param name="veiculo">Objeto JSON com os dados novos.</param>
+        [HttpPut("veiculos/{vin}")]
+        public async Task<IActionResult> PutVeiculo(string vin, [FromBody] Veiculo veiculo)
+        {
+            if (veiculo == null)
+                return BadRequest(new { Erro = "Dados inválidos", Mensagem = "Requisição nula." });
+
+            if (vin != veiculo.Vin)
+                return BadRequest(new { Erro = "Inconsistência", Mensagem = "O VIN da URL diverge do VIN no corpo da requisição." });
+
+            try
+            {
+                var atualizado = await _dadosService.AtualizarVeiculo(vin, veiculo);
+
+                if (atualizado == null)
+                    return NotFound(new { Erro = "Não encontrado", Mensagem = "Veículo não encontrado para atualização." });
+
+                return Ok(new { mensagem = "Veículo atualizado com sucesso!", veiculo = atualizado });
+            }
+            catch (Exception ex)
+            {
+                return TratarErro(ex, "Erro ao atualizar veículo");
+            }
         }
 
         /// <summary>
