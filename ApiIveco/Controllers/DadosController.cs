@@ -529,21 +529,29 @@ namespace ApiIveco.Controllers
         /// <response code="401">Se as credenciais estiverem incorretas (E-mail não encontrado ou senha errada).</response>
         /// <response code="500">Se ocorrer um erro interno no servidor de autenticação.</response>
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] Usuario credenciais)
+        public async Task<IActionResult> Login([FromBody] LoginRequest credenciais)
         {
-            if (string.IsNullOrWhiteSpace(credenciais.Email) || string.IsNullOrWhiteSpace(credenciais.Senha))
-                return BadRequest(new { Erro = "Dados Inválidos", Mensagem = "Informe e-mail e senha." });
+            if (string.IsNullOrWhiteSpace(credenciais.Email) ||
+                string.IsNullOrWhiteSpace(credenciais.Senha))
+                return BadRequest(new
+                {
+                    Erro = "Dados Inválidos",
+                    Mensagem = "Informe e-mail e senha."
+                });
 
             try
             {
-                var usuario = await _dadosService.FazerLogin(credenciais.Email, credenciais.Senha);
+                var usuario = await _dadosService.FazerLogin(
+                    credenciais.Email, credenciais.Senha);
 
                 if (usuario == null)
-                    return Unauthorized(new { Erro = "Acesso Negado", Mensagem = "E-mail ou senha incorretos." });
+                    return Unauthorized(new
+                    {
+                        Erro = "Acesso Negado",
+                        Mensagem = "E-mail ou senha incorretos."
+                    });
 
-                // Limpa a senha antes de enviar para o Front
                 usuario.Senha = "";
-
                 return Ok(new { mensagem = "Login efetuado com sucesso!", usuario });
             }
             catch (Exception ex)
@@ -566,6 +574,13 @@ namespace ApiIveco.Controllers
                 return StatusCode(StatusCodes.Status404NotFound, new { Erro = "Não encontrado", Mensagem = ex.Message });
 
             return StatusCode(StatusCodes.Status500InternalServerError, new { Erro = "Falha Interna", Mensagem = ex.Message });
+        }
+
+        // Classe auxiliar só para o login — coloque fora da classe DadosController
+        public class LoginRequest
+        {
+            public string Email { get; set; }
+            public string Senha { get; set; }
         }
     }
 }
