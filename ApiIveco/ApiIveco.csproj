@@ -9,6 +9,9 @@
 	<ItemGroup>
 	  <Compile Remove="Models\GooglePlacesResponse.cs" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="chave_Api.zip" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Google.Cloud.Firestore" Version="4.2.0" />
