@@ -370,20 +370,26 @@ namespace ApiIveco.Service
         // ==========================================
         public async Task<Usuario> CadastrarUsuario(Usuario novoUsuario)
         {
-            // 1. Usamos "Usuarios" (plural) para bater certo com o FazerLogin!
             var usuariosRef = _firestoreDb.Db.Collection("Usuarios");
-            var query = await usuariosRef.WhereEqualTo("Email", novoUsuario.Email).GetSnapshotAsync();
+
+            // Verifica se email já existe
+            var query = await usuariosRef
+                .WhereEqualTo("Email", novoUsuario.Email)
+                .GetSnapshotAsync();
 
             if (query.Documents.Count > 0)
                 throw new Exception("Já existe um usuário cadastrado com este e-mail.");
 
-            // 2. AQUI ESTÁ A MÁGICA DO SEU CONTADOR
-            // Chama o seu método gerador e cria a "gaveta" contador_usuario no Firebase
-            int novoId = await GerarProximoId("contador_usuario");
-            novoUsuario.Id = novoId.ToString(); // Converte o número 1, 2, 3... para texto
+            // Garante valor padrão
+            if (string.IsNullOrWhiteSpace(novoUsuario.Acesso))
+                novoUsuario.Acesso = "Usuario";
 
+            // Gera ID incremental
+            int novoId = await GerarProximoId("contador_usuario");
+            novoUsuario.Id = novoId.ToString();
             novoUsuario.DataCriacao = DateTime.UtcNow;
 
+            // Salva — Id NÃO será campo do documento pois não tem [FirestoreProperty]
             DocumentReference docRef = usuariosRef.Document(novoUsuario.Id);
             await docRef.SetAsync(novoUsuario);
 
@@ -392,14 +398,35 @@ namespace ApiIveco.Service
 
         public async Task<Usuario> FazerLogin(string email, string senha)
         {
-            // CORREÇÃO: Foi adicionado o ".Db" logo após o _firestoreDb
+            _logger.LogCritical("### LOGIN PARA: {email}", email);
+
             var usuariosRef = _firestoreDb.Db.Collection("Usuarios");
-            var query = await usuariosRef.WhereEqualTo("Email", email).WhereEqualTo("Senha", senha).GetSnapshotAsync();
 
-            if (query.Documents.Count == 0)
-                return null; // Usuário ou senha incorretos
+            // Busca todos e compara manualmente — evita problemas de query
+            var snapshot = await usuariosRef.GetSnapshotAsync();
 
-            return query.Documents[0].ConvertTo<Usuario>();
+            _logger.LogCritical("### TOTAL DOCS: {count}", snapshot.Documents.Count);
+
+            foreach (var doc in snapshot.Documents)
+            {
+                doc.TryGetValue<string>("Email", out var emailSalvo);
+                doc.TryGetValue<string>("Senha", out var senhaSalva);
+
+                _logger.LogCritical("### DOC {id} | Email:'{e}' | Senha:'{s}'",
+                    doc.Id, emailSalvo, senhaSalva);
+
+                if (string.Equals(emailSalvo, email, StringComparison.OrdinalIgnoreCase)
+                    && senhaSalva == senha)
+                {
+                    _logger.LogCritical("### USUARIO ENCONTRADO");
+                    var usuario = doc.ConvertTo<Usuario>();
+                    usuario.Id = doc.Id;
+                    return usuario;
+                }
+            }
+
+            _logger.LogCritical("### NENHUM USUARIO ENCONTRADO");
+            return null;
         }
     }
  }

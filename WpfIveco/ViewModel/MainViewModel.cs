@@ -151,14 +151,17 @@ namespace WpfIveco.ViewModel
             {
                 if (string.IsNullOrWhiteSpace(LoginEmail) || string.IsNullOrWhiteSpace(LoginSenha))
                 {
-                    MessageBox.Show("Preencha o e-mail e a senha.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Preencha o e-mail e a senha.", "Aviso",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 var credenciais = new { Email = LoginEmail, Senha = LoginSenha };
+
                 try
                 {
                     var response = await _httpClient.PostAsJsonAsync("api/dados/login", credenciais);
+
                     if (response.IsSuccessStatusCode)
                     {
                         var json = await response.Content.ReadAsStringAsync();
@@ -170,20 +173,37 @@ namespace WpfIveco.ViewModel
                         IsAdmin = (PerfilUsuario == "Admin");
 
                         IsLoggedIn = true;
-                        LoginSenha = ""; // Limpa por segurança
+                        LoginSenha = "";
 
                         _ = CarregarDadosDaApiAsync();
                         _timer.Start();
                     }
                     else
                     {
-                        // A API retorna Unauthorized (401) se a senha estiver incorreta ou email não existir
-                        MessageBox.Show("❌ Conta não encontrada ou Senha incorreta.\nVerifique as suas credenciais ou crie uma nova conta.", "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Error);
+                        // Mostra o erro real retornado pela API
+                        var erro = await response.Content.ReadAsStringAsync();
+                        MessageBox.Show(
+                            $"❌ Acesso negado.\nHTTP {(int)response.StatusCode}\n\nDetalhes: {erro}",
+                            "Acesso Negado",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
                     }
+                }
+                catch (HttpRequestException ex)
+                {
+                    MessageBox.Show(
+                        $"❌ API inacessível.\nVerifique se o projeto ApiIveco está rodando.\n\nErro: {ex.Message}",
+                        "Erro de Conexão",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Falha de comunicação com a API:\n{ex.Message}", "Erro Crítico", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(
+                        $"Erro inesperado:\n{ex.Message}\n\nInner: {ex.InnerException?.Message}",
+                        "Erro Crítico",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
                 }
             });
 
