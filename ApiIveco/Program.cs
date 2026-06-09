@@ -6,6 +6,14 @@ using System.Reflection;        // <-- NECESSÁRIO PARA LER O FICHEIRO XML
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders(); // Limpa a formatação feia padrão
+builder.Logging.AddSimpleConsole(options =>
+{
+    options.SingleLine = true; // Força o log a ficar numa única linha (muito mais fácil de ler)
+    options.TimestampFormat = "[HH:mm:ss] "; // Adiciona a hora exata na frente
+    options.ColorBehavior = Microsoft.Extensions.Logging.Console.LoggerColorBehavior.Enabled; // Mantém as cores (Verde, Amarelo, Vermelho)
+});
+
 // ========================================================
 // 1. CORREÇÃO DO ERRO DO CONSTRUTOR (INJEÇÃO DE DEPENDÊNCIA)
 // ========================================================
