@@ -1,5 +1,6 @@
 ﻿using LiveCharts;
 using LiveCharts.Wpf;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,6 +17,9 @@ using System.Windows.Threading;
 using WpfIveco.Models;
 using WpfIveco.Models.WpfIveco.Models;
 using WpfIveco.ViewModels;
+using Microsoft.Win32; 
+using System.Diagnostics;
+using System.IO;
 
 namespace WpfIveco.ViewModel
 {
@@ -58,6 +62,8 @@ namespace WpfIveco.ViewModel
         public ICommand FazerCadastroCommand { get; }
         public ICommand FazerLogoutCommand { get; }
         public ICommand AlternarModoAuthCommand { get; }
+        public ICommand MudarTipoRelatorioCommand { get; }
+        public ICommand GerarRelatorioPdfCommand { get; }
 
         // ==========================================
         // VARIÁVEIS - NAVEGAÇÃO E SISTEMA
@@ -145,7 +151,8 @@ namespace WpfIveco.ViewModel
             ConsultarCnpjCommand = new RelayCommand(async p => await BuscarPorCnpjAsync());
             SalvarFornecedorCommand = new RelayCommand(async p => await SalvarFornecedorAsync());
             AlternarModoAuthCommand = new RelayCommand(p => ModoCadastro = !ModoCadastro);
-
+            MudarTipoRelatorioCommand = new RelayCommand(ExecutarMudarTipoRelatorio);
+            GerarRelatorioPdfCommand = new RelayCommand(ExecutarGerarRelatorioPdf);
             // ==========================================
             // COMANDO: LOGIN
             // ==========================================
@@ -631,6 +638,76 @@ namespace WpfIveco.ViewModel
                 Debug.WriteLine($"[ERRO INESPERADO FORNECEDOR] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
                 MensagemCadastro = "❌ Ocorreu um erro inesperado. Tente novamente.";
             }
+        }
+
+        public async Task BaixarRelatorioPdf()
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    // ATENÇÃO: Substitua 7196 pela porta correta da sua API!
+                    string urlDaApi = "https://localhost:44353/api/Dados/relatorios/veiculos/pdf";
+
+                    // Faz o pedido do PDF à API
+                    var response = await client.GetAsync(urlDaApi);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Lê o ficheiro PDF em formato de bytes
+                        byte[] fileBytes = await response.Content.ReadAsByteArrayAsync();
+
+                        // Abre a janela do Windows para o utilizador escolher onde guardar
+                        SaveFileDialog saveFileDialog = new SaveFileDialog
+                        {
+                            Filter = "Ficheiro PDF (*.pdf)|*.pdf",
+                            FileName = "Relatorio_Veiculos_Iveco.pdf", // Nome sugerido
+                            Title = "Guardar Relatório de Veículos"
+                        };
+
+                        if (saveFileDialog.ShowDialog() == true)
+                        {
+                            // Guarda o ficheiro no disco rígido
+                            File.WriteAllBytes(saveFileDialog.FileName, fileBytes);
+
+                            MessageBox.Show("Relatório gerado e guardado com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                            // BÓNUS: Abre o PDF automaticamente no leitor padrão (ex: Edge, Adobe Reader)
+                            Process.Start(new ProcessStartInfo
+                            {
+                                FileName = saveFileDialog.FileName,
+                                UseShellExecute = true
+                            });
+                        }
+                    }
+                    else
+                    {
+                        // Se a API der erro, lemos o motivo
+                        string erro = await response.Content.ReadAsStringAsync();
+                        MessageBox.Show($"Falha ao gerar o relatório.\nStatus: {response.StatusCode}\nErro: {erro}", "Erro da API");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro interno ao tentar descarregar o PDF:\n{ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        // Método para lidar com os RadioButtons (Erros das linhas 967, 972 e 976)
+        private void ExecutarMudarTipoRelatorio(object param)
+        {
+            // O 'param' vai receber o CommandParameter do XAML (ex: "Veiculos", "Fornecedores", etc.)
+            // Aqui você pode colocar a lógica para saber qual relatório gerar.
+            string tipoEscolhido = param as string;
+
+            // (Lógica futura entra aqui)
+        }
+
+        // Método para lidar com o Botão de Download (Erro da linha 981)
+        private async void ExecutarGerarRelatorioPdf(object param)
+        {
+            // Chama a função de baixar o PDF que criámos anteriormente
+            await BaixarRelatorioPdf();
         }
 
         // ==========================================
