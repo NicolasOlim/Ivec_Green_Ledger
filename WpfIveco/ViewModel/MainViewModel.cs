@@ -85,6 +85,15 @@ namespace WpfIveco.ViewModel
         public string MediaCarbono { get => _mediaCarbono; set { _mediaCarbono = value; OnPropertyChanged(); } }
 
         // ==========================================
+        // VARIÁVEIS - RELATÓRIOS
+        // ==========================================
+        private string _tipoRelatorioSelecionado = "Veiculos";
+        public string TipoRelatorioSelecionado { get => _tipoRelatorioSelecionado; set { _tipoRelatorioSelecionado = value; OnPropertyChanged(); } }
+
+        public ICommand MudarTipoRelatorioCommand { get; }
+        public ICommand GerarRelatorioPdfCommand { get; }
+
+        // ==========================================
         // VARIÁVEIS - RASTREABILIDADE / FORNECEDORES / PEÇAS
         // ==========================================
         private string _pesquisaVin = "";
@@ -133,7 +142,9 @@ namespace WpfIveco.ViewModel
         public MainViewModel()
         {
             var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true };
-            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:44353/") };
+            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:7221/") };
+            MudarTipoRelatorioCommand = new RelayCommand(p => TipoRelatorioSelecionado = p?.ToString());
+            GerarRelatorioPdfCommand = new RelayCommand(async p => await GerarRelatorioPdfAsync());
 
             MudarAbaCommand = new RelayCommand(p => AbaAtiva = p as string);
             LigarDesligarSimuladorCommand = new RelayCommand(p => StatusSimulador = StatusSimulador == "Ativo" ? "Desativado" : "Ativo");
@@ -356,6 +367,75 @@ namespace WpfIveco.ViewModel
         // ==========================================
         // OUTROS MÉTODOS DE API
         // ==========================================
+
+        // ==========================================
+        // MÉTODO: GERAR E BAIXAR RELATÓRIO PDF
+        // ==========================================
+        private async Task GerarRelatorioPdfAsync()
+        {
+            string endpoint = "";
+            string defaultFileName = "";
+
+            // Verifica qual relatório o usuário escolheu na tela
+            if (TipoRelatorioSelecionado == "Veiculos")
+            {
+                endpoint = "api/dados/relatorios/veiculos/pdf";
+                defaultFileName = $"Relatorio_Veiculos_{DateTime.Now:yyyyMMdd_HHmm}.pdf";
+            }
+            else
+            {
+                MessageBox.Show("Este relatório ainda não está disponível na API.\nPara implementá-lo, crie um novo endpoint na API nos mesmos moldes do Veículo.", "Em Desenvolvimento", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            try
+            {
+                // Faz a requisição GET para a API
+                var response = await _httpClient.GetAsync(endpoint);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Lê o arquivo recebido em bytes
+                    var pdfBytes = await response.Content.ReadAsByteArrayAsync();
+
+                    // Abre a janela padrão do Windows para salvar o arquivo
+                    var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+                    {
+                        Filter = "Arquivos PDF (*.pdf)|*.pdf",
+                        FileName = defaultFileName,
+                        Title = "Salvar Relatório PDF"
+                    };
+
+                    if (saveFileDialog.ShowDialog() == true)
+                    {
+                        // Salva o arquivo no disco do usuário
+                        System.IO.File.WriteAllBytes(saveFileDialog.FileName, pdfBytes);
+
+                        var resultado = MessageBox.Show("Relatório PDF gerado e salvo com sucesso!\nDeseja abrir o arquivo agora?", "Sucesso", MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+                        // Abre o PDF automaticamente no leitor padrão do PC
+                        if (resultado == MessageBoxResult.Yes)
+                        {
+                            var process = new System.Diagnostics.Process();
+                            process.StartInfo = new System.Diagnostics.ProcessStartInfo(saveFileDialog.FileName)
+                            {
+                                UseShellExecute = true // Necessário no .NET 8 para abrir arquivos
+                            };
+                            process.Start();
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Erro ao solicitar a geração do relatório à API.", "Falha", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro crítico ao comunicar com o servidor:\n{ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private async Task PesquisarVinAsync()
         {
             if (string.IsNullOrWhiteSpace(PesquisaVin) || PesquisaVin.Length != 17)

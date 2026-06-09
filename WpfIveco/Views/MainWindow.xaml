@@ -338,6 +338,23 @@
                                 </StackPanel>
                             </Button>
 
+                            <Button Command="{Binding MudarAbaCommand}" CommandParameter="Relatorios">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding AbaAtiva}" Value="Relatorios">
+                                                <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;" FontSize="16" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Relatórios PDF" FontSize="15" VerticalAlignment="Center" FontWeight="Medium"/>
+                                </StackPanel>
+                            </Button>
+
                             <StackPanel>
                                 <StackPanel.Style>
                                     <Style TargetType="StackPanel">
@@ -921,6 +938,56 @@
                             </Border>
                         </Grid>
 
+                        <Grid>
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding AbaAtiva}" Value="Relatorios">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0">
+                                <TextBlock Style="{StaticResource H1}" Text="Central de Relatórios"/>
+                                <TextBlock Style="{StaticResource Subtitle}" Text="Exporte os dados consolidados da cadeia de suprimentos da Iveco em formato PDF oficial."/>
+                            </StackPanel>
+
+                            <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="30" Margin="0,0,0,20">
+                                <StackPanel>
+                                    <TextBlock Text="Selecione o tipo de relatório desejado:" Style="{StaticResource H2}" Margin="0,0,0,15"/>
+
+                                    <StackPanel Margin="0,0,0,30">
+                                        <RadioButton Content="📄 Relatório Geral de Veículos (Rastreabilidade)" 
+                                                     Foreground="{StaticResource TextPrimary}" FontSize="15" Margin="0,0,0,12" 
+                                                     IsChecked="True" 
+                                                     Command="{Binding MudarTipoRelatorioCommand}" CommandParameter="Veiculos"/>
+
+                                        <RadioButton Content="📄 Relatório de Fornecedores Cadastrados (Em breve)" 
+                                                     Foreground="{StaticResource TextSecondary}" FontSize="15" Margin="0,0,0,12" 
+                                                     Command="{Binding MudarTipoRelatorioCommand}" CommandParameter="Fornecedores"/>
+
+                                        <RadioButton Content="📄 Relatório de Componentes e Peças (Em breve)" 
+                                                     Foreground="{StaticResource TextSecondary}" FontSize="15" 
+                                                     Command="{Binding MudarTipoRelatorioCommand}" CommandParameter="Pecas"/>
+                                    </StackPanel>
+
+                                    <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding GerarRelatorioPdfCommand}" HorizontalAlignment="Left" Padding="24,14">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Processar e Baixar Relatório" FontSize="15" VerticalAlignment="Center" FontWeight="Bold"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
                     </Grid>
                 </ScrollViewer>
             </Grid>
@@ -1003,7 +1070,8 @@
                         <TextBlock Text="Palavra-Passe" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
                         <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding LoginSenha, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,30" />
 
-                        <Button Background="{StaticResource AppleBlue}" Foreground="White" Padding="0,14" Cursor="Hand" BorderThickness="0">                            <Button.Style>
+                        <Button Background="{StaticResource AppleBlue}" Foreground="White" Padding="0,14" Cursor="Hand" BorderThickness="0">
+                            <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Command" Value="{Binding FazerLoginCommand}"/>
                                     <Style.Triggers>
