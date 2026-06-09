@@ -3,6 +3,7 @@ using LiveCharts.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -32,7 +33,6 @@ namespace WpfIveco.ViewModel
         private bool _isAdmin = false;
         public bool IsAdmin { get => _isAdmin; set { _isAdmin = value; OnPropertyChanged(); } }
 
-        // Variável para alternar entre a Tela de Login e a de Cadastro
         private bool _modoCadastro = false;
         public bool ModoCadastro { get => _modoCadastro; set { _modoCadastro = value; OnPropertyChanged(); } }
 
@@ -42,11 +42,10 @@ namespace WpfIveco.ViewModel
         private string _loginSenha = "";
         public string LoginSenha { get => _loginSenha; set { _loginSenha = value; OnPropertyChanged(); } }
 
-        // Variáveis exclusivas para o momento do Cadastro
         private string _cadastroNome = "";
         public string CadastroNome { get => _cadastroNome; set { _cadastroNome = value; OnPropertyChanged(); } }
 
-        private string _cadastroPerfil = "Usuario"; // Padrão
+        private string _cadastroPerfil = "Usuario";
         public string CadastroPerfil { get => _cadastroPerfil; set { _cadastroPerfil = value; OnPropertyChanged(); } }
 
         private string _nomeUsuario = "Visitante";
@@ -83,15 +82,6 @@ namespace WpfIveco.ViewModel
 
         private string _mediaCarbono = "0.0K";
         public string MediaCarbono { get => _mediaCarbono; set { _mediaCarbono = value; OnPropertyChanged(); } }
-
-        // ==========================================
-        // VARIÁVEIS - RELATÓRIOS
-        // ==========================================
-        private string _tipoRelatorioSelecionado = "Veiculos";
-        public string TipoRelatorioSelecionado { get => _tipoRelatorioSelecionado; set { _tipoRelatorioSelecionado = value; OnPropertyChanged(); } }
-
-        public ICommand MudarTipoRelatorioCommand { get; }
-        public ICommand GerarRelatorioPdfCommand { get; }
 
         // ==========================================
         // VARIÁVEIS - RASTREABILIDADE / FORNECEDORES / PEÇAS
@@ -141,29 +131,29 @@ namespace WpfIveco.ViewModel
         // ==========================================
         public MainViewModel()
         {
-            var handler = new HttpClientHandler { ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true };
-            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:7221/") };
-            MudarTipoRelatorioCommand = new RelayCommand(p => TipoRelatorioSelecionado = p?.ToString());
-            GerarRelatorioPdfCommand = new RelayCommand(async p => await GerarRelatorioPdfAsync());
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
+            };
+            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:44353/") };
 
             MudarAbaCommand = new RelayCommand(p => AbaAtiva = p as string);
-            LigarDesligarSimuladorCommand = new RelayCommand(p => StatusSimulador = StatusSimulador == "Ativo" ? "Desativado" : "Ativo");
+            LigarDesligarSimuladorCommand = new RelayCommand(p =>
+                StatusSimulador = StatusSimulador == "Ativo" ? "Desativado" : "Ativo");
 
             PesquisarVinCommand = new RelayCommand(async p => await PesquisarVinAsync());
             ConsultarCnpjCommand = new RelayCommand(async p => await BuscarPorCnpjAsync());
             SalvarFornecedorCommand = new RelayCommand(async p => await SalvarFornecedorAsync());
-
-            // -------------------------------------------------------------
-            // COMANDOS DE AUTENTICAÇÃO (LOGIN E CADASTRO)
-            // -------------------------------------------------------------
             AlternarModoAuthCommand = new RelayCommand(p => ModoCadastro = !ModoCadastro);
 
+            // ==========================================
+            // COMANDO: LOGIN
+            // ==========================================
             FazerLoginCommand = new RelayCommand(async p =>
             {
                 if (string.IsNullOrWhiteSpace(LoginEmail) || string.IsNullOrWhiteSpace(LoginSenha))
                 {
-                    MessageBox.Show("Preencha o e-mail e a senha.", "Aviso",
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MostrarAvisoValidacao("Preencha o e-mail e a senha.");
                     return;
                 }
 
@@ -181,8 +171,7 @@ namespace WpfIveco.ViewModel
 
                         NomeUsuario = userJson.GetProperty("nome").GetString();
                         PerfilUsuario = userJson.GetProperty("acesso").GetString();
-                        IsAdmin = (PerfilUsuario == "Admin");
-
+                        IsAdmin = PerfilUsuario == "Admin";
                         IsLoggedIn = true;
                         LoginSenha = "";
 
@@ -191,42 +180,59 @@ namespace WpfIveco.ViewModel
                     }
                     else
                     {
-                        // Mostra o erro real retornado pela API
-                        var erro = await response.Content.ReadAsStringAsync();
-                        MessageBox.Show(
-                            $"❌ Acesso negado.\nHTTP {(int)response.StatusCode}\n\nDetalhes: {erro}",
-                            "Acesso Negado",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error);
+                        // Loga o erro real no Output do Visual Studio
+                        var erroDetalhado = await response.Content.ReadAsStringAsync();
+                        Debug.WriteLine($"[ERRO LOGIN] HTTP {(int)response.StatusCode} -> {erroDetalhado}");
+
+                        // Utilizador vê mensagem genérica baseada no status code
+                        var mensagem = response.StatusCode switch
+                        {
+                            System.Net.HttpStatusCode.Unauthorized =>
+                                "Credenciais incorretas.\nVerifique o e-mail e a senha.",
+                            System.Net.HttpStatusCode.BadRequest =>
+                                "Os dados enviados são inválidos.\nVerifique e tente novamente.",
+                            _ => "Não foi possível entrar no sistema.\nTente novamente mais tarde."
+                        };
+
+                        MessageBox.Show(mensagem, "Acesso Negado",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                 }
                 catch (HttpRequestException ex)
                 {
+                    // Erro técnico completo no Output
+                    Debug.WriteLine($"[ERRO CONEXÃO LOGIN] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+
+                    // Mensagem genérica para o utilizador
                     MessageBox.Show(
-                        $"❌ API inacessível.\nVerifique se o projeto ApiIveco está rodando.\n\nErro: {ex.Message}",
-                        "Erro de Conexão",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
+                        "Não foi possível conectar ao servidor.\nVerifique a sua ligação e tente novamente.",
+                        "Erro de Ligação", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 catch (Exception ex)
                 {
+                    // Erro inesperado completo no Output
+                    Debug.WriteLine($"[ERRO INESPERADO LOGIN] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+
+                    // Mensagem genérica para o utilizador
                     MessageBox.Show(
-                        $"Erro inesperado:\n{ex.Message}\n\nInner: {ex.InnerException?.Message}",
-                        "Erro Crítico",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
+                        "Ocorreu um erro inesperado.\nTente novamente ou contacte o suporte.",
+                        "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             });
 
+            // ==========================================
+            // COMANDO: CADASTRO
+            // ==========================================
             FazerCadastroCommand = new RelayCommand(async p =>
             {
-                if (string.IsNullOrWhiteSpace(CadastroNome) || string.IsNullOrWhiteSpace(LoginEmail) || string.IsNullOrWhiteSpace(LoginSenha))
+                if (string.IsNullOrWhiteSpace(CadastroNome) ||
+                    string.IsNullOrWhiteSpace(LoginEmail) ||
+                    string.IsNullOrWhiteSpace(LoginSenha))
                 {
-                    MessageBox.Show("Preencha todos os campos para criar a conta.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MostrarAvisoValidacao("Preencha todos os campos para criar a conta.");
                     return;
                 }
 
-                // Cria o payload que a API espera
                 var novoUser = new
                 {
                     Nome = CadastroNome,
@@ -237,26 +243,46 @@ namespace WpfIveco.ViewModel
 
                 try
                 {
-                    var response = await _httpClient.PostAsJsonAsync("api/dados/cadastrar", novoUser); ;
+                    var response = await _httpClient.PostAsJsonAsync("api/dados/cadastrar", novoUser);
+
                     if (response.IsSuccessStatusCode)
                     {
-                        MessageBox.Show("✅ Conta criada com sucesso! Já pode fazer login.", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
-                        ModoCadastro = false; // Volta para a tela de Login
+                        MessageBox.Show(
+                            "Conta criada com sucesso!\nJá pode fazer login.",
+                            "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                        ModoCadastro = false;
                         CadastroNome = "";
                         LoginSenha = "";
                     }
                     else
                     {
-                        var erroJson = await response.Content.ReadAsStringAsync();
-                        MessageBox.Show($"❌ Erro ao criar conta.\nDetalhes: {erroJson}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                        var erroDetalhado = await response.Content.ReadAsStringAsync();
+                        Debug.WriteLine($"[ERRO CADASTRO] HTTP {(int)response.StatusCode} -> {erroDetalhado}");
+
+                        MessageBox.Show(
+                            "Não foi possível criar a conta.\nTente novamente ou contacte o suporte.",
+                            "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
+                }
+                catch (HttpRequestException ex)
+                {
+                    Debug.WriteLine($"[ERRO CONEXÃO CADASTRO] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                    MessageBox.Show(
+                        "Não foi possível conectar ao servidor.\nVerifique a sua ligação e tente novamente.",
+                        "Erro de Ligação", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Falha de comunicação com a API:\n{ex.Message}", "Erro Crítico", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Debug.WriteLine($"[ERRO INESPERADO CADASTRO] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                    MessageBox.Show(
+                        "Ocorreu um erro inesperado.\nTente novamente ou contacte o suporte.",
+                        "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             });
 
+            // ==========================================
+            // COMANDO: LOGOUT
+            // ==========================================
             FazerLogoutCommand = new RelayCommand(p =>
             {
                 IsLoggedIn = false;
@@ -268,28 +294,72 @@ namespace WpfIveco.ViewModel
                 _timer.Stop();
             });
 
-            // Inicializa Gráfico Vazio
-            EmissoesSeries = new SeriesCollection {
-                new LineSeries { Title = "Escopo 1 (Fábrica)", Values = new ChartValues<double>(), Stroke = new SolidColorBrush(Color.FromRgb(10, 132, 255)), Fill = new SolidColorBrush(Color.FromArgb(50, 10, 132, 255)), PointGeometrySize = 10 },
-                new LineSeries { Title = "Escopo 3 (Cadeia)", Values = new ChartValues<double>(), Stroke = new SolidColorBrush(Color.FromRgb(48, 209, 88)), Fill = new SolidColorBrush(Color.FromArgb(50, 48, 209, 88)), PointGeometrySize = 10 }
-            };
-
+            // ==========================================
+            // COMANDO: ADICIONAR PEÇA
+            // ==========================================
             AdicionarPecaManualCommand = new RelayCommand(async p =>
             {
-                if (string.IsNullOrWhiteSpace(NovaPecaNome) || string.IsNullOrWhiteSpace(NovaPecaVin)) return;
-                var novaPecaParaApi = new { Id = Guid.NewGuid().ToString().Substring(0, 8), NomePeca = NovaPecaNome, Fk_Veiculo_Vin = NovaPecaVin, Fk_LoteMateriaPrima_Id = "LOTE-MANUAL-" + DateTime.Now.ToString("yyyyMMdd") };
+                if (string.IsNullOrWhiteSpace(NovaPecaNome) || string.IsNullOrWhiteSpace(NovaPecaVin))
+                    return;
+
+                var novaPeca = new
+                {
+                    Id = Guid.NewGuid().ToString().Substring(0, 8),
+                    NomePeca = NovaPecaNome,
+                    Fk_Veiculo_Vin = NovaPecaVin,
+                    Fk_LoteMateriaPrima_Id = "LOTE-MANUAL-" + DateTime.Now.ToString("yyyyMMdd")
+                };
+
                 try
                 {
-                    var response = await _httpClient.PostAsJsonAsync("api/dados/componentes", novaPecaParaApi);
+                    var response = await _httpClient.PostAsJsonAsync("api/dados/componentes", novaPeca);
+
                     if (response.IsSuccessStatusCode)
                     {
                         ListaPecas.Insert(0, new PecaModel { NomePeca = NovaPecaNome, VinAssociado = NovaPecaVin });
-                        NovaPecaNome = ""; NovaPecaVin = "";
-                        MessageBox.Show("✅ Peça registada no Firebase com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                        NovaPecaNome = "";
+                        NovaPecaVin = "";
+                        MessageBox.Show("Peça registada com sucesso!", "Sucesso",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        var erroDetalhado = await response.Content.ReadAsStringAsync();
+                        Debug.WriteLine($"[ERRO ADICIONAR PEÇA] HTTP {(int)response.StatusCode} -> {erroDetalhado}");
+                        MessageBox.Show(
+                            "Não foi possível registar a peça.\nTente novamente.",
+                            "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
-                catch (Exception ex) { MessageBox.Show(ex.Message); }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[ERRO INESPERADO PEÇA] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                    MessageBox.Show(
+                        "Ocorreu um erro inesperado.\nTente novamente ou contacte o suporte.",
+                        "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             });
+
+            // Inicializa gráfico vazio
+            EmissoesSeries = new SeriesCollection
+            {
+                new LineSeries
+                {
+                    Title            = "Escopo 1 (Fábrica)",
+                    Values           = new ChartValues<double>(),
+                    Stroke           = new SolidColorBrush(Color.FromRgb(10, 132, 255)),
+                    Fill             = new SolidColorBrush(Color.FromArgb(50, 10, 132, 255)),
+                    PointGeometrySize = 10
+                },
+                new LineSeries
+                {
+                    Title            = "Escopo 3 (Cadeia)",
+                    Values           = new ChartValues<double>(),
+                    Stroke           = new SolidColorBrush(Color.FromRgb(48, 209, 88)),
+                    Fill             = new SolidColorBrush(Color.FromArgb(50, 48, 209, 88)),
+                    PointGeometrySize = 10
+                }
+            };
 
             _timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(2) };
             _timer.Tick += async (s, e) => await CarregarDadosDaApiAsync();
@@ -316,6 +386,10 @@ namespace WpfIveco.ViewModel
                         AtualizarGraficoComDadosReais(veiculos);
                     }
                 }
+                else
+                {
+                    Debug.WriteLine($"[ERRO CARREGAR VEÍCULOS] HTTP {(int)responseVeiculos.StatusCode}");
+                }
 
                 var responseFornecedores = await _httpClient.GetAsync("api/dados/fornecedores");
                 if (responseFornecedores.IsSuccessStatusCode)
@@ -323,6 +397,10 @@ namespace WpfIveco.ViewModel
                     var json = await responseFornecedores.Content.ReadAsStringAsync();
                     var fornecedores = JsonSerializer.Deserialize<List<FornecedorModel>>(json, opcoes);
                     TotalFornecedores = fornecedores?.Count.ToString() ?? "0";
+                }
+                else
+                {
+                    Debug.WriteLine($"[ERRO CARREGAR FORNECEDORES] HTTP {(int)responseFornecedores.StatusCode}");
                 }
 
                 var responseComponentes = await _httpClient.GetAsync("api/dados/componentes");
@@ -332,12 +410,23 @@ namespace WpfIveco.ViewModel
                     var componentesApi = JsonSerializer.Deserialize<List<VeiculoComponenteApi>>(json, opcoes);
                     if (componentesApi != null)
                     {
-                        var listaMapeada = componentesApi.Select(c => new PecaModel { NomePeca = c.NomePeca, VinAssociado = c.Fk_Veiculo_Vin }).Reverse().ToList();
+                        var listaMapeada = componentesApi
+                            .Select(c => new PecaModel { NomePeca = c.NomePeca, VinAssociado = c.Fk_Veiculo_Vin })
+                            .Reverse()
+                            .ToList();
                         ListaPecas = new ObservableCollection<PecaModel>(listaMapeada);
                     }
                 }
+                else
+                {
+                    Debug.WriteLine($"[ERRO CARREGAR COMPONENTES] HTTP {(int)responseComponentes.StatusCode}");
+                }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                // Erro real no Output — sem popup para não interromper o utilizador
+                Debug.WriteLine($"[ERRO CARREGAR DADOS] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+            }
         }
 
         private void AtualizarGraficoComDadosReais(List<VeiculoModel> veiculos)
@@ -349,98 +438,45 @@ namespace WpfIveco.ViewModel
             var valoresEscopo1 = new ChartValues<double>();
             var valoresEscopo3 = new ChartValues<double>();
 
-            double baseEscopo1 = 120.0; double baseEscopo3 = 250.0;
+            double baseEscopo1 = 120.0;
+            double baseEscopo3 = 250.0;
 
             foreach (var mes in ultimosMeses)
             {
                 int veiculosNoMes = 0;
-                try { veiculosNoMes = veiculos.Count(v => Convert.ToDateTime(v.DataMontagem).Year == mes.Year && Convert.ToDateTime(v.DataMontagem).Month == mes.Month); }
-                catch { veiculosNoMes = veiculos.Count / 6; }
+                try
+                {
+                    veiculosNoMes = veiculos.Count(v =>
+                        Convert.ToDateTime(v.DataMontagem).Year == mes.Year &&
+                        Convert.ToDateTime(v.DataMontagem).Month == mes.Month);
+                }
+                catch
+                {
+                    veiculosNoMes = veiculos.Count / 6;
+                }
+
                 valoresEscopo1.Add(Math.Round(baseEscopo1 + (veiculosNoMes * 1.8), 1));
                 valoresEscopo3.Add(Math.Round(baseEscopo3 + (veiculosNoMes * 3.5), 1));
             }
 
-            if (EmissoesSeries.Count == 2) { EmissoesSeries[0].Values = valoresEscopo1; EmissoesSeries[1].Values = valoresEscopo3; }
-            if (veiculos.Count > 0) MediaCarbono = $"{((valoresEscopo1.Sum() + valoresEscopo3.Sum()) / veiculos.Count):F1}K";
+            if (EmissoesSeries.Count == 2)
+            {
+                EmissoesSeries[0].Values = valoresEscopo1;
+                EmissoesSeries[1].Values = valoresEscopo3;
+            }
+
+            if (veiculos.Count > 0)
+                MediaCarbono = $"{((valoresEscopo1.Sum() + valoresEscopo3.Sum()) / veiculos.Count):F1}K";
         }
 
         // ==========================================
         // OUTROS MÉTODOS DE API
         // ==========================================
-
-        // ==========================================
-        // MÉTODO: GERAR E BAIXAR RELATÓRIO PDF
-        // ==========================================
-        private async Task GerarRelatorioPdfAsync()
-        {
-            string endpoint = "";
-            string defaultFileName = "";
-
-            // Verifica qual relatório o usuário escolheu na tela
-            if (TipoRelatorioSelecionado == "Veiculos")
-            {
-                endpoint = "api/dados/relatorios/veiculos/pdf";
-                defaultFileName = $"Relatorio_Veiculos_{DateTime.Now:yyyyMMdd_HHmm}.pdf";
-            }
-            else
-            {
-                MessageBox.Show("Este relatório ainda não está disponível na API.\nPara implementá-lo, crie um novo endpoint na API nos mesmos moldes do Veículo.", "Em Desenvolvimento", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            try
-            {
-                // Faz a requisição GET para a API
-                var response = await _httpClient.GetAsync(endpoint);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    // Lê o arquivo recebido em bytes
-                    var pdfBytes = await response.Content.ReadAsByteArrayAsync();
-
-                    // Abre a janela padrão do Windows para salvar o arquivo
-                    var saveFileDialog = new Microsoft.Win32.SaveFileDialog
-                    {
-                        Filter = "Arquivos PDF (*.pdf)|*.pdf",
-                        FileName = defaultFileName,
-                        Title = "Salvar Relatório PDF"
-                    };
-
-                    if (saveFileDialog.ShowDialog() == true)
-                    {
-                        // Salva o arquivo no disco do usuário
-                        System.IO.File.WriteAllBytes(saveFileDialog.FileName, pdfBytes);
-
-                        var resultado = MessageBox.Show("Relatório PDF gerado e salvo com sucesso!\nDeseja abrir o arquivo agora?", "Sucesso", MessageBoxButton.YesNo, MessageBoxImage.Information);
-
-                        // Abre o PDF automaticamente no leitor padrão do PC
-                        if (resultado == MessageBoxResult.Yes)
-                        {
-                            var process = new System.Diagnostics.Process();
-                            process.StartInfo = new System.Diagnostics.ProcessStartInfo(saveFileDialog.FileName)
-                            {
-                                UseShellExecute = true // Necessário no .NET 8 para abrir arquivos
-                            };
-                            process.Start();
-                        }
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Erro ao solicitar a geração do relatório à API.", "Falha", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erro crítico ao comunicar com o servidor:\n{ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
         private async Task PesquisarVinAsync()
         {
             if (string.IsNullOrWhiteSpace(PesquisaVin) || PesquisaVin.Length != 17)
             {
-                MessageBox.Show("⚠️ Introduza um VIN válido com 17 caracteres.", "Erro de Validação", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MostrarAvisoValidacao("Introduza um VIN válido com 17 caracteres.");
                 return;
             }
 
@@ -459,23 +495,47 @@ namespace WpfIveco.ViewModel
 
                     if (resSalvar.IsSuccessStatusCode)
                     {
-                        MessageBox.Show("✅ Veículo IVECO rastreado e guardado no Ledger!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("Veículo IVECO rastreado e guardado no Ledger!",
+                            "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
                         PesquisaVin = "";
                         _ = CarregarDadosDaApiAsync();
                     }
                     else if (resSalvar.StatusCode == System.Net.HttpStatusCode.Conflict)
                     {
-                        MessageBox.Show("⚠️ Veículo autêntico, mas já estava registado no sistema.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show("Veículo autêntico, mas já estava registado no sistema.",
+                            "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                    else
+                    {
+                        var erroDetalhado = await resSalvar.Content.ReadAsStringAsync();
+                        Debug.WriteLine($"[ERRO SALVAR VIN] HTTP {(int)resSalvar.StatusCode} -> {erroDetalhado}");
+                        MessageBox.Show(
+                            "Não foi possível guardar o veículo.\nTente novamente.",
+                            "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
                 else
                 {
-                    MessageBox.Show("❌ Este número de VIN não pertence a um veículo Iveco válido ou ocorreu um erro.", "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Error);
+                    var erroDetalhado = await response.Content.ReadAsStringAsync();
+                    Debug.WriteLine($"[ERRO VALIDAR VIN] HTTP {(int)response.StatusCode} -> {erroDetalhado}");
+                    MessageBox.Show(
+                        "Este VIN não pertence a um veículo Iveco válido.",
+                        "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+            }
+            catch (HttpRequestException ex)
+            {
+                Debug.WriteLine($"[ERRO CONEXÃO VIN] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                MessageBox.Show(
+                    "Não foi possível conectar ao servidor.\nVerifique a sua ligação.",
+                    "Erro de Ligação", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Falha de comunicação: {ex.Message}", "Erro Crítico", MessageBoxButton.OK, MessageBoxImage.Error);
+                Debug.WriteLine($"[ERRO INESPERADO VIN] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                MessageBox.Show(
+                    "Ocorreu um erro inesperado.\nTente novamente ou contacte o suporte.",
+                    "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -493,6 +553,7 @@ namespace WpfIveco.ViewModel
             try
             {
                 var response = await _httpClient.GetAsync($"api/dados/fornecedores/buscar-cnpj/{cnpjLimpo}");
+
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
@@ -505,14 +566,23 @@ namespace WpfIveco.ViewModel
                 }
                 else
                 {
-                    MensagemCadastro = "❌ CNPJ não encontrado na base de dados.";
+                    var erroDetalhado = await response.Content.ReadAsStringAsync();
+                    Debug.WriteLine($"[ERRO BUSCAR CNPJ] HTTP {(int)response.StatusCode} -> {erroDetalhado}");
+
+                    MensagemCadastro = "❌ CNPJ não encontrado. Verifique e tente novamente.";
                     NomeFornecedorEncontrado = "";
                     LocalizacaoFornecedorEncontrado = "";
                 }
             }
+            catch (HttpRequestException ex)
+            {
+                Debug.WriteLine($"[ERRO CONEXÃO CNPJ] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                MensagemCadastro = "❌ Erro de ligação. Verifique a sua rede.";
+            }
             catch (Exception ex)
             {
-                MensagemCadastro = $"Erro de API: {ex.Message}";
+                Debug.WriteLine($"[ERRO INESPERADO CNPJ] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                MensagemCadastro = "❌ Ocorreu um erro inesperado. Tente novamente.";
             }
         }
 
@@ -535,6 +605,7 @@ namespace WpfIveco.ViewModel
             try
             {
                 var response = await _httpClient.PostAsJsonAsync("api/dados/fornecedores", novoFornecedor);
+
                 if (response.IsSuccessStatusCode)
                 {
                     MensagemCadastro = "✅ Fornecedor registado com sucesso no Ledger!";
@@ -545,13 +616,29 @@ namespace WpfIveco.ViewModel
                 }
                 else
                 {
-                    MensagemCadastro = $"❌ Erro ao guardar fornecedor (HTTP {response.StatusCode}).";
+                    var erroDetalhado = await response.Content.ReadAsStringAsync();
+                    Debug.WriteLine($"[ERRO SALVAR FORNECEDOR] HTTP {(int)response.StatusCode} -> {erroDetalhado}");
+                    MensagemCadastro = "❌ Não foi possível guardar o fornecedor. Tente novamente.";
                 }
+            }
+            catch (HttpRequestException ex)
+            {
+                Debug.WriteLine($"[ERRO CONEXÃO FORNECEDOR] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                MensagemCadastro = "❌ Erro de ligação. Verifique a sua rede.";
             }
             catch (Exception ex)
             {
-                MensagemCadastro = $"Erro: {ex.Message}";
+                Debug.WriteLine($"[ERRO INESPERADO FORNECEDOR] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                MensagemCadastro = "❌ Ocorreu um erro inesperado. Tente novamente.";
             }
+        }
+
+        // ==========================================
+        // MÉTODO AUXILIAR — VALIDAÇÃO DE CAMPOS
+        // ==========================================
+        private void MostrarAvisoValidacao(string mensagem)
+        {
+            MessageBox.Show(mensagem, "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 }

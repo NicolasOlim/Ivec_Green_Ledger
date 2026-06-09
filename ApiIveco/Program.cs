@@ -1,3 +1,4 @@
+using ApiIveco;
 using ApiIveco.Data;
 using ApiIveco.Service;
 using Microsoft.AspNetCore.Diagnostics;
@@ -90,6 +91,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseMiddleware<ExceptionMiddleware>(); 
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
