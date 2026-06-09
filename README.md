@@ -65,6 +65,22 @@
 ---
 
 
+## 📢 Pitch de Negócios & Defesa Estratégica
+
+Nós somos o grupo responsável por desenvolver uma solução para a descarbonização na Iveco. Criamos um software capaz de monitorar o consumo energético na linha de produção, gerando dados em tempo real e ajudando a reduzir desperdícios. Destacando a economia de energia, a sustentabilidade e o ganho de eficiência como valores principais. Sendo criado um protótipo de sistema que integra sensores IoT capazes de medir tensão e corrente em cada máquina. Esses dados são enviados para um banco de dados central e exibidos em um painel interativo/interface. O sistema consegue identificar falhas, alertar desperdícios e mapear os lotes de produção, mostrando exatamente o gasto de energia de cada caminhão. Também vamos integrar um sistema de machine learning para aplicar a manutenção preditiva, que utiliza dados e monitoramento contínuo para prever falhas antes que ocorram. Conseguindo reduzir os custos operacionais com desperdício de energia, prevenir falhas que geram altos custos de manutenção e aumentar a sua competitividade no mercado. Além de confiável, o sistema é flexível e pode ser expandido para diferentes tipos de produção.
+
+---
+
+### 🚨 1. O Problema e a Proposta de Valor
+A descarbonização e a eficiência energética tornaram-se pilares críticos na manufatura da indústria automotiva pesada. O desafio central consiste em monitorar, quantificar e mitigar o consumo energético diretamente na linha de produção em tempo real, eliminando desperdícios operacionais.
+
+A nossa solução propõe uma abordagem estruturada (baseada no Modelo Canvas), cujos principais valores entregues são:
+* **Sustentabilidade Mensurável:** Transparência no consumo de recursos e emissões por ativo.
+* **Economia de Energia:** Identificação cirúrgica de gargalos e vazamentos energéticos.
+* **Ganho de Eficiência:** Otimização dos ciclos de montagem com base em dados reais de consumo.
+
+---
+
 ## Documentação do Ecossistema: Cadeia de Suprimentos, Veículos e Persistência em Nuvem
 
 Bem-vindo à documentação do ecossistema de software desenvolvido para o gerenciamento, rastreabilidade e monitoramento ambiental da cadeia de suprimentos de veículos Iveco. Este ecossistema é distribuído, composto por uma **API REST Core**, uma interface visual **WPF (Desktop)** baseada no padrão **MVVM**, um **Simulador** e armazenamento distribuído via **Firebase Firestore**. O nosso projeto é uma evolução do protótipo entregue no SAGA SENAI, onde foi remodelado para operarmos com a arquitetura e codificação do código com base os conhecimentos adquiridos no curso técnico de Desenvolvimento De Sistemas e como nosso projeto de conclusão de curso, sendo assim dividimos a nossa solução em três projetos, sendo eles:
