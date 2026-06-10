@@ -341,6 +341,10 @@ graph LR
 
 Essa parte do projeto é responsável por capturar os dados criados, estruturados e observados em tempo real na linha de produção da Iveco. Em vez de simplesmente acumular um histórico de registros, o sistema refina essas informações, correlacionando o consumo elétrico monitorado pelas estações de trabalho ao chassi de cada caminhão e aos respectivos lotes de insumos. 
 
+<div align="center">
+<img src="imagens/Exportação - PDF.png" alt="Descrição" width="600"/>
+</div>
+
 Para atender aos rigorosos requisitos de governança ambiental e conformidade com os padrões ESG, esse motor de geração documental foi projetado com foco em alta performance e segurança. Todo o processo de compilação histórica no banco de dados e renderização geométrica do arquivo é executado de forma estritamente assíncrona em segundo plano. Essa abordagem de desenvolvimento impede o travamento da interface visual e garante que o operador continue utilizando o sistema sem interrupções enquanto o arquivo  é gerado. Por fim o PDF é construído por...
 
 ---
