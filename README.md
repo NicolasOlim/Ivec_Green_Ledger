@@ -252,7 +252,7 @@ CREATE TABLE VeiculoComponente (
 
 ## API' s Públicas utilizadas no projeto
 
-**BrasilAPI:** É uma comunidade de desenvolvedores no Brasil e que nasceu com um propósito claro de simplificar o acesso a dados públicos nacionais, centralizando diversas consultas que antes eram espalhadas por sites governamentais instáveis, lentos ou de difícil integração. 
+####  **BrasilAPI:** É uma comunidade de desenvolvedores no Brasil e que nasceu com um propósito claro de simplificar o acesso a dados públicos nacionais, centralizando diversas consultas que antes eram espalhadas por sites governamentais instáveis, lentos ou de difícil integração. 
 
 #### 🛠️ Pilares Arquiteturais e Diferenciais Técnicos
 
@@ -264,7 +264,7 @@ O sucesso e a confiabilidade da Brasil API na integração de sistemas industria
 
 ---
 
-**NHTSA Response:** Elas funcionam via requisições HTTP normais e retornam respostas estruturadas em formatos como JSON, XML ou CSV.
+#### **NHTSA Response:** Elas funcionam via requisições HTTP normais e retornam respostas estruturadas em formatos como JSON, XML ou CSV.
 
 #### 🛠️ Pilares Arquiteturais e Diferenciais Técnicos
 
@@ -276,7 +276,7 @@ O sucesso e a confiabilidade da NHTSA API na integração de sistemas industriai
 
    ---
 
-**API Mercado Livre:** Elas funcionam via requisições HTTP normais e retornam respostas estruturadas em formatos como JSON, XML ou CSV.
+#### **API Mercado Livre:** Elas funcionam via requisições HTTP normais e retornam respostas estruturadas em formatos como JSON, XML ou CSV.
 
 #### 🛠️ Pilares Arquiteturais e Diferenciais Técnicos
 
@@ -341,7 +341,9 @@ graph LR
 
 Essa parte do projeto é responsável por capturar os dados criados, estruturados e observados em tempo real na linha de produção da Iveco. Em vez de simplesmente acumular um histórico de registros, o sistema refina essas informações, correlacionando o consumo elétrico monitorado pelas estações de trabalho ao chassi de cada caminhão e aos respectivos lotes de insumos. 
 
-Para atender aos rigorosos requisitos de governança ambiental e conformidade com os padrões ESG, esse motor de geração documental foi projetado com foco em alta performance e segurança. Todo o processo de compilação histórica no banco de dados e renderização geométrica do arquivo é executado de forma estritamente assíncrona em segundo plano. Essa abordagem de desenvolvimento impede o travamento da interface visual e garante que o operador continue utilizando o sistema sem interrupções enquanto o arquivo  é gerado. Por fim o PDF é construído por.
+Para atender aos rigorosos requisitos de governança ambiental e conformidade com os padrões ESG, esse motor de geração documental foi projetado com foco em alta performance e segurança. Todo o processo de compilação histórica no banco de dados e renderização geométrica do arquivo é executado de forma estritamente assíncrona em segundo plano. Essa abordagem de desenvolvimento impede o travamento da interface visual e garante que o operador continue utilizando o sistema sem interrupções enquanto o arquivo  é gerado. Por fim o PDF é construído por...
+
+---
 
 #### Arquitetura do Front-End
 
