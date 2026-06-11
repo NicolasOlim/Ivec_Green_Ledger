@@ -24,7 +24,7 @@ namespace ApiIveco
             }
             catch (Exception ex)
             {
-                // Erro REAL aparece só no Output/terminal da API
+                /// Erro REAL aparece só no Output/terminal da API
                 _logger.LogError(ex,
                     "[ERRO] {Method} {Path} -> {Tipo}: {Mensagem}",
                     context.Request.Method,
@@ -32,7 +32,7 @@ namespace ApiIveco
                     ex.GetType().Name,
                     ex.Message);
 
-                // Mensagem GENÉRICA vai para o cliente (WPF)
+                /// Mensagem GENÉRICA vai para o cliente (WPF)
                 await EscreverRespostaGenerica(context, ex);
             }
         }

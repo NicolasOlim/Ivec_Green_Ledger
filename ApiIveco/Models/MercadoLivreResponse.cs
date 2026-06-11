@@ -15,6 +15,6 @@ namespace ApiIveco.Models
         public string Id { get; set; }
 
         [JsonPropertyName("title")]
-        public string Title { get; set; } // Aqui virá o nome real da peça (Ex: "Filtro De Ar Caminhão Iveco")
+        public string Title { get; set; } /// Aqui virá o nome real da peça (Ex: "Filtro De Ar Caminhão Iveco")
     }
 }

@@ -10,11 +10,15 @@ namespace WpfIveco
         {
             InitializeComponent();
 
-            // LIGA O XAML AO SEU MOTOR LÓGICO
+            /// LIGA O XAML AO SEU MOTOR LÓGICO
             DataContext = new MainViewModel();
         }
 
-        // --- MÉTODOS DE CONTROLO DA JANELA ---
+        /// <summary>
+        /// --- MÉTODOS DE CONTROLO DA JANELA ---
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
@@ -37,16 +41,6 @@ namespace WpfIveco
                 this.WindowState = WindowState.Maximized;
             else
                 this.WindowState = WindowState.Normal;
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-
         }
 
 

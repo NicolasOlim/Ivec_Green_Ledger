@@ -28,9 +28,9 @@ namespace ApiIveco.Controllers
             _logger = logger;
         }
 
-        // ==========================================
-        // VEÍCULOS
-        // ==========================================
+        
+        /// VEÍCULOS
+        
 
         /// <summary>Lista todos os veículos.</summary>
         /// <response code="200">Lista de veículos (pode ser vazia).</response>
@@ -209,9 +209,9 @@ namespace ApiIveco.Controllers
             return File(pdfBytes, "application/pdf", "Relatorio_Veiculos.pdf");
         }
 
-        // ==========================================
-        // FORNECEDORES
-        // ==========================================
+        
+        /// FORNECEDORES
+        
 
         /// <summary>Lista todos os fornecedores.</summary>
         [HttpGet("fornecedores")]
@@ -267,9 +267,9 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Fornecedor deletado com sucesso." });
         }
 
-        // ==========================================
-        // LOTES
-        // ==========================================
+        
+        /// LOTES
+        
 
         /// <summary>Lista todos os lotes de matéria-prima.</summary>
         [HttpGet("lotes")]
@@ -304,9 +304,9 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Lote deletado com sucesso." });
         }
 
-        // ==========================================
-        // COMPONENTES
-        // ==========================================
+        
+        /// COMPONENTES
+        
 
         /// <summary>Lista todos os componentes de veículos.</summary>
         [HttpGet("componentes")]
@@ -341,9 +341,9 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Componente deletado com sucesso." });
         }
 
-        // ==========================================
-        // AUTENTICAÇÃO
-        // ==========================================
+        
+        /// AUTENTICAÇÃO
+        
 
         /// <summary>Cadastra um novo usuário no Firebase.</summary>
         /// <remarks>Se "acesso" não for informado, assume "Usuario".</remarks>

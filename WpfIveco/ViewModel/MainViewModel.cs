@@ -28,9 +28,11 @@ namespace WpfIveco.ViewModel
         private readonly HttpClient _httpClient;
         private readonly DispatcherTimer _timer;
 
-        // ==========================================
-        // VARIÁVEIS - SISTEMA DE LOGIN / SESSÃO
-        // ==========================================
+        
+        /// <summary>
+        /// VARIÁVEIS - SISTEMA DE LOGIN / SESSÃO
+        /// </summary>
+        
         private bool _isLoggedIn = false;
         public bool IsLoggedIn { get => _isLoggedIn; set { _isLoggedIn = value; OnPropertyChanged(); } }
 
@@ -65,21 +67,25 @@ namespace WpfIveco.ViewModel
         public ICommand MudarTipoRelatorioCommand { get; }
         public ICommand GerarRelatorioPdfCommand { get; }
 
-        // ==========================================
-        // VARIÁVEIS - NAVEGAÇÃO E SISTEMA
-        // ==========================================
+        
+        /// <summary>
+        /// VARIÁVEIS - NAVEGAÇÃO E SISTEMA
+        /// </summary>
+        
         private string _abaAtiva = "Dashboard";
         public string AbaAtiva { get => _abaAtiva; set { _abaAtiva = value; OnPropertyChanged(); } }
 
-        private string _apiUrlConfig = "http://localhost:5000/api";
+        private string _apiUrlConfig = "http://localhost:7221/api";
         public string ApiUrlConfig { get => _apiUrlConfig; set { _apiUrlConfig = value; OnPropertyChanged(); } }
 
         private string _statusSimulador = "Desativado";
         public string StatusSimulador { get => _statusSimulador; set { _statusSimulador = value; OnPropertyChanged(); } }
 
-        // ==========================================
-        // VARIÁVEIS - DASHBOARD
-        // ==========================================
+        
+        /// <summary>
+        /// VARIÁVEIS - DASHBOARD
+        /// </summary>
+        
         private string _totalVeiculos = "0";
         public string TotalVeiculos { get => _totalVeiculos; set { _totalVeiculos = value; OnPropertyChanged(); } }
 
@@ -89,9 +95,11 @@ namespace WpfIveco.ViewModel
         private string _mediaCarbono = "0.0K";
         public string MediaCarbono { get => _mediaCarbono; set { _mediaCarbono = value; OnPropertyChanged(); } }
 
-        // ==========================================
-        // VARIÁVEIS - RASTREABILIDADE / FORNECEDORES / PEÇAS
-        // ==========================================
+        
+        /// <summary>
+        /// VARIÁVEIS - RASTREABILIDADE / FORNECEDORES / PEÇAS
+        /// </summary>
+        
         private string _pesquisaVin = "";
         public string PesquisaVin { get => _pesquisaVin; set { _pesquisaVin = value; OnPropertyChanged(); } }
 
@@ -132,9 +140,11 @@ namespace WpfIveco.ViewModel
         private string[] _mesesLabels;
         public string[] MesesLabels { get => _mesesLabels; set { _mesesLabels = value; OnPropertyChanged(); } }
 
-        // ==========================================
-        // CONSTRUTOR
-        // ==========================================
+        
+        /// <summary>
+        /// CONSTRUTOR
+        /// </summary>
+        
         public MainViewModel()
         {
             var handler = new HttpClientHandler
@@ -143,7 +153,7 @@ namespace WpfIveco.ViewModel
             };
             _httpClient = new HttpClient(handler)
             {
-                BaseAddress = new Uri("http://localhost:5000/")
+                BaseAddress = new Uri("http://localhost:7221/")
             };
 
             MudarAbaCommand = new RelayCommand(p => AbaAtiva = p as string);
@@ -230,9 +240,9 @@ namespace WpfIveco.ViewModel
                 }
             });
 
-            // ==========================================
-            // COMANDO: CADASTRO
-            // ==========================================
+            
+            /// COMANDO: CADASTRO
+            
             FazerCadastroCommand = new RelayCommand(async p =>
             {
                 if (string.IsNullOrWhiteSpace(CadastroNome) ||
@@ -290,9 +300,8 @@ namespace WpfIveco.ViewModel
                 }
             });
 
-            // ==========================================
-            // COMANDO: LOGOUT
-            // ==========================================
+            /// COMANDO: LOGOUT
+            
             FazerLogoutCommand = new RelayCommand(p =>
             {
                 IsLoggedIn = false;
@@ -304,9 +313,9 @@ namespace WpfIveco.ViewModel
                 _timer.Stop();
             });
 
-            // ==========================================
-            // COMANDO: ADICIONAR PEÇA
-            // ==========================================
+            
+            /// COMANDO: ADICIONAR PEÇA
+            
             AdicionarPecaManualCommand = new RelayCommand(async p =>
             {
                 if (string.IsNullOrWhiteSpace(NovaPecaNome) || string.IsNullOrWhiteSpace(NovaPecaVin))
@@ -350,7 +359,7 @@ namespace WpfIveco.ViewModel
                 }
             });
 
-            // Inicializa gráfico vazio
+            /// Inicializa gráfico vazio
             EmissoesSeries = new SeriesCollection
             {
                 new LineSeries
@@ -375,9 +384,9 @@ namespace WpfIveco.ViewModel
             _timer.Tick += async (s, e) => await CarregarDadosDaApiAsync();
         }
 
-        // ==========================================
+        
         // MÉTODOS DE COMUNICAÇÃO COM A API
-        // ==========================================
+        
         private async Task CarregarDadosDaApiAsync()
         {
             try
@@ -479,9 +488,12 @@ namespace WpfIveco.ViewModel
                 MediaCarbono = $"{((valoresEscopo1.Sum() + valoresEscopo3.Sum()) / veiculos.Count):F1}K";
         }
 
-        // ==========================================
-        // OUTROS MÉTODOS DE API
-        // ==========================================
+        
+        /// <summary>
+        /// OUTROS MÉTODOS DE API
+        /// </summary>
+        /// <returns></returns>
+        
         private async Task PesquisarVinAsync()
         {
             if (string.IsNullOrWhiteSpace(PesquisaVin) || PesquisaVin.Length != 17)
@@ -649,18 +661,18 @@ namespace WpfIveco.ViewModel
             {
                 using (var client = new HttpClient())
                 {
-                    // ATENÇÃO: Substitua 7196 pela porta correta da sua API!
-                    string urlDaApi = "http://localhost:5000/api/Dados/relatorios/veiculos/pdf";
+                    /// ATENÇÃO: Substitua 7196 pela porta correta da sua API!
+                    string urlDaApi = "http://localhost:7221/api/Dados/relatorios/veiculos/pdf";
 
-                    // Faz o pedido do PDF à API
+                    /// Faz o pedido do PDF à API
                     var response = await client.GetAsync(urlDaApi);
 
                     if (response.IsSuccessStatusCode)
                     {
-                        // Lê o ficheiro PDF em formato de bytes
+                        /// Lê o ficheiro PDF em formato de bytes
                         byte[] fileBytes = await response.Content.ReadAsByteArrayAsync();
 
-                        // Abre a janela do Windows para o utilizador escolher onde guardar
+                        /// Abre a janela do Windows para o utilizador escolher onde guardar
                         SaveFileDialog saveFileDialog = new SaveFileDialog
                         {
                             Filter = "Ficheiro PDF (*.pdf)|*.pdf",
@@ -670,12 +682,12 @@ namespace WpfIveco.ViewModel
 
                         if (saveFileDialog.ShowDialog() == true)
                         {
-                            // Guarda o ficheiro no disco rígido
+                            /// Guarda o ficheiro no disco rígido
                             File.WriteAllBytes(saveFileDialog.FileName, fileBytes);
 
                             MessageBox.Show("Relatório gerado e guardado com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                            // BÓNUS: Abre o PDF automaticamente no leitor padrão (ex: Edge, Adobe Reader)
+                            /// BÓNUS: Abre o PDF automaticamente no leitor padrão (ex: Edge, Adobe Reader)
                             Process.Start(new ProcessStartInfo
                             {
                                 FileName = saveFileDialog.FileName,
@@ -685,7 +697,7 @@ namespace WpfIveco.ViewModel
                     }
                     else
                     {
-                        // Se a API der erro, lemos o motivo
+                        /// Se a API der erro, lemos o motivo
                         string erro = await response.Content.ReadAsStringAsync();
                         MessageBox.Show($"Falha ao gerar o relatório.\nStatus: {response.StatusCode}\nErro: {erro}", "Erro da API");
                     }
@@ -696,26 +708,35 @@ namespace WpfIveco.ViewModel
                 MessageBox.Show($"Erro interno ao tentar descarregar o PDF:\n{ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        // Método para lidar com os RadioButtons (Erros das linhas 967, 972 e 976)
+        /// <summary>
+        /// Método para lidar com os RadioButtons (Erros das linhas 967, 972 e 976)
+        /// </summary>
+        /// <param name="param"></param>
         private void ExecutarMudarTipoRelatorio(object param)
         {
-            // O 'param' vai receber o CommandParameter do XAML (ex: "Veiculos", "Fornecedores", etc.)
-            // Aqui você pode colocar a lógica para saber qual relatório gerar.
+            /// O 'param' vai receber o CommandParameter do XAML (ex: "Veiculos", "Fornecedores", etc.)
+            /// Aqui você pode colocar a lógica para saber qual relatório gerar.
             string tipoEscolhido = param as string;
 
-            // (Lógica futura entra aqui)
+            /// (Lógica futura entra aqui)
         }
 
-        // Método para lidar com o Botão de Download (Erro da linha 981)
+        /// <summary>
+        /// Método para lidar com o Botão de Download (Erro da linha 981)
+        /// </summary>
+        /// <param name="param"></param>
         private async void ExecutarGerarRelatorioPdf(object param)
         {
             // Chama a função de baixar o PDF que criámos anteriormente
             await BaixarRelatorioPdf();
         }
 
-        // ==========================================
-        // MÉTODO AUXILIAR — VALIDAÇÃO DE CAMPOS
-        // ==========================================
+        
+        /// <summary>
+        /// MÉTODO AUXILIAR — VALIDAÇÃO DE CAMPOS
+        /// </summary>
+        /// <param name="mensagem"></param>
+       
         private void MostrarAvisoValidacao(string mensagem)
         {
             MessageBox.Show(mensagem, "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);

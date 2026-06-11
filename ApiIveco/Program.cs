@@ -9,27 +9,27 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ========================================================
-// 1. CONFIGURAÇÃO DO SERILOG
-// ========================================================
+
+/// 1. CONFIGURAÇÃO DO SERILOG
+
 builder.Host.UseSerilog((context, config) =>
 
 {
     config.ReadFrom.Configuration(context.Configuration);
 });
 
-// ========================================================
-// 2. DEPENDÊNCIAS
-// ========================================================
+
+/// 2. DEPENDÊNCIAS
+
 builder.Services.AddSingleton<FireBaseData>();
 builder.Services.AddScoped<DadosService>();
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// ========================================================
-// 3. SWAGGER
-// ========================================================
+
+/// 3. SWAGGER
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -52,9 +52,9 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// ========================================================
-// 4. MIDDLEWARES (ORDEM CRÍTICA)
-// ========================================================
+
+/// 4. MIDDLEWARES (ORDEM CRÍTICA)
+
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
@@ -84,9 +84,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-// ========================================================
-// 5. INÍCIO
-// ========================================================
+
+/// 5. INÍCIO
+
 try
 {
     Log.Information("🚀 API Iveco Green Ledger iniciada com sucesso!");

@@ -23,10 +23,10 @@ public class RequestResponseLoggingMiddleware
     {
         var stopwatch = Stopwatch.StartNew();
 
-        // LOG DE ENTRADA (APENAS MÉTODO E PATH)
+        /// LOG DE ENTRADA (APENAS MÉTODO E PATH)
         _logger.LogInformation("➡️ {Method} {Path}", context.Request.Method, context.Request.Path);
 
-        // EM DESENVOLVIMENTO, MOSTRA O CORPO DA REQUISIÇÃO (OPCIONAL)
+        /// EM DESENVOLVIMENTO, MOSTRA O CORPO DA REQUISIÇÃO (OPCIONAL)
         if (_env.IsDevelopment())
         {
             var requestBody = await FormatRequest(context.Request);
@@ -57,7 +57,7 @@ public class RequestResponseLoggingMiddleware
 
             _logger.Log(logLevel, $"{emoji} {status} ({stopwatch.ElapsedMilliseconds}ms)");
 
-            // EM DESENVOLVIMENTO, MOSTRA O CORPO DA RESPOSTA
+            /// EM DESENVOLVIMENTO, MOSTRA O CORPO DA RESPOSTA
             if (_env.IsDevelopment())
             {
                 var responseBodyText = await FormatResponse(context.Response);

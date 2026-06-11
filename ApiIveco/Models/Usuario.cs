@@ -8,7 +8,9 @@ namespace ApiIveco.Models
     {
         public Usuario() { }
 
-        // SEM FirestoreProperty — Id é o ID do documento
+        /// <summary>
+        /// SEM FirestoreProperty — Id é o ID do documento
+        /// </summary>
         public string Id { get; set; } = "0";
 
         [FirestoreProperty]
