@@ -13,42 +13,42 @@
         FontFamily="Segoe UI Variable, Segoe UI, Helvetica Neue, sans-serif">
 
     <Window.Resources>
-        <!-- 🍃 Paleta de cores sustentável (claro + verde) -->
-        <SolidColorBrush x:Key="PaperBeige" Color="#F7F5EB"/>
-        <SolidColorBrush x:Key="PaperBeigeLight" Color="#FDFCF8"/>
-        <SolidColorBrush x:Key="PaperBeigeDark" Color="#E8E3D3"/>
-        <SolidColorBrush x:Key="RecycledGreen" Color="#2E7D32"/>
-        <SolidColorBrush x:Key="RecycledGreenLight" Color="#4CAF50"/>
-        <SolidColorBrush x:Key="RecycledGreenPale" Color="#E8F5E9"/>
-        <SolidColorBrush x:Key="ForestText" Color="#1E2A1E"/>
-        <SolidColorBrush x:Key="MossText" Color="#3A4A3A"/>
-        <SolidColorBrush x:Key="StoneText" Color="#6B6E6B"/>
-        <SolidColorBrush x:Key="BorderGreen" Color="#C8E6C9"/>
-        <SolidColorBrush x:Key="ShadowGreen" Color="#A5D6A7"/>
+        <SolidColorBrush x:Key="OledBlack" Color="#000000"/>
+        <SolidColorBrush x:Key="AppBackground" Color="#0C0C0E"/>
+        <SolidColorBrush x:Key="ElevatedGray1" Color="#1C1C1E"/>
+        <SolidColorBrush x:Key="ElevatedGray2" Color="#2C2C2E"/>
+        <SolidColorBrush x:Key="ElevatedGray3" Color="#3C3C3E"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#8E8E93"/>
+        <SolidColorBrush x:Key="TextTertiary" Color="#48484A"/>
+        <SolidColorBrush x:Key="AppleBlue" Color="#0A84FF"/>
+        <SolidColorBrush x:Key="AppleBlueHover" Color="#409CFF"/>
+        <SolidColorBrush x:Key="AppleGreen" Color="#30D158"/>
+        <SolidColorBrush x:Key="AppleRed" Color="#FF453A"/>
+        <SolidColorBrush x:Key="AppleOrange" Color="#FF9F0A"/>
+        <SolidColorBrush x:Key="CardBorder" Color="#2A2A2C"/>
 
-        <!-- Estilos de texto -->
         <Style x:Key="H1" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource ForestText}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="FontSize" Value="34"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Margin" Value="0,0,0,8"/>
         </Style>
         <Style x:Key="H2" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource ForestText}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="FontSize" Value="22"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Margin" Value="0,0,0,16"/>
         </Style>
         <Style x:Key="Subtitle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource StoneText}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Margin" Value="0,0,0,24"/>
         </Style>
 
-        <!-- ScrollBar suave -->
         <Style TargetType="ScrollBar">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{StaticResource BorderGreen}"/>
+            <Setter Property="Foreground" Value="{StaticResource ElevatedGray3}"/>
             <Setter Property="Width" Value="8"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -72,14 +72,14 @@
             </Setter>
         </Style>
 
-        <!-- Botão do menu lateral -->
         <Style x:Key="MenuButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{StaticResource MossText}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
             <Setter Property="Padding" Value="16,12"/>
             <Setter Property="Margin" Value="0,4"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -88,11 +88,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource RecycledGreenPale}"/>
-                                <Setter Property="Foreground" Value="{StaticResource RecycledGreen}"/>
+                                <Setter TargetName="border" Property="Background" Value="#10FFFFFF"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource BorderGreen}"/>
+                                <Setter TargetName="border" Property="Background" Value="#20FFFFFF"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -100,9 +100,8 @@
             </Setter>
         </Style>
 
-        <!-- Botão primário verde -->
         <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource RecycledGreen}"/>
+            <Setter Property="Background" Value="{StaticResource AppleBlue}"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -115,10 +114,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource RecycledGreenLight}"/>
+                                <Setter TargetName="border" Property="Opacity" Value="0.85"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource ForestText}"/>
+                                <Setter TargetName="border" Property="Opacity" Value="0.65"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -126,26 +125,26 @@
             </Setter>
         </Style>
 
-        <!-- Caixa de texto sustentável -->
         <Style x:Key="PremiumTextBoxStyle" TargetType="TextBox">
-            <Setter Property="Background" Value="{StaticResource PaperBeigeLight}"/>
-            <Setter Property="Foreground" Value="{StaticResource ForestText}"/>
-            <Setter Property="CaretBrush" Value="{StaticResource RecycledGreen}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="CaretBrush" Value="{StaticResource AppleBlue}"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="10" BorderThickness="1" BorderBrush="{StaticResource BorderGreen}">
-                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                        <Border x:Name="border" Background="{StaticResource OledBlack}" CornerRadius="10" BorderThickness="1" BorderBrush="{StaticResource ElevatedGray2}">
+                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" Margin="4,0"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
-                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource RecycledGreen}"/>
-                                <Setter TargetName="border" Property="Background" Value="#F0F7E9"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource AppleBlue}"/>
+                                <Setter TargetName="border" Property="Background" Value="#050A84FF"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource RecycledGreenLight}"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource ElevatedGray3}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -153,20 +152,18 @@
             </Setter>
         </Style>
 
-        <!-- Card estilo reciclado -->
         <Style x:Key="PremiumCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="{StaticResource PaperBeigeLight}"/>
+            <Setter Property="Background" Value="{StaticResource ElevatedGray1}"/>
             <Setter Property="CornerRadius" Value="24"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderGreen}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource CardBorder}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.08" Color="#2E7D32"/>
+                    <DropShadowEffect BlurRadius="20" ShadowDepth="5" Opacity="0.1" Color="Black"/>
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <!-- Badge pequeno -->
         <Style x:Key="BadgeStyle" TargetType="Border">
             <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="Padding" Value="8,4"/>
@@ -175,8 +172,9 @@
     </Window.Resources>
 
     <Grid>
-        <!-- Container principal após login -->
-        <Border Background="{StaticResource PaperBeige}" CornerRadius="20" BorderBrush="{StaticResource BorderGreen}" BorderThickness="1" Margin="10">
+
+        <!-- ==================== TELA PRINCIPAL (logado) ==================== -->
+        <Border Background="{StaticResource AppBackground}" CornerRadius="20" BorderBrush="#3A3A3C" BorderThickness="1" Margin="10">
             <Border.Style>
                 <Style TargetType="Border">
                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -188,7 +186,7 @@
                 </Style>
             </Border.Style>
             <Border.Effect>
-                <DropShadowEffect BlurRadius="30" ShadowDepth="0" Opacity="0.1" Color="#2E7D32"/>
+                <DropShadowEffect BlurRadius="30" ShadowDepth="0" Opacity="0.5"/>
             </Border.Effect>
 
             <Grid>
@@ -197,8 +195,8 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Menu lateral (bege mais escuro) -->
-                <Border Grid.Column="0" Background="{StaticResource PaperBeigeDark}" CornerRadius="20,0,0,20" BorderBrush="{StaticResource BorderGreen}" BorderThickness="0,0,1,0">
+                <!-- ===== SIDEBAR ===== -->
+                <Border Grid.Column="0" Background="{StaticResource OledBlack}" CornerRadius="20,0,0,20" BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,1,0">
                     <Grid Margin="20,24,20,24">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -207,7 +205,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <!-- Botões da janela (mantém cores originais, mas opcional) -->
+                        <!-- Botões de janela macOS -->
                         <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Top" Margin="8,0,0,30">
                             <Button Width="14" Height="14" Margin="0,0,8,0" Cursor="Hand" Click="CloseButton_Click" ToolTip="Fechar">
                                 <Button.Template>
@@ -247,28 +245,28 @@
                             </Button>
                         </StackPanel>
 
-                        <!-- Logo / Cabeçalho -->
+                        <!-- Logo -->
                         <StackPanel Grid.Row="1" Margin="10,0,0,30" Orientation="Horizontal">
-                            <Border Width="45" Height="45" CornerRadius="10" Background="{StaticResource RecycledGreenPale}">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEB41;" FontSize="24" Foreground="{StaticResource RecycledGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Width="45" Height="45" CornerRadius="10" Background="{StaticResource ElevatedGray2}">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEB41;" FontSize="24" Foreground="{StaticResource AppleGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                <TextBlock Text="Iveco S.p.A" Foreground="{StaticResource ForestText}" FontWeight="Bold" FontSize="16"/>
-                                <TextBlock Text="Green Ledger Node" Foreground="{StaticResource RecycledGreen}" FontWeight="Medium" FontSize="11"/>
+                                <TextBlock Text="Iveco S.p.A" Foreground="{StaticResource TextPrimary}" FontWeight="Bold" FontSize="16"/>
+                                <TextBlock Text="Green Ledger Node" Foreground="{StaticResource AppleGreen}" FontWeight="Medium" FontSize="11"/>
                             </StackPanel>
                         </StackPanel>
 
                         <!-- Navegação -->
                         <StackPanel Grid.Row="2">
-                            <TextBlock Text="NAVEGAÇÃO" Foreground="{StaticResource StoneText}" FontSize="11" FontWeight="Bold" Margin="14,0,0,10"/>
+                            <TextBlock Text="NAVEGAÇÃO" Foreground="{StaticResource TextTertiary}" FontSize="11" FontWeight="Bold" Margin="14,0,0,10"/>
 
                             <Button Command="{Binding MudarAbaCommand}" CommandParameter="Dashboard" Click="Button_Click_1">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding AbaAtiva}" Value="Dashboard">
-                                                <Setter Property="Background" Value="{StaticResource RecycledGreenPale}"/>
-                                                <Setter Property="Foreground" Value="{StaticResource RecycledGreen}"/>
+                                                <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -284,8 +282,8 @@
                                     <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding AbaAtiva}" Value="Projetos">
-                                                <Setter Property="Background" Value="{StaticResource RecycledGreenPale}"/>
-                                                <Setter Property="Foreground" Value="{StaticResource RecycledGreen}"/>
+                                                <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -301,8 +299,8 @@
                                     <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding AbaAtiva}" Value="Cadastro">
-                                                <Setter Property="Background" Value="{StaticResource RecycledGreenPale}"/>
-                                                <Setter Property="Foreground" Value="{StaticResource RecycledGreen}"/>
+                                                <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -318,8 +316,8 @@
                                     <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding AbaAtiva}" Value="Analises">
-                                                <Setter Property="Background" Value="{StaticResource RecycledGreenPale}"/>
-                                                <Setter Property="Foreground" Value="{StaticResource RecycledGreen}"/>
+                                                <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -335,8 +333,8 @@
                                     <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding AbaAtiva}" Value="Pecas">
-                                                <Setter Property="Background" Value="{StaticResource RecycledGreenPale}"/>
-                                                <Setter Property="Foreground" Value="{StaticResource RecycledGreen}"/>
+                                                <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -352,8 +350,8 @@
                                     <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding AbaAtiva}" Value="Relatorios">
-                                                <Setter Property="Background" Value="{StaticResource RecycledGreenPale}"/>
-                                                <Setter Property="Foreground" Value="{StaticResource RecycledGreen}"/>
+                                                <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -364,7 +362,7 @@
                                 </StackPanel>
                             </Button>
 
-                            <!-- Admin -->
+                            <!-- Seção Admin -->
                             <StackPanel>
                                 <StackPanel.Style>
                                     <Style TargetType="StackPanel">
@@ -376,14 +374,14 @@
                                         </Style.Triggers>
                                     </Style>
                                 </StackPanel.Style>
-                                <TextBlock Text="SISTEMA" Foreground="{StaticResource StoneText}" FontSize="11" FontWeight="Bold" Margin="14,30,0,10"/>
+                                <TextBlock Text="SISTEMA" Foreground="{StaticResource TextTertiary}" FontSize="11" FontWeight="Bold" Margin="14,30,0,10"/>
                                 <Button Command="{Binding MudarAbaCommand}" CommandParameter="Ajustes">
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding AbaAtiva}" Value="Ajustes">
-                                                    <Setter Property="Background" Value="{StaticResource RecycledGreenPale}"/>
-                                                    <Setter Property="Foreground" Value="{StaticResource RecycledGreen}"/>
+                                                    <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                                    <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -396,31 +394,32 @@
                             </StackPanel>
                         </StackPanel>
 
-                        <!-- Perfil do usuário -->
-                        <Border Grid.Row="3" Background="{StaticResource RecycledGreenPale}" CornerRadius="12" Padding="12">
+                        <!-- Perfil do utilizador -->
+                        <Border Grid.Row="3" Background="{StaticResource ElevatedGray1}" CornerRadius="12" Padding="12">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <Ellipse Grid.Column="0" Width="32" Height="32" Fill="#C8E6C9"/>
+                                <Ellipse Grid.Column="0" Width="32" Height="32" Fill="#4A4A4C"/>
                                 <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding NomeUsuario}" Foreground="{StaticResource ForestText}" FontSize="13" FontWeight="SemiBold"/>
-                                    <TextBlock Text="{Binding PerfilUsuario}" Foreground="{StaticResource StoneText}" FontSize="11"/>
+                                    <TextBlock Text="{Binding NomeUsuario}" Foreground="{StaticResource TextPrimary}" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding PerfilUsuario}" Foreground="{StaticResource TextSecondary}" FontSize="11"/>
                                 </StackPanel>
                                 <Button Grid.Column="2" Command="{Binding FazerLogoutCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand" ToolTip="Terminar Sessão">
-                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xF3B1;" Foreground="{StaticResource RecycledGreen}" FontSize="16" VerticalAlignment="Center"/>
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xF3B1;" Foreground="{StaticResource AppleRed}" FontSize="16" VerticalAlignment="Center"/>
                                 </Button>
                             </Grid>
                         </Border>
                     </Grid>
                 </Border>
 
-                <!-- Conteúdo principal -->
-                <ScrollViewer Grid.Column="1" Padding="40" VerticalScrollBarVisibility="Auto">
+                <!-- ===== CONTEÚDO PRINCIPAL ===== -->
+                <ScrollViewer Grid.Column="1" Padding="40" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <Grid>
-                        <!-- DASHBOARD -->
+
+                        <!-- ===== ABA: DASHBOARD ===== -->
                         <Grid>
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -451,53 +450,57 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
+                                <!-- Total Veículos — Rastreabilidade.TotalVeiculos -->
                                 <Border Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="24">
                                     <StackPanel>
-                                        <Border Width="40" Height="40" Background="{StaticResource RecycledGreenPale}" HorizontalAlignment="Left" CornerRadius="10">
+                                        <Border Width="40" Height="40" Background="#1A30D158" HorizontalAlignment="Left" CornerRadius="10">
                                             <TextBlock Text="🚚" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
-                                        <TextBlock Text="Total de Veículos" Foreground="{StaticResource StoneText}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
-                                        <TextBlock Text="{Binding TotalVeiculos, FallbackValue='0'}" Foreground="{StaticResource ForestText}" FontSize="36" FontWeight="Bold"/>
-                                        <Border Style="{StaticResource BadgeStyle}" Background="{StaticResource RecycledGreenPale}" Margin="0,10,0,0">
-                                            <TextBlock Text="Ao Vivo do Firebase" Foreground="{StaticResource RecycledGreen}" FontSize="11" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Total de Veículos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
+                                        <TextBlock Text="{Binding Rastreabilidade.TotalVeiculos, FallbackValue='0'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
+                                        <Border Style="{StaticResource BadgeStyle}" Background="#1A30D158" Margin="0,10,0,0">
+                                            <TextBlock Text="Ao Vivo do Firebase" Foreground="{StaticResource AppleGreen}" FontSize="11" FontWeight="SemiBold"/>
                                         </Border>
                                     </StackPanel>
                                 </Border>
 
+                                <!-- Total Fornecedores — Fornecedor.TotalFornecedores -->
                                 <Border Grid.Column="1" Style="{StaticResource PremiumCardStyle}" Margin="10,0,10,0" Padding="24">
                                     <StackPanel>
-                                        <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource RecycledGreenPale}" HorizontalAlignment="Left">
-                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE710;" FontSize="18" Foreground="{StaticResource RecycledGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <Border Width="40" Height="40" CornerRadius="10" Background="#1A0A84FF" HorizontalAlignment="Left">
+                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE710;" FontSize="18" Foreground="{StaticResource AppleBlue}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
-                                        <TextBlock Text="Fornecedores Ativos" Foreground="{StaticResource StoneText}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
-                                        <TextBlock Text="{Binding TotalFornecedores, FallbackValue='0'}" Foreground="{StaticResource ForestText}" FontSize="36" FontWeight="Bold"/>
-                                        <Border Style="{StaticResource BadgeStyle}" Background="{StaticResource RecycledGreenPale}" Margin="0,10,0,0">
-                                            <TextBlock Text="Em Conformidade" Foreground="{StaticResource RecycledGreen}" FontSize="11" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Fornecedores Ativos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
+                                        <TextBlock Text="{Binding Fornecedor.TotalFornecedores, FallbackValue='0'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
+                                        <Border Style="{StaticResource BadgeStyle}" Background="#1A0A84FF" Margin="0,10,0,0">
+                                            <TextBlock Text="Em Conformidade" Foreground="{StaticResource AppleBlue}" FontSize="11" FontWeight="SemiBold"/>
                                         </Border>
                                     </StackPanel>
                                 </Border>
 
+                                <!-- Média Carbono — Analises.MediaCarbono -->
                                 <Border Grid.Column="2" Style="{StaticResource PremiumCardStyle}" Margin="10,0,0,0" Padding="24">
                                     <StackPanel>
-                                        <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource RecycledGreenPale}" HorizontalAlignment="Left">
-                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" FontSize="18" Foreground="{StaticResource RecycledGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <Border Width="40" Height="40" CornerRadius="10" Background="#1AFF9F0A" HorizontalAlignment="Left">
+                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" FontSize="18" Foreground="{StaticResource AppleOrange}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
-                                        <TextBlock Text="Pegada Média (kg CO2)" Foreground="{StaticResource StoneText}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
-                                        <TextBlock Text="{Binding MediaCarbono, FallbackValue='0.0K'}" Foreground="{StaticResource ForestText}" FontSize="36" FontWeight="Bold"/>
-                                        <Border Style="{StaticResource BadgeStyle}" Background="{StaticResource RecycledGreenPale}" Margin="0,10,0,0">
-                                            <TextBlock Text="Baseado no Ledger" Foreground="{StaticResource RecycledGreen}" FontSize="11" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Pegada Média (kg CO2)" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
+                                        <TextBlock Text="{Binding Analises.MediaCarbono, FallbackValue='0.0K'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
+                                        <Border Style="{StaticResource BadgeStyle}" Background="#1AFF9F0A" Margin="0,10,0,0">
+                                            <TextBlock Text="Baseado no Ledger" Foreground="{StaticResource AppleOrange}" FontSize="11" FontWeight="SemiBold"/>
                                         </Border>
                                     </StackPanel>
                                 </Border>
                             </Grid>
 
-                            <!-- Gráfico e transações -->
+                            <!-- Gráfico + Transações -->
                             <Grid Grid.Row="2">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="2*"/>
                                     <ColumnDefinition Width="1*"/>
                                 </Grid.ColumnDefinitions>
 
+                                <!-- Gráfico — Analises.EmissoesSeries / Analises.MesesLabels -->
                                 <Border Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="24" MinHeight="350">
                                     <Grid>
                                         <Grid.RowDefinitions>
@@ -505,18 +508,18 @@
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
                                         <TextBlock Grid.Row="0" Text="Emissões da Cadeia (YTD)" Style="{StaticResource H2}"/>
-                                        <lvc:CartesianChart Grid.Row="1" Series="{Binding EmissoesSeries}" Margin="0,15,0,0" LegendLocation="Top">
+                                        <lvc:CartesianChart Grid.Row="1" Series="{Binding Analises.EmissoesSeries}" Margin="0,15,0,0" LegendLocation="Top">
                                             <lvc:CartesianChart.AxisX>
-                                                <lvc:Axis Labels="{Binding MesesLabels}" Foreground="{StaticResource MossText}">
+                                                <lvc:Axis Labels="{Binding Analises.MesesLabels}" Foreground="{StaticResource TextSecondary}">
                                                     <lvc:Axis.Separator>
-                                                        <lvc:Separator Step="1" StrokeThickness="0" />
+                                                        <lvc:Separator Step="1" StrokeThickness="0"/>
                                                     </lvc:Axis.Separator>
                                                 </lvc:Axis>
                                             </lvc:CartesianChart.AxisX>
                                             <lvc:CartesianChart.AxisY>
-                                                <lvc:Axis Title="Ton CO2" Foreground="{StaticResource MossText}">
+                                                <lvc:Axis Title="Ton CO2" Foreground="{StaticResource TextSecondary}">
                                                     <lvc:Axis.Separator>
-                                                        <lvc:Separator Stroke="{StaticResource BorderGreen}" StrokeDashArray="4" />
+                                                        <lvc:Separator Stroke="{StaticResource ElevatedGray3}" StrokeDashArray="4"/>
                                                     </lvc:Axis.Separator>
                                                 </lvc:Axis>
                                             </lvc:CartesianChart.AxisY>
@@ -532,22 +535,22 @@
                                         </Grid.RowDefinitions>
                                         <TextBlock Grid.Row="0" Text="Transações na Rede" Style="{StaticResource H2}"/>
                                         <StackPanel Grid.Row="1" Margin="0,16,0,0">
-                                            <Border BorderBrush="{StaticResource BorderGreen}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
+                                            <Border BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
                                                 <StackPanel>
-                                                    <TextBlock Text="Bloco #8942 Registrado" Foreground="{StaticResource ForestText}" FontWeight="SemiBold"/>
-                                                    <TextBlock Text="Chassi adicionado pela Magneti Marelli" Foreground="{StaticResource StoneText}" FontSize="12" Margin="0,4,0,0"/>
+                                                    <TextBlock Text="Bloco #8942 Registrado" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold"/>
+                                                    <TextBlock Text="Chassi adicionado pela Magneti Marelli" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,4,0,0"/>
                                                 </StackPanel>
                                             </Border>
-                                            <Border BorderBrush="{StaticResource BorderGreen}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
+                                            <Border BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
                                                 <StackPanel>
-                                                    <TextBlock Text="Auditoria ESG Concluída" Foreground="{StaticResource RecycledGreen}" FontWeight="SemiBold"/>
-                                                    <TextBlock Text="Fornecedor: Bosch Ltda - Nota A" Foreground="{StaticResource StoneText}" FontSize="12" Margin="0,4,0,0"/>
+                                                    <TextBlock Text="Auditoria ESG Concluída" Foreground="{StaticResource AppleGreen}" FontWeight="SemiBold"/>
+                                                    <TextBlock Text="Fornecedor: Bosch Ltda - Nota A" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,4,0,0"/>
                                                 </StackPanel>
                                             </Border>
                                             <Border Padding="0,0,0,12">
                                                 <StackPanel>
-                                                    <TextBlock Text="Falha de Autenticação API" Foreground="#D32F2F" FontWeight="SemiBold"/>
-                                                    <TextBlock Text="Tentativa de acesso não autorizada (IoT)" Foreground="{StaticResource StoneText}" FontSize="12" Margin="0,4,0,0"/>
+                                                    <TextBlock Text="Falha de Autenticação API" Foreground="{StaticResource AppleRed}" FontWeight="SemiBold"/>
+                                                    <TextBlock Text="Tentativa de acesso não autorizada (IoT)" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,4,0,0"/>
                                                 </StackPanel>
                                             </Border>
                                         </StackPanel>
@@ -556,7 +559,7 @@
                             </Grid>
                         </Grid>
 
-                        <!-- PROJETOS (Rastreabilidade) -->
+                        <!-- ===== ABA: RASTREABILIDADE ===== -->
                         <Grid>
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -587,8 +590,24 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBox Grid.Column="0" Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding PesquisaVin, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,16,0"/>
-                                        <Button Grid.Column="1" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding PesquisarVinCommand}">
+                                        <!-- Rastreabilidade.PesquisaVin -->
+                                        <Grid Grid.Column="0" Margin="0,0,16,0">
+                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Rastreabilidade.PesquisaVin, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <TextBlock Text="Insira o número VIN do veículo..." Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="14,0,0,0" IsHitTestVisible="False">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Rastreabilidade.PesquisaVin}" Value="">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
+                                        <!-- Rastreabilidade.PesquisarVinCommand -->
+                                        <Button Grid.Column="1" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding Rastreabilidade.PesquisarVinCommand}">
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE721;" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                                 <TextBlock Text="Rastrear Origem" VerticalAlignment="Center"/>
@@ -605,31 +624,32 @@
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
                                     <TextBlock Grid.Row="0" Text="Veículos Disponíveis no Banco" Style="{StaticResource H2}" Margin="0,0,0,10"/>
-                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="300">
-                                        <ItemsControl ItemsSource="{Binding ListaVeiculos}">
+                                    <!-- Rastreabilidade.ListaVeiculos -->
+                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="400">
+                                        <ItemsControl ItemsSource="{Binding Rastreabilidade.ListaVeiculos}">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Border Background="{StaticResource PaperBeige}" BorderBrush="{StaticResource BorderGreen}" BorderThickness="1" CornerRadius="12" Padding="16,12" Margin="0,0,0,10">
+                                                    <Border Background="{StaticResource ElevatedGray2}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="12" Padding="16,12" Margin="0,0,0,10">
                                                         <Grid>
                                                             <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto" />
-                                                                <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
                                                             </Grid.ColumnDefinitions>
-                                                            <Border Grid.Column="0" Width="38" Height="38" CornerRadius="8" Background="{StaticResource RecycledGreenPale}" Margin="0,0,12,0">
+                                                            <Border Grid.Column="0" Width="38" Height="38" CornerRadius="8" Background="{StaticResource ElevatedGray3}" Margin="0,0,12,0">
                                                                 <TextBlock Text="🚚" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                             </Border>
                                                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                                <TextBlock Text="{Binding Modelo, FallbackValue='Modelo Iveco'}" Foreground="{StaticResource ForestText}" FontWeight="SemiBold" FontSize="14"/>
+                                                                <TextBlock Text="{Binding Modelo, FallbackValue='Modelo Iveco'}" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" FontSize="14"/>
                                                                 <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                                                    <TextBlock Text="VIN: " Foreground="{StaticResource StoneText}" FontSize="12"/>
-                                                                    <TextBlock Text="{Binding Vin}" Foreground="{StaticResource RecycledGreen}" FontSize="12" FontWeight="Medium"/>
+                                                                    <TextBlock Text="VIN: " Foreground="{StaticResource TextSecondary}" FontSize="12"/>
+                                                                    <TextBlock Text="{Binding Vin}" Foreground="{StaticResource AppleBlue}" FontSize="12" FontWeight="Medium"/>
                                                                 </StackPanel>
                                                             </StackPanel>
                                                             <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
-                                                                <TextBlock Text="{Binding DataMontagem, StringFormat={}{0:dd/MM/yyyy}}" Foreground="{StaticResource StoneText}" FontSize="13" HorizontalAlignment="Right"/>
-                                                                <Border Background="{StaticResource RecycledGreenPale}" CornerRadius="4" Padding="6,2" Margin="0,4,0,0" HorizontalAlignment="Right">
-                                                                    <TextBlock Text="Sincronizado" Foreground="{StaticResource RecycledGreen}" FontSize="10" FontWeight="Bold"/>
+                                                                <TextBlock Text="{Binding DataMontagem, StringFormat={}{0:dd/MM/yyyy}}" Foreground="{StaticResource TextSecondary}" FontSize="13" HorizontalAlignment="Right"/>
+                                                                <Border Background="#1530D158" CornerRadius="4" Padding="6,2" Margin="0,4,0,0" HorizontalAlignment="Right">
+                                                                    <TextBlock Text="Sincronizado" Foreground="{StaticResource AppleGreen}" FontSize="10" FontWeight="Bold"/>
                                                                 </Border>
                                                             </StackPanel>
                                                         </Grid>
@@ -642,7 +662,7 @@
                             </Border>
                         </Grid>
 
-                        <!-- CADASTRO (Fornecedores) -->
+                        <!-- ===== ABA: FORNECEDORES ===== -->
                         <Grid>
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -673,14 +693,31 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
+
                                     <TextBlock Grid.Row="0" Text="Integração Receita Federal" Style="{StaticResource H2}"/>
+
+                                    <!-- Fornecedor.CnpjBusca + Fornecedor.ConsultarCnpjCommand -->
                                     <Grid Grid.Row="1" Margin="0,0,0,30">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBox Grid.Column="0" Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding CnpjBusca, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,16,0"/>
-                                        <Button Grid.Column="1" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ConsultarCnpjCommand}">
+                                        <Grid Grid.Column="0" Margin="0,0,16,0">
+                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Fornecedor.CnpjBusca, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <TextBlock Text="00.000.000/0000-00" Foreground="{StaticResource TextTertiary}" VerticalAlignment="Center" Margin="14,0,0,0" IsHitTestVisible="False">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Fornecedor.CnpjBusca}" Value="">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
+                                        <Button Grid.Column="1" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding Fornecedor.ConsultarCnpjCommand}">
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8B6;" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                                 <TextBlock Text="Consultar CNPJ" VerticalAlignment="Center"/>
@@ -688,6 +725,7 @@
                                         </Button>
                                     </Grid>
 
+                                    <!-- Fornecedor.NomeFornecedorEncontrado + Fornecedor.LocalizacaoFornecedorEncontrado -->
                                     <Grid Grid.Row="2" Margin="0,0,0,30">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -695,33 +733,35 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Grid.Column="0">
-                                            <TextBlock Text="Razão Social" Foreground="{StaticResource StoneText}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding NomeFornecedorEncontrado}" IsReadOnly="True" Background="{StaticResource PaperBeigeLight}"/>
-                                            <TextBlock Text="Status RFB" Foreground="{StaticResource StoneText}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
-                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="ATIVA" IsReadOnly="True" Foreground="{StaticResource RecycledGreen}" Background="{StaticResource PaperBeigeLight}"/>
+                                            <TextBlock Text="Razão Social" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Fornecedor.NomeFornecedorEncontrado}" IsReadOnly="True" Background="#0C0C0E"/>
+                                            <TextBlock Text="Status RFB" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="ATIVA" IsReadOnly="True" Foreground="{StaticResource AppleGreen}" Background="#0C0C0E"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="2">
-                                            <TextBlock Text="Endereço Sede" Foreground="{StaticResource StoneText}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding LocalizacaoFornecedorEncontrado}" IsReadOnly="True" Background="{StaticResource PaperBeigeLight}"/>
-                                            <TextBlock Text="Categoria ESG (Atribuída)" Foreground="{StaticResource StoneText}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
-                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="Pendente de Auditoria" IsReadOnly="True" Foreground="#FF8C00" Background="{StaticResource PaperBeigeLight}"/>
+                                            <TextBlock Text="Endereço Sede" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Fornecedor.LocalizacaoFornecedorEncontrado}" IsReadOnly="True" Background="#0C0C0E"/>
+                                            <TextBlock Text="Categoria ESG (Atribuída)" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="Pendente de Auditoria" IsReadOnly="True" Foreground="{StaticResource AppleOrange}" Background="#0C0C0E"/>
                                         </StackPanel>
                                     </Grid>
 
-                                    <Border Grid.Row="3" BorderBrush="{StaticResource BorderGreen}" BorderThickness="0,0,0,1" Margin="0,0,0,20"/>
+                                    <Border Grid.Row="3" BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="0,0,0,1" Margin="0,0,0,20"/>
+
+                                    <!-- Fornecedor.MensagemCadastro + Fornecedor.SalvarFornecedorCommand -->
                                     <Grid Grid.Row="4">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding MensagemCadastro}" Foreground="{StaticResource RecycledGreen}" FontSize="14" VerticalAlignment="Center" FontWeight="Medium"/>
-                                        <Button Grid.Column="1" Command="{Binding SalvarFornecedorCommand}" Background="{StaticResource RecycledGreen}" Foreground="White" Padding="32,14" Cursor="Hand" BorderThickness="0">
+                                        <TextBlock Grid.Column="0" Text="{Binding Fornecedor.MensagemCadastro}" Foreground="{StaticResource AppleGreen}" FontSize="14" VerticalAlignment="Center" FontWeight="Medium"/>
+                                        <Button Grid.Column="1" Command="{Binding Fornecedor.SalvarFornecedorCommand}" Cursor="Hand" BorderThickness="0">
                                             <Button.Template>
                                                 <ControlTemplate TargetType="Button">
-                                                    <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="12">
+                                                    <Border x:Name="border" Background="{StaticResource AppleGreen}" CornerRadius="12" Padding="32,14">
                                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74E;" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                                                            <TextBlock Text="Registrar no Ledger" FontWeight="Bold" FontSize="15" VerticalAlignment="Center"/>
+                                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74E;" FontSize="16" Foreground="White" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                                            <TextBlock Text="Registrar no Ledger" Foreground="White" FontWeight="Bold" FontSize="15" VerticalAlignment="Center"/>
                                                         </StackPanel>
                                                     </Border>
                                                     <ControlTemplate.Triggers>
@@ -740,7 +780,7 @@
                             </Border>
                         </Grid>
 
-                        <!-- ANÁLISES ESG -->
+                        <!-- ===== ABA: ANÁLISES ESG ===== -->
                         <Grid>
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -762,25 +802,25 @@
                             </StackPanel>
                             <Grid Grid.Row="1">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Border Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="30" MinHeight="400">
                                     <StackPanel>
                                         <TextBlock Text="Distribuição de Emissões" Style="{StaticResource H2}"/>
-                                        <TextBlock Text="O gráfico de pizza com os escopos 1, 2 e 3 será renderizado aqui." Foreground="{StaticResource StoneText}" TextWrapping="Wrap"/>
+                                        <TextBlock Text="O gráfico de pizza com os escopos 1, 2 e 3 será renderizado aqui." Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                 </Border>
                                 <Border Grid.Column="1" Style="{StaticResource PremiumCardStyle}" Margin="10,0,0,0" Padding="30" MinHeight="400">
                                     <StackPanel>
                                         <TextBlock Text="Top Fornecedores Verdes" Style="{StaticResource H2}"/>
-                                        <TextBlock Text="Ranking baseado nos certificados ISO 14001 registrados no blockchain." Foreground="{StaticResource StoneText}" TextWrapping="Wrap"/>
+                                        <TextBlock Text="Ranking baseado nos certificados ISO 14001 registrados no blockchain." Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                 </Border>
                             </Grid>
                         </Grid>
 
-                        <!-- PEÇAS E COMPONENTES -->
+                        <!-- ===== ABA: PEÇAS ===== -->
                         <Grid>
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -801,6 +841,8 @@
                                 <TextBlock Style="{StaticResource H1}" Text="Gestão de Componentes"/>
                                 <TextBlock Style="{StaticResource Subtitle}" Text="Adicione peças manualmente e associe ao Chassi (VIN) de um veículo no Ledger."/>
                             </StackPanel>
+
+                            <!-- Pecas.NovaPecaVin + Pecas.NovaPecaNome + Pecas.AdicionarPecaManualCommand -->
                             <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="24" Margin="0,0,0,20">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -809,14 +851,14 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Column="0" Margin="0,0,16,0">
-                                        <TextBlock Text="Chassi do Veículo (VIN)" Foreground="{StaticResource StoneText}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding NovaPecaVin, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBlock Text="Chassi do Veículo (VIN)" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Pecas.NovaPecaVin, UpdateSourceTrigger=PropertyChanged}"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" Margin="0,0,16,0">
-                                        <TextBlock Text="Nome/Descrição da Peça" Foreground="{StaticResource StoneText}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding NovaPecaNome, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBlock Text="Nome/Descrição da Peça" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Pecas.NovaPecaNome, UpdateSourceTrigger=PropertyChanged}"/>
                                     </StackPanel>
-                                    <Button Grid.Column="2" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding AdicionarPecaManualCommand}" VerticalAlignment="Bottom">
+                                    <Button Grid.Column="2" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding Pecas.AdicionarPecaManualCommand}" VerticalAlignment="Bottom">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE710;" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                             <TextBlock Text="Registrar Peça" VerticalAlignment="Center"/>
@@ -824,6 +866,8 @@
                                     </Button>
                                 </Grid>
                             </Border>
+
+                            <!-- Pecas.ListaPecas -->
                             <Border Grid.Row="2" Style="{StaticResource PremiumCardStyle}" Padding="24" MinHeight="300">
                                 <Grid>
                                     <Grid.RowDefinitions>
@@ -832,28 +876,28 @@
                                     </Grid.RowDefinitions>
                                     <TextBlock Grid.Row="0" Text="Últimas Peças Registradas" Style="{StaticResource H2}" Margin="0,0,0,16"/>
                                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                                        <ItemsControl ItemsSource="{Binding ListaPecas}">
+                                        <ItemsControl ItemsSource="{Binding Pecas.ListaPecas}">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Border BorderBrush="{StaticResource BorderGreen}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
+                                                    <Border BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
                                                         <Grid>
                                                             <Grid.ColumnDefinitions>
                                                                 <ColumnDefinition Width="Auto"/>
                                                                 <ColumnDefinition Width="*"/>
                                                                 <ColumnDefinition Width="Auto"/>
                                                             </Grid.ColumnDefinitions>
-                                                            <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" Background="{StaticResource RecycledGreenPale}" Margin="0,0,12,0">
-                                                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9A1;" FontSize="16" Foreground="{StaticResource RecycledGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" Background="#1AFF9F0A" Margin="0,0,12,0">
+                                                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9A1;" FontSize="16" Foreground="{StaticResource AppleOrange}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                             </Border>
                                                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                                <TextBlock Text="{Binding NomePeca}" Foreground="{StaticResource ForestText}" FontWeight="SemiBold" FontSize="14"/>
+                                                                <TextBlock Text="{Binding NomePeca}" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" FontSize="14"/>
                                                                 <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                                                    <TextBlock Text="Veículo VIN: " Foreground="{StaticResource StoneText}" FontSize="12"/>
-                                                                    <TextBlock Text="{Binding VinAssociado}" Foreground="{StaticResource RecycledGreen}" FontSize="12" FontWeight="Medium"/>
+                                                                    <TextBlock Text="Veículo VIN: " Foreground="{StaticResource TextSecondary}" FontSize="12"/>
+                                                                    <TextBlock Text="{Binding VinAssociado}" Foreground="{StaticResource AppleBlue}" FontSize="12" FontWeight="Medium"/>
                                                                 </StackPanel>
                                                             </StackPanel>
-                                                            <Border Grid.Column="2" Background="{StaticResource RecycledGreenPale}" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
-                                                                <TextBlock Text="Gravado no Ledger" Foreground="{StaticResource RecycledGreen}" FontSize="10" FontWeight="Bold"/>
+                                                            <Border Grid.Column="2" Background="#1530D158" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+                                                                <TextBlock Text="Gravado no Ledger" Foreground="{StaticResource AppleGreen}" FontSize="10" FontWeight="Bold"/>
                                                             </Border>
                                                         </Grid>
                                                     </Border>
@@ -865,7 +909,7 @@
                             </Border>
                         </Grid>
 
-                        <!-- AJUSTES (Admin) -->
+                        <!-- ===== ABA: AJUSTES (Admin) ===== -->
                         <Grid>
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -888,11 +932,10 @@
                             <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="30">
                                 <StackPanel>
                                     <TextBlock Text="Conectividade da Rede" Style="{StaticResource H2}"/>
-                                    <TextBlock Text="Endereço Base da API (Endpoint)" Foreground="{StaticResource StoneText}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <TextBlock Text="Endereço Base da API (Endpoint)" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <!-- ApiUrlConfig fica no MainViewModel -->
                                     <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding ApiUrlConfig, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,30"/>
-
-                                    <Border BorderBrush="{StaticResource BorderGreen}" BorderThickness="0,0,0,1" Margin="0,0,0,30"/>
-
+                                    <Border BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="0,0,0,1" Margin="0,0,0,30"/>
                                     <TextBlock Text="Ferramentas de Desenvolvimento" Style="{StaticResource H2}"/>
                                     <Grid Margin="0,0,0,20">
                                         <Grid.ColumnDefinitions>
@@ -900,26 +943,21 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Grid.Column="0">
-                                            <TextBlock Text="Simulador de Chão de Fábrica (MOCK IoT)" Foreground="{StaticResource ForestText}" FontSize="16" FontWeight="SemiBold"/>
-                                            <TextBlock Text="Habilita a geração contínua de telemetria e registros de chassi simulados para testes de carga no Firebase." Foreground="{StaticResource StoneText}" FontSize="13" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                            <TextBlock Text="Simulador de Chão de Fábrica (MOCK IoT)" Foreground="{StaticResource TextPrimary}" FontSize="16" FontWeight="SemiBold"/>
+                                            <TextBlock Text="Habilita a geração contínua de telemetria e registros de chassi simulados para testes de carga no Firebase." Foreground="{StaticResource TextSecondary}" FontSize="13" Margin="0,4,0,0" TextWrapping="Wrap"/>
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding StatusSimulador, FallbackValue='Desativado'}" Foreground="{StaticResource StoneText}" Margin="0,0,16,0" VerticalAlignment="Center" FontWeight="Bold"/>
+                                        <!-- StatusSimulador + LigarDesligarSimuladorCommand ficam no MainViewModel -->
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
+                                            <TextBlock Text="{Binding StatusSimulador, FallbackValue='Desativado'}" Foreground="{StaticResource TextSecondary}" Margin="0,0,16,0" VerticalAlignment="Center" FontWeight="Bold"/>
                                             <Button Command="{Binding LigarDesligarSimuladorCommand}" Cursor="Hand">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
-                                                        <Border x:Name="bg" Background="{StaticResource BorderGreen}" CornerRadius="16" Width="52" Height="32">
-                                                            <Ellipse x:Name="knob" Width="24" Height="24" Fill="White" HorizontalAlignment="Left" Margin="4,0,0,0">
-                                                                <Ellipse.RenderTransform>
-                                                                    <TranslateTransform X="0"/>
-                                                                </Ellipse.RenderTransform>
-                                                            </Ellipse>
+                                                        <Border x:Name="bg" Background="{StaticResource ElevatedGray3}" CornerRadius="16" Width="52" Height="32">
+                                                            <Ellipse x:Name="knob" Width="24" Height="24" Fill="White" HorizontalAlignment="Left" Margin="4,0,0,0"/>
                                                         </Border>
                                                         <ControlTemplate.Triggers>
                                                             <Trigger Property="IsPressed" Value="True">
-                                                                <Setter TargetName="bg" Property="Background" Value="{StaticResource RecycledGreen}"/>
-                                                                <Setter TargetName="knob" Property="HorizontalAlignment" Value="Right"/>
-                                                                <Setter TargetName="knob" Property="Margin" Value="0,0,4,0"/>
+                                                                <Setter TargetName="bg" Property="Background" Value="{StaticResource AppleGreen}"/>
                                                             </Trigger>
                                                         </ControlTemplate.Triggers>
                                                     </ControlTemplate>
@@ -931,7 +969,7 @@
                             </Border>
                         </Grid>
 
-                        <!-- RELATÓRIOS PDF -->
+                        <!-- ===== ABA: RELATÓRIOS ===== -->
                         <Grid>
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -957,22 +995,22 @@
                                 <StackPanel>
                                     <TextBlock Text="Selecione o tipo de relatório desejado:" Style="{StaticResource H2}" Margin="0,0,0,15"/>
 
+                                    <!-- Relatorios.MudarTipoRelatorioCommand -->
                                     <StackPanel Margin="0,0,0,30">
-                                        <RadioButton Content="📄 Relatório Geral de Veículos (Rastreabilidade)" 
-                                                     Foreground="{StaticResource ForestText}" FontSize="15" Margin="0,0,0,12" 
-                                                     IsChecked="True" 
-                                                     Command="{Binding MudarTipoRelatorioCommand}" CommandParameter="Veiculos"/>
-
-                                        <RadioButton Content="📄 Relatório de Fornecedores Cadastrados (Em breve)" 
-                                                     Foreground="{StaticResource StoneText}" FontSize="15" Margin="0,0,0,12" 
-                                                     Command="{Binding MudarTipoRelatorioCommand}" CommandParameter="Fornecedores"/>
-
-                                        <RadioButton Content="📄 Relatório de Componentes e Peças (Em breve)" 
-                                                     Foreground="{StaticResource StoneText}" FontSize="15" 
-                                                     Command="{Binding MudarTipoRelatorioCommand}" CommandParameter="Pecas"/>
+                                        <RadioButton Content="📄 Relatório Geral de Veículos (Rastreabilidade)"
+                                                     Foreground="{StaticResource TextPrimary}" FontSize="15" Margin="0,0,0,12"
+                                                     IsChecked="True"
+                                                     Command="{Binding Relatorios.MudarTipoRelatorioCommand}" CommandParameter="Veiculos"/>
+                                        <RadioButton Content="📄 Relatório de Fornecedores Cadastrados (Em breve)"
+                                                     Foreground="{StaticResource TextSecondary}" FontSize="15" Margin="0,0,0,12"
+                                                     Command="{Binding Relatorios.MudarTipoRelatorioCommand}" CommandParameter="Fornecedores"/>
+                                        <RadioButton Content="📄 Relatório de Componentes e Peças (Em breve)"
+                                                     Foreground="{StaticResource TextSecondary}" FontSize="15"
+                                                     Command="{Binding Relatorios.MudarTipoRelatorioCommand}" CommandParameter="Pecas"/>
                                     </StackPanel>
 
-                                    <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding GerarRelatorioPdfCommand}" HorizontalAlignment="Left" Padding="24,14">
+                                    <!-- Relatorios.GerarRelatorioPdfCommand -->
+                                    <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding Relatorios.GerarRelatorioPdfCommand}" HorizontalAlignment="Left" Padding="24,14">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                             <TextBlock Text="Processar e Baixar Relatório" FontSize="15" VerticalAlignment="Center" FontWeight="Bold"/>
@@ -981,16 +1019,24 @@
                                 </StackPanel>
                             </Border>
                         </Grid>
+
                     </Grid>
                 </ScrollViewer>
             </Grid>
         </Border>
 
-        <!-- Tela de login (também em estilo claro/verde) -->
+        <!-- ==================== TELA DE LOGIN / CADASTRO ==================== -->
         <Border CornerRadius="20" Margin="10">
             <Border.Style>
                 <Style TargetType="Border">
-                    <Setter Property="Background" Value="{StaticResource PaperBeige}"/>
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#08080A" Offset="0.0"/>
+                                <GradientStop Color="#0F101A" Offset="1.0"/>
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsLoggedIn}" Value="False">
@@ -1009,15 +1055,17 @@
                     </Button.Template>
                 </Button>
 
-                <Border Width="450" Style="{StaticResource PremiumCardStyle}" Padding="40" Background="{StaticResource PaperBeigeLight}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Width="450" Style="{StaticResource PremiumCardStyle}" Padding="40" Background="#111113" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <StackPanel>
-                        <Border Width="60" Height="60" CornerRadius="16" Background="{StaticResource RecycledGreenPale}" HorizontalAlignment="Center" Margin="0,0,0,20">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEB41;" FontSize="32" Foreground="{StaticResource RecycledGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Border Width="60" Height="60" CornerRadius="16" Background="{StaticResource ElevatedGray2}" HorizontalAlignment="Center" Margin="0,0,0,20">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEB41;" FontSize="32" Foreground="{StaticResource AppleGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
 
-                        <TextBlock Text="Iveco Green Ledger" FontSize="28" HorizontalAlignment="Center">
+                        <!-- Título dinâmico -->
+                        <TextBlock HorizontalAlignment="Center" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8">
                             <TextBlock.Style>
-                                <Style TargetType="TextBlock" BasedOn="{StaticResource H1}">
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="Iveco Green Ledger"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ModoCadastro}" Value="True">
                                             <Setter Property="Text" Value="Criar Nova Conta"/>
@@ -1027,6 +1075,7 @@
                             </TextBlock.Style>
                         </TextBlock>
 
+                        <!-- Campos exclusivos do cadastro -->
                         <StackPanel>
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
@@ -1038,33 +1087,33 @@
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
-
-                            <TextBlock Text="Nome Completo" Foreground="{StaticResource StoneText}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                            <TextBlock Text="Nome Completo" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
                             <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding CadastroNome, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
-
-                            <TextBlock Text="Tipo de Acesso (Perfil)" Foreground="{StaticResource StoneText}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                            <TextBlock Text="Tipo de Acesso (Perfil)" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                <RadioButton Content="Usuário Normal" Foreground="{StaticResource ForestText}" IsChecked="True" GroupName="Perfil" Margin="0,0,20,0"
-                                             Command="{Binding MudarAbaCommand}" CommandParameter="Usuario" />
-                                <RadioButton Content="Administrador" Foreground="{StaticResource ForestText}" GroupName="Perfil" 
-                                             Command="{Binding MudarAbaCommand}" CommandParameter="Admin"/>
+                                <RadioButton Content="Usuário Normal" Foreground="White" IsChecked="True" GroupName="Perfil" Margin="0,0,20,0"/>
+                                <RadioButton Content="Administrador" Foreground="White" GroupName="Perfil"/>
                             </StackPanel>
                         </StackPanel>
 
-                        <TextBlock Text="Endereço de E-mail" Foreground="{StaticResource StoneText}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                        <!-- Email -->
+                        <TextBlock Text="Endereço de E-mail" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
                         <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding LoginEmail, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
 
-                        <TextBlock Text="Palavra-Passe" Foreground="{StaticResource StoneText}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding LoginSenha, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,30" />
+                        <!-- Senha -->
+                        <TextBlock Text="Palavra-Passe" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding LoginSenha, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,30"/>
 
-                        <Button Background="{StaticResource RecycledGreen}" Foreground="White" Padding="0,14" Cursor="Hand" BorderThickness="0">
+                        <!-- Botão principal -->
+                        <Button Padding="0,14" Cursor="Hand" BorderThickness="0">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Command" Value="{Binding FazerLoginCommand}"/>
+                                    <Setter Property="Background" Value="{StaticResource AppleBlue}"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ModoCadastro}" Value="True">
                                             <Setter Property="Command" Value="{Binding FazerCadastroCommand}"/>
-                                            <Setter Property="Background" Value="{StaticResource RecycledGreen}"/>
+                                            <Setter Property="Background" Value="{StaticResource AppleGreen}"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -1072,7 +1121,7 @@
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="12">
-                                        <TextBlock FontWeight="Bold" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock FontWeight="Bold" FontSize="15" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0,14">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Text" Value="Entrar no Sistema"/>
@@ -1097,8 +1146,9 @@
                             </Button.Template>
                         </Button>
 
+                        <!-- Link alternar modo -->
                         <Button Command="{Binding AlternarModoAuthCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,20,0,0">
-                            <TextBlock Foreground="{StaticResource RecycledGreen}" TextDecorations="Underline" HorizontalAlignment="Center">
+                            <TextBlock Foreground="{StaticResource TextSecondary}" TextDecorations="Underline" HorizontalAlignment="Center">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Text" Value="Não tem conta? Registre-se aqui."/>
@@ -1115,5 +1165,6 @@
                 </Border>
             </Grid>
         </Border>
+
     </Grid>
 </Window>
