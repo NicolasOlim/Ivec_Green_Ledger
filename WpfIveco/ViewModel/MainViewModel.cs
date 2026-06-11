@@ -71,7 +71,7 @@ namespace WpfIveco.ViewModel
         private string _abaAtiva = "Dashboard";
         public string AbaAtiva { get => _abaAtiva; set { _abaAtiva = value; OnPropertyChanged(); } }
 
-        private string _apiUrlConfig = "https://localhost:44353/api";
+        private string _apiUrlConfig = "http://localhost:5000/api";
         public string ApiUrlConfig { get => _apiUrlConfig; set { _apiUrlConfig = value; OnPropertyChanged(); } }
 
         private string _statusSimulador = "Desativado";
@@ -141,7 +141,10 @@ namespace WpfIveco.ViewModel
             {
                 ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
             };
-            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:44353/") };
+            _httpClient = new HttpClient(handler)
+            {
+                BaseAddress = new Uri("http://localhost:5000/")
+            };
 
             MudarAbaCommand = new RelayCommand(p => AbaAtiva = p as string);
             LigarDesligarSimuladorCommand = new RelayCommand(p =>
@@ -647,7 +650,7 @@ namespace WpfIveco.ViewModel
                 using (var client = new HttpClient())
                 {
                     // ATENÇÃO: Substitua 7196 pela porta correta da sua API!
-                    string urlDaApi = "https://localhost:44353/api/Dados/relatorios/veiculos/pdf";
+                    string urlDaApi = "http://localhost:5000/api/Dados/relatorios/veiculos/pdf";
 
                     // Faz o pedido do PDF à API
                     var response = await client.GetAsync(urlDaApi);

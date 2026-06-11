@@ -1,10 +1,8 @@
 ﻿using ApiIveco.Models;
 using ApiIveco.Service;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using QuestPDF.Fluent;
@@ -13,6 +11,10 @@ using QuestPDF.Infrastructure;
 
 namespace ApiIveco.Controllers
 {
+    /// <summary>
+    /// Gerencia veículos, fornecedores, lotes, componentes e autenticação.
+    /// </summary>
+    /// <remarks>Operações baseadas no Firebase Firestore. Logs registram ações críticas.</remarks>
     [Route("api/[controller]")]
     [ApiController]
     public class DadosController : ControllerBase
@@ -30,34 +32,21 @@ namespace ApiIveco.Controllers
         // VEÍCULOS
         // ==========================================
 
-        /// <summary>
-        /// Retorna a lista completa de veiculos cadastrados no banco de dados.
-        /// </summary>
-        /// <returns>Uma lista contendo todos os veiculos.</returns>
-        /// <response code="200">Retorna a lista de veiculos com sucesso.</response>
-        /// <response code="400">Se houver algum problema com os parâmetros de consulta.</response>
-        /// <response code="404">Se a coleção de veiculos não for encontrada.</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor (ex: falha no Firebase).</response>
-        [Tags("Veículos")]
+        /// <summary>Lista todos os veículos.</summary>
+        /// <response code="200">Lista de veículos (pode ser vazia).</response>
         [HttpGet("veiculos")]
         public async Task<IActionResult> GetVeiculos()
         {
             _logger.LogInformation("[GET] Listando todos os veículos.");
             var veiculos = await _dadosService.ListarVeiculo();
-            _logger.LogInformation("[GET] {count} veículos retornados.", veiculos.Count);
             return Ok(veiculos);
         }
 
-        /// <summary>
-        /// Busca um veiculo específico pelo seu VIN.
-        /// </summary>
-        /// <param name="vin">O identificador único do veiculo (String).</param>
-        /// <returns>Os detalhes do veiculo correspondente ao ID informado.</returns>
-        /// <response code="200">Retorna o veiculo encontrado com sucesso.</response>
-        /// <response code="400">Se o ID fornecido for nulo ou vazio.</response>
-        /// <response code="404">Se nenhum veiculo for encontrado com o ID especificado.</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor.</response>
-        [Tags("Veículos")]
+        /// <summary>Busca um veículo pelo VIN.</summary>
+        /// <param name="vin">VIN do veículo (17 caracteres).</param>
+        /// <response code="200">Veículo encontrado.</response>
+        /// <response code="400">VIN inválido.</response>
+        /// <response code="404">Não encontrado.</response>
         [HttpGet("veiculos/{vin}")]
         public async Task<IActionResult> GetVeiculoByVin(string vin)
         {
@@ -67,23 +56,18 @@ namespace ApiIveco.Controllers
                 return BadRequest(new { Mensagem = "Os dados enviados são inválidos." });
 
             var veiculo = await _dadosService.ObterVeiculoPorVin(vin);
-
             if (veiculo == null)
                 return NotFound(new { Mensagem = "O recurso solicitado não foi encontrado." });
 
-            _logger.LogInformation("[GET] Veículo localizado. VIN: {vin}", vin);
             return Ok(new { mensagem = "Veículo encontrado", veiculo });
         }
 
-        /// <summary>
-        /// Cria e salva um novo veiculo no banco de dados.
-        /// </summary>
-        /// <param name="veiculo">O objeto JSON contendo os dados do veiculo a ser criado.</param>
-        /// <returns>O veiculo recém-criado junto com a rota para acessá-lo.</returns>
-        /// <response code="201">Retorna o veiculo criado e o cabeçalho Location com a URI de acesso.</response>
-        /// <response code="400">Se os dados enviados forem nulos ou o nome do veiculo estiver vazio.</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar salvar.</response>
-        [Tags("Veículos")]
+        /// <summary>Cadastra um novo veículo.</summary>
+        /// <remarks>O VIN deve ser único. Em caso de duplicidade, retorna 409.</remarks>
+        /// <param name="veiculo">Dados do veículo.</param>
+        /// <response code="200">Veículo criado.</response>
+        /// <response code="400">Dados inválidos.</response>
+        /// <response code="409">VIN já cadastrado.</response>
         [HttpPost("veiculos")]
         public async Task<IActionResult> PostVeiculo([FromBody] Veiculo veiculo)
         {
@@ -100,16 +84,15 @@ namespace ApiIveco.Controllers
             }
 
             var criado = await _dadosService.CriarVeiculo(veiculo);
-            _logger.LogInformation("[POST] Veículo criado. VIN: {vin}", criado.Vin);
             return Ok(new { mensagem = "Veículo registrado com sucesso!", veiculo = criado });
         }
 
-        /// <summary>
-        /// Atualiza os dados de um veículo existente.
-        /// </summary>
-        /// <param name="vin">O VIN do veículo a ser atualizado.</param>
-        /// <param name="veiculo">Objeto JSON com os dados novos.</param>
-        [Tags("Veículos")]
+        /// <summary>Atualiza um veículo existente.</summary>
+        /// <param name="vin">VIN do veículo a ser atualizado.</param>
+        /// <param name="veiculo">Novos dados.</param>
+        /// <response code="200">Atualizado com sucesso.</response>
+        /// <response code="400">VIN da URL não confere com o corpo.</response>
+        /// <response code="404">Veículo não encontrado.</response>
         [HttpPut("veiculos/{vin}")]
         public async Task<IActionResult> PutVeiculo(string vin, [FromBody] Veiculo veiculo)
         {
@@ -119,23 +102,16 @@ namespace ApiIveco.Controllers
                 return BadRequest(new { Mensagem = "Os dados enviados são inválidos." });
 
             var atualizado = await _dadosService.AtualizarVeiculo(vin, veiculo);
-
             if (atualizado == null)
                 return NotFound(new { Mensagem = "O recurso solicitado não foi encontrado." });
 
-            _logger.LogInformation("[PUT] Veículo atualizado. VIN: {vin}", vin);
             return Ok(new { mensagem = "Veículo atualizado com sucesso!", veiculo = atualizado });
         }
 
-        /// <summary>
-        /// Exclui um veiculo do banco de dados.
-        /// </summary>
-        /// <param name="vin">O VIN do veiculo que será excluído.</param>
-        /// <returns>Uma mensagem de sucesso confirmando a exclusão.</returns>
-        /// <response code="200">Se o veiculo for excluído com sucesso.</response>
-        /// <response code="404">Se o veiculo com o ID especificado não for encontrado.</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar excluir.</response>
-        [Tags("Veículos")]
+        /// <summary>Remove um veículo do banco de dados.</summary>
+        /// <param name="vin">VIN do veículo.</param>
+        /// <response code="200">Excluído com sucesso.</response>
+        /// <response code="404">Veículo não encontrado.</response>
         [HttpDelete("veiculos/{vin}")]
         public async Task<IActionResult> DeleteVeiculo(string vin)
         {
@@ -146,14 +122,15 @@ namespace ApiIveco.Controllers
                 return NotFound(new { Mensagem = "O recurso solicitado não foi encontrado." });
 
             await _dadosService.ExcluirVeiculo(vin);
-            _logger.LogInformation("[DELETE] Veículo excluído. VIN: {vin}", vin);
             return Ok(new { mensagem = "Veículo deletado com sucesso." });
         }
 
-        /// <summary>
-        /// Descodifica um VIN e valida se pertence obrigatoriamente à marca IVECO.
-        /// </summary>
-        [Tags("Veículos")]
+        /// <summary>Valida se o VIN pertence à marca IVECO.</summary>
+        /// <remarks>Requer VIN de 17 caracteres. A validação é feita via serviço externo.</remarks>
+        /// <param name="vin">VIN de 17 caracteres.</param>
+        /// <response code="200">VIN válido para IVECO.</response>
+        /// <response code="400">VIN com tamanho incorreto.</response>
+        /// <response code="404">Não é IVECO ou não encontrado.</response>
         [HttpGet("veiculos/validar-vin/{vin}")]
         public async Task<IActionResult> ValidarVinIveco(string vin)
         {
@@ -163,19 +140,15 @@ namespace ApiIveco.Controllers
                 return BadRequest(new { Mensagem = "Os dados enviados são inválidos. O VIN deve ter 17 caracteres." });
 
             var veiculoIveco = await _dadosService.BuscarEValidarVinIvecoAsync(vin);
-
             if (veiculoIveco == null)
                 return NotFound(new { Mensagem = "O recurso solicitado não foi encontrado." });
 
-            _logger.LogInformation("[GET] VIN IVECO validado: {vin}", vin);
             return Ok(new { mensagem = "Veículo IVECO validado com sucesso!", veiculo = veiculoIveco });
         }
 
-        /// <summary>
-        /// Gera um relatório em PDF de todos os veículos cadastrados.
-        /// </summary>
-        /// <returns>Um arquivo PDF.</returns>
-        [Tags("Veículos")]
+        /// <summary>Gera um relatório PDF com todos os veículos.</summary>
+        /// <remarks>Usa QuestPDF (licença Community). O arquivo é baixado como "Relatorio_Veiculos.pdf".</remarks>
+        /// <response code="200">PDF gerado com sucesso.</response>
         [HttpGet("relatorios/veiculos/pdf")]
         public async Task<IActionResult> GerarRelatorioVeiculosPdf()
         {
@@ -233,7 +206,6 @@ namespace ApiIveco.Controllers
             });
 
             byte[] pdfBytes = document.GeneratePdf();
-            _logger.LogInformation("[GET] PDF gerado com sucesso.");
             return File(pdfBytes, "application/pdf", "Relatorio_Veiculos.pdf");
         }
 
@@ -241,34 +213,21 @@ namespace ApiIveco.Controllers
         // FORNECEDORES
         // ==========================================
 
-        /// <summary>
-        /// Retorna a lista completa de fornecedores cadastrados no banco de dados.
-        /// </summary>
-        /// <returns>Uma lista contendo todos os fornecedores.</returns>
-        /// <response code="200">Retorna a lista de fornecedores com sucesso.</response>
-        /// <response code="400">Se houver algum problema com os parâmetros de consulta.</response>
-        /// <response code="404">Se a coleção de fornecedores não for encontrada.</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor (ex: falha no Firebase).</response>
-        [Tags("Fornecedores")]
+        /// <summary>Lista todos os fornecedores.</summary>
         [HttpGet("fornecedores")]
         public async Task<IActionResult> GetFornecedores()
         {
             _logger.LogInformation("[GET] Listando fornecedores.");
             var fornecedores = await _dadosService.ListarFornecedor();
-            _logger.LogInformation("[GET] {count} fornecedores retornados.", fornecedores.Count);
             return Ok(fornecedores);
         }
 
-        /// <summary>
-        /// Busca o nome e endereço de uma empresa na Receita Federal via BrasilAPI.
-        /// </summary>
-        /// <param name="cnpj">O CNPJ da empresa a ser buscada (com ou sem pontuação).</param>
-        /// <returns>Os dados do fornecedor formatados e prontos para cadastro.</returns>
-        /// <response code="200">Retorna os dados da empresa localizados com sucesso.</response>
-        /// <response code="400">Se o CNPJ fornecido for nulo ou vazio.</response>
-        /// <response code="404">Se o CNPJ não for encontrado na base da Receita Federal.</response>
-        /// <response code="500">Se ocorrer um erro interno na comunicação com a BrasilAPI.</response>
-        [Tags("Fornecedores")]
+        /// <summary>Busca dados de um CNPJ na Receita Federal via BrasilAPI.</summary>
+        /// <remarks>Aceita CNPJ com ou sem pontuação.</remarks>
+        /// <param name="cnpj">CNPJ da empresa.</param>
+        /// <response code="200">Dados encontrados.</response>
+        /// <response code="400">CNPJ vazio.</response>
+        /// <response code="404">CNPJ não encontrado.</response>
         [HttpGet("fornecedores/buscar-cnpj/{cnpj}")]
         public async Task<IActionResult> GetFornecedorCnpj(string cnpj)
         {
@@ -278,23 +237,14 @@ namespace ApiIveco.Controllers
                 return BadRequest(new { Mensagem = "Os dados enviados são inválidos." });
 
             var fornecedor = await _dadosService.BuscarFornecedorPorCnpjAsync(cnpj);
-
             if (fornecedor == null)
                 return NotFound(new { Mensagem = "O recurso solicitado não foi encontrado." });
 
-            _logger.LogInformation("[GET] Fornecedor localizado: {nome}", fornecedor.Nome);
             return Ok(new { mensagem = "Fornecedor localizado com sucesso!", fornecedor });
         }
 
-        /// <summary>
-        /// Cria e salva um novo fornecedor no banco de dados.
-        /// </summary>
-        /// <param name="fornecedor">O objeto JSON contendo os dados do fornecedor a ser criado.</param>
-        /// <returns>O fornecedor recém-criado junto com a rota para acessá-lo.</returns>
-        /// <response code="201">Retorna o fornecedor criado e o cabeçalho Location com a URI de acesso.</response>
-        /// <response code="400">Se os dados enviados forem nulos ou o nome do fornecedor estiver vazio.</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar salvar.</response>
-        [Tags("Fornecedores")]
+        /// <summary>Cadastra um novo fornecedor.</summary>
+        /// <param name="fornecedor">Dados do fornecedor.</param>
         [HttpPost("fornecedores")]
         public async Task<IActionResult> PostFornecedor([FromBody] Fornecedor fornecedor)
         {
@@ -304,25 +254,16 @@ namespace ApiIveco.Controllers
                 return BadRequest(new { Mensagem = "Os dados enviados são inválidos." });
 
             var criado = await _dadosService.CriarFornecedor(fornecedor);
-            _logger.LogInformation("[POST] Fornecedor criado. CNPJ: {cnpj}", criado.Cnpj);
             return Ok(new { mensagem = "Fornecedor registrado com sucesso!", fornecedor = criado });
         }
 
-        /// <summary>
-        /// Exclui um fornecedores do banco de dados.
-        /// </summary>
-        /// <param name="id">O ID do fornencedores que será excluído.</param>
-        /// <returns>Uma mensagem de sucesso confirmando a exclusão.</returns>
-        /// <response code="200">Se o fornecedores for excluído com sucesso.</response>
-        /// <response code="404">Se o fornecedores com o ID especificado não for encontrado.</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar excluir.</response>
-        [Tags("Fornecedores")]
+        /// <summary>Exclui um fornecedor pelo ID do Firebase.</summary>
+        /// <param name="id">ID interno do fornecedor.</param>
         [HttpDelete("fornecedores/{id}")]
         public async Task<IActionResult> DeleteFornecedor(string id)
         {
             _logger.LogInformation("[DELETE] Excluindo fornecedor. ID: {id}", id);
             await _dadosService.ExcluirFornecedor(id);
-            _logger.LogInformation("[DELETE] Fornecedor excluído. ID: {id}", id);
             return Ok(new { mensagem = "Fornecedor deletado com sucesso." });
         }
 
@@ -330,33 +271,17 @@ namespace ApiIveco.Controllers
         // LOTES
         // ==========================================
 
-        /// <summary>
-        /// Retorna a lista completa de lotes cadastrados no banco de dados.
-        /// </summary>
-        /// <returns>Uma lista contendo todos os lotes.</returns>
-        /// <response code="200">Retorna a lista de lotes com sucesso.</response>
-        /// <response code="400">Se houver algum problema com os parâmetros de consulta.</response>
-        /// <response code="404">Se a coleção de lotes não for encontrada.</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor (ex: falha no Firebase).</response>
-        [Tags("Lotes e Componentes")]
+        /// <summary>Lista todos os lotes de matéria-prima.</summary>
         [HttpGet("lotes")]
         public async Task<IActionResult> GetLotes()
         {
             _logger.LogInformation("[GET] Listando lotes.");
             var lotes = await _dadosService.ListarLoteMateriaPrima();
-            _logger.LogInformation("[GET] {count} lotes retornados.", lotes.Count);
             return Ok(lotes);
         }
 
-        /// <summary>
-        /// Cria e salva um novo lote no banco de dados.
-        /// </summary>
-        /// <param name="lote">O objeto JSON contendo os dados do lote a ser criado.</param>
-        /// <returns>O lote recém-criado junto com a rota para acessá-lo.</returns>
-        /// <response code="201">Retorna o lote criado e o cabeçalho Location com a URI de acesso.</response>
-        /// <response code="400">Se os dados enviados forem nulos ou o nome do lote estiver vazio.</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar salvar.</response>
-        [Tags("Lotes e Componentes")]
+        /// <summary>Cadastra um novo lote.</summary>
+        /// <param name="lote">Dados do lote.</param>
         [HttpPost("lotes")]
         public async Task<IActionResult> PostLote([FromBody] LoteMateriaPrima lote)
         {
@@ -366,25 +291,16 @@ namespace ApiIveco.Controllers
                 return BadRequest(new { Mensagem = "Os dados enviados são inválidos." });
 
             var criado = await _dadosService.CriarLoteMateriaPrima(lote);
-            _logger.LogInformation("[POST] Lote criado. ID: {id}", criado.Id);
             return Ok(new { mensagem = "Lote registrado com sucesso!", lote = criado });
         }
 
-        /// <summary>
-        /// Exclui um lote do banco de dados.
-        /// </summary>
-        /// <param name="id">O ID do lote que será excluído.</param>
-        /// <returns>Uma mensagem de sucesso confirmando a exclusão.</returns>
-        /// <response code="200">Se o lote for excluído com sucesso.</response>
-        /// <response code="404">Se o lote com o ID especificado não for encontrado.</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar excluir.</response>
-        [Tags("Lotes e Componentes")]
+        /// <summary>Exclui um lote pelo ID.</summary>
+        /// <param name="id">ID do lote.</param>
         [HttpDelete("lotes/{id}")]
         public async Task<IActionResult> DeleteLote(string id)
         {
             _logger.LogInformation("[DELETE] Excluindo lote. ID: {id}", id);
             await _dadosService.ExcluirLoteMateriaPrima(id);
-            _logger.LogInformation("[DELETE] Lote excluído. ID: {id}", id);
             return Ok(new { mensagem = "Lote deletado com sucesso." });
         }
 
@@ -392,33 +308,17 @@ namespace ApiIveco.Controllers
         // COMPONENTES
         // ==========================================
 
-        /// <summary>
-        /// Retorna a lista completa de componentes cadastrados no banco de dados.
-        /// </summary>
-        /// <returns>Uma lista contendo todos os componentes.</returns>
-        /// <response code="200">Retorna a lista de componentes com sucesso.</response>
-        /// <response code="400">Se houver algum problema com os parâmetros de consulta.</response>
-        /// <response code="404">Se a coleção de componentes não for encontrada.</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor (ex: falha no Firebase).</response>
-        [Tags("Lotes e Componentes")]
+        /// <summary>Lista todos os componentes de veículos.</summary>
         [HttpGet("componentes")]
         public async Task<IActionResult> GetComponentes()
         {
             _logger.LogInformation("[GET] Listando componentes.");
             var componentes = await _dadosService.ListarVeiculoComponente();
-            _logger.LogInformation("[GET] {count} componentes retornados.", componentes.Count);
             return Ok(componentes);
         }
 
-        /// <summary>
-        /// Cria e salva um novo componente no banco de dados.
-        /// </summary>
-        /// <param name="componente">O objeto JSON contendo os dados do componente a ser criado.</param>
-        /// <returns>O componente recém-criado junto com a rota para acessá-lo.</returns>
-        /// <response code="201">Retorna o componente criado e o cabeçalho Location com a URI de acesso.</response>
-        /// <response code="400">Se os dados enviados forem nulos ou o nome do componente estiver vazio.</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar salvar.</response>
-        [Tags("Lotes e Componentes")]
+        /// <summary>Cadastra um novo componente.</summary>
+        /// <param name="componente">Dados do componente.</param>
         [HttpPost("componentes")]
         public async Task<IActionResult> PostComponente([FromBody] VeiculoComponente componente)
         {
@@ -428,25 +328,16 @@ namespace ApiIveco.Controllers
                 return BadRequest(new { Mensagem = "Os dados enviados são inválidos." });
 
             var criado = await _dadosService.CriarVeiculoComponente(componente);
-            _logger.LogInformation("[POST] Componente criado. ID: {id}", criado.Id);
             return Ok(new { mensagem = "Componente registrado com sucesso!", componente = criado });
         }
 
-        /// <summary>
-        /// Exclui um componente do banco de dados.
-        /// </summary>
-        /// <param name="id">O ID do componente que será excluído.</param>
-        /// <returns>Uma mensagem de sucesso confirmando a exclusão.</returns>
-        /// <response code="200">Se o componente for excluído com sucesso.</response>
-        /// <response code="404">Se o componente com o ID especificado não for encontrado.</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor ao tentar excluir.</response>
-        [Tags("Lotes e Componentes")]
+        /// <summary>Exclui um componente pelo ID.</summary>
+        /// <param name="id">ID do componente.</param>
         [HttpDelete("componentes/{id}")]
         public async Task<IActionResult> DeleteComponente(string id)
         {
             _logger.LogInformation("[DELETE] Excluindo componente. ID: {id}", id);
             await _dadosService.ExcluirVeiculoComponente(id);
-            _logger.LogInformation("[DELETE] Componente excluído. ID: {id}", id);
             return Ok(new { mensagem = "Componente deletado com sucesso." });
         }
 
@@ -454,28 +345,11 @@ namespace ApiIveco.Controllers
         // AUTENTICAÇÃO
         // ==========================================
 
-        /// <summary>
-        /// Cadastra um novo usuário no sistema (Firebase).
-        /// </summary>
-        /// <remarks>
-        /// Exemplo de requisição:
-        /// 
-        ///     POST /api/auth/cadastrar
-        ///     {
-        ///        "nome": "João Admin",
-        ///        "email": "joao@iveco.com",
-        ///        "senha": "senha_segura",
-        ///        "perfil": "Admin"
-        ///     }
-        ///     
-        /// Obs: Se o campo "perfil" não for enviado, o sistema atribuirá "Usuario" por padrão.
-        /// </remarks>
-        /// <param name="usuario">O objeto JSON contendo os dados do usuário a ser cadastrado.</param>
-        /// <returns>O usuário recém-criado com a senha omitida por segurança.</returns>
-        /// <response code="200">Retorna o usuário cadastrado com sucesso.</response>
-        /// <response code="400">Se o e-mail ou a senha estiverem nulos, vazios ou inválidos.</response>
-        /// <response code="500">Se ocorrer um erro no banco (ex: E-mail já existente no Firebase).</response>
-        [Tags("Autenticação")]
+        /// <summary>Cadastra um novo usuário no Firebase.</summary>
+        /// <remarks>Se "acesso" não for informado, assume "Usuario".</remarks>
+        /// <param name="usuario">Objeto com Nome, Email, Senha e Acesso (opcional).</param>
+        /// <response code="200">Usuário criado (senha removida da resposta).</response>
+        /// <response code="400">Email ou senha ausentes.</response>
         [HttpPost("cadastrar")]
         public async Task<IActionResult> Cadastrar([FromBody] ApiIveco.Models.Usuario usuario)
         {
@@ -489,30 +363,14 @@ namespace ApiIveco.Controllers
 
             var criado = await _dadosService.CadastrarUsuario(usuario);
             criado.Senha = "";
-
-            _logger.LogInformation("[POST] Usuário cadastrado. ID: {id}", criado.Id);
             return Ok(new { mensagem = "Usuário cadastrado com sucesso!", usuario = criado });
         }
 
-        /// <summary>
-        /// Autentica um usuário existente no sistema utilizando E-mail e Senha.
-        /// </summary>
-        /// <remarks>
-        /// Exemplo de requisição:
-        /// 
-        ///     POST /api/auth/login
-        ///     {
-        ///        "email": "joao@iveco.com",
-        ///        "senha": "senha_segura"
-        ///     }
-        /// </remarks>
-        /// <param name="credenciais">Objeto JSON contendo as credenciais de acesso (Email e Senha).</param>
-        /// <returns>Os dados do usuário autenticado, incluindo o seu Perfil (Admin/Usuario).</returns>
-        /// <response code="200">Login efetuado com sucesso. Retorna os dados da sessão.</response>
-        /// <response code="400">Se os dados enviados forem inválidos (falta de e-mail ou senha).</response>
-        /// <response code="401">Se as credenciais estiverem incorretas (E-mail não encontrado ou senha errada).</response>
-        /// <response code="500">Se ocorrer um erro interno no servidor de autenticação.</response>
-        [Tags("Autenticação")]
+        /// <summary>Autentica um usuário com email e senha.</summary>
+        /// <param name="credenciais">Objeto com Email e Senha.</param>
+        /// <response code="200">Login bem‑sucedido.</response>
+        /// <response code="400">Credenciais não informadas.</response>
+        /// <response code="401">Email ou senha incorretos.</response>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest credenciais)
         {
@@ -522,7 +380,6 @@ namespace ApiIveco.Controllers
                 return BadRequest(new { Mensagem = "Os dados enviados são inválidos." });
 
             var usuario = await _dadosService.FazerLogin(credenciais.Email, credenciais.Senha);
-
             if (usuario == null)
             {
                 _logger.LogWarning("[POST] Login falhou. E-mail: {email}", credenciais.Email);
@@ -530,13 +387,9 @@ namespace ApiIveco.Controllers
             }
 
             usuario.Senha = "";
-            _logger.LogInformation("[POST] Login OK. Utilizador: {nome} | Acesso: {acesso}", usuario.Nome, usuario.Acesso);
             return Ok(new { mensagem = "Login efetuado com sucesso!", usuario });
         }
 
-        // ==========================================
-        // DTO DE LOGIN
-        // ==========================================
         public class LoginRequest
         {
             public string Email { get; set; }

@@ -1,41 +1,41 @@
-using ApiIveco;
+Ôªøusing ApiIveco;
 using ApiIveco.Data;
+using ApiIveco.Middlewares;       // RequestResponseLoggingMiddleware
 using ApiIveco.Service;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.OpenApi.Models; // <-- NECESS¡RIO PARA O OPENAPI/SWAGGER
-using System.Reflection;        // <-- NECESS¡RIO PARA LER O FICHEIRO XML
+using Microsoft.OpenApi.Models;
+using Serilog;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logging.ClearProviders(); // Limpa a formataÁ„o feia padr„o
-builder.Logging.AddSimpleConsole(options =>
+// ========================================================
+// 1. CONFIGURA√á√ÉO DO SERILOG
+// ========================================================
+builder.Host.UseSerilog((context, config) =>
 {
-    options.SingleLine = true; // ForÁa o log a ficar numa ˙nica linha (muito mais f·cil de ler)
-    options.TimestampFormat = "[HH:mm:ss] "; // Adiciona a hora exata na frente
-    options.ColorBehavior = Microsoft.Extensions.Logging.Console.LoggerColorBehavior.Enabled; // MantÈm as cores (Verde, Amarelo, Vermelho)
+    config.ReadFrom.Configuration(context.Configuration);
 });
 
 // ========================================================
-// 1. CORRE«√O DO ERRO DO CONSTRUTOR (INJE«√O DE DEPEND NCIA)
+// 2. DEPEND√äNCIAS
 // ========================================================
 builder.Services.AddSingleton<FireBaseData>();
 builder.Services.AddScoped<DadosService>();
 builder.Services.AddHttpClient();
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 // ========================================================
-// 3. CONFIGURA«√O AVAN«ADA DO SWAGGER (DOCUMENTA«√O)
+// 3. SWAGGER
 // ========================================================
 builder.Services.AddSwaggerGen(options =>
 {
-    // InformaÁıes da p·gina inicial do Swagger
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "API Iveco Green Ledger",
         Version = "v1",
-        Description = "API de Backend para a gest„o de VeÌculos, Fornecedores e Rastreabilidade do projeto Iveco Green Ledger.",
+        Description = "API de Backend para gest√£o de Ve√≠culos, Fornecedores e Rastreabilidade.",
         Contact = new OpenApiContact
         {
             Name = "Equipa de Desenvolvimento",
@@ -43,39 +43,29 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 
-    // ConfiguraÁ„o para ler os coment·rios /// (Summary) do cÛdigo
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
-
-    // Verifica se o ficheiro existe para n„o crashar caso te esqueÁas do Passo 2
     if (File.Exists(xmlPath))
-    {
         options.IncludeXmlComments(xmlPath);
-    }
 });
 
 var app = builder.Build();
 
 // ========================================================
-// 2. ESCONDER ERROS DO SWAGGER E MOSTRAR S” NOS LOGS
+// 4. MIDDLEWARES (ORDEM CR√çTICA)
 // ========================================================
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
     {
-        var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-        var exception = exceptionHandlerPathFeature?.Error;
-
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"\n[ERRO CRÕTICO NO BACKEND]: {exception?.Message}\n");
-        Console.ResetColor();
-
+        var exception = context.Features.Get<IExceptionHandlerPathFeature>()?.Error;
+        Log.Error(exception, "üí• ERRO CR√çTICO N√ÉO TRATADO");
         context.Response.StatusCode = 500;
         context.Response.ContentType = "application/json";
         await context.Response.WriteAsJsonAsync(new
         {
             Erro = "Falha Interna do Servidor",
-            Mensagem = "Ocorreu um erro interno. Por favor, verifique a consola da API para ler os logs."
+            Mensagem = "Ocorreu um erro interno. Verifique os logs da API."
         });
     });
 });
@@ -83,17 +73,30 @@ app.UseExceptionHandler(errorApp =>
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    // Personaliza a interface do Swagger UI
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "API Iveco v1");
-        // options.RoutePrefix = string.Empty; // <- Descomenta isto se quiseres que o Swagger abra logo no http://localhost:44353/ (sem ter que escrever /swagger)
-    });
+    app.UseSwaggerUI();
 }
 
-app.UseMiddleware<ExceptionMiddleware>(); 
+app.UseMiddleware<RequestResponseLoggingMiddleware>(); // Loga requisi√ß√µes/respostas
+app.UseMiddleware<ExceptionMiddleware>();              // Seu middleware personalizado
+
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+// ========================================================
+// 5. IN√çCIO
+// ========================================================
+try
+{
+    Log.Information("üöÄ API Iveco Green Ledger iniciada com sucesso!");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "‚ùå Falha fatal durante a execu√ß√£o da API");
+    throw;
+}
+finally
+{
+    Log.CloseAndFlush();
+}
