@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. CONFIGURAÇÃO DO SERILOG
 // ========================================================
 builder.Host.UseSerilog((context, config) =>
+
 {
     config.ReadFrom.Configuration(context.Configuration);
 });
