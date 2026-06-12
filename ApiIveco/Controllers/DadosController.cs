@@ -28,12 +28,13 @@ namespace ApiIveco.Controllers
             _logger = logger;
         }
 
-        
+
         /// VEÍCULOS
-        
+
 
         /// <summary>Lista todos os veículos.</summary>
         /// <response code="200">Lista de veículos (pode ser vazia).</response>
+        [Tags("Veículos")]
         [HttpGet("veiculos")]
         public async Task<IActionResult> GetVeiculos()
         {
@@ -47,6 +48,7 @@ namespace ApiIveco.Controllers
         /// <response code="200">Veículo encontrado.</response>
         /// <response code="400">VIN inválido.</response>
         /// <response code="404">Não encontrado.</response>
+        [Tags("Veículos")]
         [HttpGet("veiculos/{vin}")]
         public async Task<IActionResult> GetVeiculoByVin(string vin)
         {
@@ -68,6 +70,7 @@ namespace ApiIveco.Controllers
         /// <response code="200">Veículo criado.</response>
         /// <response code="400">Dados inválidos.</response>
         /// <response code="409">VIN já cadastrado.</response>
+        [Tags("Veículos")]
         [HttpPost("veiculos")]
         public async Task<IActionResult> PostVeiculo([FromBody] Veiculo veiculo)
         {
@@ -93,6 +96,7 @@ namespace ApiIveco.Controllers
         /// <response code="200">Atualizado com sucesso.</response>
         /// <response code="400">VIN da URL não confere com o corpo.</response>
         /// <response code="404">Veículo não encontrado.</response>
+        [Tags("Veículos")]
         [HttpPut("veiculos/{vin}")]
         public async Task<IActionResult> PutVeiculo(string vin, [FromBody] Veiculo veiculo)
         {
@@ -112,6 +116,7 @@ namespace ApiIveco.Controllers
         /// <param name="vin">VIN do veículo.</param>
         /// <response code="200">Excluído com sucesso.</response>
         /// <response code="404">Veículo não encontrado.</response>
+        [Tags("Veículos")]
         [HttpDelete("veiculos/{vin}")]
         public async Task<IActionResult> DeleteVeiculo(string vin)
         {
@@ -131,6 +136,7 @@ namespace ApiIveco.Controllers
         /// <response code="200">VIN válido para IVECO.</response>
         /// <response code="400">VIN com tamanho incorreto.</response>
         /// <response code="404">Não é IVECO ou não encontrado.</response>
+        [Tags("Veículos")]
         [HttpGet("veiculos/validar-vin/{vin}")]
         public async Task<IActionResult> ValidarVinIveco(string vin)
         {
@@ -149,6 +155,7 @@ namespace ApiIveco.Controllers
         /// <summary>Gera um relatório PDF com todos os veículos.</summary>
         /// <remarks>Usa QuestPDF (licença Community). O arquivo é baixado como "Relatorio_Veiculos.pdf".</remarks>
         /// <response code="200">PDF gerado com sucesso.</response>
+        [Tags("Veículos")]
         [HttpGet("relatorios/veiculos/pdf")]
         public async Task<IActionResult> GerarRelatorioVeiculosPdf()
         {
@@ -209,11 +216,12 @@ namespace ApiIveco.Controllers
             return File(pdfBytes, "application/pdf", "Relatorio_Veiculos.pdf");
         }
 
-        
+
         /// FORNECEDORES
-        
+
 
         /// <summary>Lista todos os fornecedores.</summary>
+        [Tags("Fornecedores")]
         [HttpGet("fornecedores")]
         public async Task<IActionResult> GetFornecedores()
         {
@@ -228,6 +236,7 @@ namespace ApiIveco.Controllers
         /// <response code="200">Dados encontrados.</response>
         /// <response code="400">CNPJ vazio.</response>
         /// <response code="404">CNPJ não encontrado.</response>
+        [Tags("Fornecedores")]
         [HttpGet("fornecedores/buscar-cnpj/{cnpj}")]
         public async Task<IActionResult> GetFornecedorCnpj(string cnpj)
         {
@@ -245,6 +254,7 @@ namespace ApiIveco.Controllers
 
         /// <summary>Cadastra um novo fornecedor.</summary>
         /// <param name="fornecedor">Dados do fornecedor.</param>
+        [Tags("Fornecedores")]
         [HttpPost("fornecedores")]
         public async Task<IActionResult> PostFornecedor([FromBody] Fornecedor fornecedor)
         {
@@ -259,6 +269,7 @@ namespace ApiIveco.Controllers
 
         /// <summary>Exclui um fornecedor pelo ID do Firebase.</summary>
         /// <param name="id">ID interno do fornecedor.</param>
+        [Tags("Fornecedores")]
         [HttpDelete("fornecedores/{id}")]
         public async Task<IActionResult> DeleteFornecedor(string id)
         {
@@ -267,11 +278,12 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Fornecedor deletado com sucesso." });
         }
 
-        
+
         /// LOTES
-        
+
 
         /// <summary>Lista todos os lotes de matéria-prima.</summary>
+        [Tags("Lotes e Componentes")]
         [HttpGet("lotes")]
         public async Task<IActionResult> GetLotes()
         {
@@ -282,6 +294,7 @@ namespace ApiIveco.Controllers
 
         /// <summary>Cadastra um novo lote.</summary>
         /// <param name="lote">Dados do lote.</param>
+        [Tags("Lotes e Componentes")]
         [HttpPost("lotes")]
         public async Task<IActionResult> PostLote([FromBody] LoteMateriaPrima lote)
         {
@@ -296,6 +309,7 @@ namespace ApiIveco.Controllers
 
         /// <summary>Exclui um lote pelo ID.</summary>
         /// <param name="id">ID do lote.</param>
+        [Tags("Lotes e Componentes")]
         [HttpDelete("lotes/{id}")]
         public async Task<IActionResult> DeleteLote(string id)
         {
@@ -304,11 +318,12 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Lote deletado com sucesso." });
         }
 
-        
+
         /// COMPONENTES
-        
+
 
         /// <summary>Lista todos os componentes de veículos.</summary>
+        [Tags("Lotes e Componentes")]
         [HttpGet("componentes")]
         public async Task<IActionResult> GetComponentes()
         {
@@ -319,6 +334,7 @@ namespace ApiIveco.Controllers
 
         /// <summary>Cadastra um novo componente.</summary>
         /// <param name="componente">Dados do componente.</param>
+        [Tags("Lotes e Componentes")]
         [HttpPost("componentes")]
         public async Task<IActionResult> PostComponente([FromBody] VeiculoComponente componente)
         {
@@ -333,6 +349,7 @@ namespace ApiIveco.Controllers
 
         /// <summary>Exclui um componente pelo ID.</summary>
         /// <param name="id">ID do componente.</param>
+        [Tags("Lotes e Componentes")]
         [HttpDelete("componentes/{id}")]
         public async Task<IActionResult> DeleteComponente(string id)
         {
@@ -341,15 +358,16 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Componente deletado com sucesso." });
         }
 
-        
+
         /// AUTENTICAÇÃO
-        
+
 
         /// <summary>Cadastra um novo usuário no Firebase.</summary>
         /// <remarks>Se "acesso" não for informado, assume "Usuario".</remarks>
         /// <param name="usuario">Objeto com Nome, Email, Senha e Acesso (opcional).</param>
         /// <response code="200">Usuário criado (senha removida da resposta).</response>
         /// <response code="400">Email ou senha ausentes.</response>
+        [Tags("Autenticação")]
         [HttpPost("cadastrar")]
         public async Task<IActionResult> Cadastrar([FromBody] ApiIveco.Models.Usuario usuario)
         {
@@ -371,6 +389,7 @@ namespace ApiIveco.Controllers
         /// <response code="200">Login bem‑sucedido.</response>
         /// <response code="400">Credenciais não informadas.</response>
         /// <response code="401">Email ou senha incorretos.</response>
+        [Tags("Autenticação")]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest credenciais)
         {
