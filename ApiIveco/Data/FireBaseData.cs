@@ -10,7 +10,7 @@ namespace ApiIveco.Data
         public FireBaseData()
         {
 
-            var chave = "chave_API/firebase-key.json";
+            var chave = "chave_Api/firebase-key.json";
             var fullPath = Path.Combine(AppContext.BaseDirectory, chave);
 
             if (!File.Exists(fullPath))
