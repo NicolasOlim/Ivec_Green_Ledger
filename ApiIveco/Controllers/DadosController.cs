@@ -33,6 +33,7 @@ namespace ApiIveco.Controllers
 
 
         /// <summary>Lista todos os veículos.</summary>
+        /// <remarks>Recupera a coleção elástica NoSQL de veículos armazenados diretamente no repositório Firestore.</remarks>
         /// <response code="200">Lista de veículos (pode ser vazia).</response>
         [Tags("Veículos")]
         [HttpGet("veiculos")]
@@ -44,6 +45,7 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Busca um veículo pelo VIN.</summary>
+        /// <remarks>Efetua a busca linear por correspondência exata baseando-se no identificador único do documento (VIN).</remarks>
         /// <param name="vin">VIN do veículo (17 caracteres).</param>
         /// <response code="200">Veículo encontrado.</response>
         /// <response code="400">VIN inválido.</response>
@@ -65,7 +67,7 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Cadastra um novo veículo.</summary>
-        /// <remarks>O VIN deve ser único. Em caso de duplicidade, retorna 409.</remarks>
+        /// <remarks>O VIN deve ser único. Em caso de duplicidade, retorna 409 Conflict antes de processar a inserção na nuvem.</remarks>
         /// <param name="veiculo">Dados do veículo.</param>
         /// <response code="200">Veículo criado.</response>
         /// <response code="400">Dados inválidos.</response>
@@ -91,7 +93,8 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Atualiza um veículo existente.</summary>
-        /// <param name="vin">VIN do veículo a ser atualizado.</param>
+        /// <remarks>Utiliza o método SetAsync com a diretiva MergeAll do Firestore para mesclar os novos dados com as propriedades existentes sem corromper o histórico do documento.</remarks>
+        /// <param name="vin">VIN do veículo a ser updated.</param>
         /// <param name="veiculo">Novos dados.</param>
         /// <response code="200">Atualizado com sucesso.</response>
         /// <response code="400">VIN da URL não confere com o corpo.</response>
@@ -113,6 +116,7 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Remove um veículo do banco de dados.</summary>
+        /// <remarks>Realiza a deleção física do documento mapeado pelo VIN na coleção do Firebase Firestore.</remarks>
         /// <param name="vin">VIN do veículo.</param>
         /// <response code="200">Excluído com sucesso.</response>
         /// <response code="404">Veículo não encontrado.</response>
@@ -131,7 +135,7 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Valida se o VIN pertence à marca IVECO.</summary>
-        /// <remarks>Requer VIN de 17 caracteres. A validação é feita via serviço externo.</remarks>
+        /// <remarks>Dispara uma requisição HTTP assíncrona para a API governamental da NHTSA, processa o JSON e valida de forma estrita se os metadados de fabricação contêm a marca IVECO.</remarks>
         /// <param name="vin">VIN de 17 caracteres.</param>
         /// <response code="200">VIN válido para IVECO.</response>
         /// <response code="400">VIN com tamanho incorreto.</response>
@@ -153,7 +157,7 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Gera um relatório PDF com todos os veículos.</summary>
-        /// <remarks>Usa QuestPDF (licença Community). O arquivo é baixado como "Relatorio_Veiculos.pdf".</remarks>
+        /// <remarks>Usa a biblioteca QuestPDF sob licença comunitária. Compila os dados dinamicamente estruturando uma tabela A4 que é convertida e retornada em fluxo de bytes binários.</remarks>
         /// <response code="200">PDF gerado com sucesso.</response>
         [Tags("Veículos")]
         [HttpGet("relatorios/veiculos/pdf")]
@@ -221,6 +225,7 @@ namespace ApiIveco.Controllers
 
 
         /// <summary>Lista todos os fornecedores.</summary>
+        /// <remarks>Mapeia de forma assíncrona todos os documentos da coleção "fornecedores" injetando os IDs internos do Firebase de volta nas propriedades dos modelos.</remarks>
         [Tags("Fornecedores")]
         [HttpGet("fornecedores")]
         public async Task<IActionResult> GetFornecedores()
@@ -231,7 +236,7 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Busca dados de um CNPJ na Receita Federal via BrasilAPI.</summary>
-        /// <remarks>Aceita CNPJ com ou sem pontuação.</remarks>
+        /// <remarks>Encapsula regras industriais com User-Agent blindado para consultar informações de cadastro nacional e sanitizar strings de endereçamento de sede corporativa.</remarks>
         /// <param name="cnpj">CNPJ da empresa.</param>
         /// <response code="200">Dados encontrados.</response>
         /// <response code="400">CNPJ vazio.</response>
@@ -253,6 +258,7 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Cadastra um novo fornecedor.</summary>
+        /// <remarks>Aciona uma transação atômica síncrona no Firestore para computar e incrementar o ID sequencial na coleção de contadores do banco NoSQL.</remarks>
         /// <param name="fornecedor">Dados do fornecedor.</param>
         [Tags("Fornecedores")]
         [HttpPost("fornecedores")]
@@ -268,6 +274,7 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Exclui um fornecedor pelo ID do Firebase.</summary>
+        /// <remarks>Exclui fisicamente o nó do documento de fornecedor com base em sua chave primária textual indexada na nuvem.</remarks>
         /// <param name="id">ID interno do fornecedor.</param>
         [Tags("Fornecedores")]
         [HttpDelete("fornecedores/{id}")]
@@ -283,6 +290,7 @@ namespace ApiIveco.Controllers
 
 
         /// <summary>Lista todos os lotes de matéria-prima.</summary>
+        /// <remarks>Retorna os lotes de suprimentos incluindo as métricas ambientais corporativas críticas de cálculo da pegada ecológica por quilograma (kg CO2).</remarks>
         [Tags("Lotes e Componentes")]
         [HttpGet("lotes")]
         public async Task<IActionResult> GetLotes()
@@ -293,6 +301,7 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Cadastra um novo lote.</summary>
+        /// <remarks>Gera de maneira transacional controlada um identificador incremental do tipo 'contador_lote' antes de persistir o mapeamento de massa de insumos.</remarks>
         /// <param name="lote">Dados do lote.</param>
         [Tags("Lotes e Componentes")]
         [HttpPost("lotes")]
@@ -308,6 +317,7 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Exclui um lote pelo ID.</summary>
+        /// <remarks>Remove o documento correspondente da coleção "lotes_materia_prima" interrompendo o elo lógico relacional de rastreabilidade do Ledger.</remarks>
         /// <param name="id">ID do lote.</param>
         [Tags("Lotes e Componentes")]
         [HttpDelete("lotes/{id}")]
@@ -323,6 +333,7 @@ namespace ApiIveco.Controllers
 
 
         /// <summary>Lista todos os componentes de veículos.</summary>
+        /// <remarks>Retorna o acervo de subcomponentes estruturais e peças que se encontram associados a um determinado chassi (VIN).</remarks>
         [Tags("Lotes e Componentes")]
         [HttpGet("componentes")]
         public async Task<IActionResult> GetComponentes()
@@ -333,6 +344,7 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Cadastra um novo componente.</summary>
+        /// <remarks>Salva uma nova instância de montagem na coleção "veiculo_componentes" utilizando IDs computados dinamicamente de forma incremental.</remarks>
         /// <param name="componente">Dados do componente.</param>
         [Tags("Lotes e Componentes")]
         [HttpPost("componentes")]
@@ -348,6 +360,7 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Exclui um componente pelo ID.</summary>
+        /// <remarks>Efetua a limpeza de registro de peça física e encerra o vínculo logístico da linha de produção fabril.</remarks>
         /// <param name="id">ID do componente.</param>
         [Tags("Lotes e Componentes")]
         [HttpDelete("componentes/{id}")]
@@ -363,7 +376,7 @@ namespace ApiIveco.Controllers
 
 
         /// <summary>Cadastra um novo usuário no Firebase.</summary>
-        /// <remarks>Se "acesso" não for informado, assume "Usuario".</remarks>
+        /// <remarks>Valida preventivamente a duplicidade eletrônica de e-mail na nuvem. Trata as credenciais e remove a senha em texto puro do objeto serializado retornado como resposta de segurança.</remarks>
         /// <param name="usuario">Objeto com Nome, Email, Senha e Acesso (opcional).</param>
         /// <response code="200">Usuário criado (senha removida da resposta).</response>
         /// <response code="400">Email ou senha ausentes.</response>
@@ -385,6 +398,7 @@ namespace ApiIveco.Controllers
         }
 
         /// <summary>Autentica um usuário com email e senha.</summary>
+        /// <remarks>Efetua a varredura e o mapeamento manual reativo nos documentos Firestore, aplicando comparações que evitam gargalos de indexação NoSQL. A senha é ocultada pós-autenticação.</remarks>
         /// <param name="credenciais">Objeto com Email e Senha.</param>
         /// <response code="200">Login bem‑sucedido.</response>
         /// <response code="400">Credenciais não informadas.</response>
