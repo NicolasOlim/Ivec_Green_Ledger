@@ -11,7 +11,6 @@
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
         FontFamily="Segoe UI Variable, Segoe UI, Helvetica Neue, sans-serif">
-
     <Window.Resources>
         <!-- CORES DO TEMA CLARO -->
         <SolidColorBrush x:Key="OledBlack" Color="#FFFFFF"/>
@@ -19,17 +18,17 @@
         <SolidColorBrush x:Key="AppBackground" Color="#F5F5F7"/>
         <!-- Cinza muito claro -->
         <SolidColorBrush x:Key="ElevatedGray1" Color="#FFFFFF"/>
-        <!-- Branco cartão -->
+        <!-- Branco cart o -->
         <SolidColorBrush x:Key="ElevatedGray2" Color="#E9E9EF"/>
         <!-- Cinza leve hover -->
         <SolidColorBrush x:Key="ElevatedGray3" Color="#C6C6C8"/>
-        <!-- Cinza médio bordas -->
+        <!-- Cinza m dio bordas -->
         <SolidColorBrush x:Key="TextPrimary" Color="#1C1C1E"/>
         <!-- Preto suave -->
         <SolidColorBrush x:Key="TextSecondary" Color="#6C6C70"/>
         <!-- Cinza escuro -->
         <SolidColorBrush x:Key="TextTertiary" Color="#8E8E93"/>
-        <!-- Cinza médio -->
+        <!-- Cinza m dio -->
         <SolidColorBrush x:Key="AppleBlue" Color="#007AFF"/>
         <!-- Azul vibrante -->
         <SolidColorBrush x:Key="AppleBlueHover" Color="#0055CC"/>
@@ -42,7 +41,7 @@
         <SolidColorBrush x:Key="CardBorder" Color="#E5E5EA"/>
         <!-- Bordas claras -->
 
-        <!-- ESTILOS DE TEXTO (mantidos, mas as cores agora são claras) -->
+        <!-- ESTILOS DE TEXTO (mantidos, mas as cores agora s o claras) -->
         <Style x:Key="H1" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="FontSize" Value="34"/>
@@ -117,7 +116,7 @@
             </Setter>
         </Style>
 
-        <!-- ESTILO BOTÃO PRIMÁRIO (claro) -->
+        <!-- ESTILO BOT O PRIM RIO (claro) -->
         <Style x:Key="PrimaryButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource AppleBlue}"/>
             <Setter Property="Foreground" Value="White"/>
@@ -172,7 +171,7 @@
             </Setter>
         </Style>
 
-        <!-- ESTILO CARTÃO CLARO -->
+        <!-- ESTILO CART O CLARO -->
         <Style x:Key="PremiumCardStyle" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource ElevatedGray1}"/>
             <Setter Property="CornerRadius" Value="24"/>
@@ -184,14 +183,12 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
         <Style x:Key="BadgeStyle" TargetType="Border">
             <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="Padding" Value="8,4"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
         </Style>
     </Window.Resources>
-
     <Grid>
         <!-- ==================== TELA PRINCIPAL (logado) ==================== -->
         <Border Background="{StaticResource AppBackground}" CornerRadius="20" BorderBrush="#E5E5EA" BorderThickness="1" Margin="10">
@@ -208,13 +205,11 @@
             <Border.Effect>
                 <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.1"/>
             </Border.Effect>
-
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="280"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-
                 <!-- ===== SIDEBAR ===== -->
                 <Border Grid.Column="0" Background="{StaticResource OledBlack}" CornerRadius="20,0,0,20" BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,1,0">
                     <Grid Margin="20,24,20,24">
@@ -224,8 +219,7 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-
-                        <!-- Botões macOS (mantidos os mesmos) -->
+                        <!-- Bot es macOS (mantidos os mesmos) -->
                         <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Top" Margin="8,0,0,30">
                             <Button Width="14" Height="14" Margin="0,0,8,0" Cursor="Hand" Click="CloseButton_Click" ToolTip="Fechar">
                                 <Button.Template>
@@ -249,7 +243,6 @@
                                 </Button.Template>
                             </Button>
                         </StackPanel>
-
                         <!-- Logo -->
                         <StackPanel Grid.Row="1" Margin="10,0,0,30" Orientation="Horizontal">
                             <Border Width="45" Height="45" CornerRadius="10" Background="{StaticResource ElevatedGray2}">
@@ -260,11 +253,9 @@
                                 <TextBlock Text="Green Ledger Node" Foreground="{StaticResource AppleGreen}" FontWeight="Medium" FontSize="11"/>
                             </StackPanel>
                         </StackPanel>
-
-                        <!-- Navegação -->
+                        <!-- Navega o -->
                         <StackPanel Grid.Row="2">
-                            <TextBlock Text="NAVEGAÇÃO" Foreground="{StaticResource TextTertiary}" FontSize="11" FontWeight="Bold" Margin="14,0,0,10"/>
-
+                            <TextBlock Text="NAVEGA O" Foreground="{StaticResource TextTertiary}" FontSize="11" FontWeight="Bold" Margin="14,0,0,10"/>
                             <!-- Dashboard -->
                             <Button Command="{Binding MudarAbaCommand}" CommandParameter="Dashboard">
                                 <Button.Style>
@@ -282,7 +273,6 @@
                                     <TextBlock Text="Dashboard" FontSize="15" VerticalAlignment="Center" FontWeight="Medium"/>
                                 </StackPanel>
                             </Button>
-
                             <!-- Rastreabilidade -->
                             <Button Command="{Binding MudarAbaCommand}" CommandParameter="Projetos">
                                 <Button.Style>
@@ -300,7 +290,6 @@
                                     <TextBlock Text="Rastreabilidade" FontSize="15" VerticalAlignment="Center" FontWeight="Medium"/>
                                 </StackPanel>
                             </Button>
-
                             <!-- Fornecedores -->
                             <Button Command="{Binding MudarAbaCommand}" CommandParameter="Cadastro">
                                 <Button.Style>
@@ -318,8 +307,7 @@
                                     <TextBlock Text="Fornecedores" FontSize="15" VerticalAlignment="Center" FontWeight="Medium"/>
                                 </StackPanel>
                             </Button>
-
-                            <!-- Análises ESG -->
+                            <!-- An lises ESG -->
                             <Button Command="{Binding MudarAbaCommand}" CommandParameter="Analises">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
@@ -333,11 +321,10 @@
                                 </Button.Style>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" FontSize="16" Margin="0,0,16,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Análises ESG" FontSize="15" VerticalAlignment="Center" FontWeight="Medium"/>
+                                    <TextBlock Text="An lises ESG" FontSize="15" VerticalAlignment="Center" FontWeight="Medium"/>
                                 </StackPanel>
                             </Button>
-
-                            <!-- Peças -->
+                            <!-- Pe as -->
                             <Button Command="{Binding MudarAbaCommand}" CommandParameter="Pecas">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
@@ -351,11 +338,10 @@
                                 </Button.Style>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74C;" FontSize="16" Margin="0,0,16,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Peças e Componentes" FontSize="15" VerticalAlignment="Center" FontWeight="Medium"/>
+                                    <TextBlock Text="Pe as e Componentes" FontSize="15" VerticalAlignment="Center" FontWeight="Medium"/>
                                 </StackPanel>
                             </Button>
-
-                            <!-- Relatórios PDF -->
+                            <!-- Relat rios PDF -->
                             <Button Command="{Binding MudarAbaCommand}" CommandParameter="Relatorios">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
@@ -369,11 +355,10 @@
                                 </Button.Style>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;" FontSize="16" Margin="0,0,16,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Relatórios PDF" FontSize="15" VerticalAlignment="Center" FontWeight="Medium"/>
+                                    <TextBlock Text="Relat rios PDF" FontSize="15" VerticalAlignment="Center" FontWeight="Medium"/>
                                 </StackPanel>
                             </Button>
-
-                            <!-- Seção Admin (configuração) -->
+                            <!-- Se o Admin (configura o) -->
                             <StackPanel>
                                 <StackPanel.Style>
                                     <Style TargetType="StackPanel">
@@ -399,12 +384,11 @@
                                     </Button.Style>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" FontSize="16" Margin="0,0,16,0" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Configurações (Admin)" FontSize="15" VerticalAlignment="Center" FontWeight="Medium"/>
+                                        <TextBlock Text="Configura es (Admin)" FontSize="15" VerticalAlignment="Center" FontWeight="Medium"/>
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
                         </StackPanel>
-
                         <!-- Perfil do utilizador (claro) -->
                         <Border Grid.Row="3" Background="{StaticResource ElevatedGray2}" CornerRadius="12" Padding="12">
                             <Grid>
@@ -418,18 +402,16 @@
                                     <TextBlock Text="{Binding NomeUsuario}" Foreground="{StaticResource TextPrimary}" FontSize="13" FontWeight="SemiBold"/>
                                     <TextBlock Text="{Binding PerfilUsuario}" Foreground="{StaticResource TextSecondary}" FontSize="11"/>
                                 </StackPanel>
-                                <Button Grid.Column="2" Command="{Binding FazerLogoutCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand" ToolTip="Terminar Sessão">
+                                <Button Grid.Column="2" Command="{Binding FazerLogoutCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand" ToolTip="Terminar Sess">
                                     <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xF3B1;" Foreground="{StaticResource AppleRed}" FontSize="16" VerticalAlignment="Center"/>
                                 </Button>
                             </Grid>
                         </Border>
                     </Grid>
                 </Border>
-
-                <!-- ===== CONTEÚDO PRINCIPAL (SCROLL) ===== -->
+                <!-- ===== CONTE DO PRINCIPAL (SCROLL) ===== -->
                 <ScrollViewer Grid.Column="1" Padding="40" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <Grid>
-
                         <!-- ===== ABA: DASHBOARD ===== -->
                         <Grid>
                             <Grid.Style>
@@ -447,13 +429,11 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-
                             <StackPanel Grid.Row="0">
-                                <TextBlock Style="{StaticResource H1}" Text="Visão Geral do Ledger"/>
-                                <TextBlock Style="{StaticResource Subtitle}" Text="Acompanhamento em tempo real da cadeia de suprimentos sustentável."/>
+                                <TextBlock Style="{StaticResource H1}" Text="Vis o Geral do Ledger"/>
+                                <TextBlock Style="{StaticResource Subtitle}" Text="Acompanhamento em tempo real da cadeia de suprimentos sustent vel."/>
                             </StackPanel>
-
-                            <!-- Cards de métricas (cores mantidas) -->
+                            <!-- Cards de m tricas (cores mantidas) -->
                             <Grid Grid.Row="1" Margin="0,0,0,30">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -463,9 +443,9 @@
                                 <Border Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="24">
                                     <StackPanel>
                                         <Border Width="40" Height="40" Background="#E6F0FF" HorizontalAlignment="Left" CornerRadius="10">
-                                            <TextBlock Text="🚚" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            <TextBlock Text=" " FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
-                                        <TextBlock Text="Total de Veículos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
+                                        <TextBlock Text="Total de Ve culos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
                                         <TextBlock Text="{Binding Rastreabilidade.TotalVeiculos, FallbackValue='0'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
                                         <Border Style="{StaticResource BadgeStyle}" Background="#E6F0FF" Margin="0,10,0,0">
                                             <TextBlock Text="Ao Vivo do Firebase" Foreground="{StaticResource AppleBlue}" FontSize="11" FontWeight="SemiBold"/>
@@ -489,7 +469,7 @@
                                         <Border Width="40" Height="40" CornerRadius="10" Background="#FFF0E0" HorizontalAlignment="Left">
                                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" FontSize="18" Foreground="{StaticResource AppleOrange}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
-                                        <TextBlock Text="Pegada Média (kg CO2)" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
+                                        <TextBlock Text="Pegada M dia (kg CO2)" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
                                         <TextBlock Text="{Binding Analises.MediaCarbono, FallbackValue='0.0K'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
                                         <Border Style="{StaticResource BadgeStyle}" Background="#FFF0E0" Margin="0,10,0,0">
                                             <TextBlock Text="Baseado no Ledger" Foreground="{StaticResource AppleOrange}" FontSize="11" FontWeight="SemiBold"/>
@@ -497,8 +477,7 @@
                                     </StackPanel>
                                 </Border>
                             </Grid>
-
-                            <!-- Gráfico e transações -->
+                            <!-- Gr fico e transa es -->
                             <Grid Grid.Row="2">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="2*"/>
@@ -510,7 +489,7 @@
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
-                                        <TextBlock Grid.Row="0" Text="Emissões da Cadeia (YTD)" Style="{StaticResource H2}"/>
+                                        <TextBlock Grid.Row="0" Text="Emiss es da Cadeia (YTD)" Style="{StaticResource H2}"/>
                                         <lvc:CartesianChart Grid.Row="1" Series="{Binding Analises.EmissoesSeries}" Margin="0,15,0,0" LegendLocation="Top">
                                             <lvc:CartesianChart.AxisX>
                                                 <lvc:Axis Labels="{Binding Analises.MesesLabels}" Foreground="{StaticResource TextSecondary}">
@@ -535,7 +514,7 @@
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
-                                        <TextBlock Grid.Row="0" Text="Transações na Rede" Style="{StaticResource H2}"/>
+                                        <TextBlock Grid.Row="0" Text="Transa es na Rede" Style="{StaticResource H2}"/>
                                         <StackPanel Grid.Row="1" Margin="0,16,0,0">
                                             <Border BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
                                                 <StackPanel>
@@ -545,14 +524,14 @@
                                             </Border>
                                             <Border BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
                                                 <StackPanel>
-                                                    <TextBlock Text="Auditoria ESG Concluída" Foreground="{StaticResource AppleGreen}" FontWeight="SemiBold"/>
+                                                    <TextBlock Text="Auditoria ESG Conclu da" Foreground="{StaticResource AppleGreen}" FontWeight="SemiBold"/>
                                                     <TextBlock Text="Fornecedor: Bosch Ltda - Nota A" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,4,0,0"/>
                                                 </StackPanel>
                                             </Border>
                                             <Border Padding="0,0,0,12">
                                                 <StackPanel>
-                                                    <TextBlock Text="Falha de Autenticação API" Foreground="{StaticResource AppleRed}" FontWeight="SemiBold"/>
-                                                    <TextBlock Text="Tentativa de acesso não autorizada (IoT)" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,4,0,0"/>
+                                                    <TextBlock Text="Falha de Autentica o API" Foreground="{StaticResource AppleRed}" FontWeight="SemiBold"/>
+                                                    <TextBlock Text="Tentativa de acesso n o autorizada (IoT)" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,4,0,0"/>
                                                 </StackPanel>
                                             </Border>
                                         </StackPanel>
@@ -560,7 +539,6 @@
                                 </Border>
                             </Grid>
                         </Grid>
-
                         <!-- ===== ABA: RASTREABILIDADE ===== -->
                         <Grid>
                             <Grid.Style>
@@ -579,8 +557,8 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0">
-                                <TextBlock Style="{StaticResource H1}" Text="Rastreabilidade de Veículos"/>
-                                <TextBlock Style="{StaticResource Subtitle}" Text="Consulte o gêmeo digital de um veículo para validar a origem de componentes."/>
+                                <TextBlock Style="{StaticResource H1}" Text="Rastreabilidade de Ve culos"/>
+                                <TextBlock Style="{StaticResource Subtitle}" Text="Consulte o g meo digital de um ve culo para validar a origem de componentes."/>
                             </StackPanel>
                             <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="24" Margin="0,0,0,20">
                                 <StackPanel>
@@ -591,8 +569,9 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid Grid.Column="0" Margin="0,0,16,0">
-                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Rastreabilidade.PesquisaVin, UpdateSourceTrigger=PropertyChanged}"/>
-                                            <TextBlock Text="Insira o número VIN do veículo..." Foreground="{StaticResource TextTertiary}" VerticalAlignment="Center" Margin="14,0,0,0" IsHitTestVisible="False">
+                                            <!-- MÁSCARA VIN APLICADA (MaxLength="17") -->
+                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Rastreabilidade.PesquisaVin, UpdateSourceTrigger=PropertyChanged}" MaxLength="17"/>
+                                            <TextBlock Text="Insira o n mero VIN do ve culo..." Foreground="{StaticResource TextTertiary}" VerticalAlignment="Center" Margin="14,0,0,0" IsHitTestVisible="False">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
                                                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -620,7 +599,7 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" Text="Veículos Disponíveis no Banco" Style="{StaticResource H2}" Margin="0,0,0,10"/>
+                                    <TextBlock Grid.Row="0" Text="Ve culos Dispon veis no Banco" Style="{StaticResource H2}" Margin="0,0,0,10"/>
                                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="400">
                                         <ItemsControl ItemsSource="{Binding Rastreabilidade.ListaVeiculos}">
                                             <ItemsControl.ItemTemplate>
@@ -633,7 +612,7 @@
                                                                 <ColumnDefinition Width="Auto"/>
                                                             </Grid.ColumnDefinitions>
                                                             <Border Grid.Column="0" Width="38" Height="38" CornerRadius="8" Background="{StaticResource ElevatedGray3}" Margin="0,0,12,0">
-                                                                <TextBlock Text="🚚" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                <TextBlock Text=" " FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                             </Border>
                                                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                                 <TextBlock Text="{Binding Modelo, FallbackValue='Modelo Iveco'}" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" FontSize="14"/>
@@ -657,7 +636,6 @@
                                 </Grid>
                             </Border>
                         </Grid>
-
                         <!-- ===== ABA: FORNECEDORES ===== -->
                         <Grid>
                             <Grid.Style>
@@ -675,7 +653,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0">
-                                <TextBlock Style="{StaticResource H1}" Text="Gestão de Fornecedores"/>
+                                <TextBlock Style="{StaticResource H1}" Text="Gest o de Fornecedores"/>
                                 <TextBlock Style="{StaticResource Subtitle}" Text="Cadastre parceiros na rede permissionada do Ledger."/>
                             </StackPanel>
                             <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="30">
@@ -687,14 +665,19 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" Text="Integração Receita Federal" Style="{StaticResource H2}"/>
+                                    <TextBlock Grid.Row="0" Text="Integra o Receita Federal" Style="{StaticResource H2}"/>
                                     <Grid Grid.Row="1" Margin="0,0,0,30">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid Grid.Column="0" Margin="0,0,16,0">
-                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Fornecedor.CnpjBusca, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <!-- MÁSCARA CNPJ VINCULADA (TextChanged, PreviewTextInput, MaxLength="18") -->
+                                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
+                                                     Text="{Binding Fornecedor.CnpjBusca, UpdateSourceTrigger=PropertyChanged}"
+                                                     TextChanged="CnpjTextBox_TextChanged"
+                                                     PreviewTextInput="NumberValidationTextBox"
+                                                     MaxLength="18"/>
                                             <TextBlock Text="00.000.000/0000-00" Foreground="{StaticResource TextTertiary}" VerticalAlignment="Center" Margin="14,0,0,0" IsHitTestVisible="False">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
@@ -722,15 +705,15 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Grid.Column="0">
-                                            <TextBlock Text="Razão Social" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBlock Text="Raz o Social" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                             <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Fornecedor.NomeFornecedorEncontrado}" IsReadOnly="True" Background="#F9F9FB"/>
                                             <TextBlock Text="Status RFB" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
                                             <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="ATIVA" IsReadOnly="True" Foreground="{StaticResource AppleGreen}" Background="#F9F9FB"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="2">
-                                            <TextBlock Text="Endereço Sede" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBlock Text="Endere o Sede" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                             <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Fornecedor.LocalizacaoFornecedorEncontrado}" IsReadOnly="True" Background="#F9F9FB"/>
-                                            <TextBlock Text="Categoria ESG (Atribuída)" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                                            <TextBlock Text="Categoria ESG (Atribu da)" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
                                             <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="Pendente de Auditoria" IsReadOnly="True" Foreground="{StaticResource AppleOrange}" Background="#F9F9FB"/>
                                         </StackPanel>
                                     </Grid>
@@ -765,8 +748,7 @@
                                 </Grid>
                             </Border>
                         </Grid>
-
-                        <!-- ===== ABA: ANÁLISES ESG ===== -->
+                        <!-- ===== ABA: AN LISES ESG ===== -->
                         <Grid>
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -783,8 +765,8 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0">
-                                <TextBlock Style="{StaticResource H1}" Text="Análise de Sustentabilidade"/>
-                                <TextBlock Style="{StaticResource Subtitle}" Text="Métricas detalhadas para emissão de relatórios corporativos ESG."/>
+                                <TextBlock Style="{StaticResource H1}" Text="An lise de Sustentabilidade"/>
+                                <TextBlock Style="{StaticResource Subtitle}" Text="M tricas detalhadas para emiss o de relat rios corporativos ESG."/>
                             </StackPanel>
                             <Grid Grid.Row="1">
                                 <Grid.ColumnDefinitions>
@@ -793,8 +775,8 @@
                                 </Grid.ColumnDefinitions>
                                 <Border Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="30" MinHeight="400">
                                     <StackPanel>
-                                        <TextBlock Text="Distribuição de Emissões" Style="{StaticResource H2}"/>
-                                        <TextBlock Text="O gráfico de pizza com os escopos 1, 2 e 3 será renderizado aqui." Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
+                                        <TextBlock Text="Distribui o de Emiss es" Style="{StaticResource H2}"/>
+                                        <TextBlock Text="O gr fico de pizza com os escopos 1, 2 e 3 ser  renderizado aqui." Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                 </Border>
                                 <Border Grid.Column="1" Style="{StaticResource PremiumCardStyle}" Margin="10,0,0,0" Padding="30" MinHeight="400">
@@ -805,8 +787,7 @@
                                 </Border>
                             </Grid>
                         </Grid>
-
-                        <!-- ===== ABA: PEÇAS ===== -->
+                        <!-- ===== ABA: PE AS ===== -->
                         <Grid>
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -824,8 +805,8 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0">
-                                <TextBlock Style="{StaticResource H1}" Text="Gestão de Componentes"/>
-                                <TextBlock Style="{StaticResource Subtitle}" Text="Adicione peças manualmente e associe ao Chassi (VIN) de um veículo no Ledger."/>
+                                <TextBlock Style="{StaticResource H1}" Text="Gest o de Componentes"/>
+                                <TextBlock Style="{StaticResource Subtitle}" Text="Adicione pe as manualmente e associe ao Chassi (VIN) de um ve culo no Ledger."/>
                             </StackPanel>
                             <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="24" Margin="0,0,0,20">
                                 <Grid>
@@ -835,17 +816,18 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Column="0" Margin="0,0,16,0">
-                                        <TextBlock Text="Chassi do Veículo (VIN)" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Pecas.NovaPecaVin, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <TextBlock Text="Chassi do Ve culo (VIN)" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                        <!-- MÁSCARA VIN APLICADA (MaxLength="17") -->
+                                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Pecas.NovaPecaVin, UpdateSourceTrigger=PropertyChanged}" MaxLength="17"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" Margin="0,0,16,0">
-                                        <TextBlock Text="Nome/Descrição da Peça" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Nome/Descri o da Pe a" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                         <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Pecas.NovaPecaNome, UpdateSourceTrigger=PropertyChanged}"/>
                                     </StackPanel>
                                     <Button Grid.Column="2" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding Pecas.AdicionarPecaManualCommand}" VerticalAlignment="Bottom">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE710;" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                            <TextBlock Text="Registrar Peça" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Registrar Pe a" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </Button>
                                 </Grid>
@@ -856,7 +838,7 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" Text="Últimas Peças Registradas" Style="{StaticResource H2}" Margin="0,0,0,16"/>
+                                    <TextBlock Grid.Row="0" Text=" ltimas Pe as Registradas" Style="{StaticResource H2}" Margin="0,0,0,16"/>
                                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                                         <ItemsControl ItemsSource="{Binding Pecas.ListaPecas}">
                                             <ItemsControl.ItemTemplate>
@@ -874,7 +856,7 @@
                                                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                                 <TextBlock Text="{Binding NomePeca}" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" FontSize="14"/>
                                                                 <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                                                    <TextBlock Text="Veículo VIN: " Foreground="{StaticResource TextSecondary}" FontSize="12"/>
+                                                                    <TextBlock Text="Ve culo VIN: " Foreground="{StaticResource TextSecondary}" FontSize="12"/>
                                                                     <TextBlock Text="{Binding VinAssociado}" Foreground="{StaticResource AppleBlue}" FontSize="12" FontWeight="Medium"/>
                                                                 </StackPanel>
                                                             </StackPanel>
@@ -890,7 +872,6 @@
                                 </Grid>
                             </Border>
                         </Grid>
-
                         <!-- ===== ABA: AJUSTES (Admin) ===== -->
                         <Grid>
                             <Grid.Style>
@@ -908,13 +889,13 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0">
-                                <TextBlock Style="{StaticResource H1}" Text="Configurações do Node"/>
-                                <TextBlock Style="{StaticResource Subtitle}" Text="Gerencie a comunicação com a rede, API externa e o simulador local."/>
+                                <TextBlock Style="{StaticResource H1}" Text="Configura es do Node"/>
+                                <TextBlock Style="{StaticResource Subtitle}" Text="Gerencie a comunica o com a rede, API externa e o simulador local."/>
                             </StackPanel>
                             <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="30">
                                 <StackPanel>
                                     <TextBlock Text="Conectividade da Rede" Style="{StaticResource H2}"/>
-                                    <TextBlock Text="Endereço Base da API (Endpoint)" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <TextBlock Text="Endere o Base da API (Endpoint)" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                     <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding ApiUrlConfig, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,30"/>
                                     <Border BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="0,0,0,1" Margin="0,0,0,30"/>
                                     <TextBlock Text="Ferramentas de Desenvolvimento" Style="{StaticResource H2}"/>
@@ -924,8 +905,8 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Grid.Column="0">
-                                            <TextBlock Text="Simulador de Chão de Fábrica (MOCK IoT)" Foreground="{StaticResource TextPrimary}" FontSize="16" FontWeight="SemiBold"/>
-                                            <TextBlock Text="Habilita a geração contínua de telemetria e registros de chassi simulados para testes de carga no Firebase." Foreground="{StaticResource TextSecondary}" FontSize="13" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                            <TextBlock Text="Simulador de Ch o de F brica (MOCK IoT)" Foreground="{StaticResource TextPrimary}" FontSize="16" FontWeight="SemiBold"/>
+                                            <TextBlock Text="Habilita a gera o cont nua de telemetria e registros de chassi simulados para testes de carga no Firebase." Foreground="{StaticResource TextSecondary}" FontSize="13" Margin="0,4,0,0" TextWrapping="Wrap"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
                                             <TextBlock Text="{Binding StatusSimulador, FallbackValue='Desativado'}" Foreground="{StaticResource TextSecondary}" Margin="0,0,16,0" VerticalAlignment="Center" FontWeight="Bold"/>
@@ -948,8 +929,7 @@
                                 </StackPanel>
                             </Border>
                         </Grid>
-
-                        <!-- ===== ABA: RELATÓRIOS ===== -->
+                        <!-- ===== ABA: RELAT RIOS ===== -->
                         <Grid>
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -966,39 +946,37 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0">
-                                <TextBlock Style="{StaticResource H1}" Text="Central de Relatórios"/>
+                                <TextBlock Style="{StaticResource H1}" Text="Central de Relat rios"/>
                                 <TextBlock Style="{StaticResource Subtitle}" Text="Exporte os dados consolidados da cadeia de suprimentos da Iveco em formato PDF oficial."/>
                             </StackPanel>
                             <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="30" Margin="0,0,0,20">
                                 <StackPanel>
-                                    <TextBlock Text="Selecione o tipo de relatório desejado:" Style="{StaticResource H2}" Margin="0,0,0,15"/>
+                                    <TextBlock Text="Selecione o tipo de relat rio desejado:" Style="{StaticResource H2}" Margin="0,0,0,15"/>
                                     <StackPanel Margin="0,0,0,30">
-                                        <RadioButton Content="📄 Relatório Geral de Veículos (Rastreabilidade)"
-                                                     Foreground="{StaticResource TextPrimary}" FontSize="15" Margin="0,0,0,12"
-                                                     IsChecked="True"
+                                        <RadioButton Content="  Relat rio Geral de Ve culos (Rastreabilidade)" 
+                                                     Foreground="{StaticResource TextPrimary}" FontSize="15" Margin="0,0,0,12" 
+                                                     IsChecked="True" 
                                                      Command="{Binding Relatorios.MudarTipoRelatorioCommand}" CommandParameter="Veiculos"/>
-                                        <RadioButton Content="📄 Relatório de Fornecedores Cadastrados (Em breve)"
-                                                     Foreground="{StaticResource TextSecondary}" FontSize="15" Margin="0,0,0,12"
+                                        <RadioButton Content="  Relat rio de Fornecedores Cadastrados (Em breve)" 
+                                                     Foreground="{StaticResource TextSecondary}" FontSize="15" Margin="0,0,0,12" 
                                                      Command="{Binding Relatorios.MudarTipoRelatorioCommand}" CommandParameter="Fornecedores"/>
-                                        <RadioButton Content="📄 Relatório de Componentes e Peças (Em breve)"
-                                                     Foreground="{StaticResource TextSecondary}" FontSize="15"
+                                        <RadioButton Content="  Relat rio de Componentes e Pe as (Em breve)" 
+                                                     Foreground="{StaticResource TextSecondary}" FontSize="15" 
                                                      Command="{Binding Relatorios.MudarTipoRelatorioCommand}" CommandParameter="Pecas"/>
                                     </StackPanel>
                                     <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding Relatorios.GerarRelatorioPdfCommand}" HorizontalAlignment="Left" Padding="24,14">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                                            <TextBlock Text="Processar e Baixar Relatório" FontSize="15" VerticalAlignment="Center" FontWeight="Bold"/>
+                                            <TextBlock Text="Processar e Baixar Relat rio" FontSize="15" VerticalAlignment="Center" FontWeight="Bold"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
                             </Border>
                         </Grid>
-
                     </Grid>
                 </ScrollViewer>
             </Grid>
         </Border>
-
         <!-- ==================== TELA DE LOGIN / CADASTRO (CLARA) ==================== -->
         <Border CornerRadius="20" Margin="10">
             <Border.Style>
@@ -1020,13 +998,11 @@
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
-
                 <Border Width="450" Style="{StaticResource PremiumCardStyle}" Padding="40" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <StackPanel>
                         <Border Width="60" Height="60" CornerRadius="16" Background="{StaticResource ElevatedGray2}" HorizontalAlignment="Center" Margin="0,0,0,20">
                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEB41;" FontSize="32" Foreground="{StaticResource AppleGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
-
                         <TextBlock HorizontalAlignment="Center" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
@@ -1039,7 +1015,6 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-
                         <StackPanel>
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
@@ -1055,17 +1030,14 @@
                             <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding CadastroNome, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
                             <TextBlock Text="Tipo de Acesso (Perfil)" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                <RadioButton Content="Usuário Normal" Foreground="{StaticResource TextPrimary}" IsChecked="True" GroupName="Perfil" Margin="0,0,20,0"/>
+                                <RadioButton Content="Usu rio Normal" Foreground="{StaticResource TextPrimary}" IsChecked="True" GroupName="Perfil" Margin="0,0,20,0"/>
                                 <RadioButton Content="Administrador" Foreground="{StaticResource TextPrimary}" GroupName="Perfil"/>
                             </StackPanel>
                         </StackPanel>
-
-                        <TextBlock Text="Endereço de E-mail" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                        <TextBlock Text="Endere o de E-mail" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
                         <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding LoginEmail, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
-
                         <TextBlock Text="Palavra-Passe" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
                         <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding LoginSenha, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,30"/>
-
                         <Button Padding="0,14" Cursor="Hand" BorderThickness="0">
                             <Button.Style>
                                 <Style TargetType="Button">
@@ -1106,15 +1078,14 @@
                                 </ControlTemplate>
                             </Button.Template>
                         </Button>
-
                         <Button Command="{Binding AlternarModoAuthCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,20,0,0">
                             <TextBlock Foreground="{StaticResource AppleBlue}" TextDecorations="Underline" HorizontalAlignment="Center">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="Text" Value="Não tem conta? Registre-se aqui."/>
+                                        <Setter Property="Text" Value="N o tem conta? Registre-se aqui."/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding DataContext.ModoCadastro, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                                                <Setter Property="Text" Value="Já tem uma conta? Faça Login."/>
+                                                <Setter Property="Text" Value="J  tem uma conta? Fa a Login."/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
