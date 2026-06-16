@@ -1,0 +1,125 @@
+﻿<UserControl x:Class="WpfIveco.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- TÍTULO -->
+        <StackPanel Grid.Row="0">
+            <TextBlock Style="{StaticResource H1}" Text="Visão Geral do Ledger"/>
+            <TextBlock Style="{StaticResource Subtitle}" Text="Acompanhamento em tempo real da cadeia de suprimentos sustentável."/>
+        </StackPanel>
+
+        <!-- CARDS -->
+        <Grid Grid.Row="1" Margin="0,0,0,30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="24">
+                <StackPanel>
+                    <Border Width="40" Height="40" Background="#E6F0FF" HorizontalAlignment="Left" CornerRadius="10">
+                        <TextBlock Text=" " FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Total de Veículos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
+                    <TextBlock Text="{Binding Rastreabilidade.TotalVeiculos, FallbackValue='0'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
+                    <Border Style="{StaticResource BadgeStyle}" Background="#E6F0FF" Margin="0,10,0,0">
+                        <TextBlock Text="Ao Vivo do Firebase" Foreground="{StaticResource AppleBlue}" FontSize="11" FontWeight="SemiBold"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Style="{StaticResource PremiumCardStyle}" Margin="10,0,10,0" Padding="24">
+                <StackPanel>
+                    <Border Width="40" Height="40" CornerRadius="10" Background="#E6F0FF" HorizontalAlignment="Left">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE710;" FontSize="18" Foreground="{StaticResource AppleBlue}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Fornecedores Ativos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
+                    <TextBlock Text="{Binding Fornecedor.TotalFornecedores, FallbackValue='0'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
+                    <Border Style="{StaticResource BadgeStyle}" Background="#E6F0FF" Margin="0,10,0,0">
+                        <TextBlock Text="Em Conformidade" Foreground="{StaticResource AppleBlue}" FontSize="11" FontWeight="SemiBold"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2" Style="{StaticResource PremiumCardStyle}" Margin="10,0,0,0" Padding="24">
+                <StackPanel>
+                    <Border Width="40" Height="40" CornerRadius="10" Background="#FFF0E0" HorizontalAlignment="Left">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" FontSize="18" Foreground="{StaticResource AppleOrange}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Pegada Média (kg CO2)" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
+                    <TextBlock Text="{Binding Analises.MediaCarbono, FallbackValue='0.0K'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
+                    <Border Style="{StaticResource BadgeStyle}" Background="#FFF0E0" Margin="0,10,0,0">
+                        <TextBlock Text="Baseado no Ledger" Foreground="{StaticResource AppleOrange}" FontSize="11" FontWeight="SemiBold"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- GRÁFICO E TRANSAÇÕES -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="24" MinHeight="350">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Emissões da Cadeia (YTD)" Style="{StaticResource H2}"/>
+                    <lvc:CartesianChart Grid.Row="1" Series="{Binding Analises.EmissoesSeries}" Margin="0,15,0,0" LegendLocation="Top">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding Analises.MesesLabels}" Foreground="{StaticResource TextSecondary}">
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Step="1" StrokeThickness="0"/>
+                                </lvc:Axis.Separator>
+                            </lvc:Axis>
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis Title="Ton CO2" Foreground="{StaticResource TextSecondary}">
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Stroke="{StaticResource ElevatedGray3}" StrokeDashArray="4"/>
+                                </lvc:Axis.Separator>
+                            </lvc:Axis>
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                </Grid>
+            </Border>
+            <Border Grid.Column="1" Style="{StaticResource PremiumCardStyle}" Margin="10,0,0,0" Padding="24">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Transações na Rede" Style="{StaticResource H2}"/>
+                    <StackPanel Grid.Row="1" Margin="0,16,0,0">
+                        <Border BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="Bloco #8942 Registrado" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold"/>
+                                <TextBlock Text="Chassi adicionado pela Magneti Marelli" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        <Border BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="Auditoria ESG Concluída" Foreground="{StaticResource AppleGreen}" FontWeight="SemiBold"/>
+                                <TextBlock Text="Fornecedor: Bosch Ltda - Nota A" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Padding="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="Falha de Autenticação API" Foreground="{StaticResource AppleRed}" FontWeight="SemiBold"/>
+                                <TextBlock Text="Tentativa de acesso não autorizada (IoT)" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

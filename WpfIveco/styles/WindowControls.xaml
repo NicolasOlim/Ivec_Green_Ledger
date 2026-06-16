@@ -1,0 +1,19 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Template para o botão Fechar -->
+    <ControlTemplate x:Key="CloseButtonTemplate" TargetType="Button">
+        <Ellipse Fill="#FF5F56" Stroke="#E0443E" StrokeThickness="0.5"/>
+    </ControlTemplate>
+
+    <!-- Template para o botão Minimizar -->
+    <ControlTemplate x:Key="MinimizeButtonTemplate" TargetType="Button">
+        <Ellipse Fill="#FFBD2E" Stroke="#DEA123" StrokeThickness="0.5"/>
+    </ControlTemplate>
+
+    <!-- Template para o botão Maximizar -->
+    <ControlTemplate x:Key="MaximizeButtonTemplate" TargetType="Button">
+        <Ellipse Fill="#27C93F" Stroke="#1AAB29" StrokeThickness="0.5"/>
+    </ControlTemplate>
+
+</ResourceDictionary>

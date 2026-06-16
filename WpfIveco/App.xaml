@@ -4,6 +4,13 @@
              xmlns:local="clr-namespace:WpfIveco"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="styles/Colors.xaml"/>
+                <ResourceDictionary Source="styles/Controls.xaml"/>
+                <ResourceDictionary Source="styles/TextStyles.xaml"/>
+                <ResourceDictionary Source="styles/WindowControls.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

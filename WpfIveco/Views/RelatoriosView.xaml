@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="WpfIveco.Views.RelatoriosView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0">
+            <TextBlock Style="{StaticResource H1}" Text="Central de Relatórios"/>
+            <TextBlock Style="{StaticResource Subtitle}" Text="Exporte os dados consolidados da cadeia de suprimentos da Iveco em formato PDF oficial."/>
+        </StackPanel>
+        <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="30" Margin="0,0,0,20">
+            <StackPanel>
+                <TextBlock Text="Selecione o tipo de relatório desejado:" Style="{StaticResource H2}" Margin="0,0,0,15"/>
+                <StackPanel Margin="0,0,0,30">
+                    <RadioButton Content="  Relatório Geral de Veículos (Rastreabilidade)" 
+                                 Foreground="{StaticResource TextPrimary}" FontSize="15" Margin="0,0,0,12" 
+                                 IsChecked="True" 
+                                 Command="{Binding Relatorios.MudarTipoRelatorioCommand}" CommandParameter="Veiculos"/>
+                    <RadioButton Content="  Relatório de Fornecedores Cadastrados (Em breve)" 
+                                 Foreground="{StaticResource TextSecondary}" FontSize="15" Margin="0,0,0,12" 
+                                 Command="{Binding Relatorios.MudarTipoRelatorioCommand}" CommandParameter="Fornecedores"/>
+                    <RadioButton Content="  Relatório de Componentes e Peças (Em breve)" 
+                                 Foreground="{StaticResource TextSecondary}" FontSize="15" 
+                                 Command="{Binding Relatorios.MudarTipoRelatorioCommand}" CommandParameter="Pecas"/>
+                </StackPanel>
+                <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding Relatorios.GerarRelatorioPdfCommand}" HorizontalAlignment="Left" Padding="24,14">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Processar e Baixar Relatório" FontSize="15" VerticalAlignment="Center" FontWeight="Bold"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
