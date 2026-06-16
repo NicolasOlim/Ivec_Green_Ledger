@@ -1,21 +1,11 @@
 # 📦🍃 Sistema de Rastreamento Inteligente - Iveco Green Ledger
-
+ 
 ### Trabalho de Conclusão de Curso - Desenvolvimento de Sistemas
-
-<p align="center">
-  <img src="https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white" alt="C#" />
-  <img src="https://img.shields.io/badge/.NET%208-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 8" />
-  <img src="https://img.shields.io/badge/ASP.NET%20Core-0089D6?style=for-the-badge&logo=dotnet&logoColor=white" alt="ASP.NET Core" />
-  <img src="https://img.shields.io/badge/WPF-0089D6?style=for-the-badge&logo=windows&logoColor=white" alt="WPF" />
-  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase" />
-  <img src="https://img.shields.io/badge/Serilog-5C4033?style=for-the-badge" alt="Serilog" />
-  <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" alt="Swagger" />
-</p>
-
+ 
 ### Escola De Programação e Robótica - SENAI 
-
+ 
 #### Orientado por: Fred Aguiar
-
+ 
 👥 **Equipe de Desenvolvimento**
 
 <p align="center">
@@ -29,6 +19,10 @@
 ---
 
 # 🎯 Proposta de Valor: Sistema de Rastreamento Inteligente (Projeto Iveco)
+
+
+
+    
 
 **Contexto:** Solução tecnológica voltada para a rastreabilidade logística e a transparência ambiental na cadeia de suprimentos da indústria automotiva pesada.
 
