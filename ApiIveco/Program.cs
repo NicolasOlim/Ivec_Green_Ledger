@@ -7,20 +7,18 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Reflection;
 
+Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "logs"));
+
 var builder = WebApplication.CreateBuilder(args);
 
-
-/// 1. CONFIGURAÇÃO DO SERILOG
-
+// 1. CONFIGURAÇÃO DO SERILOG
 builder.Host.UseSerilog((context, config) =>
-
 {
     config.ReadFrom.Configuration(context.Configuration);
 });
 
 
-/// 2. DEPENDÊNCIAS
-
+// 2. DEPENDÊNCIAS
 builder.Services.AddSingleton<FireBaseData>();
 builder.Services.AddScoped<DadosService>();
 builder.Services.AddHttpClient();
@@ -28,8 +26,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 
-/// 3. SWAGGER
-
+// 3. SWAGGER
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -39,7 +36,7 @@ builder.Services.AddSwaggerGen(options =>
         Description = "API de Backend para gestão de Veículos, Fornecedores e Rastreabilidade.",
         Contact = new OpenApiContact
         {
-            Name = "Equipa de Desenvolvimento",
+            Name = "Equipe de Desenvolvimento",
             Email = "suporte@ivecogreenledger.com"
         }
     });
@@ -53,8 +50,7 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 
-/// 4. MIDDLEWARES (ORDEM CRÍTICA)
-
+// 4. MIDDLEWARES (ORDEM CRÍTICA)
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
@@ -71,22 +67,24 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// AQUI ESTÁ A PRIMEIRA CORREÇÃO: Removido o 'if (IsDevelopment)' 
+// para o Swagger aparecer na internet no runasp.net
+app.UseSwagger();
+app.UseSwaggerUI();
+
+// AQUI ESTÁ A SEGUNDA CORREÇÃO: Redireciona a rota raiz ("/") para o Swagger,
+// acabando com o Erro 404 ao acessar o link principal.
+app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.UseMiddleware<RequestResponseLoggingMiddleware>(); // Loga requisições/respostas
 app.UseMiddleware<ExceptionMiddleware>();              // Seu middleware personalizado
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
 
-/// 5. INÍCIO
-
+// 5. INÍCIO
 try
 {
     Log.Information("🚀 API Iveco Green Ledger iniciada com sucesso!");
