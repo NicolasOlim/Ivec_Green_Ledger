@@ -9,6 +9,11 @@ namespace WpfIveco
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            // Adicione esta linha:
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+        }
     }
 
 }
