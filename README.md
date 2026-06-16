@@ -264,33 +264,7 @@ A API foi desenvolvida em ASP.NET Core 8 e documentada com Swagger. Ela centrali
 - Middleware `RequestResponseLoggingMiddleware` que registra em logs (via Serilog) cada requisição, seu tempo de resposta e eventuais erros.  
 - Configuração de CORS para permitir requisições a partir da aplicação WPF.
 
-A Tabela 1 resume os endpoints organizados por tag no Swagger.
-
-**Tabela 1 – Endpoints da API**
-
-| Tag | Método e Rota | Descrição |
-| :--- | :--- | :--- |
-| **Veículos** | `GET /api/dados/veiculos` | Lista todos os veículos |
-| | `GET /api/dados/veiculos/{vin}` | Busca veículo por VIN |
-| | `POST /api/dados/veiculos` | Cadastra novo veículo |
-| | `PUT /api/dados/veiculos/{vin}` | Atualiza dados do veículo |
-| | `DELETE /api/dados/veiculos/{vin}` | Remove veículo |
-| | `GET /api/dados/veiculos/validar-vin/{vin}` | Valida VIN via NHTSA |
-| | `GET /api/dados/relatorios/veiculos/pdf` | Gera relatório PDF de veículos |
-| **Fornecedores** | `GET /api/dados/fornecedores` | Lista todos os fornecedores |
-| | `GET /api/dados/fornecedores/buscar-cnpj/{cnpj}` | Consulta CNPJ na BrasilAPI |
-| | `POST /api/dados/fornecedores` | Cadastra fornecedor |
-| | `DELETE /api/dados/fornecedores/{id}` | Remove fornecedor |
-| **Lotes e Componentes** | `GET /api/dados/lotes` | Lista lotes de matéria-prima |
-| | `POST /api/dados/lotes` | Cadastra novo lote |
-| | `DELETE /api/dados/lotes/{id}` | Remove lote |
-| | `GET /api/dados/componentes` | Lista componentes cadastrados |
-| | `POST /api/dados/componentes` | Cadastra componente |
-| | `DELETE /api/dados/componentes/{id}` | Remove componente |
-| **Autenticação** | `POST /api/dados/cadastrar` | Cria novo usuário |
-| | `POST /api/dados/login` | Autentica usuário |
-
-O controller `SuporteController` disponibiliza `GET /api/suporte/logs` para download do arquivo de log mais recente, auxiliando na depuração.
+anexar link ou print da API no Swagger: --------------------------------
 
 ### 6.2 Integrações Externas
 
