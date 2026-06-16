@@ -40,14 +40,16 @@ Os resultados confirmam que a plataforma entrega rastreabilidade completa e gera
 
 ### 1.1 Contexto e Problema
 
-A indústria automotiva pesada enfrenta uma transformação profunda impulsionada por metas globais de descarbonização e exigências de transparência ambiental. Regulamentações como o *European Green Deal* e padrões de reporte ESG (Environmental, Social, and Governance) demandam que fabricantes monitorem não apenas suas emissões diretas, mas também as emissões indiretas provenientes de suas cadeias de suprimentos (Escopo 3). Para a Iveco, uma das líderes no segmento de veículos comerciais, a capacidade de rastrear cada componente desde o fornecedor de matéria‑prima até o veículo final tornou‑se um imperativo estratégico e regulatório.
+O setor automotivo pesado está passando por uma transformação urgente. Metas globais de descarbonização e padrões de transparência ambiental — como o European Green Deal e as exigências de relatórios ESG — estão forçando os fabricantes a olharem muito além de suas próprias fábricas. Agora é preciso rastrear também as emissões indiretas, aquelas que acontecem ao longo de toda a cadeia de fornecedores (o chamado Escopo 3).
 
-O problema central reside na ausência de um sistema que integre, em tempo real, as informações de lotes de materiais, fornecedores e processos de montagem, automatizando o cálculo da pegada de carbono e gerando evidências auditáveis para conformidade.
+Para a Iveco, uma das principais marcas mundiais de veículos comerciais, essa realidade trouxe um desafio concreto: como saber exatamente a origem de cada componente e qual o seu impacto ambiental, da matéria‑prima ao produto final? A resposta a essa pergunta deixou de ser apenas uma vantagem competitiva — tornou‑se uma exigência regulatória e estratégica.
+
+O problema central estava justamente na falta de um sistema único e integrado. As informações sobre lotes de materiais, fornecedores e processos de montagem existiam, mas estavam espalhadas, sem conexão em tempo real e sem nenhum mecanismo automático que transformasse esses dados em indicadores de pegada de carbono ou relatórios prontos para auditoria. Era exatamente essa lacuna que o projeto Iveco Green Ledger se propôs a fechar.
 
 ### 1.2 Objetivos
 
 **Objetivo Geral**  
-Desenvolver um sistema de rastreamento inteligente que permita à Iveco gerenciar a cadeia de suprimentos, calcular a pegada de carbono de seus veículos e gerar relatórios para atender aos critérios ESG.
+Construir um sistema inteligente de rastreamento que permita à Iveco gerenciar com clareza sua cadeia de suprimentos, calcular a pegada de carbono de cada veículo e gerar relatórios compatíveis com os padrões ESG.
 
 **Objetivos Específicos**  
 - Modelar uma base de dados NoSQL que represente fornecedores, lotes de matéria‑prima, veículos e componentes.  
