@@ -19,9 +19,10 @@ namespace WpfIveco.ViewModel
     {
         private readonly HttpClient _httpClient;
 
-        // ==========================================
-        // PROPRIEDADES
-        // ==========================================
+        /// <summary>
+        /// PROPRIEDADES
+        /// </summary>
+        
         private string _novaPecaVin = "";
         public string NovaPecaVin
         {
@@ -43,23 +44,31 @@ namespace WpfIveco.ViewModel
             set { _listaPecas = value; OnPropertyChanged(); }
         }
 
-        // ==========================================
-        // COMANDOS
-        // ==========================================
+        
+        /// <summary>
+        /// COMANDOS
+        /// </summary>
+        
         public ICommand AdicionarPecaManualCommand { get; }
 
-        // ==========================================
-        // CONSTRUTOR
-        // ==========================================
+        
+        /// <summary>
+        /// CONSTRUTOR
+        /// </summary>
+        /// <param name="httpClient"></param>
+        
         public PecasViewModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
             AdicionarPecaManualCommand = new RelayCommand(async p => await AdicionarPecaAsync());
         }
 
-        // ==========================================
-        // CARREGAR PEÇAS
-        // ==========================================
+        
+        /// <summary>
+        /// CARREGAR PEÇAS
+        /// </summary>
+        /// <returns></returns>
+        
         public async Task CarregarPecasAsync()
         {
             try
@@ -96,9 +105,9 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        // ==========================================
-        // ADICIONAR PEÇA MANUAL
-        // ==========================================
+        
+        /// ADICIONAR PEÇA MANUAL
+        
         private async Task AdicionarPecaAsync()
         {
             if (string.IsNullOrWhiteSpace(NovaPecaNome) || string.IsNullOrWhiteSpace(NovaPecaVin))

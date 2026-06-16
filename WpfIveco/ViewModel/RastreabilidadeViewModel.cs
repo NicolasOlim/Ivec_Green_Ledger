@@ -16,9 +16,11 @@ namespace WpfIveco.ViewModel
     {
         private readonly HttpClient _httpClient;
 
-        // ==========================================
-        // PROPRIEDADES
-        // ==========================================
+        
+        /// <summary>
+        /// PROPRIEDADES
+        /// </summary>
+        
         private string _pesquisaVin = "";
         public string PesquisaVin
         {
@@ -40,23 +42,31 @@ namespace WpfIveco.ViewModel
             set { _listaVeiculos = value; OnPropertyChanged(); }
         }
 
-        // ==========================================
-        // COMANDOS
-        // ==========================================
+        
+        /// <summary>
+        /// COMANDOS
+        /// </summary>
+        
         public ICommand PesquisarVinCommand { get; }
 
-        // ==========================================
-        // CONSTRUTOR
-        // ==========================================
+        
+        /// <summary>
+        /// CONSTRUTOR
+        /// </summary>
+        /// <param name="httpClient"></param>
+        
         public RastreabilidadeViewModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
             PesquisarVinCommand = new RelayCommand(async p => await PesquisarVinAsync());
         }
 
-        // ==========================================
-        // CARREGAR VEÍCULOS
-        // ==========================================
+        
+        /// <summary>
+        /// CARREGAR VEÍCULOS
+        /// </summary>
+        /// <returns></returns>
+        
         public async Task CarregarVeiculosAsync()
         {
             try
@@ -85,9 +95,12 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        // ==========================================
-        // PESQUISAR VIN
-        // ==========================================
+        
+        /// <summary>
+        /// PESQUISAR VIN
+        /// </summary>
+        /// <returns></returns>
+        
         private async Task PesquisarVinAsync()
         {
             if (string.IsNullOrWhiteSpace(PesquisaVin) || PesquisaVin.Length != 17)

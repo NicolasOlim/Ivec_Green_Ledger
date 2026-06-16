@@ -16,9 +16,10 @@ namespace WpfIveco.ViewModel
     {
         private readonly HttpClient _httpClient;
 
-        // ==========================================
-        // PROPRIEDADES
-        // ==========================================
+        /// <summary>
+        /// PROPRIEDADES
+        /// </summary>
+        
         private string _mediaCarbono = "0.0K";
         public string MediaCarbono
         {
@@ -40,14 +41,16 @@ namespace WpfIveco.ViewModel
             set { _mesesLabels = value; OnPropertyChanged(); }
         }
 
-        // ==========================================
-        // CONSTRUTOR
-        // ==========================================
+        /// <summary>
+        /// CONSTRUTOR
+        /// </summary>
+        /// <param name="httpClient"></param>
+ 
         public AnalisesViewModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
 
-            // Inicializa o gráfico vazio com as duas séries
+            /// Inicializa o gráfico vazio com as duas séries
             EmissoesSeries = new SeriesCollection
             {
                 new LineSeries
@@ -69,10 +72,14 @@ namespace WpfIveco.ViewModel
             };
         }
 
-        // ==========================================
-        // ATUALIZAR GRÁFICO COM DADOS REAIS
-        // Chamado pelo MainViewModel após carregar veículos
-        // ==========================================
+        
+        /// <summary>
+        /// ATUALIZAR GRÁFICO COM DADOS REAIS
+        /// </summary>
+        /// <param name="veiculos"></param>
+        /// <returns></returns>
+        /// Chamado pelo MainViewModel após carregar veículos
+        
         public Task AtualizarAsync(List<VeiculoModel> veiculos)
         {
             try

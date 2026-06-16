@@ -14,9 +14,9 @@ namespace WpfIveco.ViewModel
     {
         private readonly HttpClient _httpClient;
 
-        // ==========================================
-        // PROPRIEDADES
-        // ==========================================
+        
+        /// PROPRIEDADES
+       
         private string _tipoRelatorio = "Veiculos";
         public string TipoRelatorio
         {
@@ -31,15 +31,18 @@ namespace WpfIveco.ViewModel
             set { _isGerandoPdf = value; OnPropertyChanged(); }
         }
 
-        // ==========================================
-        // COMANDOS
-        // ==========================================
+        
+        /// COMANDOS
+        
         public ICommand GerarRelatorioPdfCommand { get; }
         public ICommand MudarTipoRelatorioCommand { get; }
 
-        // ==========================================
-        // CONSTRUTOR
-        // ==========================================
+        
+        /// <summary>
+        /// CONSTRUTOR
+        /// </summary>
+        /// <param name="httpClient"></param>
+        
         public RelatoriosViewModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -47,9 +50,12 @@ namespace WpfIveco.ViewModel
             MudarTipoRelatorioCommand = new RelayCommand(p => TipoRelatorio = p as string ?? "Veiculos");
         }
 
-        // ==========================================
-        // DOWNLOAD DO PDF
-        // ==========================================
+        
+        /// <summary>
+        /// DOWNLOAD DO PDF
+        /// </summary>
+        /// <returns></returns>
+        
         public async Task BaixarRelatorioPdfAsync()
         {
             if (IsGerandoPdf)
@@ -59,7 +65,7 @@ namespace WpfIveco.ViewModel
 
             try
             {
-                // Monta a URL com base no tipo selecionado
+                /// Monta a URL com base no tipo selecionado
                 var urlPdf = TipoRelatorio switch
                 {
                     "Veiculos" => "api/dados/relatorios/veiculos/pdf",
@@ -72,7 +78,7 @@ namespace WpfIveco.ViewModel
                 {
                     byte[] fileBytes = await response.Content.ReadAsByteArrayAsync();
 
-                    // Abre o diálogo de guardar ficheiro
+                    ///Abre o diálogo de guardar ficheiro
                     var saveDialog = new SaveFileDialog
                     {
                         Filter = "Ficheiro PDF (*.pdf)|*.pdf",
@@ -87,7 +93,7 @@ namespace WpfIveco.ViewModel
                         MessageBox.Show("Relatório gerado e guardado com sucesso!", "Sucesso",
                             MessageBoxButton.OK, MessageBoxImage.Information);
 
-                        // Abre o PDF automaticamente no leitor padrão
+                        /// Abre o PDF automaticamente no leitor padrão
                         Process.Start(new ProcessStartInfo
                         {
                             FileName = saveDialog.FileName,

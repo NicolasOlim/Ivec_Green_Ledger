@@ -15,9 +15,10 @@ namespace WpfIveco.ViewModel
     {
         private readonly HttpClient _httpClient;
 
-        // ==========================================
-        // PROPRIEDADES
-        // ==========================================
+        /// <summary>
+        /// PROPRIEDADES
+        /// </summary>
+        
         private string _totalFornecedores = "0";
         public string TotalFornecedores
         {
@@ -53,15 +54,19 @@ namespace WpfIveco.ViewModel
             set { _mensagemCadastro = value; OnPropertyChanged(); }
         }
 
-        // ==========================================
-        // COMANDOS
-        // ==========================================
+        /// <summary>
+        /// COMANDOS
+        /// </summary>
+       
         public ICommand ConsultarCnpjCommand { get; }
         public ICommand SalvarFornecedorCommand { get; }
 
-        // ==========================================
-        // CONSTRUTOR
-        // ==========================================
+        
+        /// <summary>
+        /// CONSTRUTOR
+        /// </summary>
+        /// <param name="httpClient"></param>
+        
         public FornecedorViewModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -69,9 +74,12 @@ namespace WpfIveco.ViewModel
             SalvarFornecedorCommand = new RelayCommand(async p => await SalvarFornecedorAsync());
         }
 
-        // ==========================================
-        // CARREGAR FORNECEDORES
-        // ==========================================
+      
+        /// <summary>
+        /// CARREGAR FORNECEDORES
+        /// </summary>
+        /// <returns></returns>
+        
         public async Task CarregarFornecedoresAsync()
         {
             try
@@ -96,9 +104,12 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        // ==========================================
-        // BUSCAR POR CNPJ
-        // ==========================================
+        
+        /// <summary>
+        /// BUSCAR POR CNPJ
+        /// </summary>
+        /// <returns></returns>
+        
         private async Task BuscarPorCnpjAsync()
         {
             var cnpjLimpo = new string(System.Linq.Enumerable.ToArray(
@@ -148,9 +159,12 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        // ==========================================
-        // SALVAR FORNECEDOR
-        // ==========================================
+        
+        /// <summary>
+        /// SALVAR FORNECEDOR
+        /// </summary>
+        /// <returns></returns>
+        
         private async Task SalvarFornecedorAsync()
         {
             if (string.IsNullOrWhiteSpace(NomeFornecedorEncontrado))

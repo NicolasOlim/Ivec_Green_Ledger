@@ -17,18 +17,24 @@ namespace WpfIveco.ViewModel
         private readonly HttpClient _httpClient;
         private readonly DispatcherTimer _timer;
 
-        // ==========================================
-        // SUB-VIEWMODELS — cada aba tem o seu
-        // ==========================================
+        
+        /// <summary>
+        /// SUB-VIEWMODELS — cada aba tem o seu
+        /// </summary>
+        
         public RastreabilidadeViewModel Rastreabilidade { get; }
         public FornecedorViewModel Fornecedor { get; }
         public PecasViewModel Pecas { get; }
         public AnalisesViewModel Analises { get; }
         public RelatoriosViewModel Relatorios { get; }
 
-        // ==========================================
-        // VARIÁVEIS - SISTEMA DE LOGIN / SESSÃO
-        // ==========================================
+        
+        /// <summary>
+        /// VARIÁVEIS - SISTEMA DE LOGIN / SESSÃO
+        /// </summary>
+        
+        private bool _isBusy = false;
+        public bool IsBusy { get => _isBusy; set { _isBusy = value; OnPropertyChanged(); } }
         private bool _isLoggedIn = false;
         public bool IsLoggedIn { get => _isLoggedIn; set { _isLoggedIn = value; OnPropertyChanged(); } }
 
@@ -56,9 +62,13 @@ namespace WpfIveco.ViewModel
         private string _perfilUsuario = "Sessão não iniciada";
         public string PerfilUsuario { get => _perfilUsuario; set { _perfilUsuario = value; OnPropertyChanged(); } }
 
-        // ==========================================
-        // VARIÁVEIS - NAVEGAÇÃO E SISTEMA
-        // ==========================================
+
+
+        
+        /// <summary>
+        /// VARIÁVEIS - NAVEGAÇÃO E SISTEMA
+        /// </summary>
+        
         private string _abaAtiva = "Dashboard";
         public string AbaAtiva { get => _abaAtiva; set { _abaAtiva = value; OnPropertyChanged(); } }
 
@@ -68,9 +78,11 @@ namespace WpfIveco.ViewModel
         private string _statusSimulador = "Desativado";
         public string StatusSimulador { get => _statusSimulador; set { _statusSimulador = value; OnPropertyChanged(); } }
 
-        // ==========================================
-        // COMANDOS
-        // ==========================================
+        
+        /// <summary>
+        /// COMANDOS
+        /// </summary>
+        
         public ICommand FazerLoginCommand { get; }
         public ICommand FazerCadastroCommand { get; }
         public ICommand FazerLogoutCommand { get; }
@@ -78,9 +90,11 @@ namespace WpfIveco.ViewModel
         public ICommand MudarAbaCommand { get; }
         public ICommand LigarDesligarSimuladorCommand { get; }
 
-        // ==========================================
-        // CONSTRUTOR
-        // ==========================================
+        
+        /// <summary>
+        /// CONSTRUTOR
+        /// </summary>
+        
         public MainViewModel()
         {
             var handler = new HttpClientHandler
@@ -89,32 +103,31 @@ namespace WpfIveco.ViewModel
             };
             _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:7221/") };
 
-            // Instancia cada sub-ViewModel partilhando o mesmo HttpClient
+            /// Instancia cada sub-ViewModel partilhando o mesmo HttpClient
             Rastreabilidade = new RastreabilidadeViewModel(_httpClient);
             Fornecedor = new FornecedorViewModel(_httpClient);
             Pecas = new PecasViewModel(_httpClient);
             Analises = new AnalisesViewModel(_httpClient);
             Relatorios = new RelatoriosViewModel(_httpClient);
 
-            // Comandos de navegação e sistema
+            /// Comandos de navegação e sistema
             MudarAbaCommand = new RelayCommand(p => AbaAtiva = p as string);
             AlternarModoAuthCommand = new RelayCommand(p => ModoCadastro = !ModoCadastro);
             LigarDesligarSimuladorCommand = new RelayCommand(p =>
                 StatusSimulador = StatusSimulador == "Ativo" ? "Desativado" : "Ativo");
 
-            // Comandos de autenticação
+            /// Comandos de autenticação
             FazerLoginCommand = new RelayCommand(async p => await ExecutarLoginAsync());
             FazerCadastroCommand = new RelayCommand(async p => await ExecutarCadastroAsync());
             FazerLogoutCommand = new RelayCommand(p => ExecutarLogout());
 
-            // Timer de atualização automática a cada 2 minutos
+            /// Timer de atualização automática a cada 2 minutos
             _timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(2) };
             _timer.Tick += async (s, e) => await CarregarTudoAsync();
         }
 
-        // ==========================================
-        // LOGIN
-        // ==========================================
+        /// LOGIN
+        
         private async Task ExecutarLoginAsync()
         {
             if (string.IsNullOrWhiteSpace(LoginEmail) || string.IsNullOrWhiteSpace(LoginSenha))
@@ -128,6 +141,8 @@ namespace WpfIveco.ViewModel
 
             try
             {
+                IsBusy = true; /// Ativa a animação de carregamento
+
                 var response = await _httpClient.PostAsJsonAsync("api/dados/login", credenciais);
 
                 if (response.IsSuccessStatusCode)
@@ -152,63 +167,55 @@ namespace WpfIveco.ViewModel
 
                     var mensagem = response.StatusCode switch
                     {
-                        System.Net.HttpStatusCode.Unauthorized =>
-                            "Credenciais incorretas.\nVerifique o e-mail e a senha.",
-                        System.Net.HttpStatusCode.BadRequest =>
-                            "Os dados enviados são inválidos.\nVerifique e tente novamente.",
+                        System.Net.HttpStatusCode.Unauthorized => "Credenciais incorretas.\nVerifique o e-mail e a senha.",
+                        System.Net.HttpStatusCode.BadRequest => "Os dados enviados são inválidos.\nVerifique e tente novamente.",
                         _ => "Não foi possível entrar no sistema.\nTente novamente mais tarde."
                     };
 
-                    MessageBox.Show(mensagem, "Acesso Negado",
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(mensagem, "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
             catch (HttpRequestException ex)
             {
-                Debug.WriteLine($"[ERRO CONEXÃO LOGIN] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
-                MessageBox.Show(
-                    "Não foi possível conectar ao servidor.\nVerifique a sua ligação e tente novamente.",
-                    "Erro de Ligação", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Debug.WriteLine($"[ERRO CONEXÃO LOGIN] {ex.GetType().Name}: {ex.Message}");
+                MessageBox.Show("Não foi possível conectar ao servidor.\nVerifique a sua ligação e tente novamente.", "Erro de Ligação", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ERRO INESPERADO LOGIN] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
-                MessageBox.Show(
-                    "Ocorreu um erro inesperado.\nTente novamente ou contacte o suporte.",
-                    "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                Debug.WriteLine($"[ERRO INESPERADO LOGIN] {ex.GetType().Name}: {ex.Message}");
+                MessageBox.Show("Ocorreu um erro inesperado.\nTente novamente ou contacte o suporte.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsBusy = false; // Desativa a animação, independentemente do sucesso ou falha
             }
         }
 
-        // ==========================================
-        // CADASTRO
-        // ==========================================
+        
+        /// <summary>
+        /// CADASTRO
+        /// </summary>
+        /// <returns></returns>
+        
         private async Task ExecutarCadastroAsync()
         {
-            if (string.IsNullOrWhiteSpace(CadastroNome) ||
-                string.IsNullOrWhiteSpace(LoginEmail) ||
-                string.IsNullOrWhiteSpace(LoginSenha))
+            if (string.IsNullOrWhiteSpace(CadastroNome) || string.IsNullOrWhiteSpace(LoginEmail) || string.IsNullOrWhiteSpace(LoginSenha))
             {
-                MessageBox.Show("Preencha todos os campos para criar a conta.", "Aviso",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Preencha todos os campos para criar a conta.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            var novoUser = new
-            {
-                Nome = CadastroNome,
-                Email = LoginEmail,
-                Senha = LoginSenha,
-                Acesso = CadastroPerfil
-            };
+            var novoUser = new { Nome = CadastroNome, Email = LoginEmail, Senha = LoginSenha, Acesso = CadastroPerfil };
 
             try
             {
+                IsBusy = true; /// Ativa a animação de carregamento
+
                 var response = await _httpClient.PostAsJsonAsync("api/dados/cadastrar", novoUser);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    MessageBox.Show("Conta criada com sucesso!\nJá pode fazer login.",
-                        "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Conta criada com sucesso!\nJá pode fazer login.", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
                     ModoCadastro = false;
                     CadastroNome = "";
                     LoginSenha = "";
@@ -217,30 +224,25 @@ namespace WpfIveco.ViewModel
                 {
                     var erro = await response.Content.ReadAsStringAsync();
                     Debug.WriteLine($"[ERRO CADASTRO] HTTP {(int)response.StatusCode} -> {erro}");
-                    MessageBox.Show(
-                        "Não foi possível criar a conta.\nTente novamente ou contacte o suporte.",
-                        "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Não foi possível criar a conta.\nTente novamente ou contacte o suporte.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (HttpRequestException ex)
             {
-                Debug.WriteLine($"[ERRO CONEXÃO CADASTRO] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
-                MessageBox.Show(
-                    "Não foi possível conectar ao servidor.\nVerifique a sua ligação e tente novamente.",
-                    "Erro de Ligação", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Debug.WriteLine($"[ERRO CONEXÃO CADASTRO] {ex.GetType().Name}: {ex.Message}");
+                MessageBox.Show("Não foi possível conectar ao servidor.\nVerifique a sua ligação e tente novamente.", "Erro de Ligação", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            catch (Exception ex)
+            finally
             {
-                Debug.WriteLine($"[ERRO INESPERADO CADASTRO] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
-                MessageBox.Show(
-                    "Ocorreu um erro inesperado.\nTente novamente ou contacte o suporte.",
-                    "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                IsBusy = false; // Desativa a animação
             }
         }
 
-        // ==========================================
-        // LOGOUT
-        // ==========================================
+        
+        /// <summary>
+        /// LOGOUT
+        /// </summary>
+        
         private void ExecutarLogout()
         {
             IsLoggedIn = false;
@@ -252,9 +254,12 @@ namespace WpfIveco.ViewModel
             _timer.Stop();
         }
 
-        // ==========================================
-        // CARREGAMENTO GLOBAL — chama todos os sub-ViewModels
-        // ==========================================
+        
+        /// <summary>
+        /// CARREGAMENTO GLOBAL — chama todos os sub-ViewModels
+        /// </summary>
+        /// <returns></returns>
+        
         private async Task CarregarTudoAsync()
         {
             await Rastreabilidade.CarregarVeiculosAsync();
