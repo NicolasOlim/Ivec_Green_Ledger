@@ -1,106 +1,106 @@
-# 📦🍃 Sistema de Rastreamento Inteligente - Iveco Green Ledger
- 
-### Trabalho de Conclusão de Curso - Desenvolvimento de Sistemas
- 
-### Escola De Programação e Robótica - SENAI 
- 
-#### Orientado por: Fred Aguiar
- 
-👥 **Equipe de Desenvolvimento**
+# 📦🍃 Iveco Green Ledger – Sistema de Rastreamento Inteligente  
+**Trabalho de Conclusão de Curso**  
+**Unidade SENAI: Nova Lima**
 
-<p align="center">
-<strong>Colaboradores:</strong><br>
-<a href="https://github.com/NicolasOlim">🧑‍💻 Nicolas  Oliveira Lima</a> |
-<a href="https://github.com/aliceandradee">🧑‍💻 Alice Andrade</a> |
-<a href="https://github.com/erick190813">🧑‍💻 Erick Silva</a> |
-<a href="https://github.com/vnxtry">🧑‍💻 Vinicius Augusto </a> |
-</p>
+**Instrutor: Frederico Martins Aguiar**
 
 ---
 
-# 🎯 Proposta de Valor: Sistema de Rastreamento Inteligente (Projeto Iveco)
-
-
-
-    
-
-**Contexto:** Solução tecnológica voltada para a rastreabilidade logística e a transparência ambiental na cadeia de suprimentos da indústria automotiva pesada.
+**Equipe de Desenvolvimento**  
+[🧑‍💻 Nicolas Oliveira Lima](https://github.com/NicolasOlim)  |  [🧑‍💻 Alice Andrade](https://github.com/aliceandradee)  |  [🧑‍💻 Erick Silva](https://github.com/erick190813)  
 
 ---
 
-## 🎯 Principais Pilares de Valor
+## 📌 Resumo
 
-### 📦 1. Gerenciamento e Rastreabilidade Logística
-* **Monitoramento em Tempo Real:** Capacidade de catalogar insumos e rastrear a produção instantaneamente.
-* **Controle de Suprimentos:** Gestão integrada que atende à complexidade logística da manufatura de veículos industriais.
+A indústria automotiva pesada enfrenta crescentes pressões por transparência ambiental e conformidade com normas ESG. O Iveco Green Ledger é uma plataforma desenvolvida para rastrear materiais do fornecedor ao veículo acabado, calcular automaticamente a pegada de carbono e gerar relatórios auditáveis.
 
-### 🌱 2. Sustentabilidade e Conformidade ESG
-* **Cálculo da Pegada de Carbono:** Automação no cálculo da emissão de gases de efeito estufa para a frota.
-* **Alinhamento a Diretrizes:** Facilita o atendimento aos rigorosos requisitos de conformidade e auditoria estabelecidos pelas políticas Ambientais, Sociais e de Governança Corporativa (ESG).
-
-### ⚙️ 3. Infraestrutura de Alta Performance e Resiliência
-* **Arquitetura Distribuída:** Solução escalável estruturada em nuvem (Firebase Firestore - NoSQL) e preparada para suportar a demanda de produção em escala industrial.
-* **Processamento Assíncrono:** Absorve alta demanda de operações sem interrupções utilizando `async/await` e padrões de processamento paralelo, garantindo integridade e resposta ágil.
-
-### 📊 4. Ferramenta Estratégica de Monitoramento
-* **Inteligência de Dados:** Atua como o núcleo de governança e painel de controle administrativo das operações logísticas (Dashboards com LiveCharts2).
-* **Comprovação Ecológica:** Estruturada para gerar relatórios em PDF (QuestPDF) como prova estratégica de responsabilidade ecológica e eficiência operacional.
+O sistema combina uma API RESTful em ASP.NET Core 8, uma aplicação desktop em WPF (padrão MVVM) e o banco de dados NoSQL Firebase Firestore. Integra validações externas de CNPJ (BrasilAPI) e chassi (NHTSA), oferecendo dashboards analíticos (LiveCharts2) e exportação em PDF (QuestPDF). A solução entrega rastreabilidade completa com evidências ambientais estruturadas para auditoria, alinhando-se às diretrizes ESG.
 
 ---
 
-## 🛠️ Tecnologias e Stack
+## 📑 Sumário
 
-<p align="center">
-  <img src="https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white" alt="C#" />
-  <img src="https://img.shields.io/badge/.NET%208-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 8" />
-  <img src="https://img.shields.io/badge/ASP.NET%20Core-0089D6?style=for-the-badge&logo=dotnet&logoColor=white" alt="ASP.NET Core" />
-  <img src="https://img.shields.io/badge/WPF-0089D6?style=for-the-badge&logo=windows&logoColor=white" alt="WPF" />
-  <img src="https://img.shields.io/badge/MVVM-FF6B6B?style=for-the-badge" alt="MVVM Pattern" />
-  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase" />
-  <img src="https://img.shields.io/badge/Firestore-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firestore" />
-  <img src="https://img.shields.io/badge/LiveCharts2-4FC3F7?style=for-the-badge" alt="LiveCharts" />
-  <img src="https://img.shields.io/badge/QuestPDF-FF69B4?style=for-the-badge" alt="QuestPDF" />
-  <img src="https://img.shields.io/badge/Serilog-5C4033?style=for-the-badge" alt="Serilog" />
-  <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" alt="Swagger" />
-  <img src="https://img.shields.io/badge/REST%20API-FF6C37?style=for-the-badge&logo=rest&logoColor=white" alt="REST API" />
-  <img src="https://img.shields.io/badge/NoSQL-13aa52?style=for-the-badge&logo=mongodb&logoColor=white" alt="NoSQL" />
-  <img src="https://img.shields.io/badge/Google%20Cloud-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white" alt="Google Cloud" />
-  <img src="https://img.shields.io/badge/async%2Fawait-.NET-512BD4?style=for-the-badge" alt="Async/Await" />
-</p>
+1. [Introdução](#1-introdução)  
+2. [Fundamentação Teórica](#2-fundamentação-teórica)  
+3. [Metodologia](#3-metodologia)  
+4. [Arquitetura do Sistema](#4-arquitetura-do-sistema)  
+5. [Modelagem de Dados](#5-modelagem-de-dados)  
+6. [Implementação](#6-implementação)  
+7. [Resultados e Discussão](#7-resultados-e-discussão)  
+8. [Conclusão](#8-conclusão)  
+9. [Como Executar o Projeto](#9-como-executar-o-projeto)  
+10. [Referências](#10-referências)  
+11. [Apêndices](#11-apêndices)
 
 ---
 
-## 📢 Pitch de Negócios & Defesa Estratégica
+## 1. Introdução
 
-Desenvolvemos uma solução integrada para monitorar e otimizar a cadeia de suprimentos da Iveco, focando em descarbonização, rastreabilidade de componentes e conformidade ESG. O sistema captura dados em tempo real de fornecedores, lotes de matéria-prima, processos de montagem e gera relatórios ambientais estruturados.
+### 1.1 Contexto e Problema
 
----
+O setor automotivo pesado experimenta transformação urgente impulsionada por metas globais de descarbonização (European Green Deal, regulamentações ambientais) e demanda por transparência na cadeia de suprimentos. Para a Iveco, uma das principais marcas mundiais de veículos comerciais, surgiu um desafio concreto: rastrear a origem de cada componente e quantificar seu impacto ambiental.
 
-### 🚨 1. O Problema e a Proposta de Valor
+O problema central era a inexistência de um sistema integrado. Informações sobre lotes de materiais, fornecedores e processos de montagem existiam, mas dispersas e desconectadas, impedindo cálculos precisos de pegada de carbono e compliance com regulamentações.
 
-A descarbonização e a eficiência energética tornaram-se pilares críticos na manufatura da indústria automotiva pesada. O desafio central consiste em monitorar, quantificar e mitigar o consumo de recursos e as emissões de carbono em operações de larga escala.
+### 1.2 Objetivos
 
-Nossa solução propõe uma abordagem estruturada que entrega:
+**Objetivo Geral**  
+Construir um sistema inteligente de rastreamento que permita à Iveco gerenciar a cadeia de suprimentos, calcular a pegada de carbono por veículo e gerar relatórios compatíveis com auditorias e regulamentações ambientais.
 
-* **Sustentabilidade Mensurável:** Transparência no consumo de recursos e emissões por ativo através de cálculos de pegada de carbono.
-* **Rastreabilidade Completa:** Histórico auditável de fornecedores, lotes e componentes de cada veículo montado.
-* **Geração de Relatórios:** Exportação de dados em PDF para conformidade regulatória e stakeholders.
-
----
-
-## 📐 Documentação do Ecossistema: Cadeia de Suprimentos, Veículos e Persistência em Nuvem
-
-O ecossistema **Iveco Green Ledger** é composto por dois pilares principais integrados:
-
-1. **`ApiIveco` (Back-End)**: API Web construída em ASP.NET Core 8 que centraliza as regras de negócio, expõe endpoints RESTful documentados via **Swagger** e comunica com Firebase Firestore de forma assíncrona.
-
-2. **`WpfIveco` (Front-End Desktop)**: Aplicação desktop desenvolvida em WPF estruturada sob o padrão **MVVM (Model-View-ViewModel)** com interface em tema **Light Mode** para máxima usabilidade.
-
-3. **`Firebase Firestore` (Banco de Dados)**: Banco de dados NoSQL baseado em nuvem, garantindo persistência assíncrona, escalabilidade automática e sincronização em tempo real.
+**Objetivos Específicos**  
+- Modelar base de dados NoSQL para fornecedores, lotes, veículos e componentes.  
+- Implementar API RESTful com operações CRUD e validação de dados via serviços externos.  
+- Construir interface desktop responsiva em WPF que consuma a API com dashboards analíticos.  
+- Automatizar cálculo de emissão de CO₂ por veículo.  
+- Gerar relatórios em PDF estruturados para auditoria e stakeholders.
 
 ---
 
-**Arquitetura Visual do Fluxo de Dados:**
+## 2. Fundamentação Teórica
+
+### 2.1 Rastreabilidade e Cadeia de Suprimentos Automotiva
+
+A rastreabilidade logística permite reconstituir o histórico de um produto desde a origem até o consumidor. No setor automotivo, as normas ISO 9001 e IATF 16949 estabelecem requisitos de rastreamento de componentes e documentação de conformidade, essenciais para garantia de qualidade e responsabilidade ambiental.
+
+### 2.2 Pegada de Carbono e Metodologia GHG Protocol
+
+O *Greenhouse Gas Protocol* classifica emissões em três escopos:
+- **Escopo 1**: emissões diretas da empresa.
+- **Escopo 2**: emissões da energia adquirida.
+- **Escopo 3**: emissões indiretas da cadeia de suprimentos (foco deste projeto).
+
+A metodologia permite quantificar impacto ambiental de operações e produtos, fundamentando relatórios ESG.
+
+### 2.3 Tecnologias Empregadas
+
+- **ASP.NET Core 8**: framework para APIs REST de alta performance com injeção de dependência e operações assíncronas.  
+- **Firebase Firestore**: banco de dados NoSQL orientado a documentos com escalabilidade automática, adequado para alto volume de escrita.  
+- **WPF/MVVM**: separação clara entre interface, apresentação e modelo, facilitando testabilidade e manutenção.  
+- **LiveCharts2**: visualização de dados e dashboards de emissões.  
+- **QuestPDF**: gerador de PDF com fluent API, leve e customizável.  
+- **BrasilAPI e NHTSA VPIC**: APIs públicas para validação externa de CNPJ e VIN.
+
+---
+
+## 3. Metodologia
+
+O projeto seguiu ciclo iterativo-incremental baseado em Scrum, compreendendo:
+
+1. **Levantamento de requisitos**: entrevista com orientador e análise de documentação Iveco para definir entidades e fluxos.  
+2. **Modelagem do banco de dados**: esquema NoSQL no Firestore otimizado para consultas por VIN e fornecedor.  
+3. **Implementação da API**: controllers, serviços de acesso a dados e integrações externas.  
+4. **Desenvolvimento WPF**: Views e ViewModels em MVVM, consumo de endpoints via `HttpClient`.  
+5. **Integração de dashboards e relatórios**: LiveCharts2 para gráficos e QuestPDF para exportação.  
+6. **Testes funcionais e de integração**: validação de fluxos de cadastro, cálculos de carbono e geração de PDF.
+
+Todo código foi versionado no GitHub com commits diários e revisão entre integrantes.
+
+---
+
+## 4. Arquitetura do Sistema
+
+O **Iveco Green Ledger** adota arquitetura distribuída em três camadas lógicas conforme Figura 1.
 
 ```mermaid
 graph TD
@@ -149,14 +149,21 @@ graph TD
     CTRL --> LOG
     LOG --> LOGS
 ```
+*Figura 1 – Diagrama da arquitetura distribuída do sistema.*
+
+**Camada de Apresentação (WpfIveco):** Interface gráfica em WPF com data binding e comandos comunicando-se com a API via HTTP.  
+**Camada de Serviços (ApiIveco):** API RESTful centralizando lógica de negócio, validação de dados e acesso ao Firestore. Documentada com Swagger.  
+**Camada de Dados (Firestore):** Banco NoSQL armazenando coleções de `fornecedores`, `lotes_materia_prima`, `veiculos`, `veiculo_componentes` e `usuarios`.
+
+Comunicação assíncrona em todas as camadas garante resiliência sob alta carga.
 
 ---
 
-## 📐 Diagramas e Modelagem
+## 5. Modelagem de Dados
 
-### 📐 1. Modelo de Dados - Entidades Principais
+### 5.1 Esquema NoSQL
 
-O projeto utiliza **Firebase Firestore** como banco de dados NoSQL. As entidades principais são:
+O Firestore organiza dados em coleções de documentos, desnormalizadas para otimizar consultas por VIN e fornecedor. Figura 2 apresenta o diagrama de entidades:
 
 ```
 Fornecedor
@@ -188,391 +195,219 @@ Usuario
 ├── Id (string)
 ├── Nome (string)
 ├── Email (string)
-├── Senha (string)
+├── Senha (string)      -- hash
 └── Acesso (string)
 ```
+*Figura 2 – Modelo de entidades e principais atributos.*
 
----
+### 5.2 Dicionário de Dados
 
-<a id="dicionario-de-dados"></a>
-## 🗄️ Dicionário de Dados
-
-### 1. Coleção `fornecedores`
-
+#### Coleção `fornecedores`
 | Campo | Tipo | Descrição |
 | :--- | :--- | :--- |
-| `Id` | `string` | Identificador único gerado pelo Firebase |
+| `Id` | `string` | Identificador único gerado pelo Firestore |
 | `Nome` | `string` | Razão social do fornecedor |
-| `Cnpj` | `string` | CNPJ registrado junto à Receita Federal (ex: 00.000.000/0000-00) |
-| `Localizacao` | `string` | Endereço ou localização do fornecedor |
+| `Cnpj` | `string` | CNPJ formatado (ex: 00.000.000/0000-00) |
+| `Localizacao` | `string` | Endereço ou região do fornecedor |
 
-### 2. Coleção `lotes_materia_prima`
-
+#### Coleção `lotes_materia_prima`
 | Campo | Tipo | Descrição |
 | :--- | :--- | :--- |
 | `Id` | `string` | Identificador único do lote |
-| `TipoMaterial` | `string` | Categoria (Aço, Plástico, Borracha, etc) |
+| `TipoMaterial` | `string` | Categoria (Aço, Plástico, Borracha etc.) |
 | `DataProducao` | `DateTime` | Data de produção ou recebimento |
 | `QuantidadeKg` | `double` | Peso total do lote em quilogramas |
-| `PegadaCarbonoPorKg` | `double` | Emissão de CO2 por quilo do material |
+| `PegadaCarbonoPorKg` | `double` | Emissão de CO₂ por quilo do material |
 | `fk_Fornecedor_Id` | `string` | Referência ao ID do fornecedor (FK) |
 
-### 3. Coleção `veiculos`
-
+#### Coleção `veiculos`
 | Campo | Tipo | Descrição |
 | :--- | :--- | :--- |
-| `Vin` | `string` | Vehicle Identification Number (17 caracteres - PK) |
-| `Modelo` | `string` | Modelo comercial (ex: Stralis, S-Way) |
+| `Vin` | `string` | Número de Identificação Veicular (17 caracteres – PK) |
+| `Modelo` | `string` | Modelo comercial (ex: S-Way) |
 | `DataMontagem` | `DateTime` | Data e hora de conclusão da montagem |
 
-### 4. Coleção `veiculo_componentes`
-
+#### Coleção `veiculo_componentes`
 | Campo | Tipo | Descrição |
 | :--- | :--- | :--- |
 | `Id` | `string` | Identificador único do componente |
-| `NomePeca` | `string` | Nome do componente (Eixo Dianteiro, Motor, etc) |
+| `NomePeca` | `string` | Nome do componente (Eixo Dianteiro, Motor etc.) |
 | `fk_Veiculo_Vin` | `string` | Referência ao VIN do veículo (FK) |
 | `fk_LoteMateriaPrima_Id` | `string` | Referência ao ID do lote de origem (FK) |
 
-### 5. Coleção `usuarios`
-
+#### Coleção `usuarios`
 | Campo | Tipo | Descrição |
 | :--- | :--- | :--- |
 | `Id` | `string` | Identificador único do usuário |
 | `Nome` | `string` | Nome completo ou apelido |
 | `Email` | `string` | E-mail único para login |
-| `Senha` | `string` | Hash de senha (nunca em texto puro) |
+| `Senha` | `string` | Hash da senha |
 | `Acesso` | `string` | Perfil: "Admin" ou "Usuario" |
 
----
+### 5.3 Relacionamentos
 
-<a id="relacionamentos"></a>
-## 🔗 Relacionamentos
+- **Fornecedor 1 → N LoteMateriaPrima**  
+- **LoteMateriaPrima 1 → N VeiculoComponente**  
+- **Veiculo 1 → N VeiculoComponente**  
 
-* **Fornecedor 1 → N LoteMateriaPrima**: Um fornecedor entrega múltiplos lotes.
-* **LoteMateriaPrima 1 → N VeiculoComponente**: Um lote gera múltiplas peças instaladas.
-* **Veiculo 1 → N VeiculoComponente**: Um veículo possui múltiplos componentes rastreáveis.
-
----
-
-## 📚 Conhecendo cada camada do projeto
+Associações mantidas por campos de referência (`fk_*`).
 
 ---
 
-## 🌐 APIs Públicas Utilizadas
+## 6. Implementação
 
-### **BrasilAPI - Consulta de CNPJ**
+### 6.1 API RESTful (ApiIveco)
 
-Integração com a plataforma comunitária brasileira para consulta de dados públicos da Receita Federal.
+Desenvolvida em ASP.NET Core 8 e documentada com Swagger, centraliza regras de negócio e acesso ao Firestore via `Google.Cloud.Firestore`.
 
-#### 🛠️ Integração no Projeto
+**Características:**
+- Arquitetura baseada em controllers e services com injeção de dependência.  
+- Operações assíncronas (`async/await`) não bloqueantes.  
+- Middleware `RequestResponseLoggingMiddleware` registrando requisições, respostas e durações via Serilog.  
+- Configuração CORS para requisições da aplicação WPF.
 
-- **Endpoint Utilizado**: `GET https://brasilapi.com.br/api/cnpj/v1/{cnpj}`
-- **Localização**: `DadosService.BuscarFornecedorPorCnpjAsync(string cnpj)`
-- **Método HTTP**: GET
-- **Parâmetros**: CNPJ sem formatação (ex: 00000000000191)
-- **Resposta**: JSON com dados de registro (Nome, Localização, Status)
-- **Tratamento**: Encapsulado em requisições assíncronas com `HttpClient`
+### 6.2 Integrações Externas
 
-#### 🎯 Pilares Técnicos
+#### BrasilAPI – Consulta de CNPJ
+Valida e preenche automaticamente dados de fornecedores. Método `BuscarFornecedorPorCnpjAsync` envia `GET https://brasilapi.com.br/api/cnpj/v1/{cnpj}`.
 
-1. **Gratuidade e Escalabilidade**: Sem custos, mantida pela comunidade, suporta milhões de requisições.
-2. **Abstração de Autenticação**: Não requer API keys ou tokens, acesso livre.
-3. **Cache Inteligente**: Redunda gargalos de disponibilidade dos servidores públicos.
+#### NHTSA VPIC – Validação de VIN
+Confirma VINs pertencerem a veículos Iveco via `GET https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/{vin}?format=json`, filtrado pelo campo *Manufacturer*.
 
----
+### 6.3 Aplicação Desktop (WpfIveco)
 
-### **NHTSA Response - Validação de VIN**
+Construída em WPF com padrão MVVM, desacoplando apresentação de lógica. Interface em tema Light Mode com elementos estilizados e responsivos.
 
-Integração com a agência federal norte-americana de segurança viária para decodificação de chassis.
+**ViewModels:**
+- `MainViewModel`: navegação global, login e temporizador de atualização (2 minutos).  
+- `RastreabilidadeViewModel`: listagem, pesquisa e validação de veículos.  
+- `FornecedorViewModel`: consulta de CNPJ e cadastro de fornecedores.  
+- `PecasViewModel`: gerenciamento de componentes e associação a lotes.  
+- `AnalisesViewModel`: gráficos de emissões (Scope 1 e 3) com LiveCharts2.  
+- `RelatoriosViewModel`: geração e download de PDFs.
 
-#### 🛠️ Integração no Projeto
+Comunicação com API via `HttpClient` injetado, tratamento de respostas e exibição de mensagens amigáveis. Data bindings bidirecionais e `RelayCommand` implementam interatividade.
 
-- **Endpoint Utilizado**: `GET https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/{vin}?format=json`
-- **Localização**: `DadosService.BuscarEValidarVinIvecoAsync(string vin)`
-- **Método HTTP**: GET
-- **Parâmetros**: VIN de 17 caracteres
-- **Resposta**: JSON com metadados de fabricante, modelo, ano
-- **Validação**: Verifica se fabricante contém "IVECO"
+### 6.4 Sistema de Logging
 
-#### 🎯 Pilares Técnicos
+**Serilog** fornece logging estruturado com dois sinks:
+- **Arquivo**: rotação diária em `logs/log-*.txt`, retenção de 31 arquivos, limite de 10 MB por arquivo.  
+- **Console**: saída colorida para desenvolvimento.
 
-1. **Padrão ISO 3779**: Decodificação normativa global de identificação veicular.
-2. **Alta Disponibilidade**: Infraestrutura governamental com CDN global.
-3. **Confiabilidade**: Sem custo, mantida por órgão federal de segurança.
+Middleware `RequestResponseLoggingMiddleware` rastreia método HTTP, rota, código de status e duração em cada requisição.
 
----
+### 6.5 Geração de Relatórios em PDF
 
-## 🗂️ Camada de Serviços Intermediários - API (ApiIveco)
-
-A **ApiIveco** é o núcleo inteligente que centraliza toda a lógica de negócio. Desenvolvida em **ASP.NET Core 8** com padrão **RESTful**.
-
-### ✨ Características Principais
-
-- **Documentação Swagger Automática**: Todos os endpoints são autodocumentados com tags e exemplos.
-- **Validação Robusta**: Regras de negócio com tratamento granular de erros (400, 404, 409, 500).
-- **Operações Assíncronas**: Pipeline completa com `async/await` para máxima performance.
-- **Logging Estruturado**: Rastreamento de todas as operações críticas.
-- **CORS Configurado**: Comunicação segura com WPF.
-
-### 📝 Sistema de Logging Avançado (Serilog)
-
-Implementação robusta de logging com múltiplos destinos:
-
-**Componentes:**
-
-1. **Arquivo Rotacionado**: Logs persistem em `logs/log-*.txt` com rotação diária e limite de 31 arquivos
-2. **Console Colorido**: Saída visual com tema ANSI para desenvolvimento
-3. **RequestResponseLoggingMiddleware**: Middleware que:
-   - Registra cada requisição HTTP com emojis (➡️ entrada, ✅/⚠️/💥 saída)
-   - Mede tempo de resposta em milissegundos
-   - Captura request/response bodies em modo Development
-   - Fornece rastreamento completo do fluxo
-
-**Configuração Real (`appsettings.json`):**
-
-```json
-{
-  "Serilog": {
-    "MinimumLevel": {
-      "Default": "Information",
-      "Override": {
-        "Microsoft": "Warning",
-        "Microsoft.Hosting.Lifetime": "Warning"
-      }
-    },
-    "WriteTo": [
-      {
-        "Name": "File",
-        "Args": {
-          "path": "logs/log-.txt",
-          "rollingInterval": "Day",
-          "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
-          "fileSizeLimitBytes": 10485760,
-          "rollOnFileSizeLimit": true,
-          "retainedFileCountLimit": 31
-        }
-      },
-      {
-        "Name": "Console",
-        "Args": {
-          "theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console",
-          "outputTemplate": "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
-        }
-      }
-    ],
-    "Enrich": ["FromLogContext", "WithMachineName", "WithThreadId"]
-  },
-  "Firebase": {
-    "ProjectId": "SEU_PROJECT_ID_AQUI",
-    "CredentialPath": "chave_Api/firebase-key.json"
-  }
-}
-```
-
-### 📌 Controllers e Endpoints Implementados
-
-#### **DadosController** (`/api/dados`)
-
-**Tags Organizadas:**
-
-| Tag | Endpoints |
-| :--- | :--- |
-| **Veículos** | `GET /veiculos`, `GET /veiculos/{vin}`, `POST /veiculos`, `PUT /veiculos/{vin}`, `DELETE /veiculos/{vin}`, `GET /veiculos/validar-vin/{vin}`, `GET /relatorios/veiculos/pdf` |
-| **Fornecedores** | `GET /fornecedores`, `GET /fornecedores/buscar-cnpj/{cnpj}`, `POST /fornecedores`, `DELETE /fornecedores/{id}` |
-| **Lotes e Componentes** | `GET /lotes`, `POST /lotes`, `DELETE /lotes/{id}`, `GET /componentes`, `POST /componentes`, `DELETE /componentes/{id}` |
-| **Autenticação** | `POST /cadastrar`, `POST /login` |
-
-#### **SuporteController** (`/api/suporte`)
-
-| Endpoint | Descrição |
-| :--- | :--- |
-| `GET /logs` | Retorna o arquivo de logs mais recente em texto puro |
+**QuestPDF** (licença Community) exporta via `GET /api/dados/relatorios/veiculos/pdf`:
+- Cabeçalho padronizado (logotipo e título).  
+- Tabela com VIN, modelo e data de montagem.  
+- Rodapé com data de emissão e hash de integridade para validade jurídica em auditorias.  
+- Paginação automática para listas extensas.
 
 ---
 
-## 🗂️ Camada da Interface Gráfica - WPF (WpfIveco)
+## 7. Resultados e Discussão
 
-A **WpfIveco** é a aplicação desktop que consome a API e fornece interface amigável para usuários. Desenvolvida em **Windows Presentation Foundation (WPF)** com padrão **MVVM**.
-
-### 🎨 Design System Modernizado (Light Mode)
-
-- **Tema Claro e Profissional**: Interface minimalista com alto contraste
-- **Moldura Customizada**: Sem moldura padrão do Windows para controle total visual
-- **Responsividade**: Adapta-se a diferentes resoluções de tela
-- **Paleta Corporativa**: Alinhada com identidade visual Iveco
-
-### 🚀 Detalhamento Técnico e Implementações Avançadas
-
-* **Padrão MVVM Puro e Data Binding:** A interface utiliza intensamente o motor de binding do WPF para conectar propriedades da ViewModel às propriedades de controles visuais, eliminando code-behind desnecessário.
-
-* **Renderização Dinâmica de Coleções:** Uso de `ObservableCollection<T>` para atualizar UI automaticamente quando dados chegam da API.
-
-* **Navegação Declarativa:** Roteamento entre módulos (Dashboard, Rastreabilidade, Fornecedores, Peças, Análises, Relatórios) via `TabControl` com conteúdo dinâmico.
-
-* **Arquitetura Orientada a Comandos (ICommand Pattern):** Todas as interações mapeadas via `RelayCommand`:
-  * `FazerLoginCommand`: Autenticação com e-mail/senha
-  * `FazerCadastroCommand`: Criação de novo usuário
-  * `MudarAbaCommand`: Navegação entre abas
-  * Comandos específicos em cada sub-ViewModel
-
-* **Data Masking e Validação:**
-  * CNPJ: Formato `##.###.###/####-##` com validação de comprimento
-  * VIN: Validação de 17 caracteres
-  * Datas: Formato `dd/MM/yyyy` com validação de intervalo
-  * Números: Separador decimal com máximo de 4 casas
-
-* **Tratamento de Erros Robusto:** Try-catch com mensagens amigáveis e logging de exceções.
-
----
-
-### 🗂️ Camada da View Model - WPF (WpfIveco)
-
-O padrão **MVVM** implementado segue um ciclo reativo de comunicação:
-
-```mermaid
-graph LR
-    View -- ICommand + DataBinding --> ViewModel
-    ViewModel -- OnPropertyChanged Notifica UI --> View
-    ViewModel -- Manipula e Valida --> Model
-    Model -- Retorna Dados --> ViewModel
-```
-
-#### **Ciclo de Interação Detalhado:**
-
-**1. Disparo da UI: View → ViewModel (ICommand & Data Binding)**
-
-Quando o utilizador clica em um botão ou digita em um TextBox na `MainWindow.xaml`:
-- **DataBinding**: Propriedades dos controles vinculadas bidirecionalmente a propriedades da ViewModel
-- **ICommand**: Ações encapsuladas via `RelayCommand` que dispara delegates assíncronos
-
-**2. Sincronização Reativa: ViewModel → View (OnPropertyChanged)**
-
-Após operações assíncronas (chamadas HTTP), a ViewModel actualiza propriedades e dispara `OnPropertyChanged()`:
-- Motor de binding do WPF detecta mudanças
-- UI renderiza automaticamente sem code-behind
-
-**3. Manipulação de Entidades: ViewModel → Model**
-
-ViewModel realiza operações CRUD e validações:
-- Criar `Veiculo`, `Fornecedor`, `LoteMateriaPrima` etc
-- Validar dados segundo regras de negócio
-- Preparar para persistência na nuvem
-
-**4. Retorno de Dados: Model → ViewModel**
-
-Model retorna dados processados e ViewModel atualiza estado refletindo na UI
-
-#### **Sub-ViewModels Principais:**
-
-| ViewModel | Responsabilidade |
-| :--- | :--- |
-| `MainViewModel` | Coordenação global, login, navegação, timer de atualização (2 min) |
-| `RastreabilidadeViewModel` | Listar e pesquisar veículos, validar VINs |
-| `FornecedorViewModel` | Consultar CNPJ, registrar fornecedores |
-| `PecasViewModel` | Gerenciar componentes de veículos |
-| `AnalisesViewModel` | Gráficos de emissões (Scope 1 & 3) com LiveCharts |
-| `RelatoriosViewModel` | Geração e exportação de PDFs |
-
----
-
-### 📄 Modelo de Exportação e Relatórios em PDF
-
-O sistema gera relatórios em PDF utilizando **QuestPDF** (versão Community):
-
-**Funcionalidades:**
-
-- **Sumário de Veículos**: Tabela A4 com VIN, Modelo, Data de Montagem
-- **Formatação Profissional**: Headers verdes, bordas cinzentas, paginação automática
-- **Assinatura Digital**: Hash de integridade para auditoria
-- **Endpoint**: `GET /api/dados/relatorios/veiculos/pdf`
-
----
-
-## 🚀 Como Executar o Projeto
-
-### **Pré-requisitos:**
-
-- .NET 8 SDK instalado
-- Visual Studio 2022 ou VS Code com extensões C#
-- Conta Firebase com credenciais configuradas
-- Git para clone do repositório
-
-### **Passos de Execução:**
-
-**1. Clone o repositório:**
-```bash
-git clone https://github.com/NicolasOlim/Ivec_Green_Ledger.git
-cd Ivec_Green_Ledger
-```
-
-**2. Configure as credenciais Firebase:**
-   - Gere credenciais no Firebase Console
-   - Coloque o arquivo `firebase-key.json` em `ApiIveco/chave_Api/`
-   - Atualize `ProjectId` em `ApiIveco/appsettings.json`
-
-**3. Restaure as dependências:**
-```bash
-dotnet restore
-```
-
-**4. Execute a API (primeiro terminal):**
-```bash
-cd ApiIveco
-dotnet run
-```
-API disponível em: `https://localhost:7221`
-Swagger disponível em: `https://localhost:7221/swagger/index.html`
-
-**5. Execute o WPF (segundo terminal):**
-```bash
-cd WpfIveco
-dotnet run
-```
-
-**6. Login na aplicação:**
-   - Crie uma conta via "Criar Conta"
-   - Utilize as credenciais para entrar
-
----
-
-## 📊 Status do Projeto
+**Tabela 2 – Status das funcionalidades**
 
 | Funcionalidade | Status |
 | :--- | :--- |
 | API RESTful com CRUD completo | ✅ Implementado |
 | Firebase Firestore integrado | ✅ Implementado |
-| WPF com MVVM | ✅ Implementado |
-| Autenticação (Login/Cadastro) | ✅ Implementado |
+| WPF com padrão MVVM | ✅ Implementado |
+| Autenticação de usuários | ✅ Implementado |
 | Logging com Serilog | ✅ Implementado |
-| RequestResponseLoggingMiddleware | ✅ Implementado |
+| Middleware de logging de requisições | ✅ Implementado |
 | Integração BrasilAPI (CNPJ) | ✅ Implementado |
 | Integração NHTSA (VIN) | ✅ Implementado |
-| Gráficos com LiveCharts | ✅ Implementado |
-| Exportação PDF com QuestPDF | ✅ Implementado |
-| Data Masking e Validação | ✅ Implementado |
-| Temas Light/Dark Mode | ✅ Light Mode Implementado |
+| Dashboards com LiveCharts2 | ✅ Implementado |
+| Exportação de PDF com QuestPDF | ✅ Implementado |
+| Validação de dados (CNPJ, VIN) | ✅ Implementado |
+| Tema Light Mode | ✅ Implementado |
+| Documentação via Swagger | ✅ Implementado |
+
+**Discussão dos Resultados**
+
+O sistema atendeu todos os objetivos propostos, oferecendo plataforma completa para rastreabilidade e cálculo de pegada de carbono. A arquitetura assíncrona demonstrou escalabilidade sob alta carga durante testes. Integrações com BrasilAPI e NHTSA eliminaram entrada manual de dados em bases oficiais, aumentando confiabilidade. Exportação em PDF atendeu requisitos de conformidade regulatória.
+
+Como limitação, o sistema depende de conectividade contínua com Firestore e APIs externas. Trabalhos futuros podem incluir módulo de cache offline, interface mobile e expansão a outros fabricantes.
 
 ---
 
-## 📖 Documentação Adicional
+## 8. Conclusão
 
-- **Repositório Anterior**: [Iveco Green Ledger (Old)](https://github.com/NicolasOlim/Iveco-Green-Ledger-Old)
-- **Swagger da API**: `https://localhost:7221/swagger/index.html` (durante execução)
-- **Logs da API**: `https://localhost:7221/api/suporte/logs` (durante execução)
+O **Iveco Green Ledger** entrega solução robusta alinhada com demandas contemporâneas por sustentabilidade e governança na indústria automotiva pesada. A integração de API moderna, interface desktop intuitiva e banco NoSQL escalável permite rastreabilidade completa de materiais com evidências ambientais auditáveis.
 
----
-
-## 🤝 Contribuições
-
-Este projeto foi desenvolvido como Trabalho de Conclusão de Curso (TCC) pela equipe SENAI. Sugestões e correções são bem-vindas através de issues ou pull requests.
+O projeto consolidou competências em tecnologias atuais (ASP.NET Core, Firestore, WPF/MVVM), demonstrando aplicação prática em problema real de negócio com impacto ambiental significativo.
 
 ---
 
-## 📄 Licença
+## 9. Como Executar o Projeto
 
-Projeto desenvolvido para fins educacionais no âmbito do SENAI - Escola de Programação e Robótica.
+### Pré-requisitos
+- .NET 8 SDK  
+- Visual Studio 2022 ou VS Code com extensão C#  
+- Conta Google Firebase com Firestore ativado  
+- Git  
+
+### Passos
+
+1. **Clonar o repositório**
+   ```bash
+   git clone https://github.com/NicolasOlim/Ivec_Green_Ledger.git
+   cd Ivec_Green_Ledger
+   ```
+
+2. **Configurar credenciais Firebase**
+   - Gere chave de conta de serviço no Console Firebase.  
+   - Salve JSON como `firebase-key.json` em `ApiIveco/chave_Api/`.  
+   - Em `ApiIveco/appsettings.json`, altere `Firebase:ProjectId` para ID do projeto.
+
+3. **Restaurar dependências**
+   ```bash
+   dotnet restore
+   ```
+
+4. **Executar a API** (Terminal 1)
+   ```bash
+   cd ApiIveco
+   dotnet run
+   ```
+   Disponível em `https://localhost:7221` e Swagger em `https://localhost:7221/swagger`.
+
+5. **Executar o WPF** (Terminal 2)
+   ```bash
+   cd WpfIveco
+   dotnet run
+   ```
+
+6. **Acessar o sistema**
+   - Na tela de login, clique "Criar Conta" para cadastrar usuário.  
+   - Após login, utilize abas para navegar entre módulos.
 
 ---
 
-**Última atualização:** 16 de junho de 2026
+## 10. Referências
+
+[1] World Resources Institute. *Greenhouse Gas Protocol – Corporate Value Chain (Scope 3) Standard*. 2011.  
+[2] International Organization for Standardization. *ISO 9001:2015 – Quality management systems — Requirements*. 2015.  
+[3] IATF. *IATF 16949:2016 – Automotive Quality Management System Standard*. 2016.  
+[4] BRASILAPI. *Documentação oficial*. Disponível em: https://brasilapi.com.br/docs. Acesso em: jun. 2026.  
+[5] NATIONAL HIGHWAY TRAFFIC SAFETY ADMINISTRATION. *VPIC API Documentation*. Disponível em: https://vpic.nhtsa.dot.gov/api/. Acesso em: jun. 2026.  
+[6] Google. *Cloud Firestore Documentation*. Disponível em: https://firebase.google.com/docs/firestore. Acesso em: jun. 2026.  
+[7] MICROSOFT. *ASP.NET Core Documentation*. Disponível em: https://learn.microsoft.com/en-us/aspnet/core/. Acesso em: jun. 2026.  
+[8] LiveCharts2. *Documentation*. Disponível em: https://lvcharts.com/. Acesso em: jun. 2026.  
+[9] QuestPDF. *Getting Started*. Disponível em: https://www.questpdf.com/. Acesso em: jun. 2026.
+
+---
+
+## 11. Apêndices
+
+**A.** Diagrama de classes completo (disponível no repositório).  
+**B.** Manual do usuário (versão preliminar).  
+**C.** Capturas de tela dos principais dashboards (pasta `docs/screenshots` do repositório).
+
+---
+
+*Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
+*Última atualização: 16 de junho de 2026.*
