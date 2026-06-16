@@ -1,4 +1,4 @@
-# 📦🍃 Sistema de Rastreamento Inteligente – Iveco Green Ledger  
+# 📦🍃 Iveco Green Ledger -  Sistema de Rastreamento Inteligente  
 **Trabalho de Conclusão de Curso**  
 *Escola de Programação e Robótica – SENAI*  
 *Orientação: Prof. Fred Aguiar*
@@ -26,11 +26,6 @@ A crescente pressão regulatória e de mercado por transparência ambiental imp�
 4. [Arquitetura do Sistema](#4-arquitetura-do-sistema)  
 5. [Modelagem de Dados](#5-modelagem-de-dados)  
 6. [Implementação](#6-implementação)  
-   - 6.1 API RESTful (ApiIveco)  
-   - 6.2 Integrações Externas  
-   - 6.3 Aplicação Desktop (WpfIveco)  
-   - 6.4 Sistema de Logging  
-   - 6.5 Geração de Relatórios em PDF  
 7. [Resultados e Discussão](#7-resultados-e-discussão)  
 8. [Conclusão](#8-conclusão)  
 9. [Como Executar o Projeto](#9-como-executar-o-projeto)  
