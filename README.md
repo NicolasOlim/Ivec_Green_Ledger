@@ -20,11 +20,10 @@
 
 <p align="center">
 <strong>Colaboradores:</strong><br>
-<a href="https://github.com/NicolasOlim">🧑‍💻 Nicolas de Oliveira Lima</a> |
+<a href="https://github.com/NicolasOlim">🧑‍💻 Nicolas  Oliveira Lima</a> |
 <a href="https://github.com/aliceandradee">🧑‍💻 Alice Andrade</a> |
 <a href="https://github.com/erick190813">🧑‍💻 Erick Silva</a> |
-<a href="https://github.com/vnxtry">🧑‍💻 Vinicius Trindade</a> |
-<a href="https://github.com/vncsqxy">🧑‍💻 Vinícius Oliveira</a>
+<a href="https://github.com/vnxtry">🧑‍💻 Vinicius Augusto </a> |
 </p>
 
 ---
