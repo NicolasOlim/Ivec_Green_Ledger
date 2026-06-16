@@ -12,9 +12,11 @@
 
 ## 📌 Resumo
 
-A crescente pressão regulatória e de mercado por transparência ambiental impõe à indústria automotiva pesada o desafio de mensurar, rastrear e mitigar as emissões de carbono em toda a cadeia de suprimentos. Este trabalho apresenta o **Iveco Green Ledger**, uma solução tecnológica integrada composta por uma API RESTful em ASP.NET Core 8 e uma aplicação desktop em WPF (MVVM), apoiadas pelo banco de dados NoSQL Firebase Firestore. O sistema viabiliza o cadastro de fornecedores e lotes de matéria-prima, o rastreamento de componentes até o veículo montado e o cálculo automatizado da pegada de carbono por ativo. São utilizadas integrações externas para validação de CNPJ (BrasilAPI) e de número de chassi (NHTSA). A interface oferece dashboards analíticos com LiveCharts2 e exportação de relatórios em PDF via QuestPDF. Os resultados demonstram a capacidade da plataforma de prover rastreabilidade completa e relatórios ambientais auditáveis, alinhando-se às diretrizes ESG e fortalecendo a governança logística da Iveco.
-
-**Palavras‑chave:** rastreabilidade, pegada de carbono, ESG, Firebase, WPF, ASP.NET Core, cadeia de suprimentos.
+A indústria automotiva pesada vive hoje um momento de transformação: normas ambientais mais rígidas e a pressão do mercado por transparência obrigam as montadoras a conhecerem profundamente o impacto de cada etapa da sua produção. Mensurar e rastrear as emissões de carbono ao longo de toda a cadeia de suprimentos deixou de ser um diferencial e passou a ser uma exigência.
+É nesse cenário que se insere o Iveco Green Ledger, uma plataforma desenvolvida para dar visibilidade total ao caminho dos materiais do fornecedor ao veículo acabado e calcular, de forma automatizada, a pegada de carbono de cada unidade fabricada.
+A solução combina uma API RESTful em ASP.NET Core 8 e uma aplicação desktop em WPF, estruturada no padrão MVVM, com o banco de dados NoSQL Firebase Firestore. Na prática, o sistema permite cadastrar fornecedores e lotes de matéria‑prima, montar o histórico de componentes de cada veículo e emitir relatórios ambientais confiáveis.
+Para garantir a qualidade dos dados, foram integrados serviços externos de validação de CNPJ (BrasilAPI) e de chassi (NHTSA). A interface oferece dashboards analíticos com LiveCharts2 e exportação de documentos em PDF via QuestPDF.
+Os resultados confirmam que a plataforma entrega rastreabilidade completa e gera evidências ambientais prontas para auditoria, alinhando‑se às diretrizes ESG e fortalecendo a governança logística da Iveco.
 
 ---
 
