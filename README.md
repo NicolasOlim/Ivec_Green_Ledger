@@ -1,7 +1,8 @@
 # 📦🍃 Iveco Green Ledger – Sistema de Rastreamento Inteligente  
 **Trabalho de Conclusão de Curso**  
-*Escola de Programação e Robótica – SENAI*  
-*Orientação: Prof. Fred Aguiar*
+**Unidade SENAI: Nova Lima**
+
+**Instrutor: Frederico Martins Aguiar**
 
 ---
 
