@@ -12,6 +12,12 @@
 	<ItemGroup>
 	  <None Remove="chave_Api.zip" />
 	</ItemGroup>
+	<ItemGroup>
+		<None Update="chave_Api\firebase-key.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
+		</None>
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Google.Cloud.Firestore" Version="4.2.0" />

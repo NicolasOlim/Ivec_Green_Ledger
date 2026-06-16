@@ -14,75 +14,62 @@ namespace WpfIveco.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
-        private readonly HttpClient _httpClient;
+        private HttpClient _httpClient;
         private readonly DispatcherTimer _timer;
 
-        
-        /// <summary>
-        /// SUB-VIEWMODELS — cada aba tem o seu
-        /// </summary>
-        
+        // Sub-ViewModels
         public RastreabilidadeViewModel Rastreabilidade { get; }
         public FornecedorViewModel Fornecedor { get; }
         public PecasViewModel Pecas { get; }
         public AnalisesViewModel Analises { get; }
         public RelatoriosViewModel Relatorios { get; }
 
-        
-        /// <summary>
-        /// VARIÁVEIS - SISTEMA DE LOGIN / SESSÃO
-        /// </summary>
-        
+        // Estado
         private bool _isBusy = false;
         public bool IsBusy { get => _isBusy; set { _isBusy = value; OnPropertyChanged(); } }
         private bool _isLoggedIn = false;
         public bool IsLoggedIn { get => _isLoggedIn; set { _isLoggedIn = value; OnPropertyChanged(); } }
-
         private bool _isAdmin = false;
         public bool IsAdmin { get => _isAdmin; set { _isAdmin = value; OnPropertyChanged(); } }
-
         private bool _modoCadastro = false;
         public bool ModoCadastro { get => _modoCadastro; set { _modoCadastro = value; OnPropertyChanged(); } }
 
+        // Campos de login/cadastro
         private string _loginEmail = "";
         public string LoginEmail { get => _loginEmail; set { _loginEmail = value; OnPropertyChanged(); } }
-
         private string _loginSenha = "";
         public string LoginSenha { get => _loginSenha; set { _loginSenha = value; OnPropertyChanged(); } }
-
         private string _cadastroNome = "";
         public string CadastroNome { get => _cadastroNome; set { _cadastroNome = value; OnPropertyChanged(); } }
-
         private string _cadastroPerfil = "Usuario";
         public string CadastroPerfil { get => _cadastroPerfil; set { _cadastroPerfil = value; OnPropertyChanged(); } }
-
         private string _nomeUsuario = "Visitante";
         public string NomeUsuario { get => _nomeUsuario; set { _nomeUsuario = value; OnPropertyChanged(); } }
-
         private string _perfilUsuario = "Sessão não iniciada";
         public string PerfilUsuario { get => _perfilUsuario; set { _perfilUsuario = value; OnPropertyChanged(); } }
 
-
-
-        
-        /// <summary>
-        /// VARIÁVEIS - NAVEGAÇÃO E SISTEMA
-        /// </summary>
-        
+        // Navegação
         private string _abaAtiva = "Dashboard";
         public string AbaAtiva { get => _abaAtiva; set { _abaAtiva = value; OnPropertyChanged(); } }
 
-        private string _apiUrlConfig = "https://localhost:7221/api";
-        public string ApiUrlConfig { get => _apiUrlConfig; set { _apiUrlConfig = value; OnPropertyChanged(); } }
+        // URL da API (configurável)
+        private string _apiUrlConfig = "https://apiivecogreenledger.runasp.net/"; // URL de produção
+        public string ApiUrlConfig
+        {
+            get => _apiUrlConfig;
+            set
+            {
+                _apiUrlConfig = value;
+                OnPropertyChanged();
+                // Atualiza o HttpClient com a nova base
+                InicializarHttpClient(value);
+            }
+        }
 
         private string _statusSimulador = "Desativado";
         public string StatusSimulador { get => _statusSimulador; set { _statusSimulador = value; OnPropertyChanged(); } }
 
-        
-        /// <summary>
-        /// COMANDOS
-        /// </summary>
-        
+        // Comandos
         public ICommand FazerLoginCommand { get; }
         public ICommand FazerCadastroCommand { get; }
         public ICommand FazerLogoutCommand { get; }
@@ -90,50 +77,49 @@ namespace WpfIveco.ViewModel
         public ICommand MudarAbaCommand { get; }
         public ICommand LigarDesligarSimuladorCommand { get; }
 
-        
-        /// <summary>
-        /// CONSTRUTOR
-        /// </summary>
-        
         public MainViewModel()
         {
-            var handler = new HttpClientHandler
-            {
-                ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
-            };
-            _httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost:7221/") };
+            // Inicializa o HttpClient com a URL configurada
+            InicializarHttpClient(_apiUrlConfig);
 
-            /// Instancia cada sub-ViewModel partilhando o mesmo HttpClient
+            // Sub-ViewModels (compartilham o mesmo HttpClient)
             Rastreabilidade = new RastreabilidadeViewModel(_httpClient);
             Fornecedor = new FornecedorViewModel(_httpClient);
             Pecas = new PecasViewModel(_httpClient);
             Analises = new AnalisesViewModel(_httpClient);
             Relatorios = new RelatoriosViewModel(_httpClient);
 
-            /// Comandos de navegação e sistema
+            // Comandos
             MudarAbaCommand = new RelayCommand(p => AbaAtiva = p as string);
             AlternarModoAuthCommand = new RelayCommand(p => ModoCadastro = !ModoCadastro);
             LigarDesligarSimuladorCommand = new RelayCommand(p =>
                 StatusSimulador = StatusSimulador == "Ativo" ? "Desativado" : "Ativo");
 
-            /// Comandos de autenticação
             FazerLoginCommand = new RelayCommand(async p => await ExecutarLoginAsync());
             FazerCadastroCommand = new RelayCommand(async p => await ExecutarCadastroAsync());
             FazerLogoutCommand = new RelayCommand(p => ExecutarLogout());
 
-            /// Timer de atualização automática a cada 2 minutos
+            // Timer
             _timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(2) };
             _timer.Tick += async (s, e) => await CarregarTudoAsync();
         }
 
-        /// LOGIN
-        
+        private void InicializarHttpClient(string baseUrl)
+        {
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
+            };
+            _httpClient = new HttpClient(handler) { BaseAddress = new Uri(baseUrl) };
+            // Adiciona um User-Agent (opcional, mas bom)
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "IvecoWpfApp/1.0");
+        }
+
         private async Task ExecutarLoginAsync()
         {
             if (string.IsNullOrWhiteSpace(LoginEmail) || string.IsNullOrWhiteSpace(LoginSenha))
             {
-                MessageBox.Show("Preencha o e-mail e a senha.", "Aviso",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Preencha o e-mail e a senha.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -141,13 +127,25 @@ namespace WpfIveco.ViewModel
 
             try
             {
-                IsBusy = true; /// Ativa a animação de carregamento
+                IsBusy = true;
+                Debug.WriteLine($"[LOGIN] Tentando conectar a {_httpClient.BaseAddress}api/dados/login");
 
                 var response = await _httpClient.PostAsJsonAsync("api/dados/login", credenciais);
 
+                // Verifica se a resposta tem conteúdo
+                var contentLength = response.Content.Headers.ContentLength;
+                if (contentLength == 0)
+                {
+                    MessageBox.Show("O servidor respondeu com uma resposta vazia.\nVerifique se a API está funcionando corretamente.",
+                        "Erro de comunicação", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
+                Debug.WriteLine($"[LOGIN] Resposta: {json}");
+
                 if (response.IsSuccessStatusCode)
                 {
-                    var json = await response.Content.ReadAsStringAsync();
                     using var doc = JsonDocument.Parse(json);
                     var userJson = doc.RootElement.GetProperty("usuario");
 
@@ -162,41 +160,46 @@ namespace WpfIveco.ViewModel
                 }
                 else
                 {
-                    var erro = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"[ERRO LOGIN] HTTP {(int)response.StatusCode} -> {erro}");
-
-                    var mensagem = response.StatusCode switch
+                    // Tenta extrair a mensagem de erro do JSON
+                    string mensagemErro = "Erro desconhecido.";
+                    try
                     {
-                        System.Net.HttpStatusCode.Unauthorized => "Credenciais incorretas.\nVerifique o e-mail e a senha.",
-                        System.Net.HttpStatusCode.BadRequest => "Os dados enviados são inválidos.\nVerifique e tente novamente.",
-                        _ => "Não foi possível entrar no sistema.\nTente novamente mais tarde."
-                    };
+                        using var doc = JsonDocument.Parse(json);
+                        if (doc.RootElement.TryGetProperty("mensagem", out var msgElem))
+                            mensagemErro = msgElem.GetString();
+                        else if (doc.RootElement.TryGetProperty("Mensagem", out var msgElem2))
+                            mensagemErro = msgElem2.GetString();
+                    }
+                    catch { }
 
-                    MessageBox.Show(mensagem, "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"Falha no login: {mensagemErro}\n\nCódigo HTTP: {(int)response.StatusCode}",
+                        "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
             catch (HttpRequestException ex)
             {
-                Debug.WriteLine($"[ERRO CONEXÃO LOGIN] {ex.GetType().Name}: {ex.Message}");
-                MessageBox.Show("Não foi possível conectar ao servidor.\nVerifique a sua ligação e tente novamente.", "Erro de Ligação", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Debug.WriteLine($"[ERRO CONEXÃO] {ex.Message}");
+                MessageBox.Show($"Não foi possível conectar ao servidor em {_httpClient.BaseAddress}.\nVerifique a URL e se a API está em execução.\n\nDetalhe: {ex.Message}",
+                    "Erro de Ligação", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (JsonException ex)
+            {
+                Debug.WriteLine($"[ERRO JSON] {ex.Message}");
+                MessageBox.Show("A resposta do servidor não está em um formato JSON válido.\nVerifique a API.",
+                    "Erro de formato", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ERRO INESPERADO LOGIN] {ex.GetType().Name}: {ex.Message}");
-                MessageBox.Show("Ocorreu um erro inesperado.\nTente novamente ou contacte o suporte.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                Debug.WriteLine($"[ERRO INESPERADO] {ex.Message}");
+                MessageBox.Show($"Ocorreu um erro inesperado:\n{ex.Message}",
+                    "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
-                IsBusy = false; // Desativa a animação, independentemente do sucesso ou falha
+                IsBusy = false;
             }
         }
 
-        
-        /// <summary>
-        /// CADASTRO
-        /// </summary>
-        /// <returns></returns>
-        
         private async Task ExecutarCadastroAsync()
         {
             if (string.IsNullOrWhiteSpace(CadastroNome) || string.IsNullOrWhiteSpace(LoginEmail) || string.IsNullOrWhiteSpace(LoginSenha))
@@ -209,8 +212,7 @@ namespace WpfIveco.ViewModel
 
             try
             {
-                IsBusy = true; /// Ativa a animação de carregamento
-
+                IsBusy = true;
                 var response = await _httpClient.PostAsJsonAsync("api/dados/cadastrar", novoUser);
 
                 if (response.IsSuccessStatusCode)
@@ -223,26 +225,20 @@ namespace WpfIveco.ViewModel
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"[ERRO CADASTRO] HTTP {(int)response.StatusCode} -> {erro}");
-                    MessageBox.Show("Não foi possível criar a conta.\nTente novamente ou contacte o suporte.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Não foi possível criar a conta.\nCódigo HTTP: {(int)response.StatusCode}\n{erro}",
+                        "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex)
             {
-                Debug.WriteLine($"[ERRO CONEXÃO CADASTRO] {ex.GetType().Name}: {ex.Message}");
-                MessageBox.Show("Não foi possível conectar ao servidor.\nVerifique a sua ligação e tente novamente.", "Erro de Ligação", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"Erro ao conectar: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
-                IsBusy = false; // Desativa a animação
+                IsBusy = false;
             }
         }
 
-        
-        /// <summary>
-        /// LOGOUT
-        /// </summary>
-        
         private void ExecutarLogout()
         {
             IsLoggedIn = false;
@@ -254,12 +250,6 @@ namespace WpfIveco.ViewModel
             _timer.Stop();
         }
 
-        
-        /// <summary>
-        /// CARREGAMENTO GLOBAL — chama todos os sub-ViewModels
-        /// </summary>
-        /// <returns></returns>
-        
         private async Task CarregarTudoAsync()
         {
             await Rastreabilidade.CarregarVeiculosAsync();

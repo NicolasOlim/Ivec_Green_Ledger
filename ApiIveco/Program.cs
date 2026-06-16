@@ -47,6 +47,14 @@ builder.Services.AddSwaggerGen(options =>
         options.IncludeXmlComments(xmlPath);
 });
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
+
+
 var app = builder.Build();
 
 
@@ -76,8 +84,8 @@ app.UseSwaggerUI();
 // acabando com o Erro 404 ao acessar o link principal.
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
-app.UseMiddleware<RequestResponseLoggingMiddleware>(); // Loga requisições/respostas
-app.UseMiddleware<ExceptionMiddleware>();              // Seu middleware personalizado
+//app.UseMiddleware<RequestResponseLoggingMiddleware>(); // Loga requisições/respostas
+//app.UseMiddleware<ExceptionMiddleware>();              // Seu middleware personalizado
 
 //app.UseHttpsRedirection();
 app.UseAuthorization();
