@@ -1,12 +1,16 @@
 ﻿using Microsoft.Win32;
+using QuestPDF.Fluent;  
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Text.Json; 
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using WpfIveco.ViewModels;
+using WpfIveco.Models;
+using WpfIveco.Relatorios;
 
 namespace WpfIveco.ViewModel
 {
@@ -50,12 +54,12 @@ namespace WpfIveco.ViewModel
             MudarTipoRelatorioCommand = new RelayCommand(p => TipoRelatorio = p as string ?? "Veiculos");
         }
 
-        
+
         /// <summary>
         /// DOWNLOAD DO PDF
         /// </summary>
         /// <returns></returns>
-        
+
         public async Task BaixarRelatorioPdfAsync()
         {
             if (IsGerandoPdf)
@@ -65,20 +69,22 @@ namespace WpfIveco.ViewModel
 
             try
             {
-                /// Monta a URL com base no tipo selecionado
-                var urlPdf = TipoRelatorio switch
-                {
-                    "Veiculos" => "api/dados/relatorios/veiculos/pdf",
-                    _ => "api/dados/relatorios/veiculos/pdf"
-                };
-
-                var response = await _httpClient.GetAsync(urlPdf);
+                // 1. Opcional: Se os dados já estiverem guardados no ViewModel, 
+                // ignore o HttpClient e use as suas listas locais. 
+                // Caso contrário, peça os dados à API em formato JSON:
+                var urlDados = "api/dados/veiculos"; // Endpoint que devolve a lista de veículos
+                var response = await _httpClient.GetAsync(urlDados);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    byte[] fileBytes = await response.Content.ReadAsByteArrayAsync();
+                    // 2. Lê os dados e converte para as suas classes C#
+                    var json = await response.Content.ReadAsStringAsync();
+                    var listaVeiculos = JsonSerializer.Deserialize<List<VeiculoModel>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<VeiculoModel>();
 
-                    ///Abre o diálogo de guardar ficheiro
+                    // (Faça o mesmo para buscar a listaPecas, ou passe uma lista vazia se não precisar)
+                    var listaPecas = new List<PecaModel>();
+
+                    // 3. Abre o diálogo de guardar ficheiro
                     var saveDialog = new SaveFileDialog
                     {
                         Filter = "Ficheiro PDF (*.pdf)|*.pdf",
@@ -88,12 +94,14 @@ namespace WpfIveco.ViewModel
 
                     if (saveDialog.ShowDialog() == true)
                     {
-                        File.WriteAllBytes(saveDialog.FileName, fileBytes);
+                        // 4. GERA O PDF COM A NOVA CLASSE DE DESIGN E GUARDA O FICHEIRO
+                        var relatorio = new RelatorioVeiculosDocument(listaVeiculos, listaPecas);
+                        relatorio.GeneratePdf(saveDialog.FileName);
 
                         MessageBox.Show("Relatório gerado e guardado com sucesso!", "Sucesso",
                             MessageBoxButton.OK, MessageBoxImage.Information);
 
-                        /// Abre o PDF automaticamente no leitor padrão
+                        // Abre o PDF automaticamente no leitor padrão
                         Process.Start(new ProcessStartInfo
                         {
                             FileName = saveDialog.FileName,
@@ -104,8 +112,8 @@ namespace WpfIveco.ViewModel
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"[ERRO GERAR PDF] HTTP {(int)response.StatusCode} -> {erro}");
-                    MessageBox.Show("Não foi possível gerar o relatório.\nTente novamente.",
+                    Debug.WriteLine($"[ERRO OBTER DADOS] HTTP {(int)response.StatusCode} -> {erro}");
+                    MessageBox.Show("Não foi possível obter os dados para o relatório.\nTente novamente.",
                         "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
