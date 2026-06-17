@@ -153,8 +153,107 @@ O trânsito da informação entre as duas camadas de persistência obedece a um 
 
 Essa arquitetura híbrida garante que o Iveco Green Ledger ofereça o melhor de dois mundos: a robustez analítica e a segurança centralizada de um banco de dados em nuvem estruturado para governança ESG, sem sacrificar a resiliência e a continuidade operacional exigidas no chão de fábrica de uma montadora automotiva de grande porte.
 
+---
+## Viabilidade Técnica:
+
+A análise de viabilidade técnica do ecossistema Iveco Green Ledger foi estruturada para comprovar a capacidade de execução, escalabilidade e resiliência do sistema dentro do ambiente industrial dinâmico da montadora. Abaixo estão detalhados os componentes que sustentam a viabilidade tecnológica da solução.
+
+**Introdução**
+
+A validação técnica de um software voltado para a indústria automobilística pesada exige que as escolhas arquiteturais garantam alta disponibilidade, segurança e capacidade de processamento assíncrono. O ambiente fabril é notoriamente hostil para sistemas puramente dependentes da nuvem devido a oscilações de conectividade e à necessidade de respostas em tempo real no chão de fábrica.
+
+A análise a seguir demonstra que o projeto é plenamente viável, pois utiliza uma pilha tecnológica madura, padronizada e baseada em componentes de mercado amplamente suportados pelas comunidades globais de desenvolvimento, garantindo baixo custo de manutenção e alta eficiência operacional.
+
+**Descrição**
+
+O Iveco Green Ledger é um ecossistema distribuído focado na intersecção entre a logística de recebimento de materiais e a governança climática (ESG). A solução consiste em capturar os dados físicos de cubagem e massa dos lotes de matéria-prima no momento do recebimento e, por meio de um motor matemático parametrizado pelo GHG Protocol, calcular a pegada de carbono de Escopo 3 associada a cada componente.
+
+O grande diferencial da solução é vincular esse impacto ecológico de forma indissociável ao número de chassi (VIN) de cada veículo comercial Iveco. Para garantir que o fluxo de produção nunca pare, a solução adota uma arquitetura híbrida de dados: um cliente de pátio que retém as operações localmente em cenários offline e uma API em nuvem que centraliza as validações fiscais/industriais e consolida os dashboards analíticos e relatórios para auditoria.
+
+**Organização Tecnológica:**
+
+A engenharia do sistema foi dividida em camadas lógicas bem definidas, utilizando linguagens e frameworks que conversam nativamente entre si:
+
+- Camada de Apresentação e Operação (Cliente Desktop): Desenvolvida em WPF (Windows Presentation Foundation) com a linguagem C# e .NET 8, utilizando o padrão arquitetural MVVM (Model-View-ViewModel). Essa escolha isola a interface gráfica da lógica de processamento, garantindo uma aplicação responsiva e de fácil manutenção.
+
+- Camada de Persistência Local (Offline-Safe): Utilização do banco de dados embutido SQLite. Por ser serverless e rodar diretamente na memória do processo da aplicação, ele dispensa a instalação de servidores complexos de banco de dados nos terminais físicos do pátio logístico.
+
+- Camada de Serviços e Negócios (Back-End): Uma API RESTful construída com ASP.NET Core 8. O framework fornece injeção de dependência nativa e processamento de requisições de forma puramente assíncrona (async/await), otimizando o consumo de hardware do servidor.
+
+- Camada de Nuvem e Consolidação (Banco de Dados Central): O Firebase Firestore atua como o repositório NoSQL orientado a documentos. Ele foi escolhido por sua escalabilidade horizontal automatizada e pela capacidade de sincronização orientada a eventos em tempo real.
+
+- Componentes Analíticos e de Auditoria: A biblioteca LiveCharts2 foi integrada para a plotagem dinâmica de gráficos vetoriais na interface, enquanto o framework QuestPDF foi selecionada para a renderização sob demanda dos relatórios fiscais assinados.
+
+---
+## Arquitetura de Persistência de Dados:
+
+A Metodologia de Implementação do ecossistema Iveco Green Ledger foi reestruturada para refletir o ciclo de vida iterativo e incremental da solução unificada (Ivec_Green_Ledger.sln), mapeando o avanço do software desde a captura física no pátio logístico até a inteligência analítica na nuvem.
+
+O processo de engenharia dividiu-se nas seguintes etapas fundamentais:
 
 
+**Etapa 1 – Desenvolvimento do Módulo Cliente e Captura Física (WpfIveco)**
+
+A fase inicial concentrou-se na construção da aplicação de chão de fábrica dentro do projeto WpfIveco. A interface com o operador de pátio foi desenvolvida em XAML utilizando o padrão arquitetural MVVM, garantindo a reatividade dos campos de entrada. Nesta etapa, implementou-se a lógica de medição e pesagem dos insumos logísticos, acoplando a biblioteca LiveCharts2 para a plotagem dos dados na View. Para assegurar o funcionamento da linha de montagem em cenários de instabilidade de rede, estruturou-se nesta fase a persistência relacional embutida via SQLite, permitindo que o terminal armazene os dados localmente de forma temporária (offline-safe).
+
+**Etapa 2 – Integração com a Aplicação Back-End (ApiIveco)**
+
+A segunda fase consistiu no desenvolvimento e conectividade com o projeto ApiIveco, uma API RESTful baseada em ASP.NET Core 8. Implementou-se a sincronização assíncrona para que os payloads retidos no SQLite local fossem transmitidos via HTTP POST para o servidor assim que o link de rede fosse restabelecido. Na API, configurou-se o motor matemático do GHG Protocol para calcular a pegada de carbono de Escopo 3 e orquestraram-se as chamadas HTTP externas (BrasilAPI para homologação fiscal e NHTSA para validação de chassis). Após o processamento do back-end, os dados consolidados foram integrados à persistência global do banco de dados NoSQL Firebase Firestore.
+
+**Benefícios Técnicos**
+
+A separação e posterior integração dos projetos dentro da mesma solução trouxe vantagens de engenharia cruciais para o projeto:
+
+- Desacoplamento e Performance: O processamento pesado dos motores algorítmicos e as requisições para as APIs governamentais ficaram isolados na ApiIveco, mantendo o cliente desktop WpfIveco leve e responsivo para o operador de pátio.
+  
+- Tolerância a Falhas Industrial: A arquitetura híbrida (SQLite + Firestore) elimina o ponto único de falha de redes industriais, blindando a Iveco contra a perda de dados climáticos ou paralisações de inventário.
+  
+- Rastreabilidade e Compliance: A integração nativa do Serilog na camada de serviços permitiu auditar a telemetria e latência de ponta a ponta, enquanto o QuestPDF garantiu a geração automatizada de relatórios com assinaturas digitais imutáveis.
+
+---
+## Viabilidade Econômica:
+
+O projeto **Iveco Green Ledger** foi concebido como uma solução tecnológica de alta eficiência e baixo custo de implantação, utilizando componentes de hardware convencionais para pátio logístico e desenvolvimento próprio. Essa abordagem reduz significativamente o investimento inicial quando comparada a sistemas industriais proprietários de telemetria ambiental e rastreabilidade de frotas.
+
+---
+
+### Custos Estimados de Implantação
+
+####  Investimento em Hardware
+| Item | Quantidade | Valor Unitário | Total |
+| :--- | :--- | :--- | :--- |
+| Terminal de Chão de Fábrica (Computador Core i5) | 1 | R$ 1.800,00 | R$ 1.800,00 |
+| Dispositivo de Entrada de Pátio (Coletor USB) | 1 | R$ 150,00 | R$ 150,00 |
+| Balança de Precisão Comercial / Sensor de Cubagem | 1 | R$ 450,00 | R$ 450,00 |
+| **Subtotal Hardware** | — | — | **R$ 2.400,00** |
+
+#### Custo de Desenvolvimento (Mão de Obra)
+| Métrica de Esforço | Detalhamento | Valor |
+| :--- | :--- | :--- |
+| **Horas Totais Dedicadas** | Desenvolvimento dos projetos `ApiIveco` e `WpfIveco` | 60 horas |
+| **Valor Estimado por Hora** | Custo-hora de engenharia de software júnior | R$ 25,00 |
+| **Subtotal Mão de Obra** | **Total Geral Estimado** | **R$ 1.500,00** |
+
+#### Custo Total do Projeto Consolidado
+| Categoria de Despesa | Valor Absoluto (R$) | Representação Percentual (%) |
+| :--- | :--- | :--- |
+| Hardware e Infraestrutura Física | R$ 2.400,00 | 61,54% |
+| Mão de Obra e Engenharia de Software | R$ 1.500,00 | 38,46% |
+| **Total Geral do Investimento** | **R$ 3.900,00** | **100,00%** |
+
+---
+
+### Benefícios Econômicos e Retorno sobre o Investimento (ROI)
+
+#### Matriz de Ganhos Financeiros e Operacionais
+| Benefício Mapeado | Impacto Econômico Direto | Indicador de Sucesso |
+| :--- | :--- | :--- |
+| **Mitigação de Sanções** | Evita multas ambientais e fiscais através da automação de relatórios precisos do Escopo 3 de acordo com o GHG Protocol. | Zero passivos ambientais em auditorias. |
+| **Eliminação de Ociosidade** | O mecanismo *offline-safe* do SQLite impede o travamento do pátio por falta de internet, anulando o altíssimo custo de linha de produção parada. | Disponibilidade contínua de pátio (100% *uptime* local). |
+| **Redução do Tempo Operacional** | Consumo automatizado da BrasilAPI e NHTSA elimina preenchimentos manuais lentos e erros humanos de digitação. | Redução no tempo de triagem por caminhão. |
+| **Otimização de Suprimentos** | Dashboards visuais em tempo real via LiveCharts2 expõem os lotes de matéria-prima mais poluentes, permitindo troca estratégica por fornecedores mais econômicos. | Economia na escolha de insumos ecológicos. |
+
+  
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
 *Última atualização: 16 de junho de 2026.*
