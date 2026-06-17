@@ -253,6 +253,63 @@ O projeto **Iveco Green Ledger** foi concebido como uma solução tecnológica d
 | **Redução do Tempo Operacional** | Consumo automatizado da BrasilAPI e NHTSA elimina preenchimentos manuais lentos e erros humanos de digitação. | Redução no tempo de triagem por caminhão. |
 | **Otimização de Suprimentos** | Dashboards visuais em tempo real via LiveCharts2 expõem os lotes de matéria-prima mais poluentes, permitindo troca estratégica por fornecedores mais econômicos. | Economia na escolha de insumos ecológicos. |
 
+---
+
+# 📖 Regra de Negócio: Validação Restritiva de Chassis (VIN)
+
+## 1. Visão Geral
+No contexto do ecossistema **Iveco Green Ledger**, é estritamente proibido o registo de componentes logísticos ou a geração de métricas ambientais (Escopo 3) para veículos que não pertençam à fabricante **IVECO**. Esta regra garante a integridade dos relatórios ESG e evita a contaminação da base de dados corporativa com veículos de terceiros.
+
+## 2. Atores e Componentes Envolvidos
+* **Ator:** Operador de Pátio (via cliente desktop WPF).
+* **Sistema Interno:** Back-End em ASP.NET Core 8 (`DadosController` e `DadosService`).
+* **Serviço Externo:** API Pública da NHTSA (National Highway Traffic Safety Administration).
+
+## 3. Fluxo de Validação e Critérios de Aceitação
+A validação de um chassi segue um pipeline de verificações síncronas/assíncronas antes da persistência no banco de dados NoSQL (Firebase Firestore):
+
+### Passo 3.1: Validação de Fronteira (Cliente/API)
+* O utilizador introduz o código VIN.
+* O sistema verifica o tamanho da string.
+* **Critério:** O código VIN deve conter **exatamente 17 caracteres**.
+* **Falha:** Retorna `HTTP 400 (Bad Request)` com a mensagem "O VIN deve ter 17 caracteres."
+
+### Passo 3.2: Higienização de Dados (Sanitization)
+* Antes de enviar para a entidade externa, o VIN sofre um tratamento.
+* **Ação:** Remoção de espaços em branco (`Trim`) e conversão de todos os caracteres para maiúsculas (`ToUpper`).
+
+### Passo 3.3: Auditoria Industrial Externa (Integração NHTSA)
+* O Back-End consome o endpoint `decodevin` da API VPIC da NHTSA.
+* O payload JSON devolvido é analisado em busca da variável correspondente à Marca (`Make`).
+* **Critério de Sucesso:** O valor retornado no campo Marca deve conter obrigatoriamente a substring **"IVECO"**.
+* **Critério de Rejeição:** Se a marca for nula, vazia ou diferente de IVECO (ex: Volvo, Scania, Ford).
+
+### Passo 3.4: Resolução
+* **Em caso de Sucesso:** O sistema extrai o modelo do veículo (ou define um genérico caso a API não o forneça) e aprova a transação, avançando para a criação do veículo no Firebase e posterior vínculo das peças/lotes.
+* **Em caso de Falha:** O motor de regras de negócio dispara uma exceção crítica. A camada Controller interceta a exceção de forma amigável e retorna o erro para a aplicação WPF, impedindo instantaneamente a continuação da linha de montagem e exibindo a marca não autorizada detetada.
+
+## 4. Tratamento de Erros e Códigos HTTP
+
+| Cenário de Erro | Código HTTP Retornado | Comportamento do Sistema |
+| :--- | :---: | :--- |
+| VIN nulo ou em branco | `400 Bad Request` | Rejeição instantânea sem chamada à rede. |
+| VIN diferente de 17 caracteres | `400 Bad Request` | Rejeição instantânea sem chamada à rede. |
+| Marca detetada não é IVECO | `400 Bad Request` | Controller captura a `Exception` do Service e notifica o Operador com a marca incorreta detetada. |
+| Falha na ligação com a NHTSA | `500 / 503` | O sistema notifica indisponibilidade temporária. (Nota: Aqui entra a contingência *Offline-Safe* no lado do Cliente WPF). |
+
+## 5. Implementação Técnica de Referência
+A salvaguarda desta regra está codificada no serviço `DadosService.cs`, garantindo que a regra nunca seja contornada, independentemente do cliente que chame a API:
+
+```csharp
+// Extração da Marca
+var marca = data.Results.FirstOrDefault(r => r.Variable == "Make")?.Value;
+
+// VALIDAÇÃO CRÍTICA (Regra de Negócio)
+if (string.IsNullOrEmpty(marca) || !marca.ToUpper().Contains("IVECO"))
+{
+    throw new Exception($"VIN inválido para este sistema. A marca detetada foi: {marca ?? "Desconhecida"}. Apenas veículos IVECO são permitidos.");
+}
+
   
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
