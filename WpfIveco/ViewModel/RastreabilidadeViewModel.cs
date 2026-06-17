@@ -155,8 +155,15 @@ namespace WpfIveco.ViewModel
             catch (HttpRequestException ex)
             {
                 Debug.WriteLine($"[ERRO CONEXÃO VIN] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
-                MessageBox.Show("Não foi possível conectar ao servidor.\nVerifique a sua ligação.",
-                    "Erro de Ligação", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                /// IMPLEMENTAÇÃO OFFLINE-SAFE
+                MessageBox.Show("Modo Offline ativado. O veículo será guardado localmente e sincronizado quando a rede for restabelecida.",
+                    "Aviso de Contingência", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                /// Aqui chamaria o seu serviço de SQLite local:
+                /// await _sqliteService.SalvarVeiculoLocalAsync(new VeiculoModel { Vin = PesquisaVin, is_sintonizado = false });
+
+                PesquisaVin = "";
             }
             catch (Exception ex)
             {

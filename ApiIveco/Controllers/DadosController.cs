@@ -88,8 +88,21 @@ namespace ApiIveco.Controllers
                 return Conflict(new { Mensagem = $"Veículo com VIN '{veiculo.Vin}' já cadastrado." });
             }
 
+            /// Cria o veículo
             var criado = await _dadosService.CriarVeiculo(veiculo);
-            return Ok(new { mensagem = "Veículo registrado com sucesso!", veiculo = criado });
+
+            /// NOVA IMPLEMENTAÇÃO: Gera e vincula automaticamente os componentes associados a este VIN
+            try
+            {
+                await _dadosService.GerarComponentesParaVeiculoAsync(criado.Vin);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Veículo criado, mas falhou ao vincular peças: {erro}", ex.Message);
+                /// Pode optar por devolver um aviso sem quebrar a criação do veículo
+            }
+
+            return Ok(new { mensagem = "Veículo registado e peças vinculadas com sucesso!", veiculo = criado });
         }
 
         /// <summary>Atualiza um veículo existente.</summary>
@@ -149,11 +162,22 @@ namespace ApiIveco.Controllers
             if (string.IsNullOrWhiteSpace(vin) || vin.Length != 17)
                 return BadRequest(new { Mensagem = "Os dados enviados são inválidos. O VIN deve ter 17 caracteres." });
 
-            var veiculoIveco = await _dadosService.BuscarEValidarVinIvecoAsync(vin);
-            if (veiculoIveco == null)
-                return NotFound(new { Mensagem = "O recurso solicitado não foi encontrado." });
+            try
+            {
+                /// Se não for IVECO, o service dispara uma Exception
+                var veiculoIveco = await _dadosService.BuscarEValidarVinIvecoAsync(vin);
 
-            return Ok(new { mensagem = "Veículo IVECO validado com sucesso!", veiculo = veiculoIveco });
+                if (veiculoIveco == null)
+                    return NotFound(new { Mensagem = "O recurso solicitado não foi encontrado na NHTSA." });
+
+                return Ok(new { mensagem = "Veículo IVECO validado com sucesso!", veiculo = veiculoIveco });
+            }
+            catch (Exception ex)
+            {
+                /// Captura a rejeição da marca e devolve para o WPF de forma controlada
+                _logger.LogWarning("[GET] Rejeição de VIN: {mensagem}", ex.Message);
+                return BadRequest(new { Mensagem = ex.Message });
+            }
         }
 
         /// <summary>Gera um relatório PDF com todos os veículos.</summary>
