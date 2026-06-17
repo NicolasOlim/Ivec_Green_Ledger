@@ -124,6 +124,22 @@ O ecossistema Iveco Green Ledger opera por meio de um fluxo sequencial e rígido
 - **Cálculo de Emissões e Saída de Dados:** Após a validação das peças e dos dados físicos de cubagem dos lotes associados, o motor algorítmico calcula as emissões de Escopo 3 sob as diretrizes do GHG Protocol, atualizando instantaneamente os painéis visuais do LiveCharts2 e disponibilizando os relatórios auditáveis para exportação em PDF via QuestPDF.
 
 
+  ---
+<div class="logo-container">
+    <img src="imagens/diagrama de sequencia.png" alt="Logo Iveco Green Ledger" class="logo-img">
+</div>
+O Diagrama de Sequência do Iveco Green Ledger descreve a ordem cronológica em que as requisições e dados trafegam pelas camadas da arquitetura distribuída:
+
+- **Início na Interface (WPF):** O operador insere o VIN e os dados das peças na RastreabilidadeView. Ao salvar, a ViewModel dispara uma requisição assíncrona via HTTP POST contendo o payload em JSON para a API (ApiIveco).
+
+- **Validação de Fronteira (NHTSA):** O DadosController repassa os dados para o DadosService, que consome a API externa da NHTSA. Se o chassi não for validado como original da Iveco, o fluxo é interrompido com um erro HTTP 400; caso contrário, o fluxo avança.
+
+- **Processamento e Cálculo (API):** Com o chassi validado, a camada de serviço busca os fatores de emissão dos lotes das peças no banco de dados e executa o motor matemático para calcular a pegada de carbono de Escopo 3 do veículo.
+
+- **Persistência e Confirmação (Firestore):** O back-end grava os dados consolidados no Firebase Firestore de forma assíncrona. O banco confirma a gravação para a API, que responde com status HTTP 200 para o cliente WPF, atualizando instantaneamente os gráficos do LiveCharts2.
+
+
+
 
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
