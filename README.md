@@ -125,6 +125,8 @@ O ecossistema Iveco Green Ledger opera por meio de um fluxo sequencial e rígido
 
 
   ---
+**Diagrama de Sequência**
+  
 <div class="logo-container">
     <img src="imagens/diagrama de sequencia.png" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
@@ -138,6 +140,18 @@ O Diagrama de Sequência do Iveco Green Ledger descreve a ordem cronológica em 
 
 - **Persistência e Confirmação (Firestore):** O back-end grava os dados consolidados no Firebase Firestore de forma assíncrona. O banco confirma a gravação para a API, que responde com status HTTP 200 para o cliente WPF, atualizando instantaneamente os gráficos do LiveCharts2.
 
+---
+## Arquitetura de Persistência de Dados:
+
+O trânsito da informação entre as duas camadas de persistência obedece a um fluxo síncrono-assíncrono controlado por software:
+
+- **Escrita Local de Contingência:** Em cenários offline, os dados capturados no pátio são estruturados em tabelas relacionais locais no SQLite com carimbos de data/hora (timestamps) e flags de controle de status de sincronização (is_sintonizado = false).
+
+- **Consumo de API e Validação:** Assim que a rede é restabelecida, a aplicação desktop lê o buffer local do SQLite e dispara os payloads via HttpClient para a API em ASP.NET Core 8.
+
+- **Persistência Definitiva:** O back-end recebe os dados, executa as validações externas nas APIs da NHTSA e BrasilAPI, roda o motor matemático do GHG Protocol e persiste o documento final no Firebase Firestore. Após a confirmação de sucesso da nuvem, a flag local no SQLite é atualizada (is_sintonizado = true), mantendo o histórico local apenas para auditoria de desempenho do terminal.
+
+Essa arquitetura híbrida garante que o Iveco Green Ledger ofereça o melhor de dois mundos: a robustez analítica e a segurança centralizada de um banco de dados em nuvem estruturado para governança ESG, sem sacrificar a resiliência e a continuidade operacional exigidas no chão de fábrica de uma montadora automotiva de grande porte.
 
 
 
