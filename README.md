@@ -104,6 +104,26 @@ O desenvolvimento do ecossistema distribuído do Iveco Green Ledger foi estrutur
 | **UC09** | Emitir Dossiê Auditável (PDF) | Administrador | Compila os dados consolidados de um chassi ou período em um relatório paginado e criptografado gerado pelo QuestPDF. |
 | **UC10** | Registrar Logs de Requisições | Sistema | Intercepta o tráfego HTTP por meio do middleware do Serilog para auditar a latência e o status das operações. |
 
+  ---
+  
+**Diagrama de Fluxo**
+
+
+<div class="logo-container">
+    <img src="imagens/diagrama de fluxo.png" alt="Logo Iveco Green Ledger" class="logo-img">
+</div>
+
+O ecossistema Iveco Green Ledger opera por meio de um fluxo sequencial e rígido de validações automatizadas que estruturam a lógica do seu diagrama de fluxo:
+
+- **Controle de Acesso e Autenticação:** O sistema inicia verificando as credenciais na tela de login, comparando o hash da senha na coleção usuarios para conceder o acesso e liberar as abas da interface de acordo com o nível de privilégio do usuário (Admin ou Operador).
+
+- **Homologação Fiscal de Fornecedores:** Ao registrar uma empresa parceira, o software realiza uma chamada assíncrona à BrasilAPI para validar a situação do CNPJ na base da Receita Federal e autocompletar as informações cadastrais, mitigando erros humanos de digitação.
+
+- **Validação Industrial de Chassis:** Na etapa de montagem do veículo, o operador insere o código VIN (chassi), e o sistema consome a API da NHTSA para ratificar a legitimidade do código, bloqueando a operação caso o chassi não pertença originalmente ao grupo Iveco.
+
+- **Cálculo de Emissões e Saída de Dados:** Após a validação das peças e dos dados físicos de cubagem dos lotes associados, o motor algorítmico calcula as emissões de Escopo 3 sob as diretrizes do GHG Protocol, atualizando instantaneamente os painéis visuais do LiveCharts2 e disponibilizando os relatórios auditáveis para exportação em PDF via QuestPDF.
+
+
 
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
