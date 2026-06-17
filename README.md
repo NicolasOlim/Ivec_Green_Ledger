@@ -213,6 +213,46 @@ A separação e posterior integração dos projetos dentro da mesma solução tr
 ---
 ## Viabilidade Econômica:
 
+O projeto **Iveco Green Ledger** foi concebido como uma solução tecnológica de alta eficiência e baixo custo de implantação, utilizando componentes de hardware convencionais para pátio logístico e desenvolvimento próprio. Essa abordagem reduz significativamente o investimento inicial quando comparada a sistemas industriais proprietários de telemetria ambiental e rastreabilidade de frotas.
+
+---
+
+### Custos Estimados de Implantação
+
+####  Investimento em Hardware
+| Item | Quantidade | Valor Unitário | Total |
+| :--- | :--- | :--- | :--- |
+| Terminal de Chão de Fábrica (Computador Core i5) | 1 | R$ 1.800,00 | R$ 1.800,00 |
+| Dispositivo de Entrada de Pátio (Coletor USB) | 1 | R$ 150,00 | R$ 150,00 |
+| Balança de Precisão Comercial / Sensor de Cubagem | 1 | R$ 450,00 | R$ 450,00 |
+| **Subtotal Hardware** | — | — | **R$ 2.400,00** |
+
+#### Custo de Desenvolvimento (Mão de Obra)
+| Métrica de Esforço | Detalhamento | Valor |
+| :--- | :--- | :--- |
+| **Horas Totais Dedicadas** | Desenvolvimento dos projetos `ApiIveco` e `WpfIveco` | 60 horas |
+| **Valor Estimado por Hora** | Custo-hora de engenharia de software júnior | R$ 25,00 |
+| **Subtotal Mão de Obra** | **Total Geral Estimado** | **R$ 1.500,00** |
+
+#### Custo Total do Projeto Consolidado
+| Categoria de Despesa | Valor Absoluto (R$) | Representação Percentual (%) |
+| :--- | :--- | :--- |
+| Hardware e Infraestrutura Física | R$ 2.400,00 | 61,54% |
+| Mão de Obra e Engenharia de Software | R$ 1.500,00 | 38,46% |
+| **Total Geral do Investimento** | **R$ 3.900,00** | **100,00%** |
+
+---
+
+### Benefícios Econômicos e Retorno sobre o Investimento (ROI)
+
+#### Matriz de Ganhos Financeiros e Operacionais
+| Benefício Mapeado | Impacto Econômico Direto | Indicador de Sucesso |
+| :--- | :--- | :--- |
+| **Mitigação de Sanções** | Evita multas ambientais e fiscais através da automação de relatórios precisos do Escopo 3 de acordo com o GHG Protocol. | Zero passivos ambientais em auditorias. |
+| **Eliminação de Ociosidade** | O mecanismo *offline-safe* do SQLite impede o travamento do pátio por falta de internet, anulando o altíssimo custo de linha de produção parada. | Disponibilidade contínua de pátio (100% *uptime* local). |
+| **Redução do Tempo Operacional** | Consumo automatizado da BrasilAPI e NHTSA elimina preenchimentos manuais lentos e erros humanos de digitação. | Redução no tempo de triagem por caminhão. |
+| **Otimização de Suprimentos** | Dashboards visuais em tempo real via LiveCharts2 expõem os lotes de matéria-prima mais poluentes, permitindo troca estratégica por fornecedores mais econômicos. | Economia na escolha de insumos ecológicos. |
+
   
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
