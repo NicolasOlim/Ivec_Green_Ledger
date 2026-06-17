@@ -61,65 +61,49 @@
         </Grid>
 
         <!-- GRÁFICO E TRANSAÇÕES -->
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="24" MinHeight="350">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="Emissões da Cadeia (YTD)" Style="{StaticResource H2}"/>
-                    <lvc:CartesianChart Grid.Row="1" Series="{Binding Analises.EmissoesSeries}" Margin="0,15,0,0" LegendLocation="Top">
-                        <lvc:CartesianChart.AxisX>
-                            <lvc:Axis Labels="{Binding Analises.MesesLabels}" Foreground="{StaticResource TextSecondary}">
-                                <lvc:Axis.Separator>
-                                    <lvc:Separator Step="1" StrokeThickness="0"/>
-                                </lvc:Axis.Separator>
-                            </lvc:Axis>
-                        </lvc:CartesianChart.AxisX>
-                        <lvc:CartesianChart.AxisY>
-                            <lvc:Axis Title="Ton CO2" Foreground="{StaticResource TextSecondary}">
-                                <lvc:Axis.Separator>
-                                    <lvc:Separator Stroke="{StaticResource ElevatedGray3}" StrokeDashArray="4"/>
-                                </lvc:Axis.Separator>
-                            </lvc:Axis>
-                        </lvc:CartesianChart.AxisY>
-                    </lvc:CartesianChart>
-                </Grid>
-            </Border>
-            <Border Grid.Column="1" Style="{StaticResource PremiumCardStyle}" Margin="10,0,0,0" Padding="24">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="Transações na Rede" Style="{StaticResource H2}"/>
-                    <StackPanel Grid.Row="1" Margin="0,16,0,0">
-                        <Border BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
-                            <StackPanel>
-                                <TextBlock Text="Bloco #8942 Registrado" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold"/>
-                                <TextBlock Text="Chassi adicionado pela Magneti Marelli" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,4,0,0"/>
-                            </StackPanel>
-                        </Border>
-                        <Border BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
-                            <StackPanel>
-                                <TextBlock Text="Auditoria ESG Concluída" Foreground="{StaticResource AppleGreen}" FontWeight="SemiBold"/>
-                                <TextBlock Text="Fornecedor: Bosch Ltda - Nota A" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,4,0,0"/>
-                            </StackPanel>
-                        </Border>
-                        <Border Padding="0,0,0,12">
-                            <StackPanel>
-                                <TextBlock Text="Falha de Autenticação API" Foreground="{StaticResource AppleRed}" FontWeight="SemiBold"/>
-                                <TextBlock Text="Tentativa de acesso não autorizada (IoT)" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,4,0,0"/>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </Grid>
-            </Border>
-        </Grid>
+        <!-- Gráfico de Emissões -->
+        <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="24" MinHeight="350">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Emissões da Cadeia (YTD)" Style="{StaticResource H2}"/>
+
+                <lvc:CartesianChart Grid.Row="1" 
+                            Series="{Binding Analises.EmissoesSeries}" 
+                            Margin="0,15,0,0" 
+                            LegendLocation="Top">
+
+                    <!-- Eixo X -->
+                    <lvc:CartesianChart.AxisX>
+                        <lvc:Axis Labels="{Binding Analises.MesesLabels}" 
+                          Foreground="{StaticResource TextSecondary}"
+                          FontSize="12">
+                            <lvc:Axis.Separator>
+                                <lvc:Separator Step="1" StrokeThickness="0"/>
+                            </lvc:Axis.Separator>
+                        </lvc:Axis>
+                    </lvc:CartesianChart.AxisX>
+
+                    <!-- Eixo Y -->
+                    <lvc:CartesianChart.AxisY>
+                        <lvc:Axis Title="Ton CO₂" 
+              Foreground="{StaticResource TextSecondary}"
+              FontSize="12"
+              LabelFormatter="{Binding Analises.Formatter}"
+              MinValue="0">
+                            <!-- FORÇA O EIXO Y A COMEÇAR EM 0 -->
+                            <lvc:Axis.Separator>
+                                <lvc:Separator Stroke="{StaticResource ElevatedGray3}" 
+                           StrokeDashArray="4" 
+                           StrokeThickness="1"/>
+                            </lvc:Axis.Separator>
+                        </lvc:Axis>
+                    </lvc:CartesianChart.AxisY>
+                </lvc:CartesianChart>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

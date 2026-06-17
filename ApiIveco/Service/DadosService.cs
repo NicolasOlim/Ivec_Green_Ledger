@@ -1,6 +1,7 @@
 ﻿using ApiIveco.Data;
 using ApiIveco.Models;
 using Google.Cloud.Firestore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -15,16 +16,18 @@ namespace ApiIveco.Service
     {
         private readonly ILogger<DadosService> _logger;
         private readonly FireBaseData _firestoreDb;
+        private readonly IMemoryCache _cache;
 
         private readonly string _collectionFornecedor = "fornecedores";
         private readonly string _collectionLote = "lotes_materia_prima";
         private readonly string _collectionVeiculo = "veiculos";
         private readonly string _collectionComponente = "veiculo_componentes";
 
-        public DadosService(ILogger<DadosService> logger, FireBaseData firestoreDb)
+        public DadosService(ILogger<DadosService> logger, FireBaseData firestoreDb, IMemoryCache memoryCache)
         {
             _logger = logger;
             _firestoreDb = firestoreDb;
+            _cache = memoryCache;
         }
 
         
@@ -211,6 +214,10 @@ namespace ApiIveco.Service
             lote.Id = novoId.ToString();
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionLote).Document(lote.Id);
             await docRef.SetAsync(lote);
+
+            // Invalida cache
+            _cache.Remove("PegadaMediaCache");
+
             return lote;
         }
 
@@ -250,6 +257,10 @@ namespace ApiIveco.Service
             componente.Id = novoId.ToString();
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionComponente).Document(componente.Id);
             await docRef.SetAsync(componente);
+
+            // Invalida cache
+            _cache.Remove("PegadaMediaCache");
+
             return componente;
         }
 
@@ -490,13 +501,36 @@ namespace ApiIveco.Service
         /// </summary>
         public async Task<double> CalcularPegadaMediaAsync()
         {
-            // 1. Tenta calcular a partir dos lotes
+            const string cacheKey = "PegadaMediaCache";
+
+            // Tenta obter do cache
+            if (_cache.TryGetValue(cacheKey, out double cachedValue))
+            {
+                return cachedValue;
+            }
+
+            // Se não estiver em cache, calcula
+            double resultado = await CalcularPegadaMediaInternoAsync();
+
+            // Armazena em cache por 5 minutos
+            _cache.Set(cacheKey, resultado, TimeSpan.FromMinutes(5));
+
+            return resultado;
+        }
+
+        /// <summary>
+        /// Cálculo real (sem cache) – chamado internamente
+        /// </summary>
+        private async Task<double> CalcularPegadaMediaInternoAsync()
+        {
+            // 1. Tenta calcular a partir dos lotes de matéria-prima
             var lotes = await ListarLoteMateriaPrima();
             if (lotes != null && lotes.Count > 0)
             {
                 double somaPegada = 0;
                 foreach (var lote in lotes)
                 {
+                    // Pegada total do lote = QuantidadeKg * PegadaCarbonoPorKg
                     somaPegada += lote.QuantidadeKg * lote.PegadaCarbonoPorKg;
                 }
                 return somaPegada / lotes.Count;
@@ -520,7 +554,6 @@ namespace ApiIveco.Service
                 double pegadaVeiculo = 0;
                 foreach (var comp in grupo)
                 {
-                    // Usa o PesoKg * fator padrão (sem FatorEmissao)
                     pegadaVeiculo += comp.PesoKg * FatorEmissaoPadrao;
                 }
                 somaPegadaPorVeiculo += pegadaVeiculo;
@@ -529,6 +562,135 @@ namespace ApiIveco.Service
 
             // Média por veículo (apenas veículos que têm peças)
             return totalVeiculosComPecas > 0 ? somaPegadaPorVeiculo / totalVeiculosComPecas : 0;
+        }
+
+        /// <summary>
+        /// Retorna dados de emissões por mês para o gráfico YTD.
+        /// </summary>
+        public async Task<GraficoEmissoesDto> ObterDadosGraficoAsync()
+        {
+            var resultado = new GraficoEmissoesDto();
+
+            // 1. Buscar veículos com DataMontagem
+            var veiculos = await ListarVeiculo();
+            if (veiculos == null || !veiculos.Any())
+            {
+                // Fallback: dados de exemplo
+                return ObterDadosExemplo();
+            }
+
+            // 2. Buscar componentes
+            var componentes = await ListarVeiculoComponente();
+            var dictComponentesPorVin = componentes?
+                .GroupBy(c => c.fk_Veiculo_Vin)
+                .ToDictionary(g => g.Key, g => g.ToList()) ?? new Dictionary<string, List<VeiculoComponente>>();
+
+            // 3. Calcular emissão por veículo (soma dos componentes)
+            const double fatorEmissaoPadrao = 2.5; // kg CO2/kg
+            var emissaoPorVeiculo = new Dictionary<string, double>();
+            foreach (var v in veiculos)
+            {
+                double somaPeso = 0;
+                if (dictComponentesPorVin.TryGetValue(v.Vin, out var comps))
+                {
+                    somaPeso = comps.Sum(c => c.PesoKg);
+                }
+                emissaoPorVeiculo[v.Vin] = somaPeso * fatorEmissaoPadrao;
+            }
+
+            // 4. Agrupar por mês/ano com base em DataMontagem (apenas veículos com data)
+            var veiculosComData = veiculos
+                .Where(v => v.DataMontagem.HasValue)
+                .Select(v => new
+                {
+                    v.Vin,
+                    MesAno = new DateTime(v.DataMontagem.Value.Year, v.DataMontagem.Value.Month, 1),
+                    Emissao = emissaoPorVeiculo.GetValueOrDefault(v.Vin, 0)
+                })
+                .GroupBy(x => x.MesAno)
+                .OrderBy(g => g.Key)
+                .Select(g => new
+                {
+                    Mes = g.Key.ToString("MMM"),
+                    Ano = g.Key.Year,
+                    TotalEmissao = g.Sum(x => x.Emissao) / 1000 // converte para toneladas
+                })
+                .ToList();
+
+            // 5. Se não houver dados com data, usar exemplo
+            if (!veiculosComData.Any())
+            {
+                return ObterDadosExemplo();
+            }
+
+            // 6. Preencher resultado
+            resultado.Meses = veiculosComData.Select(x => $"{x.Mes}/{x.Ano}").ToArray();
+            resultado.ValoresFabrica = veiculosComData.Select(x => Math.Round(x.TotalEmissao, 1)).ToArray();
+
+            // 7. Cadeia de Fornecedores (baseado em lotes)
+            var lotes = await ListarLoteMateriaPrima();
+            if (lotes != null && lotes.Any())
+            {
+                var lotesPorMes = lotes
+                    .Where(l => l.DataProducao.HasValue)
+                    .GroupBy(l => new DateTime(l.DataProducao.Value.Year, l.DataProducao.Value.Month, 1))
+                    .OrderBy(g => g.Key)
+                    .Select(g => new
+                    {
+                        Mes = g.Key.ToString("MMM"),
+                        Ano = g.Key.Year,
+                        TotalEmissao = g.Sum(l => l.QuantidadeKg * l.PegadaCarbonoPorKg) / 1000 // toneladas
+                    })
+                    .ToList();
+
+                // Unificar os meses (usar todos os meses de veículos e lotes)
+                var todosMeses = veiculosComData
+                    .Select(x => new { x.Mes, x.Ano })
+                    .Union(lotesPorMes.Select(x => new { x.Mes, x.Ano }))
+                    .Distinct()
+                    .OrderBy(x => x.Ano).ThenBy(x => x.Mes)
+                    .ToList();
+
+                // Recalcular séries para ter os mesmos meses
+                resultado.Meses = todosMeses.Select(x => $"{x.Mes}/{x.Ano}").ToArray();
+                resultado.ValoresFabrica = todosMeses.Select(m =>
+                    veiculosComData.FirstOrDefault(x => x.Mes == m.Mes && x.Ano == m.Ano)?.TotalEmissao ?? 0
+                ).ToArray();
+                resultado.ValoresCadeia = todosMeses.Select(m =>
+                    lotesPorMes.FirstOrDefault(x => x.Mes == m.Mes && x.Ano == m.Ano)?.TotalEmissao ?? 0
+                ).ToArray();
+            }
+            else
+            {
+                // Se não houver lotes, usar zeros
+                resultado.ValoresCadeia = resultado.Meses.Select(_ => 0.0).ToArray();
+            }
+
+            // Garantir que não haja valores negativos
+            resultado.ValoresFabrica = resultado.ValoresFabrica.Select(v => v < 0 ? 0 : v).ToArray();
+            resultado.ValoresCadeia = resultado.ValoresCadeia.Select(v => v < 0 ? 0 : v).ToArray();
+
+            return resultado;
+        }
+
+        /// <summary>
+        /// Dados de exemplo (fallback)
+        /// </summary>
+        private GraficoEmissoesDto ObterDadosExemplo()
+        {
+            return new GraficoEmissoesDto
+            {
+                Meses = new[] { "Jan/2025", "Fev/2025", "Mar/2025", "Abr/2025", "Mai/2025", "Jun/2025" },
+                ValoresFabrica = new double[] { 12.5, 15.2, 14.8, 18.5, 20.1, 22.0 },
+                ValoresCadeia = new double[] { 8.0, 9.5, 8.8, 12.0, 14.5, 16.0 }
+            };
+        }
+
+        public class GraficoEmissoesDto
+        {
+            public string[] Meses { get; set; } = Array.Empty<string>();
+            public double[] ValoresFabrica { get; set; } = Array.Empty<double>();
+            public double[] ValoresCadeia { get; set; } = Array.Empty<double>();
         }
 
     }

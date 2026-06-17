@@ -2,133 +2,102 @@
 using LiveCharts.Wpf;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using WpfIveco.Models;
-using WpfIveco.ViewModels;
 
-namespace WpfIveco.ViewModel
+namespace WpfIveco.ViewModels
 {
     public class AnalisesViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
-
-        /// <summary>
-        /// PROPRIEDADES
-        /// </summary>
-        
-        private string _mediaCarbono = "0.0K";
-        public string MediaCarbono
-        {
-            get => _mediaCarbono;
-            set { _mediaCarbono = value; OnPropertyChanged(); }
-        }
-
         private SeriesCollection _emissoesSeries;
+        private string[] _mesesLabels;
+
         public SeriesCollection EmissoesSeries
         {
             get => _emissoesSeries;
             set { _emissoesSeries = value; OnPropertyChanged(); }
         }
 
-        private string[] _mesesLabels;
         public string[] MesesLabels
         {
             get => _mesesLabels;
             set { _mesesLabels = value; OnPropertyChanged(); }
         }
 
-        /// <summary>
-        /// CONSTRUTOR
-        /// </summary>
-        /// <param name="httpClient"></param>
- 
-        public AnalisesViewModel(HttpClient httpClient)
+        public Func<double, string> Formatter => value => $"{value:N1} t";
+
+        public AnalisesViewModel()
+        {
+            InicializarDadosExemplo();
+        }
+
+        public AnalisesViewModel(HttpClient httpClient) : this()
         {
             _httpClient = httpClient;
+        }
 
-            /// Inicializa o gráfico vazio com as duas séries
+        private void InicializarDadosExemplo()
+        {
+            MesesLabels = new[] { "Jan/2025", "Fev/2025", "Mar/2025", "Abr/2025", "Mai/2025", "Jun/2025" };
             EmissoesSeries = new SeriesCollection
             {
-                new LineSeries
+                new ColumnSeries
                 {
-                    Title             = "Escopo 1 (Fábrica)",
-                    Values            = new ChartValues<double>(),
-                    Stroke            = new SolidColorBrush(Color.FromRgb(10, 132, 255)),
-                    Fill              = new SolidColorBrush(Color.FromArgb(50, 10, 132, 255)),
-                    PointGeometrySize = 10
+                    Title = "Processo Fabril Iveco",
+                    Values = new ChartValues<double> { 12.5, 15.2, 14.8, 18.5, 20.1, 22.0 },
+                    Fill = new SolidColorBrush(Color.FromRgb(0, 120, 200)),
+                    DataLabels = true,
+                    LabelPoint = point => $"{point.Y:N1} t"
                 },
-                new LineSeries
+                new ColumnSeries
                 {
-                    Title             = "Escopo 3 (Cadeia)",
-                    Values            = new ChartValues<double>(),
-                    Stroke            = new SolidColorBrush(Color.FromRgb(48, 209, 88)),
-                    Fill              = new SolidColorBrush(Color.FromArgb(50, 48, 209, 88)),
-                    PointGeometrySize = 10
+                    Title = "Cadeia de Fornecedores",
+                    Values = new ChartValues<double> { 8.0, 9.5, 8.8, 12.0, 14.5, 16.0 },
+                    Fill = new SolidColorBrush(Color.FromRgb(255, 150, 50)),
+                    DataLabels = true,
+                    LabelPoint = point => $"{point.Y:N1} t"
                 }
             };
         }
 
-        
-        /// <summary>
-        /// ATUALIZAR GRÁFICO COM DADOS REAIS
-        /// </summary>
-        /// <param name="veiculos"></param>
-        /// <returns></returns>
-        /// Chamado pelo MainViewModel após carregar veículos
-        
-        public Task AtualizarAsync(List<VeiculoModel> veiculos)
+        public async Task AtualizarAsync(List<VeiculoModel> veiculos)
         {
             try
             {
-                var ultimosMeses = new List<DateTime>();
-                for (int i = 5; i >= 0; i--)
-                    ultimosMeses.Add(DateTime.Now.AddMonths(-i));
-
-                MesesLabels = ultimosMeses.Select(m => m.ToString("MMM")).ToArray();
-
-                var valoresEscopo1 = new ChartValues<double>();
-                var valoresEscopo3 = new ChartValues<double>();
-
-                double baseEscopo1 = 120.0;
-                double baseEscopo3 = 250.0;
-
-                foreach (var mes in ultimosMeses)
+                var response = await _httpClient.GetAsync("api/dados/grafico-emissoes");
+                if (response.IsSuccessStatusCode)
                 {
-                    int veiculosNoMes;
-                    try
-                    {
-                        veiculosNoMes = veiculos.Count(v =>
-                            Convert.ToDateTime(v.DataMontagem).Year == mes.Year &&
-                            Convert.ToDateTime(v.DataMontagem).Month == mes.Month);
-                    }
-                    catch
-                    {
-                        veiculosNoMes = veiculos.Count / 6;
-                    }
+                    var json = await response.Content.ReadAsStringAsync();
+                    var dados = JsonSerializer.Deserialize<GraficoEmissoesDto>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                    valoresEscopo1.Add(Math.Round(baseEscopo1 + (veiculosNoMes * 1.8), 1));
-                    valoresEscopo3.Add(Math.Round(baseEscopo3 + (veiculosNoMes * 3.5), 1));
+                    if (dados != null && dados.Meses != null && dados.Meses.Length > 0)
+                    {
+                        MesesLabels = dados.Meses;
+                        EmissoesSeries[0].Values = new ChartValues<double>(dados.ValoresFabrica);
+                        EmissoesSeries[1].Values = new ChartValues<double>(dados.ValoresCadeia);
+                        return;
+                    }
                 }
 
-                if (EmissoesSeries.Count == 2)
-                {
-                    EmissoesSeries[0].Values = valoresEscopo1;
-                    EmissoesSeries[1].Values = valoresEscopo3;
-                }
-
-                if (veiculos.Count > 0)
-                    MediaCarbono = $"{((valoresEscopo1.Sum() + valoresEscopo3.Sum()) / veiculos.Count):F1}K";
+                // Fallback
+                InicializarDadosExemplo();
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[ERRO ATUALIZAR GRÁFICO] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                InicializarDadosExemplo();
             }
+        }
 
-            return Task.CompletedTask;
+        public class GraficoEmissoesDto
+        {
+            public string[] Meses { get; set; }
+            public double[] ValoresFabrica { get; set; }
+            public double[] ValoresCadeia { get; set; }
         }
     }
 }
