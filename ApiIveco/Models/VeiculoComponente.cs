@@ -13,5 +13,7 @@ namespace ApiIveco.Models
         public string fk_LoteMateriaPrima_Id { get; set; }
         [FirestoreProperty]
         public string NomePeca { get; set; }
+        [FirestoreProperty]
+        public double PesoKg { get; set; }
     }
 }

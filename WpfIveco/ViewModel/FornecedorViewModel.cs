@@ -1,31 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using WpfIveco.Models;
-using WpfIveco.ViewModels;
 
-namespace WpfIveco.ViewModel
+namespace WpfIveco.ViewModels
 {
     public class FornecedorViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
 
-        /// <summary>
-        /// PROPRIEDADES
-        /// </summary>
-        
-        private string _totalFornecedores = "0";
-        public string TotalFornecedores
-        {
-            get => _totalFornecedores;
-            set { _totalFornecedores = value; OnPropertyChanged(); }
-        }
-
+        // Propriedades
         private string _cnpjBusca = "";
         public string CnpjBusca
         {
@@ -54,38 +46,31 @@ namespace WpfIveco.ViewModel
             set { _mensagemCadastro = value; OnPropertyChanged(); }
         }
 
-        /// <summary>
-        /// COMANDOS
-        /// </summary>
-       
+        private ObservableCollection<FornecedorModel> _listaFornecedores = new();
+        public ObservableCollection<FornecedorModel> ListaFornecedores
+        {
+            get => _listaFornecedores;
+            set { _listaFornecedores = value; OnPropertyChanged(); }
+        }
+
+        public int TotalFornecedores => ListaFornecedores?.Count ?? 0;
+
+        // Comandos
         public ICommand ConsultarCnpjCommand { get; }
         public ICommand SalvarFornecedorCommand { get; }
 
-        
-        /// <summary>
-        /// CONSTRUTOR
-        /// </summary>
-        /// <param name="httpClient"></param>
-        
         public FornecedorViewModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            ConsultarCnpjCommand = new RelayCommand(async p => await BuscarPorCnpjAsync());
+            ConsultarCnpjCommand = new RelayCommand(async p => await ConsultarCnpjAsync());
             SalvarFornecedorCommand = new RelayCommand(async p => await SalvarFornecedorAsync());
         }
 
-      
-        /// <summary>
-        /// CARREGAR FORNECEDORES
-        /// </summary>
-        /// <returns></returns>
-        
         public async Task CarregarFornecedoresAsync()
         {
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/fornecedores");
-
                 if (!response.IsSuccessStatusCode)
                 {
                     Debug.WriteLine($"[ERRO CARREGAR FORNECEDORES] HTTP {(int)response.StatusCode}");
@@ -96,35 +81,28 @@ namespace WpfIveco.ViewModel
                 var fornecedores = JsonSerializer.Deserialize<List<FornecedorModel>>(json,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                TotalFornecedores = fornecedores?.Count.ToString() ?? "0";
+                if (fornecedores != null)
+                {
+                    ListaFornecedores = new ObservableCollection<FornecedorModel>(fornecedores);
+                }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ERRO INESPERADO FORNECEDORES] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                Debug.WriteLine($"[ERRO CARREGAR FORNECEDORES] {ex.Message}");
             }
         }
 
-        
-        /// <summary>
-        /// BUSCAR POR CNPJ
-        /// </summary>
-        /// <returns></returns>
-        
-        private async Task BuscarPorCnpjAsync()
+        private async Task ConsultarCnpjAsync()
         {
-            var cnpjLimpo = new string(System.Linq.Enumerable.ToArray(
-                System.Linq.Enumerable.Where(CnpjBusca, char.IsDigit)));
-
-            if (cnpjLimpo.Length != 14)
+            if (string.IsNullOrWhiteSpace(CnpjBusca))
             {
-                MensagemCadastro = "⚠️ O CNPJ necessita de 14 números.";
+                MessageBox.Show("Digite um CNPJ para consultar.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            MensagemCadastro = "A consultar a Receita Federal...";
-
             try
             {
+                var cnpjLimpo = CnpjBusca.Replace(".", "").Replace("/", "").Replace("-", "");
                 var response = await _httpClient.GetAsync($"api/dados/fornecedores/buscar-cnpj/{cnpjLimpo}");
 
                 if (response.IsSuccessStatusCode)
@@ -135,61 +113,54 @@ namespace WpfIveco.ViewModel
 
                     NomeFornecedorEncontrado = fornecedor.GetProperty("nome").GetString();
                     LocalizacaoFornecedorEncontrado = fornecedor.GetProperty("localizacao").GetString();
-                    MensagemCadastro = "✅ Empresa localizada e qualificada.";
+                    MensagemCadastro = "Fornecedor encontrado! Clique em 'Registrar no Ledger' para salvar.";
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    MensagemCadastro = "CNPJ não encontrado na Receita Federal.";
+                    NomeFornecedorEncontrado = "";
+                    LocalizacaoFornecedorEncontrado = "";
                 }
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"[ERRO BUSCAR CNPJ] HTTP {(int)response.StatusCode} -> {erro}");
-
-                    MensagemCadastro = "❌ CNPJ não encontrado. Verifique e tente novamente.";
-                    NomeFornecedorEncontrado = "";
-                    LocalizacaoFornecedorEncontrado = "";
+                    Debug.WriteLine($"[ERRO CONSULTAR CNPJ] {erro}");
+                    MensagemCadastro = "Erro ao consultar CNPJ. Tente novamente.";
                 }
-            }
-            catch (HttpRequestException ex)
-            {
-                Debug.WriteLine($"[ERRO CONEXÃO CNPJ] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
-                MensagemCadastro = "❌ Erro de ligação. Verifique a sua rede.";
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ERRO INESPERADO CNPJ] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
-                MensagemCadastro = "❌ Ocorreu um erro inesperado. Tente novamente.";
+                Debug.WriteLine($"[ERRO CONSULTAR CNPJ] {ex.Message}");
+                MensagemCadastro = "Erro de conexão. Verifique sua internet.";
             }
         }
 
-        
-        /// <summary>
-        /// SALVAR FORNECEDOR
-        /// </summary>
-        /// <returns></returns>
-        
         private async Task SalvarFornecedorAsync()
         {
             if (string.IsNullOrWhiteSpace(NomeFornecedorEncontrado))
             {
-                MensagemCadastro = "⚠️ Efetue a consulta primeiro.";
+                MensagemCadastro = "Consulte um CNPJ válido primeiro.";
                 return;
             }
 
-            var cnpjLimpo = new string(System.Linq.Enumerable.ToArray(
-                System.Linq.Enumerable.Where(CnpjBusca, char.IsDigit)));
-
-            var novoFornecedor = new FornecedorModel
-            {
-                Cnpj = cnpjLimpo,
-                Nome = NomeFornecedorEncontrado,
-                Localizacao = LocalizacaoFornecedorEncontrado
-            };
-
             try
             {
-                var response = await _httpClient.PostAsJsonAsync("api/dados/fornecedores", novoFornecedor);
+                // ================================================
+                // CORREÇÃO: Adicionado o campo "Id" com valor vazio
+                // ================================================
+                var fornecedor = new
+                {
+                    Id = "",  // <-- LINHA ADICIONADA
+                    Nome = NomeFornecedorEncontrado,
+                    Localizacao = LocalizacaoFornecedorEncontrado,
+                    Cnpj = CnpjBusca.Replace(".", "").Replace("/", "").Replace("-", "")
+                };
+
+                var response = await _httpClient.PostAsJsonAsync("api/dados/fornecedores", fornecedor);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    MensagemCadastro = "✅ Fornecedor registado com sucesso no Ledger!";
+                    MensagemCadastro = "Fornecedor registrado com sucesso!";
                     CnpjBusca = "";
                     NomeFornecedorEncontrado = "";
                     LocalizacaoFornecedorEncontrado = "";
@@ -199,18 +170,37 @@ namespace WpfIveco.ViewModel
                 {
                     var erro = await response.Content.ReadAsStringAsync();
                     Debug.WriteLine($"[ERRO SALVAR FORNECEDOR] HTTP {(int)response.StatusCode} -> {erro}");
-                    MensagemCadastro = "❌ Não foi possível guardar o fornecedor. Tente novamente.";
+
+                    // Tratamento específico para erro de validação
+                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        try
+                        {
+                            using var doc = JsonDocument.Parse(erro);
+                            if (doc.RootElement.TryGetProperty("errors", out var errors))
+                            {
+                                var mensagem = "Erro de validação:\n";
+                                foreach (var prop in errors.EnumerateObject())
+                                {
+                                    var field = prop.Name;
+                                    var messages = prop.Value.EnumerateArray().Select(x => x.GetString());
+                                    mensagem += $"- {field}: {string.Join(", ", messages)}\n";
+                                }
+                                MensagemCadastro = mensagem;
+                            }
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        MensagemCadastro = $"Erro ao salvar: {erro}";
+                    }
                 }
-            }
-            catch (HttpRequestException ex)
-            {
-                Debug.WriteLine($"[ERRO CONEXÃO FORNECEDOR] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
-                MensagemCadastro = "❌ Erro de ligação. Verifique a sua rede.";
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ERRO INESPERADO FORNECEDOR] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
-                MensagemCadastro = "❌ Ocorreu um erro inesperado. Tente novamente.";
+                Debug.WriteLine($"[ERRO SALVAR FORNECEDOR] {ex.Message}");
+                MensagemCadastro = $"Erro de conexão: {ex.Message}";
             }
         }
     }

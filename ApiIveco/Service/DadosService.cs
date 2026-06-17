@@ -484,5 +484,52 @@ namespace ApiIveco.Service
             _logger.LogCritical("### NENHUM USUARIO ENCONTRADO");
             return null;
         }
+
+        /// <summary>
+        /// Calcula a pegada de carbono média (kg CO2) a partir dos lotes de matéria-prima.
+        /// </summary>
+        public async Task<double> CalcularPegadaMediaAsync()
+        {
+            // 1. Tenta calcular a partir dos lotes
+            var lotes = await ListarLoteMateriaPrima();
+            if (lotes != null && lotes.Count > 0)
+            {
+                double somaPegada = 0;
+                foreach (var lote in lotes)
+                {
+                    somaPegada += lote.QuantidadeKg * lote.PegadaCarbonoPorKg;
+                }
+                return somaPegada / lotes.Count;
+            }
+
+            // 2. Se não há lotes, calcula a partir dos componentes (peças)
+            var componentes = await ListarVeiculoComponente();
+            if (componentes == null || componentes.Count == 0)
+                return 0;
+
+            // Fator de emissão padrão (kg CO2 por kg de peça) – valor típico para metais
+            const double FatorEmissaoPadrao = 2.5;
+
+            // Agrupa componentes por veículo
+            var grupos = componentes.GroupBy(c => c.fk_Veiculo_Vin);
+            double somaPegadaPorVeiculo = 0;
+            int totalVeiculosComPecas = 0;
+
+            foreach (var grupo in grupos)
+            {
+                double pegadaVeiculo = 0;
+                foreach (var comp in grupo)
+                {
+                    // Usa o PesoKg * fator padrão (sem FatorEmissao)
+                    pegadaVeiculo += comp.PesoKg * FatorEmissaoPadrao;
+                }
+                somaPegadaPorVeiculo += pegadaVeiculo;
+                totalVeiculosComPecas++;
+            }
+
+            // Média por veículo (apenas veículos que têm peças)
+            return totalVeiculosComPecas > 0 ? somaPegadaPorVeiculo / totalVeiculosComPecas : 0;
+        }
+
     }
  }

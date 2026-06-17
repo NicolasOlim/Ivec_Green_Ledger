@@ -423,6 +423,14 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Login efetuado com sucesso!", usuario });
         }
 
+        [Tags("Dashboard")]
+        [HttpGet("pegada-media")]
+        public async Task<IActionResult> GetPegadaMedia()
+        {
+            var media = await _dadosService.CalcularPegadaMediaAsync();
+            return Ok(new { pegadaMedia = media });
+        }
+
         public class LoginRequest
         {
             public string Email { get; set; }

@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace WpfIveco.ViewModels
 {
@@ -33,18 +33,22 @@ namespace WpfIveco.ViewModels
                     using var doc = JsonDocument.Parse(json);
                     var media = doc.RootElement.GetProperty("pegadaMedia").GetDouble();
 
+                    // Formata o valor
                     if (media >= 1000)
                         PegadaMediaFormatada = (media / 1000).ToString("N1") + "K";
-                    else
+                    else if (media > 0)
                         PegadaMediaFormatada = media.ToString("N1") + " kg CO2";
+                    else
+                        PegadaMediaFormatada = "0.0 kg CO2";
                 }
                 else
                 {
                     PegadaMediaFormatada = "Erro ao carregar";
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"[Dashboard] Erro: {ex.Message}");
                 PegadaMediaFormatada = "Indisponível";
             }
         }
