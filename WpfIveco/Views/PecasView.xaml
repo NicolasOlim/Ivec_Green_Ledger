@@ -7,26 +7,90 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+
+        <!-- TÍTULO -->
         <StackPanel Grid.Row="0">
             <TextBlock Style="{StaticResource H1}" Text="Gestão de Componentes"/>
             <TextBlock Style="{StaticResource Subtitle}" Text="Adicione peças manualmente e associe ao Chassi (VIN) de um veículo no Ledger."/>
         </StackPanel>
+
+        <!-- FORMULÁRIO -->
         <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="24" Margin="0,0,0,20">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Margin="0,0,16,0">
-                    <TextBlock Text="Chassi do Veículo (VIN)" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Pecas.NovaPecaVin, UpdateSourceTrigger=PropertyChanged}" MaxLength="17"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Margin="0,0,16,0">
-                    <TextBlock Text="Nome/Descrição da Peça" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding Pecas.NovaPecaNome, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-                <Button Grid.Column="2" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding Pecas.AdicionarPecaManualCommand}" VerticalAlignment="Bottom">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- VIN (ComboBox SEM ESTILO PERSONALIZADO) -->
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Chassi do Veículo (VIN)" Foreground="{StaticResource TextSecondary}" 
+                                   FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+                        <!-- ComboBox padrão do WPF -->
+                        <ComboBox ItemsSource="{Binding Pecas.ListaVins}"
+                                  SelectedItem="{Binding Pecas.VinSelecionado, Mode=TwoWay}"
+                                  MaxDropDownHeight="200"
+                                  Padding="12,10"
+                                  FontSize="14"
+                                  Background="White"
+                                  BorderBrush="{StaticResource ElevatedGray3}"
+                                  BorderThickness="1"
+                                  Foreground="{StaticResource TextPrimary}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontSize="14" Foreground="{StaticResource TextPrimary}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <!-- DEPURAÇÃO: contagem de itens -->
+                        <TextBlock Text="{Binding Pecas.ListaVins.Count, StringFormat='Total VINs: {0}'}" 
+                                   Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="0,4,0,0"/>
+
+                        <!-- DEPURAÇÃO: ListBox para exibir todos os VINs (visível apenas em debug) -->
+                        <ListBox ItemsSource="{Binding Pecas.ListaVins}" 
+                                 Height="60" Margin="0,4,0,0"
+                                 BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="1"
+                                 Background="White" FontSize="11"
+                                 Visibility="Visible">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" Foreground="{StaticResource TextPrimary}"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+
+                    <!-- NOME / DESCRIÇÃO -->
+                    <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                        <TextBlock Text="Nome/Descrição da Peça" Foreground="{StaticResource TextSecondary}" 
+                                   FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
+                                 Text="{Binding Pecas.NovaPecaNome, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <!-- PESO (KG) -->
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Peso da peça (kg)" Foreground="{StaticResource TextSecondary}" 
+                                   FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
+                                 Text="{Binding Pecas.NovaPecaPesoKg, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:F2}}"
+                                 InputScope="Number"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- BOTÃO REGISTRAR -->
+                <Button Grid.Row="1" Style="{StaticResource PrimaryButtonStyle}" 
+                        Command="{Binding Pecas.AdicionarPecaManualCommand}"
+                        HorizontalAlignment="Right" Margin="0,16,0,0" Padding="24,12">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE710;" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
                         <TextBlock Text="Registrar Peça" VerticalAlignment="Center"/>
@@ -34,6 +98,8 @@
                 </Button>
             </Grid>
         </Border>
+
+        <!-- LISTA DE PEÇAS -->
         <Border Grid.Row="2" Style="{StaticResource PremiumCardStyle}" Padding="24" MinHeight="300">
             <Grid>
                 <Grid.RowDefinitions>
@@ -51,6 +117,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" Background="#FFF0E0" Margin="0,0,12,0">
                                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9A1;" FontSize="16" Foreground="{StaticResource AppleOrange}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -62,7 +129,9 @@
                                                 <TextBlock Text="{Binding VinAssociado}" Foreground="{StaticResource AppleBlue}" FontSize="12" FontWeight="Medium"/>
                                             </StackPanel>
                                         </StackPanel>
-                                        <Border Grid.Column="2" Background="#E6F0FF" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+                                        <TextBlock Grid.Column="2" Text="{Binding PesoKg, StringFormat='Peso: {0:N2} kg'}" 
+                                                   Foreground="{StaticResource TextSecondary}" FontSize="12" VerticalAlignment="Center" Margin="10,0,10,0"/>
+                                        <Border Grid.Column="3" Background="#E6F0FF" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
                                             <TextBlock Text="Gravado no Ledger" Foreground="{StaticResource AppleBlue}" FontSize="10" FontWeight="Bold"/>
                                         </Border>
                                     </Grid>
