@@ -447,6 +447,9 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Login efetuado com sucesso!", usuario });
         }
 
+        /// <summary>Retorna a pegada de carbono média (kg CO₂) calculada com base nos dados do Ledger.</summary>
+        /// <remarks>O cálculo consome os lotes de matéria-prima e componentes cadastrados, priorizando os lotes quando disponíveis. O resultado é armazenado em cache por 5 minutos para otimizar o desempenho em consultas repetidas do Dashboard.</remarks>
+        /// <response code="200">Pegada média calculada com sucesso (pode ser 0 se não houver dados).</response>
         [Tags("Dashboard")]
         [HttpGet("pegada-media")]
         public async Task<IActionResult> GetPegadaMedia()
@@ -456,6 +459,9 @@ namespace ApiIveco.Controllers
             return Ok(new { pegadaMedia = media });
         }
 
+        /// <summary>Retorna os dados de emissões por mês para o gráfico YTD (Year‑To‑Date).</summary>
+        /// <remarks>Agrupa as emissões calculadas a partir dos componentes dos veículos (Processo Fabril) e dos lotes de matéria-prima (Cadeia de Fornecedores), organizando os dados por mês/ano com base nas datas de montagem e produção. Em caso de ausência de dados, retorna um conjunto de exemplo para demonstração.</remarks>
+        /// <response code="200">Dados do gráfico gerados com sucesso (inclui meses, valores da fábrica e valores da cadeia).</response>
         [Tags("Dashboard")]
         [HttpGet("grafico-emissoes")]
         public async Task<IActionResult> GetDadosGrafico()
@@ -464,6 +470,9 @@ namespace ApiIveco.Controllers
             return Ok(dados);
         }
 
+        /// <summary>Obtém os indicadores ESG para a página de Análise de Sustentabilidade.</summary>
+        /// <remarks>Calcula a distribuição percentual das emissões por escopo (Escopo 1 – Fábrica, Escopo 2 – Energia, Escopo 3 – Fornecedores) com base nos componentes e lotes cadastrados. Também gera o ranking dos 10 melhores fornecedores verdes, ordenados por um score que considera a quantidade de peças fornecidas e a pegada média por peça.</remarks>
+        /// <response code="200">Dados ESG retornados com sucesso (distribuição de emissões e top fornecedores verdes).</response>
         [Tags("Dashboard")]
         [HttpGet("analises-esg")]
         public async Task<IActionResult> GetDadosAnalisesESG()

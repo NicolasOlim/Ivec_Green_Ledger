@@ -33,7 +33,7 @@ namespace WpfIveco.ViewModels
                     using var doc = JsonDocument.Parse(json);
                     var media = doc.RootElement.GetProperty("pegadaMedia").GetDouble();
 
-                    // Formata o valor
+                    /// Formata o valor
                     if (media >= 1000)
                         PegadaMediaFormatada = (media / 1000).ToString("N1") + "K";
                     else
@@ -41,13 +41,13 @@ namespace WpfIveco.ViewModels
                 }
                 else
                 {
-                    // Se a resposta não for sucesso, tenta usar dados mockados ou 0
+                   /// Se a resposta não for sucesso, tenta usar dados mockados ou 0
                     PegadaMediaFormatada = "0.0 kg CO2";
                 }
             }
             catch
             {
-                // Em caso de erro de conexão, exibe 0 (em vez de "Erro ao carregar")
+                /// Em caso de erro de conexão, exibe 0 (em vez de "Erro ao carregar")
                 PegadaMediaFormatada = "0.0 kg CO2";
                 System.Diagnostics.Debug.WriteLine("[Dashboard] Falha ao carregar pegada média, usando 0.");
             }

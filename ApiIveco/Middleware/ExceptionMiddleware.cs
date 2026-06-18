@@ -51,7 +51,7 @@ namespace ApiIveco
                 _ => (int)HttpStatusCode.InternalServerError /// 500
             };
 
-            //Se for erro 400 ou 422, enviamos a mensagem real da exceção.
+            ///Se for erro 400 ou 422, enviamos a mensagem real da exceção.
             bool enviarMensagemReal = context.Response.StatusCode == 400 || context.Response.StatusCode == 422;
 
             var resposta = new

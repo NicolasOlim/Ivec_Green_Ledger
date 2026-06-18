@@ -18,7 +18,7 @@ namespace WpfIveco.ViewModel
     {
         private readonly HttpClient _httpClient;
 
-        // Lista de VINs
+        /// Lista de VINs
         private ObservableCollection<string> _listaVins = new();
         public ObservableCollection<string> ListaVins
         {
@@ -54,7 +54,7 @@ namespace WpfIveco.ViewModel
             set { _listaPecas = value; OnPropertyChanged(); }
         }
 
-        // Fornecedores
+        /// Fornecedores
         private ObservableCollection<FornecedorModel> _listaFornecedores = new();
         public ObservableCollection<FornecedorModel> ListaFornecedores
         {
@@ -227,7 +227,9 @@ namespace WpfIveco.ViewModel
         }
     }
 
-    // DTO para a API
+    /// <summary>
+    /// DTO para a API
+    /// </summary>
     public class VeiculoComponenteApi
     {
         public string Id { get; set; }

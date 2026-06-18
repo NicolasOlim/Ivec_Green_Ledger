@@ -573,7 +573,7 @@ namespace ApiIveco.Service
         {
             try
             {
-                // 1. Tenta calcular a partir dos lotes de matéria-prima
+               /// 1. Tenta calcular a partir dos lotes de matéria-prima
                 var lotes = await ListarLoteMateriaPrima();
                 if (lotes != null && lotes.Count > 0)
                 {
@@ -585,7 +585,7 @@ namespace ApiIveco.Service
                     return somaPegada / lotes.Count;
                 }
 
-                // 2. Se não há lotes, calcula a partir dos componentes (peças)
+                /// 2. Se não há lotes, calcula a partir dos componentes (peças)
                 var componentes = await ListarVeiculoComponente();
                 if (componentes == null || componentes.Count == 0)
                     return 0;
@@ -610,7 +610,7 @@ namespace ApiIveco.Service
             }
             catch
             {
-                // Em caso de erro, retorna 0 (nunca lança exceção)
+                /// Em caso de erro, retorna 0 (nunca lança exceção)
                 return 0;
             }
         }
@@ -632,7 +632,7 @@ namespace ApiIveco.Service
 
             /// 2. Buscar componentes
             var componentes = await ListarVeiculoComponente();
-            var dictComponentesPorVin = componentes?
+            var di1ctComponentesPorVin = componentes?
                 .GroupBy(c => c.fk_Veiculo_Vin)
                 .ToDictionary(g => g.Key, g => g.ToList()) ?? new Dictionary<string, List<VeiculoComponente>>();
 
@@ -642,7 +642,7 @@ namespace ApiIveco.Service
             foreach (var v in veiculos)
             {
                 double somaPeso = 0;
-                if (dictComponentesPorVin.TryGetValue(v.Vin, out var comps))
+                if (di1ctComponentesPorVin.TryGetValue(v.Vin, out var comps))
                 {
                     somaPeso = comps.Sum(c => c.PesoKg);
                 }
@@ -754,16 +754,16 @@ namespace ApiIveco.Service
         {
             var resultado = new AnalisesESGDto();
 
-            // Buscar dados
+            ///Buscar dados
             var veiculos = await ListarVeiculo();
             var componentes = await ListarVeiculoComponente();
             var fornecedores = await ListarFornecedor();
 
             const double fatorEmissaoPadrao = 2.5;
 
-            // ============================================================
-            // 1. Calcular emissões por fornecedor (baseado nos componentes)
-            // ============================================================
+            /// ============================================================
+            /// 1. Calcular emissões por fornecedor (baseado nos componentes)
+            /// ============================================================
             var dictFornecedorEmissao = new Dictionary<string, double>();
             var dictFornecedorPecas = new Dictionary<string, int>();
 
@@ -782,9 +782,9 @@ namespace ApiIveco.Service
                 }
             }
 
-            // ============================================================
-            // 2. Distribuição de Emissões (Escopo 1, 2, 3)
-            // ============================================================
+            /// ============================================================
+            /// 2. Distribuição de Emissões (Escopo 1, 2, 3)
+            /// ============================================================
             double emissaoVeiculos = 0;
             foreach (var v in veiculos)
             {
@@ -817,9 +817,9 @@ namespace ApiIveco.Service
         };
             }
 
-            // ============================================================
-            // 3. Top Fornecedores Verdes (baseado em componentes)
-            // ============================================================
+            /// ============================================================
+            /// 3. Top Fornecedores Verdes (baseado em componentes)
+            /// ============================================================
             var fornecedoresComDados = new List<FornecedorVerdeDto>();
             if (fornecedores != null)
             {

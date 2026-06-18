@@ -15,7 +15,9 @@ namespace WpfIveco.ViewModels
     {
         private readonly HttpClient _httpClient;
 
-        // Dados do gráfico de barras (Já existentes)
+        /// <summary>
+        /// Dados do gráfico de barras (Já existentes)
+        /// </summary>
         private SeriesCollection _emissoesSeries;
         private string[] _mesesLabels;
 
@@ -33,7 +35,9 @@ namespace WpfIveco.ViewModels
 
         public Func<double, string> Formatter => value => $"{value:N1} t";
 
-        // Dados do gráfico de pizza (Distribuição de Emissões)
+        /// <summary>
+        /// Dados do gráfico de pizza (Distribuição de Emissões)
+        /// </summary>
         private SeriesCollection _distribuicaoSeries;
         public SeriesCollection DistribuicaoSeries
         {
@@ -41,7 +45,9 @@ namespace WpfIveco.ViewModels
             set { _distribuicaoSeries = value; OnPropertyChanged(); }
         }
 
-        // Top Fornecedores Verdes
+        /// <summary>
+        /// Top Fornecedores Verdes
+        /// </summary>
         private List<FornecedorVerdeDto> _topFornecedores;
         public List<FornecedorVerdeDto> TopFornecedores
         {
@@ -86,7 +92,7 @@ namespace WpfIveco.ViewModels
 
         private void InicializarDadosESGExemplo()
         {
-            // Dados de exemplo para o gráfico de pizza
+            /// Dados de exemplo para o gráfico de pizza
             DistribuicaoSeries = new SeriesCollection
             {
                 new PieSeries
@@ -115,7 +121,7 @@ namespace WpfIveco.ViewModels
                 }
             };
 
-            // Dados de exemplo para fornecedores verdes
+            /// Dados de exemplo para fornecedores verdes
             TopFornecedores = new List<FornecedorVerdeDto>
             {
                 new FornecedorVerdeDto { Nome = "Robert Bosch", Localizacao = "Campinas - SP", TotalPecas = 450, PegadaMedia = 2.3, ScoreVerde = 85.5, Certificado = "ISO 14001" },
@@ -127,7 +133,7 @@ namespace WpfIveco.ViewModels
 
         public async Task AtualizarAsync(List<VeiculoModel> veiculos)
         {
-            // Atualiza o gráfico de barras (já existente)
+            /// Atualiza o gráfico de barras (já existente)
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/grafico-emissoes");
@@ -145,7 +151,7 @@ namespace WpfIveco.ViewModels
             }
             catch { /* Fallback mantém dados de exemplo */ }
 
-            // Atualiza os dados ESG (Distribuição e Top Fornecedores)
+            /// Atualiza os dados ESG (Distribuição e Top Fornecedores)
             try
             {
                 var responseEsg = await _httpClient.GetAsync("api/dados/analises-esg");
@@ -156,7 +162,7 @@ namespace WpfIveco.ViewModels
 
                     if (dadosEsg != null && dadosEsg.DistribuicaoEmissoes != null && dadosEsg.DistribuicaoEmissoes.Any())
                     {
-                        // Atualiza gráfico de pizza
+                        /// Atualiza gráfico de pizza
                         var series = new SeriesCollection();
                         foreach (var item in dadosEsg.DistribuicaoEmissoes)
                         {
@@ -183,7 +189,7 @@ namespace WpfIveco.ViewModels
             }
             catch
             {
-                // Mantém dados de exemplo
+                /// Mantém dados de exemplo
             }
         }
 
