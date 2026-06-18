@@ -310,6 +310,67 @@ if (string.IsNullOrEmpty(marca) || !marca.ToUpper().Contains("IVECO"))
     throw new Exception($"VIN inválido para este sistema. A marca detetada foi: {marca ?? "Desconhecida"}. Apenas veículos IVECO são permitidos.");
 }
 
+---
+
+# 📖 Regra de Negócio: Cálculo Ambiental e Emissões
+
+## 1. Visão Geral
+Para garantir a conformidade com as métricas corporativas de governança ambiental (ESG), o ecossistema **Iveco Green Ledger** automatiza o cálculo da pegada de carbono indireta da cadeia de suprimentos. Esta regra dita que o impacto ecológico de cada veículo fabricado deve ser apurado de forma individualizada, cruzando a massa física das peças instaladas com os indicadores ambientais dos seus lotes de origem, seguindo estritamente as diretrizes do **GHG Protocol**.
+
+## 2. Atores e Componentes Envolvidos
+* **Sistema Interno:** Back-End em ASP.NET Core 8 (Motor de Cálculo no `DadosService` e Endpoint no `DadosController`).
+* **Base de Dados:** Firebase Firestore (Coleções `veiculo_componentes` e `lotes_materia_prima`).
+* **Interface Visual (Frontend):** Painel Desktop WPF (`AnalisesViewModel` e gráficos `LiveCharts2`).
+
+## 3. Fluxo de Cálculo e Critérios de Aceitação
+O processamento do balanço ecológico por chassi (VIN) ocorre de forma assíncrona, obedecendo ao seguinte pipeline lógico:
+
+### Passo 3.1: Identificação da Árvore de Componentes
+* O sistema recebe a solicitação de auditoria ESG para um determinado número de chassi (VIN).
+* **Ação:** O Back-End varre a coleção de componentes e isola todas as peças cuja chave estrangeira (`fk_Veiculo_Vin`) corresponda ao chassi solicitado.
+* **Falha/Critério:** Se o chassi não possuir peças associadas, a pegada de carbono retornada é automaticamente `0` (zero).
+
+### Passo 3.2: Rastreabilidade de Lotes e Fatores de Emissão
+* Para cada peça associada ao chassi, o motor de cálculo identifica o lote logístico de origem (`fk_LoteMateriaPrima_Id`).
+* O sistema extrai o indicador de pegada ecológica real do material utilizado nesse lote (ex: Kg de CO₂ equivalente por cada Kg de matéria-prima).
+
+### Passo 3.3: Aplicação do Motor Algorítmico e Contingência
+* O sistema aplica a fórmula padrão de Escopo 3: **Massa Física da Peça (kg) × Fator de Emissão do Lote**.
+* **Regra de Contingência:** Caso a peça esteja associada a um lote que foi removido, ou se o lote não possuir um indicador ambiental registado, o sistema aplica um **fator de emissão padrão/contingência de 2.5 kg CO₂e/kg** (valor típico para componentes metálicos automotivos), garantindo que a métrica ESG nunca seja subnotificada.
+
+### Passo 3.4: Consolidação ESG
+* O sistema soma os valores processados de todas as peças e consolida a Pegada de Carbono Total (em Kg) daquele veículo.
+* O valor final é devolvido via payload JSON para que o Frontend (`AnalisesViewModel`) efetue a plotagem em tempo real no dashboard.
+
+## 4. Matriz de Tratamento Algorítmico
+
+| Cenário de Cálculo | Fator Utilizado | Ação do Motor Algorítmico |
+| :--- | :--- | :--- |
+| Peça associada a Lote válido | Fator Real do Lote (`PegadaCarbonoPorKg`) | Multiplica o peso da peça (Kg) pelo fator específico do lote de matéria-prima. |
+| Peça com Lote inexistente/inválido | Fator de Contingência (`2.5`) | Aplica o multiplicador padrão de segurança (2.5) pelo peso da peça para evitar evasão ESG. |
+| Chassi sem peças associadas | `0` | Retorna zero, indicando que o veículo ainda não iniciou a montagem física no pátio. |
+
+## 5. Implementação Técnica de Referência
+A garantia do vínculo indissociável da pegada de carbono por VIN encontra-se no serviço `DadosService.cs`, através da seguinte arquitetura algorítmica:
+
+```csharp
+double pegadaTotalVeiculo = 0;
+const double FatorEmissaoContingencia = 2.5; // Fator padrão (metais) para ausência de lote
+
+foreach (var comp in componentesDoVeiculo)
+{
+    // Rastreia o lote de origem da matéria-prima
+    var loteOrigem = lotes.FirstOrDefault(l => l.Id == comp.fk_LoteMateriaPrima_Id);
+
+    // Valida a contingência caso falhe o fator real
+    double fatorEmissao = loteOrigem != null ? loteOrigem.PegadaCarbonoPorKg : FatorEmissaoContingencia;
+    
+    // Aplica o motor matemático GHG Protocol
+    pegadaTotalVeiculo += comp.PesoKg * fatorEmissao;
+}
+
+return pegadaTotalVeiculo;
+
   
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
