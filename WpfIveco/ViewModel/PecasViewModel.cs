@@ -18,28 +18,19 @@ namespace WpfIveco.ViewModel
     {
         private readonly HttpClient _httpClient;
 
+        // Lista de VINs
         private ObservableCollection<string> _listaVins = new();
         public ObservableCollection<string> ListaVins
         {
             get => _listaVins;
-            set
-            {
-                _listaVins = value;
-                OnPropertyChanged(nameof(ListaVins));
-                Debug.WriteLine($"[ListaVins] Atualizada com {_listaVins?.Count ?? 0} itens");
-            }
+            set { _listaVins = value; OnPropertyChanged(nameof(ListaVins)); }
         }
 
         private string _vinSelecionado = "";
         public string VinSelecionado
         {
             get => _vinSelecionado;
-            set
-            {
-                _vinSelecionado = value;
-                OnPropertyChanged(nameof(VinSelecionado));
-                Debug.WriteLine($"[VinSelecionado] = {value}");
-            }
+            set { _vinSelecionado = value; OnPropertyChanged(nameof(VinSelecionado)); }
         }
 
         private string _novaPecaNome = "";
@@ -63,6 +54,21 @@ namespace WpfIveco.ViewModel
             set { _listaPecas = value; OnPropertyChanged(); }
         }
 
+        // Fornecedores
+        private ObservableCollection<FornecedorModel> _listaFornecedores = new();
+        public ObservableCollection<FornecedorModel> ListaFornecedores
+        {
+            get => _listaFornecedores;
+            set { _listaFornecedores = value; OnPropertyChanged(); }
+        }
+
+        private FornecedorModel _fornecedorSelecionado;
+        public FornecedorModel FornecedorSelecionado
+        {
+            get => _fornecedorSelecionado;
+            set { _fornecedorSelecionado = value; OnPropertyChanged(nameof(FornecedorSelecionado)); }
+        }
+
         public ICommand AdicionarPecaManualCommand { get; }
 
         public PecasViewModel(HttpClient httpClient)
@@ -75,51 +81,48 @@ namespace WpfIveco.ViewModel
         {
             try
             {
-                Debug.WriteLine("[CARREGAR VINS] Iniciando...");
                 var response = await _httpClient.GetAsync("api/dados/veiculos");
-                Debug.WriteLine($"[CARREGAR VINS] Status: {response.StatusCode}");
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    Debug.WriteLine($"[ERRO CARREGAR VINS] HTTP {(int)response.StatusCode}");
-                    return;
-                }
+                if (!response.IsSuccessStatusCode) return;
 
                 var json = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine($"[CARREGAR VINS] JSON recebido (primeiros 200 chars): {json.Substring(0, Math.Min(200, json.Length))}");
-
                 var veiculos = JsonSerializer.Deserialize<List<VeiculoModel>>(json,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                Debug.WriteLine($"[CARREGAR VINS] Total de veículos: {veiculos?.Count ?? 0}");
-
                 if (veiculos != null && veiculos.Any())
                 {
-                    var vinList = veiculos
-                        .Select(v => v.Vin)
-                        .Where(vin => !string.IsNullOrEmpty(vin))
-                        .Distinct()
-                        .ToList();
-
-                    Debug.WriteLine($"[CARREGAR VINS] Lista de VINs: {string.Join(", ", vinList)}");
-
-                    ///Recria a coleção
+                    var vinList = veiculos.Select(v => v.Vin).Where(vin => !string.IsNullOrEmpty(vin)).Distinct().ToList();
                     ListaVins = new ObservableCollection<string>(vinList);
-
-                    ///Define o primeiro como selecionado
-                    if (ListaVins.Any())
-                        VinSelecionado = ListaVins.First();
-                }
-                else
-                {
-                    Debug.WriteLine("[CARREGAR VINS] Nenhum veículo encontrado.");
-                    ListaVins = new ObservableCollection<string>();
+                    if (ListaVins.Any()) VinSelecionado = ListaVins.First();
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ERRO INESPERADO VINS] {ex.GetType().Name}: {ex.Message}");
+                Debug.WriteLine($"[ERRO VINS] {ex.Message}");
                 MessageBox.Show($"Erro ao carregar VINs: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        public async Task CarregarFornecedoresAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/dados/fornecedores");
+                if (!response.IsSuccessStatusCode) return;
+
+                var json = await response.Content.ReadAsStringAsync();
+                var fornecedores = JsonSerializer.Deserialize<List<FornecedorModel>>(json,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (fornecedores != null && fornecedores.Any())
+                {
+                    ListaFornecedores = new ObservableCollection<FornecedorModel>(fornecedores);
+                    if (ListaFornecedores.Any()) FornecedorSelecionado = ListaFornecedores.First();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[ERRO FORNECEDORES] {ex.Message}");
+                MessageBox.Show($"Erro ao carregar fornecedores: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -128,11 +131,7 @@ namespace WpfIveco.ViewModel
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/componentes");
-                if (!response.IsSuccessStatusCode)
-                {
-                    Debug.WriteLine($"[ERRO CARREGAR PEÇAS] HTTP {(int)response.StatusCode}");
-                    return;
-                }
+                if (!response.IsSuccessStatusCode) return;
 
                 var json = await response.Content.ReadAsStringAsync();
                 var componentesApi = JsonSerializer.Deserialize<List<VeiculoComponenteApi>>(json,
@@ -145,7 +144,8 @@ namespace WpfIveco.ViewModel
                         {
                             NomePeca = c.NomePeca,
                             VinAssociado = c.Fk_Veiculo_Vin,
-                            PesoKg = c.PesoKg
+                            PesoKg = c.PesoKg,
+                            FornecedorId = c.Fk_Fornecedor_Id
                         })
                         .Reverse()
                         .ToList();
@@ -155,7 +155,7 @@ namespace WpfIveco.ViewModel
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ERRO INESPERADO PEÇAS] {ex.GetType().Name}: {ex.Message}");
+                Debug.WriteLine($"[ERRO PEÇAS] {ex.Message}");
             }
         }
 
@@ -163,7 +163,7 @@ namespace WpfIveco.ViewModel
         {
             if (string.IsNullOrWhiteSpace(VinSelecionado))
             {
-                MessageBox.Show("Selecione um veículo VIN válido.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Selecione um veículo.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -175,7 +175,13 @@ namespace WpfIveco.ViewModel
 
             if (NovaPecaPesoKg <= 0)
             {
-                MessageBox.Show("Informe um peso válido (maior que 0 kg).", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Informe um peso > 0 kg.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (FornecedorSelecionado == null || string.IsNullOrWhiteSpace(FornecedorSelecionado.Id))
+            {
+                MessageBox.Show("Selecione um fornecedor.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -185,7 +191,8 @@ namespace WpfIveco.ViewModel
                 NomePeca = NovaPecaNome,
                 Fk_Veiculo_Vin = VinSelecionado,
                 Fk_LoteMateriaPrima_Id = "LOTE-MANUAL-" + DateTime.Now.ToString("yyyyMMdd"),
-                PesoKg = NovaPecaPesoKg
+                PesoKg = NovaPecaPesoKg,
+                Fk_Fornecedor_Id = FornecedorSelecionado?.Id ?? "" 
             };
 
             try
@@ -197,25 +204,37 @@ namespace WpfIveco.ViewModel
                     {
                         NomePeca = NovaPecaNome,
                         VinAssociado = VinSelecionado,
-                        PesoKg = NovaPecaPesoKg
+                        PesoKg = NovaPecaPesoKg,
+                        FornecedorId = FornecedorSelecionado.Id
                     });
 
                     NovaPecaNome = "";
                     NovaPecaPesoKg = 0;
-                    MessageBox.Show("Peça registada com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Peça registrada com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"[ERRO ADICIONAR PEÇA] HTTP {(int)response.StatusCode} -> {erro}");
-                    MessageBox.Show("Não foi possível registar a peça.\nTente novamente.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Debug.WriteLine($"[ERRO ADICIONAR PEÇA] {erro}");
+                    MessageBox.Show("Erro ao registrar peça.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ERRO INESPERADO PEÇA] {ex.Message}");
-                MessageBox.Show("Ocorreu um erro inesperado.\nTente novamente.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                Debug.WriteLine($"[ERRO] {ex.Message}");
+                MessageBox.Show("Erro de conexão.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+    }
+
+    // DTO para a API
+    public class VeiculoComponenteApi
+    {
+        public string Id { get; set; }
+        public string NomePeca { get; set; }
+        public string Fk_Veiculo_Vin { get; set; }
+        public string Fk_LoteMateriaPrima_Id { get; set; }
+        public string Fk_Fornecedor_Id { get; set; }
+        public double PesoKg { get; set; }
     }
 }

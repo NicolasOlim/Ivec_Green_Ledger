@@ -214,7 +214,8 @@ namespace WpfIveco.ViewModel
             await Dashboard.AtualizarPegadaMediaAsync();
             await Rastreabilidade.CarregarVeiculosAsync();
             await Fornecedor.CarregarFornecedoresAsync();
-            await Pecas.CarregarVinsAsync();       
+            await Pecas.CarregarFornecedoresAsync();
+            await Pecas.CarregarVinsAsync();
             await Pecas.CarregarPecasAsync();
             await Analises.AtualizarAsync(Rastreabilidade.ListaVeiculos.ToList());
         }

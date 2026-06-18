@@ -36,20 +36,20 @@ namespace WpfIveco.ViewModels
                     // Formata o valor
                     if (media >= 1000)
                         PegadaMediaFormatada = (media / 1000).ToString("N1") + "K";
-                    else if (media > 0)
-                        PegadaMediaFormatada = media.ToString("N1") + " kg CO2";
                     else
-                        PegadaMediaFormatada = "0.0 kg CO2";
+                        PegadaMediaFormatada = media.ToString("N1") + " kg CO2";
                 }
                 else
                 {
-                    PegadaMediaFormatada = "Erro ao carregar";
+                    // Se a resposta não for sucesso, tenta usar dados mockados ou 0
+                    PegadaMediaFormatada = "0.0 kg CO2";
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                System.Diagnostics.Debug.WriteLine($"[Dashboard] Erro: {ex.Message}");
-                PegadaMediaFormatada = "Indisponível";
+                // Em caso de erro de conexão, exibe 0 (em vez de "Erro ao carregar")
+                PegadaMediaFormatada = "0.0 kg CO2";
+                System.Diagnostics.Debug.WriteLine("[Dashboard] Falha ao carregar pegada média, usando 0.");
             }
         }
     }
