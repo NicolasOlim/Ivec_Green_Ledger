@@ -71,7 +71,7 @@
                         <!-- Logo -->
                         <StackPanel Grid.Row="1" Margin="10,0,0,30" Orientation="Horizontal">
                             <Border Width="45" Height="45" CornerRadius="10" Background="{StaticResource ElevatedGray2}">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEB41;" FontSize="24" Foreground="{StaticResource AppleGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock FontFamily="Segoe UI Emoji" Text="🌿" FontSize="28" Foreground="{StaticResource AppleGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
                                 <TextBlock Text="Iveco S.p.A" Foreground="{StaticResource TextPrimary}" FontWeight="Bold" FontSize="16"/>
@@ -299,7 +299,7 @@
             </Grid>
         </Border>
 
-        <!-- ==================== TELA DE LOGIN / CADASTRO ==================== -->
+        <!-- ==================== TELA DE LOGIN ==================== -->
         <Border CornerRadius="20" Margin="10">
             <Border.Style>
                 <Style TargetType="Border">
@@ -322,72 +322,27 @@
                 </Button>
                 <Border Width="450" Style="{StaticResource PremiumCardStyle}" Padding="40" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <StackPanel>
+                        <!-- Ícone (agora folha) -->
                         <Border Width="60" Height="60" CornerRadius="16" Background="{StaticResource ElevatedGray2}" HorizontalAlignment="Center" Margin="0,0,0,20">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEB41;" FontSize="32" Foreground="{StaticResource AppleGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock FontFamily="Segoe UI Emoji" Text="🌿" FontSize="36" Foreground="{StaticResource AppleGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
-                        <TextBlock HorizontalAlignment="Center" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Text" Value="Iveco Green Ledger"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ModoCadastro}" Value="True">
-                                            <Setter Property="Text" Value="Criar Nova Conta"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                        <StackPanel>
-                            <StackPanel.Style>
-                                <Style TargetType="StackPanel">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ModoCadastro}" Value="True">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </StackPanel.Style>
-                            <TextBlock Text="Nome Completo" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
-                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding CadastroNome, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
-                            <TextBlock Text="Tipo de Acesso (Perfil)" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                <RadioButton Content="Usuário Normal" Foreground="{StaticResource TextPrimary}" IsChecked="True" GroupName="Perfil" Margin="0,0,20,0"/>
-                                <RadioButton Content="Administrador" Foreground="{StaticResource TextPrimary}" GroupName="Perfil"/>
-                            </StackPanel>
-                        </StackPanel>
+
+                        <!-- Título fixo -->
+                        <TextBlock HorizontalAlignment="Center" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8" Text="Iveco Green Ledger"/>
+
+                        <!-- Campos de login -->
                         <TextBlock Text="Endereço de E-mail" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
                         <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding LoginEmail, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+
                         <TextBlock Text="Palavra-Passe" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
                         <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding LoginSenha, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,30"/>
-                        <Button Padding="0,14" Cursor="Hand" BorderThickness="0">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="Command" Value="{Binding FazerLoginCommand}"/>
-                                    <Setter Property="Background" Value="{StaticResource AppleBlue}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ModoCadastro}" Value="True">
-                                            <Setter Property="Command" Value="{Binding FazerCadastroCommand}"/>
-                                            <Setter Property="Background" Value="{StaticResource AppleGreen}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
+
+                        <!-- Botão de login fixo -->
+                        <Button Command="{Binding FazerLoginCommand}" Background="{StaticResource AppleBlue}" Padding="0,14" Cursor="Hand" BorderThickness="0">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="12">
-                                        <TextBlock FontWeight="Bold" FontSize="15" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0,14">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Text" Value="Entrar no Sistema"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding DataContext.ModoCadastro, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                                                            <Setter Property="Text" Value="Concluir Registo"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
+                                        <TextBlock FontWeight="Bold" FontSize="15" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0,14" Text="Entrar no Sistema"/>
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
@@ -399,20 +354,6 @@
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </Button.Template>
-                        </Button>
-                        <Button Command="{Binding AlternarModoAuthCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,20,0,0">
-                            <TextBlock Foreground="{StaticResource AppleBlue}" TextDecorations="Underline" HorizontalAlignment="Center">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Text" Value="Não tem conta? Registre-se aqui."/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding DataContext.ModoCadastro, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                                                <Setter Property="Text" Value="Já tem uma conta? Faça Login."/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
                         </Button>
                     </StackPanel>
                 </Border>
