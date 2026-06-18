@@ -43,18 +43,21 @@ namespace ApiIveco
 
             context.Response.StatusCode = ex switch
             {
-                ArgumentException => (int)HttpStatusCode.BadRequest,
-                KeyNotFoundException => (int)HttpStatusCode.NotFound,
-                UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
-                InvalidOperationException => (int)HttpStatusCode.UnprocessableEntity,
-                HttpRequestException => (int)HttpStatusCode.BadGateway,
-                _ => (int)HttpStatusCode.InternalServerError
+                ArgumentException => (int)HttpStatusCode.BadRequest, /// 400
+                KeyNotFoundException => (int)HttpStatusCode.NotFound, /// 404
+                UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized, /// 401
+                InvalidOperationException => (int)HttpStatusCode.UnprocessableEntity, /// 422
+                HttpRequestException => (int)HttpStatusCode.BadGateway, /// 502
+                _ => (int)HttpStatusCode.InternalServerError /// 500
             };
+
+            //Se for erro 400 ou 422, enviamos a mensagem real da exceção.
+            bool enviarMensagemReal = context.Response.StatusCode == 400 || context.Response.StatusCode == 422;
 
             var resposta = new
             {
                 Status = context.Response.StatusCode,
-                Mensagem = ObterMensagemGenerica(context.Response.StatusCode)
+                Mensagem = enviarMensagemReal ? ex.Message : ObterMensagemGenerica(context.Response.StatusCode)
             };
 
             await context.Response.WriteAsync(JsonSerializer.Serialize(resposta));
