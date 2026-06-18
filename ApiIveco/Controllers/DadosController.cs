@@ -455,6 +455,14 @@ namespace ApiIveco.Controllers
             return Ok(dados);
         }
 
+        [Tags("Dashboard")]
+        [HttpGet("analises-esg")]
+        public async Task<IActionResult> GetDadosAnalisesESG()
+        {
+            var dados = await _dadosService.ObterDadosAnalisesESGAsync();
+            return Ok(dados);
+        }
+
         public class LoginRequest
         {
             public string Email { get; set; }

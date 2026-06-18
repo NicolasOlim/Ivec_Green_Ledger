@@ -14,6 +14,8 @@ namespace WpfIveco.ViewModels
     public class AnalisesViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
+
+        // Dados do gráfico de barras (Já existentes)
         private SeriesCollection _emissoesSeries;
         private string[] _mesesLabels;
 
@@ -31,9 +33,26 @@ namespace WpfIveco.ViewModels
 
         public Func<double, string> Formatter => value => $"{value:N1} t";
 
+        // Dados do gráfico de pizza (Distribuição de Emissões)
+        private SeriesCollection _distribuicaoSeries;
+        public SeriesCollection DistribuicaoSeries
+        {
+            get => _distribuicaoSeries;
+            set { _distribuicaoSeries = value; OnPropertyChanged(); }
+        }
+
+        // Top Fornecedores Verdes
+        private List<FornecedorVerdeDto> _topFornecedores;
+        public List<FornecedorVerdeDto> TopFornecedores
+        {
+            get => _topFornecedores;
+            set { _topFornecedores = value; OnPropertyChanged(); }
+        }
+
         public AnalisesViewModel()
         {
             InicializarDadosExemplo();
+            InicializarDadosESGExemplo();
         }
 
         public AnalisesViewModel(HttpClient httpClient) : this()
@@ -65,8 +84,50 @@ namespace WpfIveco.ViewModels
             };
         }
 
+        private void InicializarDadosESGExemplo()
+        {
+            // Dados de exemplo para o gráfico de pizza
+            DistribuicaoSeries = new SeriesCollection
+            {
+                new PieSeries
+                {
+                    Title = "Escopo 1 (Fábrica)",
+                    Values = new ChartValues<double> { 45 },
+                    Fill = new SolidColorBrush(Color.FromRgb(0, 120, 200)),
+                    DataLabels = true,
+                    LabelPoint = point => $"{point.Y}%"
+                },
+                new PieSeries
+                {
+                    Title = "Escopo 2 (Energia)",
+                    Values = new ChartValues<double> { 30 },
+                    Fill = new SolidColorBrush(Color.FromRgb(100, 200, 100)),
+                    DataLabels = true,
+                    LabelPoint = point => $"{point.Y}%"
+                },
+                new PieSeries
+                {
+                    Title = "Escopo 3 (Fornecedores)",
+                    Values = new ChartValues<double> { 25 },
+                    Fill = new SolidColorBrush(Color.FromRgb(255, 150, 50)),
+                    DataLabels = true,
+                    LabelPoint = point => $"{point.Y}%"
+                }
+            };
+
+            // Dados de exemplo para fornecedores verdes
+            TopFornecedores = new List<FornecedorVerdeDto>
+            {
+                new FornecedorVerdeDto { Nome = "Robert Bosch", Localizacao = "Campinas - SP", TotalPecas = 450, PegadaMedia = 2.3, ScoreVerde = 85.5, Certificado = "ISO 14001" },
+                new FornecedorVerdeDto { Nome = "Continental", Localizacao = "São Bernardo - SP", TotalPecas = 320, PegadaMedia = 3.1, ScoreVerde = 72.0, Certificado = "ISO 14001" },
+                new FornecedorVerdeDto { Nome = "ZF do Brasil", Localizacao = "São Paulo - SP", TotalPecas = 280, PegadaMedia = 4.0, ScoreVerde = 65.2, Certificado = "Pendente" },
+                new FornecedorVerdeDto { Nome = "Dana", Localizacao = "Curitiba - PR", TotalPecas = 210, PegadaMedia = 5.2, ScoreVerde = 58.8, Certificado = "Pendente" }
+            };
+        }
+
         public async Task AtualizarAsync(List<VeiculoModel> veiculos)
         {
+            // Atualiza o gráfico de barras (já existente)
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/grafico-emissoes");
@@ -74,22 +135,55 @@ namespace WpfIveco.ViewModels
                 {
                     var json = await response.Content.ReadAsStringAsync();
                     var dados = JsonSerializer.Deserialize<GraficoEmissoesDto>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
                     if (dados != null && dados.Meses != null && dados.Meses.Length > 0)
                     {
                         MesesLabels = dados.Meses;
                         EmissoesSeries[0].Values = new ChartValues<double>(dados.ValoresFabrica);
                         EmissoesSeries[1].Values = new ChartValues<double>(dados.ValoresCadeia);
-                        return;
                     }
                 }
+            }
+            catch { /* Fallback mantém dados de exemplo */ }
 
-                // Fallback
-                InicializarDadosExemplo();
+            // Atualiza os dados ESG (Distribuição e Top Fornecedores)
+            try
+            {
+                var responseEsg = await _httpClient.GetAsync("api/dados/analises-esg");
+                if (responseEsg.IsSuccessStatusCode)
+                {
+                    var jsonEsg = await responseEsg.Content.ReadAsStringAsync();
+                    var dadosEsg = JsonSerializer.Deserialize<AnalisesESGDto>(jsonEsg, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    if (dadosEsg != null && dadosEsg.DistribuicaoEmissoes != null && dadosEsg.DistribuicaoEmissoes.Any())
+                    {
+                        // Atualiza gráfico de pizza
+                        var series = new SeriesCollection();
+                        foreach (var item in dadosEsg.DistribuicaoEmissoes)
+                        {
+                            var cor = item.Escopo.Contains("Escopo 1") ? Color.FromRgb(0, 120, 200) :
+                                      item.Escopo.Contains("Escopo 2") ? Color.FromRgb(100, 200, 100) :
+                                      Color.FromRgb(255, 150, 50);
+                            series.Add(new PieSeries
+                            {
+                                Title = item.Escopo,
+                                Values = new ChartValues<double> { item.Porcentagem },
+                                Fill = new SolidColorBrush(cor),
+                                DataLabels = true,
+                                LabelPoint = point => $"{point.Y}%"
+                            });
+                        }
+                        DistribuicaoSeries = series;
+                    }
+
+                    if (dadosEsg.TopFornecedoresVerdes != null)
+                    {
+                        TopFornecedores = dadosEsg.TopFornecedoresVerdes;
+                    }
+                }
             }
             catch
             {
-                InicializarDadosExemplo();
+                // Mantém dados de exemplo
             }
         }
 
@@ -98,6 +192,29 @@ namespace WpfIveco.ViewModels
             public string[] Meses { get; set; }
             public double[] ValoresFabrica { get; set; }
             public double[] ValoresCadeia { get; set; }
+        }
+
+        public class AnalisesESGDto
+        {
+            public List<EscopoEmissaoDto> DistribuicaoEmissoes { get; set; }
+            public List<FornecedorVerdeDto> TopFornecedoresVerdes { get; set; }
+        }
+
+        public class EscopoEmissaoDto
+        {
+            public string Escopo { get; set; }
+            public double Porcentagem { get; set; }
+        }
+
+        public class FornecedorVerdeDto
+        {
+            public string Id { get; set; }
+            public string Nome { get; set; }
+            public string Localizacao { get; set; }
+            public int TotalPecas { get; set; }
+            public double PegadaMedia { get; set; }
+            public double ScoreVerde { get; set; }
+            public string Certificado { get; set; }
         }
     }
 }
