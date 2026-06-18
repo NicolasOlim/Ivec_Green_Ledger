@@ -463,16 +463,6 @@ namespace ApiIveco.Controllers
             return Ok(dados);
         }
 
-        [Tags("Dashboard")]
-        [HttpGet("pegada-media")]
-        public async Task<IActionResult> GetPegadaMedia()
-        {
-            _logger.LogInformation("[GET] Calculando pegada média.");
-            var media = await _dadosService.CalcularPegadaMediaAsync();
-            return Ok(new { pegadaMedia = media });
-        }
-
-
         public class LoginRequest
         {
             public string Email { get; set; }

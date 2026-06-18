@@ -86,42 +86,48 @@ namespace WpfIveco.ViewModels
 
         private void InicializarDadosESGExemplo()
         {
+            // Dados de exemplo para o gráfico de pizza
             DistribuicaoSeries = new SeriesCollection
-    {
-        new PieSeries
-        {
-            Title = "Escopo 1 (Fábrica)",
-            Values = new ChartValues<double> { 0 },
-            Fill = new SolidColorBrush(Color.FromRgb(0, 120, 200)),
-            DataLabels = true,
-            LabelPoint = point => $"{point.Y}%"
-        },
-        new PieSeries
-        {
-            Title = "Escopo 2 (Energia)",
-            Values = new ChartValues<double> { 0 },
-            Fill = new SolidColorBrush(Color.FromRgb(100, 200, 100)),
-            DataLabels = true,
-            LabelPoint = point => $"{point.Y}%"
-        },
-        new PieSeries
-        {
-            Title = "Escopo 3 (Fornecedores)",
-            Values = new ChartValues<double> { 0 },
-            Fill = new SolidColorBrush(Color.FromRgb(255, 150, 50)),
-            DataLabels = true,
-            LabelPoint = point => $"{point.Y}%"
-        }
-    };
+            {
+                new PieSeries
+                {
+                    Title = "Escopo 1 (Fábrica)",
+                    Values = new ChartValues<double> { 45 },
+                    Fill = new SolidColorBrush(Color.FromRgb(0, 120, 200)),
+                    DataLabels = true,
+                    LabelPoint = point => $"{point.Y}%"
+                },
+                new PieSeries
+                {
+                    Title = "Escopo 2 (Energia)",
+                    Values = new ChartValues<double> { 30 },
+                    Fill = new SolidColorBrush(Color.FromRgb(100, 200, 100)),
+                    DataLabels = true,
+                    LabelPoint = point => $"{point.Y}%"
+                },
+                new PieSeries
+                {
+                    Title = "Escopo 3 (Fornecedores)",
+                    Values = new ChartValues<double> { 25 },
+                    Fill = new SolidColorBrush(Color.FromRgb(255, 150, 50)),
+                    DataLabels = true,
+                    LabelPoint = point => $"{point.Y}%"
+                }
+            };
 
-            TopFornecedores = new List<FornecedorVerdeDto>();
+            // Dados de exemplo para fornecedores verdes
+            TopFornecedores = new List<FornecedorVerdeDto>
+            {
+                new FornecedorVerdeDto { Nome = "Robert Bosch", Localizacao = "Campinas - SP", TotalPecas = 450, PegadaMedia = 2.3, ScoreVerde = 85.5, Certificado = "ISO 14001" },
+                new FornecedorVerdeDto { Nome = "Continental", Localizacao = "São Bernardo - SP", TotalPecas = 320, PegadaMedia = 3.1, ScoreVerde = 72.0, Certificado = "ISO 14001" },
+                new FornecedorVerdeDto { Nome = "ZF do Brasil", Localizacao = "São Paulo - SP", TotalPecas = 280, PegadaMedia = 4.0, ScoreVerde = 65.2, Certificado = "Pendente" },
+                new FornecedorVerdeDto { Nome = "Dana", Localizacao = "Curitiba - PR", TotalPecas = 210, PegadaMedia = 5.2, ScoreVerde = 58.8, Certificado = "Pendente" }
+            };
         }
 
         public async Task AtualizarAsync(List<VeiculoModel> veiculos)
         {
-            // ============================================================
-            // 1. ATUALIZAR GRÁFICO DE BARRAS (YTD)
-            // ============================================================
+            // Atualiza o gráfico de barras (já existente)
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/grafico-emissoes");
@@ -137,11 +143,9 @@ namespace WpfIveco.ViewModels
                     }
                 }
             }
-            catch { /* mantém dados de exemplo */ }
+            catch { /* Fallback mantém dados de exemplo */ }
 
-            // ============================================================
-            // 2. ATUALIZAR GRÁFICO DE PIZZA (DISTRIBUIÇÃO DE EMISSÕES)
-            // ============================================================
+            // Atualiza os dados ESG (Distribuição e Top Fornecedores)
             try
             {
                 var responseEsg = await _httpClient.GetAsync("api/dados/analises-esg");
@@ -152,7 +156,7 @@ namespace WpfIveco.ViewModels
 
                     if (dadosEsg != null && dadosEsg.DistribuicaoEmissoes != null && dadosEsg.DistribuicaoEmissoes.Any())
                     {
-                        // Atualiza gráfico de pizza com dados reais (mesmo que sejam 0%)
+                        // Atualiza gráfico de pizza
                         var series = new SeriesCollection();
                         foreach (var item in dadosEsg.DistribuicaoEmissoes)
                         {
@@ -170,29 +174,16 @@ namespace WpfIveco.ViewModels
                         }
                         DistribuicaoSeries = series;
                     }
-                    else
-                    {
-                        // Se a API retornar lista vazia, usar dados de exemplo
-                        InicializarDadosESGExemplo();
-                    }
 
-                    // Atualiza top fornecedores
-                    if (dadosEsg?.TopFornecedoresVerdes != null && dadosEsg.TopFornecedoresVerdes.Any())
+                    if (dadosEsg.TopFornecedoresVerdes != null)
                     {
                         TopFornecedores = dadosEsg.TopFornecedoresVerdes;
-                    }
-                    else
-                    {
-                        // Se não houver fornecedores, manter lista vazia (ou dados de exemplo)
-                        TopFornecedores = new List<FornecedorVerdeDto>();
-                        // Opcional: se quiser mostrar exemplos, use InicializarDadosESGExemplo();
                     }
                 }
             }
             catch
             {
-                // Em caso de falha, mantém dados de exemplo
-                InicializarDadosESGExemplo();
+                // Mantém dados de exemplo
             }
         }
 

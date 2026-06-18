@@ -226,7 +226,6 @@ namespace ApiIveco.Service
             if (string.IsNullOrEmpty(id)) throw new ArgumentException("O ID não pode ser nulo ou vazio.");
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionLote).Document(id);
             await docRef.DeleteAsync();
-            _cache.Remove("PegadaMediaCache");
         }
 
         
@@ -270,7 +269,6 @@ namespace ApiIveco.Service
             if (string.IsNullOrEmpty(id)) throw new ArgumentException("O ID não pode ser nulo ou vazio.");
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionComponente).Document(id);
             await docRef.DeleteAsync();
-            _cache.Remove("PegadaMediaCache");
         }
 
         
@@ -377,7 +375,6 @@ namespace ApiIveco.Service
             if (string.IsNullOrEmpty(vin)) throw new ArgumentException("O VIN não pode ser nulo ou vazio.");
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionVeiculo).Document(vin);
             await docRef.DeleteAsync();
-            _cache.Remove("PegadaMediaCache");
         }
 
         
@@ -700,63 +697,68 @@ namespace ApiIveco.Service
 
         /// <summary>
         /// Retorna dados para a página Análise ESG: distribuição de emissões por escopo e top fornecedores verdes.
-        /// Agora baseado em componentes (peças) associados a fornecedores.
         /// </summary>
         public async Task<AnalisesESGDto> ObterDadosAnalisesESGAsync()
         {
             var resultado = new AnalisesESGDto();
 
-            // Buscar dados
+            // 1. Buscar dados
             var veiculos = await ListarVeiculo();
             var componentes = await ListarVeiculoComponente();
+            var lotes = await ListarLoteMateriaPrima();
             var fornecedores = await ListarFornecedor();
 
+            // 2. Calcular emissões totais
             const double fatorEmissaoPadrao = 2.5; // kg CO2/kg
-
-            // ============================================================
-            // 1. Calcular emissões por fornecedor (baseado nos componentes)
-            // ============================================================
-            var dictFornecedorEmissao = new Dictionary<string, double>();
-            var dictFornecedorPecas = new Dictionary<string, int>();
-
-            foreach (var comp in componentes)
-            {
-                if (!string.IsNullOrEmpty(comp.fk_Fornecedor_Id))
-                {
-                    // Soma o peso das peças por fornecedor
-                    if (!dictFornecedorPecas.ContainsKey(comp.fk_Fornecedor_Id))
-                        dictFornecedorPecas[comp.fk_Fornecedor_Id] = 0;
-                    dictFornecedorPecas[comp.fk_Fornecedor_Id]++;
-
-                    // Soma a emissão (PesoKg * fator) por fornecedor
-                    double emissao = comp.PesoKg * fatorEmissaoPadrao;
-                    if (!dictFornecedorEmissao.ContainsKey(comp.fk_Fornecedor_Id))
-                        dictFornecedorEmissao[comp.fk_Fornecedor_Id] = 0;
-                    dictFornecedorEmissao[comp.fk_Fornecedor_Id] += emissao;
-                }
-            }
-
-            // ============================================================
-            // 2. Distribuição de Emissões (Escopo 1, 2, 3)
-            // ============================================================
-            // Escopo 1 – Veículos (soma das emissões de todos os componentes, independente de fornecedor)
             double emissaoVeiculos = 0;
+            double emissaoLotes = 0;
+            double emissaoFornecedores = 0;
+
+            // Emissão dos veículos (Escopo 1 - processo fabril)
             foreach (var v in veiculos)
             {
-                double somaPeso = componentes?.Where(c => c.fk_Veiculo_Vin == v.Vin).Sum(c => c.PesoKg) ?? 0;
+                double somaPeso = 0;
+                var comps = componentes?.Where(c => c.fk_Veiculo_Vin == v.Vin) ?? Enumerable.Empty<VeiculoComponente>();
+                somaPeso = comps.Sum(c => c.PesoKg);
                 emissaoVeiculos += somaPeso * fatorEmissaoPadrao;
             }
 
-            // Escopo 2 – Lotes (mantido, mas você pode remover se não usar lotes)
-            var lotes = await ListarLoteMateriaPrima();
-            double emissaoLotes = lotes?.Sum(l => l.QuantidadeKg * l.PegadaCarbonoPorKg) ?? 0;
-
-            // Escopo 3 – Fornecedores (soma das emissões de componentes agrupadas por fornecedor)
-            double emissaoFornecedores = dictFornecedorEmissao.Values.Sum();
-
-            double total = emissaoVeiculos + emissaoLotes + emissaoFornecedores;
-            if (total > 0)
+            // Emissão dos lotes (Escopo 2 - energia)
+            if (lotes != null)
             {
+                foreach (var l in lotes)
+                {
+                    emissaoLotes += l.QuantidadeKg * l.PegadaCarbonoPorKg;
+                }
+            }
+
+            // Emissão dos fornecedores (Escopo 3 - cadeia)
+            if (fornecedores != null)
+            {
+                // Calcula a pegada média dos fornecedores com base nos lotes associados
+                var dictFornecedores = fornecedores.ToDictionary(f => f.Id, f => f);
+                foreach (var l in lotes ?? Enumerable.Empty<LoteMateriaPrima>())
+                {
+                    if (dictFornecedores.TryGetValue(l.fk_Fornecedor_Id, out var f))
+                    {
+                        emissaoFornecedores += l.QuantidadeKg * l.PegadaCarbonoPorKg * 0.3; // fator de ajuste
+                    }
+                }
+            }
+
+            // Se todas as emissões forem zero, usa dados mockados
+            if (emissaoVeiculos == 0 && emissaoLotes == 0 && emissaoFornecedores == 0)
+            {
+                resultado.DistribuicaoEmissoes = new List<EscopoEmissaoDto>
+        {
+            new EscopoEmissaoDto { Escopo = "Escopo 1 (Fábrica)", Porcentagem = 45 },
+            new EscopoEmissaoDto { Escopo = "Escopo 2 (Energia)", Porcentagem = 30 },
+            new EscopoEmissaoDto { Escopo = "Escopo 3 (Fornecedores)", Porcentagem = 25 }
+        };
+            }
+            else
+            {
+                double total = emissaoVeiculos + emissaoLotes + emissaoFornecedores;
                 resultado.DistribuicaoEmissoes = new List<EscopoEmissaoDto>
         {
             new EscopoEmissaoDto { Escopo = "Escopo 1 (Fábrica)", Porcentagem = Math.Round((emissaoVeiculos / total) * 100, 1) },
@@ -764,50 +766,29 @@ namespace ApiIveco.Service
             new EscopoEmissaoDto { Escopo = "Escopo 3 (Fornecedores)", Porcentagem = Math.Round((emissaoFornecedores / total) * 100, 1) }
         };
             }
-            else
-            {
-                resultado.DistribuicaoEmissoes = new List<EscopoEmissaoDto>
-        {
-            new EscopoEmissaoDto { Escopo = "Escopo 1 (Fábrica)", Porcentagem = 0 },
-            new EscopoEmissaoDto { Escopo = "Escopo 2 (Energia)", Porcentagem = 0 },
-            new EscopoEmissaoDto { Escopo = "Escopo 3 (Fornecedores)", Porcentagem = 0 }
-        };
-            }
 
-            // ============================================================
-            // 3. Top Fornecedores Verdes (baseado em componentes)
-            // ============================================================
+            // 3. Top Fornecedores Verdes (baseado na quantidade de peças e pegada)
             var fornecedoresComDados = new List<FornecedorVerdeDto>();
-            if (fornecedores != null)
+            foreach (var f in fornecedores ?? Enumerable.Empty<Fornecedor>())
             {
-                foreach (var f in fornecedores)
+                // Contar peças fornecidas via lotes
+                var lotesDoFornecedor = lotes?.Where(l => l.fk_Fornecedor_Id == f.Id) ?? Enumerable.Empty<LoteMateriaPrima>();
+                int totalPecas = lotesDoFornecedor.Sum(l => (int)(l.QuantidadeKg / 10)); // estimativa
+                double pegadaMedia = lotesDoFornecedor.Any() ? lotesDoFornecedor.Average(l => l.QuantidadeKg * l.PegadaCarbonoPorKg) : 0;
+
+                // Score verde: quanto menor a pegada e maior o número de peças, melhor
+                double scoreVerde = (pegadaMedia > 0) ? (totalPecas / pegadaMedia) * 100 : totalPecas * 10;
+
+                fornecedoresComDados.Add(new FornecedorVerdeDto
                 {
-                    int totalPecas = dictFornecedorPecas.GetValueOrDefault(f.Id, 0);
-                    double pegadaMedia = 0;
-                    if (totalPecas > 0)
-                    {
-                        double emissaoTotal = dictFornecedorEmissao.GetValueOrDefault(f.Id, 0);
-                        pegadaMedia = emissaoTotal / totalPecas; // média por peça
-                    }
-
-                    double scoreVerde = 0;
-                    if (pegadaMedia > 0)
-                        scoreVerde = Math.Round((totalPecas * 10) / pegadaMedia, 2);
-                    else if (totalPecas > 0)
-                        scoreVerde = totalPecas * 5;
-
-                    fornecedoresComDados.Add(new FornecedorVerdeDto
-                    {
-                        Id = f.Id,
-                        Nome = f.Nome,
-                        Localizacao = f.Localizacao,
-                        TotalPecas = totalPecas,
-                        PegadaMedia = Math.Round(pegadaMedia, 2),
-                        ScoreVerde = scoreVerde,
-                        Certificado = totalPecas == 0 ? "Sem dados" :
-                                      (scoreVerde > 50 ? "ISO 14001" : "Pendente")
-                    });
-                }
+                    Id = f.Id,
+                    Nome = f.Nome,
+                    Localizacao = f.Localizacao,
+                    TotalPecas = totalPecas,
+                    PegadaMedia = pegadaMedia,
+                    ScoreVerde = Math.Round(scoreVerde, 2),
+                    Certificado = scoreVerde > 50 ? "ISO 14001" : "Pendente"
+                });
             }
 
             resultado.TopFornecedoresVerdes = fornecedoresComDados
@@ -817,7 +798,6 @@ namespace ApiIveco.Service
 
             return resultado;
         }
-
 
         public class AnalisesESGDto
         {

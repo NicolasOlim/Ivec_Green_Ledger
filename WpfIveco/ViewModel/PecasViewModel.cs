@@ -18,11 +18,6 @@ namespace WpfIveco.ViewModel
     {
         private readonly HttpClient _httpClient;
 
-        /// <summary>
-        /// PROPRIEDADES
-        /// </summary>
-
-        // Lista de VINs para o ComboBox
         private ObservableCollection<string> _listaVins = new();
         public ObservableCollection<string> ListaVins
         {
@@ -35,7 +30,6 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        // VIN selecionado no ComboBox
         private string _vinSelecionado = "";
         public string VinSelecionado
         {
@@ -69,44 +63,14 @@ namespace WpfIveco.ViewModel
             set { _listaPecas = value; OnPropertyChanged(); }
         }
 
-        // Lista de Fornecedores para o ComboBox
-        private ObservableCollection<FornecedorModel> _listaFornecedores = new();
-        public ObservableCollection<FornecedorModel> ListaFornecedores
-        {
-            get => _listaFornecedores;
-            set { _listaFornecedores = value; OnPropertyChanged(); }
-        }
-
-        // Fornecedor selecionado no ComboBox
-        private FornecedorModel _fornecedorSelecionado;
-        public FornecedorModel FornecedorSelecionado
-        {
-            get => _fornecedorSelecionado;
-            set
-            {
-                _fornecedorSelecionado = value;
-                OnPropertyChanged(nameof(FornecedorSelecionado));
-                Debug.WriteLine($"[FornecedorSelecionado] = {value?.Nome ?? "null"} (ID: {value?.Id ?? "null"})");
-            }
-        }
-
-        /// <summary>
-        /// COMANDOS
-        /// </summary>
         public ICommand AdicionarPecaManualCommand { get; }
 
-        /// <summary>
-        /// CONSTRUTOR
-        /// </summary>
         public PecasViewModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
             AdicionarPecaManualCommand = new RelayCommand(async p => await AdicionarPecaAsync());
         }
 
-        /// <summary>
-        /// CARREGAR VINS DISPONÍVEIS
-        /// </summary>
         public async Task CarregarVinsAsync()
         {
             try
@@ -159,55 +123,6 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        /// <summary>
-        /// CARREGAR FORNECEDORES PARA O COMBOBOX
-        /// </summary>
-        public async Task CarregarFornecedoresAsync()
-        {
-            try
-            {
-                Debug.WriteLine("[CARREGAR FORNECEDORES] Iniciando...");
-                var response = await _httpClient.GetAsync("api/dados/fornecedores");
-                Debug.WriteLine($"[CARREGAR FORNECEDORES] Status: {response.StatusCode}");
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    Debug.WriteLine($"[ERRO CARREGAR FORNECEDORES] HTTP {(int)response.StatusCode}");
-                    return;
-                }
-
-                var json = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine($"[CARREGAR FORNECEDORES] JSON recebido (primeiros 200 chars): {json.Substring(0, Math.Min(200, json.Length))}");
-
-                var fornecedores = JsonSerializer.Deserialize<List<FornecedorModel>>(json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                Debug.WriteLine($"[CARREGAR FORNECEDORES] Total de fornecedores: {fornecedores?.Count ?? 0}");
-
-                if (fornecedores != null && fornecedores.Any())
-                {
-                    ListaFornecedores = new ObservableCollection<FornecedorModel>(fornecedores);
-
-                    // Define o primeiro como selecionado
-                    if (ListaFornecedores.Any())
-                        FornecedorSelecionado = ListaFornecedores.First();
-                }
-                else
-                {
-                    Debug.WriteLine("[CARREGAR FORNECEDORES] Nenhum fornecedor encontrado.");
-                    ListaFornecedores = new ObservableCollection<FornecedorModel>();
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[ERRO INESPERADO FORNECEDORES] {ex.GetType().Name}: {ex.Message}");
-                MessageBox.Show($"Erro ao carregar fornecedores: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        /// <summary>
-        /// CARREGAR PEÇAS
-        /// </summary>
         public async Task CarregarPecasAsync()
         {
             try
@@ -230,8 +145,7 @@ namespace WpfIveco.ViewModel
                         {
                             NomePeca = c.NomePeca,
                             VinAssociado = c.Fk_Veiculo_Vin,
-                            PesoKg = c.PesoKg,
-                            FornecedorId = c.Fk_Fornecedor_Id // <-- ADICIONADO
+                            PesoKg = c.PesoKg
                         })
                         .Reverse()
                         .ToList();
@@ -245,92 +159,62 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        /// <summary>
-        /// ADICIONAR PEÇA MANUAL
-        /// </summary>
         private async Task AdicionarPecaAsync()
         {
-            // VALIDAÇÕES
             if (string.IsNullOrWhiteSpace(VinSelecionado))
             {
-                MessageBox.Show("Selecione um veículo VIN válido.", "Aviso",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Selecione um veículo VIN válido.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(NovaPecaNome))
             {
-                MessageBox.Show("Preencha o nome da peça.", "Aviso",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Preencha o nome da peça.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             if (NovaPecaPesoKg <= 0)
             {
-                MessageBox.Show("Informe um peso válido (maior que 0 kg).", "Aviso",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Informe um peso válido (maior que 0 kg).", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            if (FornecedorSelecionado == null || string.IsNullOrWhiteSpace(FornecedorSelecionado.Id))
-            {
-                MessageBox.Show("Selecione um fornecedor válido.", "Aviso",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            // PREPARA O OBJETO A ENVIAR (INCLUINDO PESO E FORNECEDOR)
             var novaPeca = new
             {
                 Id = Guid.NewGuid().ToString().Substring(0, 8),
                 NomePeca = NovaPecaNome,
                 Fk_Veiculo_Vin = VinSelecionado,
                 Fk_LoteMateriaPrima_Id = "LOTE-MANUAL-" + DateTime.Now.ToString("yyyyMMdd"),
-                PesoKg = NovaPecaPesoKg,
-                Fk_Fornecedor_Id = FornecedorSelecionado.Id // <-- CAMPO ADICIONADO
+                PesoKg = NovaPecaPesoKg
             };
 
             try
             {
                 var response = await _httpClient.PostAsJsonAsync("api/dados/componentes", novaPeca);
-
                 if (response.IsSuccessStatusCode)
                 {
-                    // ADICIONA À LISTA LOCAL (COM O PESO E FORNECEDOR)
                     ListaPecas.Insert(0, new PecaModel
                     {
                         NomePeca = NovaPecaNome,
                         VinAssociado = VinSelecionado,
-                        PesoKg = NovaPecaPesoKg,
-                        FornecedorId = FornecedorSelecionado.Id
+                        PesoKg = NovaPecaPesoKg
                     });
 
-                    // LIMPA OS CAMPOS
                     NovaPecaNome = "";
                     NovaPecaPesoKg = 0;
-
-                    MessageBox.Show("Peça registada com sucesso!", "Sucesso",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Peça registada com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
                     Debug.WriteLine($"[ERRO ADICIONAR PEÇA] HTTP {(int)response.StatusCode} -> {erro}");
-                    MessageBox.Show("Não foi possível registar a peça.\nTente novamente.",
-                        "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Não foi possível registar a peça.\nTente novamente.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-            }
-            catch (HttpRequestException ex)
-            {
-                Debug.WriteLine($"[ERRO CONEXÃO PEÇA] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
-                MessageBox.Show("Não foi possível conectar ao servidor.\nVerifique a sua ligação.",
-                    "Erro de Ligação", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ERRO INESPERADO PEÇA] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
-                MessageBox.Show("Ocorreu um erro inesperado.\nTente novamente ou contacte o suporte.",
-                    "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                Debug.WriteLine($"[ERRO INESPERADO PEÇA] {ex.Message}");
+                MessageBox.Show("Ocorreu um erro inesperado.\nTente novamente.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
