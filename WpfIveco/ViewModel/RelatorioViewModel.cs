@@ -69,22 +69,22 @@ namespace WpfIveco.ViewModel
 
             try
             {
-                // 1. Opcional: Se os dados já estiverem guardados no ViewModel, 
-                // ignore o HttpClient e use as suas listas locais. 
-                // Caso contrário, peça os dados à API em formato JSON:
+                /// 1. Opcional: Se os dados já estiverem guardados no ViewModel, 
+                /// ignore o HttpClient e use as suas listas locais. 
+                /// Caso contrário, peça os dados à API em formato JSON:
                 var urlDados = "api/dados/veiculos"; // Endpoint que devolve a lista de veículos
                 var response = await _httpClient.GetAsync(urlDados);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // 2. Lê os dados e converte para as suas classes C#
+                    /// 2. Lê os dados e converte para as suas classes C#
                     var json = await response.Content.ReadAsStringAsync();
                     var listaVeiculos = JsonSerializer.Deserialize<List<VeiculoModel>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<VeiculoModel>();
 
-                    // (Faça o mesmo para buscar a listaPecas, ou passe uma lista vazia se não precisar)
+                    /// (Faça o mesmo para buscar a listaPecas, ou passe uma lista vazia se não precisar)
                     var listaPecas = new List<PecaModel>();
 
-                    // 3. Abre o diálogo de guardar ficheiro
+                    /// 3. Abre o diálogo de guardar ficheiro
                     var saveDialog = new SaveFileDialog
                     {
                         Filter = "Ficheiro PDF (*.pdf)|*.pdf",
@@ -94,14 +94,14 @@ namespace WpfIveco.ViewModel
 
                     if (saveDialog.ShowDialog() == true)
                     {
-                        // 4. GERA O PDF COM A NOVA CLASSE DE DESIGN E GUARDA O FICHEIRO
+                        /// 4. GERA O PDF COM A NOVA CLASSE DE DESIGN E GUARDA O FICHEIRO
                         var relatorio = new RelatorioVeiculosDocument(listaVeiculos, listaPecas);
                         relatorio.GeneratePdf(saveDialog.FileName);
 
                         MessageBox.Show("Relatório gerado e guardado com sucesso!", "Sucesso",
                             MessageBoxButton.OK, MessageBoxImage.Information);
 
-                        // Abre o PDF automaticamente no leitor padrão
+                        /// Abre o PDF automaticamente no leitor padrão
                         Process.Start(new ProcessStartInfo
                         {
                             FileName = saveDialog.FileName,

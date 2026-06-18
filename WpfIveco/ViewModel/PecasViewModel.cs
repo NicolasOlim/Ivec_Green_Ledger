@@ -103,10 +103,10 @@ namespace WpfIveco.ViewModel
 
                     Debug.WriteLine($"[CARREGAR VINS] Lista de VINs: {string.Join(", ", vinList)}");
 
-                    // Recria a coleção
+                    ///Recria a coleção
                     ListaVins = new ObservableCollection<string>(vinList);
 
-                    // Define o primeiro como selecionado
+                    ///Define o primeiro como selecionado
                     if (ListaVins.Any())
                         VinSelecionado = ListaVins.First();
                 }

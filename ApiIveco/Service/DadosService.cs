@@ -45,7 +45,7 @@ namespace ApiIveco.Service
                 var url = $"https://brasilapi.com.br/api/cnpj/v1/{cnpjLimpo}";
 
                 using var client = new HttpClient();
-                // BLINDAGEM: Diz à Receita Federal que somos um software legítimo para não sermos bloqueados
+                /// BLINDAGEM: Diz à Receita Federal que somos um software legítimo para não sermos bloqueados
                 client.DefaultRequestHeaders.Add("User-Agent", "IvecoApp/1.0");
 
                 var response = await client.GetAsync(url);
@@ -58,7 +58,7 @@ namespace ApiIveco.Service
 
                     if (data != null)
                     {
-                        // Atualizado com os novos nomes da Model
+                        /// Atualizado com os novos nomes da Model
                         string nomeEmpresa = !string.IsNullOrWhiteSpace(data.NomeFantasia)
                             ? data.NomeFantasia
                             : data.RazaoSocial;
@@ -215,7 +215,7 @@ namespace ApiIveco.Service
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionLote).Document(lote.Id);
             await docRef.SetAsync(lote);
 
-            // Invalida cache
+            /// Invalida cache
             _cache.Remove("PegadaMediaCache");
 
             return lote;
@@ -258,7 +258,7 @@ namespace ApiIveco.Service
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionComponente).Document(componente.Id);
             await docRef.SetAsync(componente);
 
-            // Invalida cache
+            /// Invalida cache
             _cache.Remove("PegadaMediaCache");
 
             return componente;
@@ -503,16 +503,16 @@ namespace ApiIveco.Service
         {
             const string cacheKey = "PegadaMediaCache";
 
-            // Tenta obter do cache
+            /// Tenta obter do cache
             if (_cache.TryGetValue(cacheKey, out double cachedValue))
             {
                 return cachedValue;
             }
 
-            // Se não estiver em cache, calcula
+            /// Se não estiver em cache, calcula
             double resultado = await CalcularPegadaMediaInternoAsync();
 
-            // Armazena em cache por 5 minutos
+            /// Armazena em cache por 5 minutos
             _cache.Set(cacheKey, resultado, TimeSpan.FromMinutes(5));
 
             return resultado;
@@ -523,28 +523,28 @@ namespace ApiIveco.Service
         /// </summary>
         private async Task<double> CalcularPegadaMediaInternoAsync()
         {
-            // 1. Tenta calcular a partir dos lotes de matéria-prima
+            /// 1. Tenta calcular a partir dos lotes de matéria-prima
             var lotes = await ListarLoteMateriaPrima();
             if (lotes != null && lotes.Count > 0)
             {
                 double somaPegada = 0;
                 foreach (var lote in lotes)
                 {
-                    // Pegada total do lote = QuantidadeKg * PegadaCarbonoPorKg
+                    /// Pegada total do lote = QuantidadeKg * PegadaCarbonoPorKg
                     somaPegada += lote.QuantidadeKg * lote.PegadaCarbonoPorKg;
                 }
                 return somaPegada / lotes.Count;
             }
 
-            // 2. Se não há lotes, calcula a partir dos componentes (peças)
+            /// 2. Se não há lotes, calcula a partir dos componentes (peças)
             var componentes = await ListarVeiculoComponente();
             if (componentes == null || componentes.Count == 0)
                 return 0;
 
-            // Fator de emissão padrão (kg CO2 por kg de peça) – valor típico para metais
+            /// Fator de emissão padrão (kg CO2 por kg de peça) – valor típico para metais
             const double FatorEmissaoPadrao = 2.5;
 
-            // Agrupa componentes por veículo
+            /// Agrupa componentes por veículo
             var grupos = componentes.GroupBy(c => c.fk_Veiculo_Vin);
             double somaPegadaPorVeiculo = 0;
             int totalVeiculosComPecas = 0;
@@ -560,7 +560,7 @@ namespace ApiIveco.Service
                 totalVeiculosComPecas++;
             }
 
-            // Média por veículo (apenas veículos que têm peças)
+            /// Média por veículo (apenas veículos que têm peças)
             return totalVeiculosComPecas > 0 ? somaPegadaPorVeiculo / totalVeiculosComPecas : 0;
         }
 
@@ -571,15 +571,15 @@ namespace ApiIveco.Service
         {
             var resultado = new GraficoEmissoesDto();
 
-            // 1. Buscar veículos com DataMontagem
+            /// 1. Buscar veículos com DataMontagem
             var veiculos = await ListarVeiculo();
             if (veiculos == null || !veiculos.Any())
             {
-                // Fallback: dados de exemplo
+                /// Fallback: dados de exemplo
                 return ObterDadosExemplo();
             }
 
-            // 2. Buscar componentes
+            /// 2. Buscar componentes
             var componentes = await ListarVeiculoComponente();
             var dictComponentesPorVin = componentes?
                 .GroupBy(c => c.fk_Veiculo_Vin)
@@ -598,7 +598,7 @@ namespace ApiIveco.Service
                 emissaoPorVeiculo[v.Vin] = somaPeso * fatorEmissaoPadrao;
             }
 
-            // 4. Agrupar por mês/ano com base em DataMontagem (apenas veículos com data)
+            ///4. Agrupar por mês/ano com base em DataMontagem (apenas veículos com data)
             var veiculosComData = veiculos
                 .Where(v => v.DataMontagem.HasValue)
                 .Select(v => new
@@ -617,17 +617,17 @@ namespace ApiIveco.Service
                 })
                 .ToList();
 
-            // 5. Se não houver dados com data, usar exemplo
+            ///5. Se não houver dados com data, usar exemplo
             if (!veiculosComData.Any())
             {
                 return ObterDadosExemplo();
             }
 
-            // 6. Preencher resultado
+            ///6. Preencher resultado
             resultado.Meses = veiculosComData.Select(x => $"{x.Mes}/{x.Ano}").ToArray();
             resultado.ValoresFabrica = veiculosComData.Select(x => Math.Round(x.TotalEmissao, 1)).ToArray();
 
-            // 7. Cadeia de Fornecedores (baseado em lotes)
+            ///7. Cadeia de Fornecedores (baseado em lotes)
             var lotes = await ListarLoteMateriaPrima();
             if (lotes != null && lotes.Any())
             {
@@ -643,7 +643,7 @@ namespace ApiIveco.Service
                     })
                     .ToList();
 
-                // Unificar os meses (usar todos os meses de veículos e lotes)
+                /// Unificar os meses (usar todos os meses de veículos e lotes)
                 var todosMeses = veiculosComData
                     .Select(x => new { x.Mes, x.Ano })
                     .Union(lotesPorMes.Select(x => new { x.Mes, x.Ano }))
@@ -651,7 +651,7 @@ namespace ApiIveco.Service
                     .OrderBy(x => x.Ano).ThenBy(x => x.Mes)
                     .ToList();
 
-                // Recalcular séries para ter os mesmos meses
+                /// Recalcular séries para ter os mesmos meses
                 resultado.Meses = todosMeses.Select(x => $"{x.Mes}/{x.Ano}").ToArray();
                 resultado.ValoresFabrica = todosMeses.Select(m =>
                     veiculosComData.FirstOrDefault(x => x.Mes == m.Mes && x.Ano == m.Ano)?.TotalEmissao ?? 0
@@ -662,11 +662,11 @@ namespace ApiIveco.Service
             }
             else
             {
-                // Se não houver lotes, usar zeros
+                /// Se não houver lotes, usar zeros
                 resultado.ValoresCadeia = resultado.Meses.Select(_ => 0.0).ToArray();
             }
 
-            // Garantir que não haja valores negativos
+            /// Garantir que não haja valores negativos
             resultado.ValoresFabrica = resultado.ValoresFabrica.Select(v => v < 0 ? 0 : v).ToArray();
             resultado.ValoresCadeia = resultado.ValoresCadeia.Select(v => v < 0 ? 0 : v).ToArray();
 
@@ -702,19 +702,19 @@ namespace ApiIveco.Service
         {
             var resultado = new AnalisesESGDto();
 
-            // 1. Buscar dados
+            /// 1. Buscar dados
             var veiculos = await ListarVeiculo();
             var componentes = await ListarVeiculoComponente();
             var lotes = await ListarLoteMateriaPrima();
             var fornecedores = await ListarFornecedor();
 
-            // 2. Calcular emissões totais
+            /// 2. Calcular emissões totais
             const double fatorEmissaoPadrao = 2.5; // kg CO2/kg
             double emissaoVeiculos = 0;
             double emissaoLotes = 0;
             double emissaoFornecedores = 0;
 
-            // Emissão dos veículos (Escopo 1 - processo fabril)
+            /// Emissão dos veículos (Escopo 1 - processo fabril)
             foreach (var v in veiculos)
             {
                 double somaPeso = 0;
@@ -723,7 +723,7 @@ namespace ApiIveco.Service
                 emissaoVeiculos += somaPeso * fatorEmissaoPadrao;
             }
 
-            // Emissão dos lotes (Escopo 2 - energia)
+            /// Emissão dos lotes (Escopo 2 - energia)
             if (lotes != null)
             {
                 foreach (var l in lotes)
@@ -732,7 +732,7 @@ namespace ApiIveco.Service
                 }
             }
 
-            // Emissão dos fornecedores (Escopo 3 - cadeia)
+            /// Emissão dos fornecedores (Escopo 3 - cadeia)
             if (fornecedores != null)
             {
                 // Calcula a pegada média dos fornecedores com base nos lotes associados
@@ -746,7 +746,7 @@ namespace ApiIveco.Service
                 }
             }
 
-            // Se todas as emissões forem zero, usa dados mockados
+            /// Se todas as emissões forem zero, usa dados mockados
             if (emissaoVeiculos == 0 && emissaoLotes == 0 && emissaoFornecedores == 0)
             {
                 resultado.DistribuicaoEmissoes = new List<EscopoEmissaoDto>
@@ -767,16 +767,16 @@ namespace ApiIveco.Service
         };
             }
 
-            // 3. Top Fornecedores Verdes (baseado na quantidade de peças e pegada)
+            /// 3. Top Fornecedores Verdes (baseado na quantidade de peças e pegada)
             var fornecedoresComDados = new List<FornecedorVerdeDto>();
             foreach (var f in fornecedores ?? Enumerable.Empty<Fornecedor>())
             {
-                // Contar peças fornecidas via lotes
+                /// Contar peças fornecidas via lotes
                 var lotesDoFornecedor = lotes?.Where(l => l.fk_Fornecedor_Id == f.Id) ?? Enumerable.Empty<LoteMateriaPrima>();
                 int totalPecas = lotesDoFornecedor.Sum(l => (int)(l.QuantidadeKg / 10)); // estimativa
                 double pegadaMedia = lotesDoFornecedor.Any() ? lotesDoFornecedor.Average(l => l.QuantidadeKg * l.PegadaCarbonoPorKg) : 0;
 
-                // Score verde: quanto menor a pegada e maior o número de peças, melhor
+                /// Score verde: quanto menor a pegada e maior o número de peças, melhor
                 double scoreVerde = (pegadaMedia > 0) ? (totalPecas / pegadaMedia) * 100 : totalPecas * 10;
 
                 fornecedoresComDados.Add(new FornecedorVerdeDto

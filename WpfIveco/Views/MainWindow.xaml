@@ -44,47 +44,30 @@
                         </Grid.RowDefinitions>
 
                         <!-- Botões macOS -->
-                        <!-- Botões da janela (estilo Windows com cores) -->
                         <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Top" Margin="8,0,0,30">
-                            <!-- Fechar (vermelho) -->
-                            <Button Width="16" Height="16" Margin="0,0,8,0" Cursor="Hand" Click="CloseButton_Click" ToolTip="Fechar">
+                            <Button Width="14" Height="14" Margin="0,0,8,0" Cursor="Hand" Click="CloseButton_Click" ToolTip="Fechar">
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
-                                        <Border Background="#FF5F56" CornerRadius="2">
-                                            <TextBlock Text="✕" FontSize="10" Foreground="White" 
-                               HorizontalAlignment="Center" VerticalAlignment="Center" 
-                               FontWeight="Bold"/>
-                                        </Border>
+                                        <Ellipse Fill="#FF5F56" Stroke="#E0443E" StrokeThickness="0.5"/>
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
-
-                            <!-- Minimizar (amarelo) -->
-                            <Button Width="16" Height="16" Margin="0,0,8,0" Cursor="Hand" Click="MinimizeButton_Click" ToolTip="Minimizar">
+                            <Button Width="14" Height="14" Margin="0,0,8,0" Cursor="Hand" Click="MinimizeButton_Click" ToolTip="Minimizar">
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
-                                        <Border Background="#FFBD2E" CornerRadius="2">
-                                            <TextBlock Text="─" FontSize="10" Foreground="White" 
-                               HorizontalAlignment="Center" VerticalAlignment="Center" 
-                               FontWeight="Bold"/>
-                                        </Border>
+                                        <Ellipse Fill="#FFBD2E" Stroke="#DEA123" StrokeThickness="0.5"/>
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
-
-                            <!-- Maximizar (verde) -->
-                            <Button Width="16" Height="16" Cursor="Hand" Click="MaximizeButton_Click" ToolTip="Maximizar">
+                            <Button Width="14" Height="14" Cursor="Hand" Click="MaximizeButton_Click" ToolTip="Maximizar">
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
-                                        <Border Background="#27C93F" CornerRadius="2">
-                                            <TextBlock Text="☐" FontSize="10" Foreground="White" 
-                               HorizontalAlignment="Center" VerticalAlignment="Center" 
-                               FontWeight="Bold"/>
-                                        </Border>
+                                        <Ellipse Fill="#27C93F" Stroke="#1AAB29" StrokeThickness="0.5"/>
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
                         </StackPanel>
+
                         <!-- Logo -->
                         <StackPanel Grid.Row="1" Margin="10,0,0,30" Orientation="Horizontal">
                             <Border Width="45" Height="45" CornerRadius="10" Background="{StaticResource ElevatedGray2}">
@@ -350,9 +333,9 @@
                         <!-- Campos de login -->
                         <TextBlock Text="Endereço de E-mail" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
                         <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="{Binding LoginEmail, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+
                         <TextBlock Text="Palavra-Passe" Foreground="{StaticResource TextSecondary}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
                         <PasswordBox x:Name="SenhaPasswordBox" Style="{StaticResource PremiumPasswordBoxStyle}" Margin="0,0,0,30" PasswordChanged="SenhaPasswordBox_PasswordChanged"/>
-
                         <!-- Botão de login fixo -->
                         <Button Command="{Binding FazerLoginCommand}" Background="{StaticResource AppleBlue}" Padding="0,14" Cursor="Hand" BorderThickness="0">
                             <Button.Template>
@@ -371,6 +354,7 @@
                                 </ControlTemplate>
                             </Button.Template>
                         </Button>
+                 
                     </StackPanel>
                 </Border>
             </Grid>

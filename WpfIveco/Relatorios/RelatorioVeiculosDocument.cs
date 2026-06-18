@@ -3,7 +3,7 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System;
 using System.Collections.Generic;
-using WpfIveco.Models; // Ajuste conforme o namespace da sua API/App
+using WpfIveco.Models; 
 
 namespace WpfIveco.Relatorios
 {
@@ -12,7 +12,7 @@ namespace WpfIveco.Relatorios
         private readonly List<VeiculoModel> _veiculos;
         private readonly List<PecaModel> _pecas;
 
-        // Paleta de cores baseada no seu XAML
+        /// Paleta de cores baseada no seu XAML
         private readonly string TextPrimary = "#1C1C1E";
         private readonly string TextSecondary = "#6C6C70";
         private readonly string AppleBlue = "#007AFF";
@@ -70,7 +70,7 @@ namespace WpfIveco.Relatorios
             {
                 column.Spacing(25);
 
-                // Caixa de Resumo
+                /// Caixa de Resumo
                 column.Item().Background(BackgroundGray).BorderLeft(5).BorderColor(AppleBlue).Padding(15).Row(row =>
                 {
                     row.RelativeItem().Column(col =>
@@ -92,14 +92,14 @@ namespace WpfIveco.Relatorios
                     });
                 });
 
-                // Tabela de Veículos
+                /// Tabela de Veículos
                 column.Item().Column(col =>
                 {
                     col.Item().PaddingBottom(5).BorderBottom(1).BorderColor(BorderGray).Text("Rastreabilidade de Veículos").FontSize(16).SemiBold();
                     col.Item().PaddingTop(10).Element(ComposeTabelaVeiculos);
                 });
 
-                // Tabela de Peças Vinculadas
+                /// Tabela de Peças Vinculadas
                 column.Item().Column(col =>
                 {
                     col.Item().PaddingBottom(5).BorderBottom(1).BorderColor(BorderGray).Text("Componentes Vinculados (Amostragem)").FontSize(16).SemiBold();
@@ -114,13 +114,13 @@ namespace WpfIveco.Relatorios
             {
                 table.ColumnsDefinition(columns =>
                 {
-                    columns.RelativeColumn(2); // VIN
-                    columns.RelativeColumn(2); // Modelo
-                    columns.RelativeColumn(2); // Data
-                    columns.RelativeColumn(2); // Status
+                    columns.RelativeColumn(2); ///VIN
+                    columns.RelativeColumn(2); /// Modelo
+                    columns.RelativeColumn(2); /// Data
+                    columns.RelativeColumn(2); /// Status
                 });
 
-                // Headers
+                ///Headers
                 table.Header(header =>
                 {
                     header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray).Text("VIN (Chassi)").SemiBold().FontColor(TextSecondary);
@@ -129,7 +129,7 @@ namespace WpfIveco.Relatorios
                     header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray).Text("Auditoria").SemiBold().FontColor(TextSecondary);
                 });
 
-                // Dados
+                ///Dados
                 foreach (var v in _veiculos)
                 {
                     table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text(v.Vin).SemiBold();
@@ -146,9 +146,9 @@ namespace WpfIveco.Relatorios
             {
                 table.ColumnsDefinition(columns =>
                 {
-                    columns.RelativeColumn(3); // Componente
-                    columns.RelativeColumn(3); // VIN
-                    columns.RelativeColumn(2); // Status Ledger
+                    columns.RelativeColumn(3); ///Componente
+                    columns.RelativeColumn(3); /// VIN
+                    columns.RelativeColumn(2); /// Status Ledger
                 });
 
                 table.Header(header =>

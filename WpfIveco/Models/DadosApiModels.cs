@@ -24,7 +24,7 @@ namespace WpfIveco.Models
         public double PesoKg { get; set; }
     }
 
-    // Esta classe mapeia o JSON retornado pela API em /api/dados/componentes
+    /// Esta classe mapeia o JSON retornado pela API em /api/dados/componentes
     public class VeiculoComponenteApi
     {
         public string Id { get; set; }
