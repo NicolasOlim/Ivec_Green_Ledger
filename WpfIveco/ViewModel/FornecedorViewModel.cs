@@ -17,7 +17,8 @@ namespace WpfIveco.ViewModels
     {
         private readonly HttpClient _httpClient;
 
-        // Propriedades
+        /// Propriedades
+
         private string _cnpjBusca = "";
         public string CnpjBusca
         {
@@ -55,7 +56,7 @@ namespace WpfIveco.ViewModels
 
         public int TotalFornecedores => ListaFornecedores?.Count ?? 0;
 
-        // Comandos
+        /// Comandos
         public ICommand ConsultarCnpjCommand { get; }
         public ICommand SalvarFornecedorCommand { get; }
 
@@ -145,9 +146,9 @@ namespace WpfIveco.ViewModels
 
             try
             {
-                // ================================================
-                // CORREÇÃO: Adicionado o campo "Id" com valor vazio
-                // ================================================
+                /// ================================================
+                ///CORREÇÃO: Adicionado o campo "Id" com valor vazio
+                /// ================================================
                 var fornecedor = new
                 {
                     Id = "",  // <-- LINHA ADICIONADA
@@ -171,7 +172,7 @@ namespace WpfIveco.ViewModels
                     var erro = await response.Content.ReadAsStringAsync();
                     Debug.WriteLine($"[ERRO SALVAR FORNECEDOR] HTTP {(int)response.StatusCode} -> {erro}");
 
-                    // Tratamento específico para erro de validação
+                    ///Tratamento específico para erro de validação
                     if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
                     {
                         try

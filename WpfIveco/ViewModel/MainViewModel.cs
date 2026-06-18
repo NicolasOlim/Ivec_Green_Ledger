@@ -17,7 +17,7 @@ namespace WpfIveco.ViewModel
         private HttpClient _httpClient;
         private readonly DispatcherTimer _timer;
 
-        // SUB-VIEWMODELS
+        ///SUB-VIEWMODELS
         public DashboardViewModel Dashboard { get; }
         public RastreabilidadeViewModel Rastreabilidade { get; }
         public FornecedorViewModel Fornecedor { get; }
@@ -25,7 +25,7 @@ namespace WpfIveco.ViewModel
         public AnalisesViewModel Analises { get; }
         public RelatoriosViewModel Relatorios { get; }
 
-        // ESTADO DE LOGIN
+        /// ESTADO DE LOGIN
         private bool _isBusy = false;
         public bool IsBusy { get => _isBusy; set { _isBusy = value; OnPropertyChanged(); } }
         private bool _isLoggedIn = false;
@@ -35,7 +35,7 @@ namespace WpfIveco.ViewModel
         private bool _modoCadastro = false;
         public bool ModoCadastro { get => _modoCadastro; set { _modoCadastro = value; OnPropertyChanged(); } }
 
-        // CAMPOS DE LOGIN/CADASTRO
+        /// CAMPOS DE LOGIN/CADASTRO
         private string _loginEmail = "";
         public string LoginEmail { get => _loginEmail; set { _loginEmail = value; OnPropertyChanged(); } }
         private string _loginSenha = "";
@@ -49,11 +49,11 @@ namespace WpfIveco.ViewModel
         private string _perfilUsuario = "Sessão não iniciada";
         public string PerfilUsuario { get => _perfilUsuario; set { _perfilUsuario = value; OnPropertyChanged(); } }
 
-        // NAVEGAÇÃO
+        /// NAVEGAÇÃO
         private string _abaAtiva = "Dashboard";
         public string AbaAtiva { get => _abaAtiva; set { _abaAtiva = value; OnPropertyChanged(); } }
 
-        // URL DA API
+        /// URL DA API
         private string _apiUrlConfig = "https://apiivecogreenledger.runasp.net/";
         public string ApiUrlConfig
         {
@@ -69,7 +69,7 @@ namespace WpfIveco.ViewModel
         private string _statusSimulador = "Desativado";
         public string StatusSimulador { get => _statusSimulador; set { _statusSimulador = value; OnPropertyChanged(); } }
 
-        // COMANDOS
+        /// COMANDOS
         public ICommand FazerLoginCommand { get; }
         public ICommand FazerCadastroCommand { get; }
         public ICommand FazerLogoutCommand { get; }
@@ -81,7 +81,7 @@ namespace WpfIveco.ViewModel
         {
             InicializarHttpClient(_apiUrlConfig);
 
-            // INSTANCIA TODOS OS SUB-VIEWMODELS
+            /// INSTANCIA TODOS OS SUB-VIEWMODELS
             Dashboard = new DashboardViewModel(_httpClient);
             Rastreabilidade = new RastreabilidadeViewModel(_httpClient);
             Fornecedor = new FornecedorViewModel(_httpClient);
@@ -89,7 +89,7 @@ namespace WpfIveco.ViewModel
             Analises = new AnalisesViewModel(_httpClient);
             Relatorios = new RelatoriosViewModel(_httpClient);
 
-            // COMANDOS
+            /// COMANDOS
             MudarAbaCommand = new RelayCommand(p => AbaAtiva = p as string);
             AlternarModoAuthCommand = new RelayCommand(p => ModoCadastro = !ModoCadastro);
             LigarDesligarSimuladorCommand = new RelayCommand(p =>
@@ -99,7 +99,7 @@ namespace WpfIveco.ViewModel
             FazerCadastroCommand = new RelayCommand(async p => await ExecutarCadastroAsync());
             FazerLogoutCommand = new RelayCommand(p => ExecutarLogout());
 
-            // TIMER
+            /// TIMER
             _timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(2) };
             _timer.Tick += async (s, e) => await CarregarTudoAsync();
         }
