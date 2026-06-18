@@ -22,54 +22,59 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+
+            <!-- Card 1: Total de Veículos (caminhão) -->
             <Border Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="24">
                 <StackPanel>
-                    <Border Width="40" Height="40" Background="#E6F0FF" HorizontalAlignment="Left" CornerRadius="10">
-                        <TextBlock Text=" " FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Border Width="44" Height="44" Background="#D6EAF8" HorizontalAlignment="Left" CornerRadius="12">
+                        <TextBlock FontFamily="Segoe UI Emoji" Text="🚚" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <TextBlock Text="Total de Veículos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
                     <TextBlock Text="{Binding Rastreabilidade.TotalVeiculos, FallbackValue='0'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
-                    <Border Style="{StaticResource BadgeStyle}" Background="#E6F0FF" Margin="0,10,0,0">
-                        <TextBlock Text="Ao Vivo do Firebase" Foreground="{StaticResource AppleBlue}" FontSize="11" FontWeight="SemiBold"/>
+                    <Border Style="{StaticResource BadgeStyle}" Background="#D6EAF8" Margin="0,10,0,0">
+                        <TextBlock Text="Ao Vivo do Firebase" Foreground="#2980B9" FontSize="11" FontWeight="SemiBold"/>
                     </Border>
                 </StackPanel>
             </Border>
+
+            <!-- Card 2: Fornecedores Ativos (aperto de mão) -->
             <Border Grid.Column="1" Style="{StaticResource PremiumCardStyle}" Margin="10,0,10,0" Padding="24">
                 <StackPanel>
-                    <Border Width="40" Height="40" CornerRadius="10" Background="#E6F0FF" HorizontalAlignment="Left">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE710;" FontSize="18" Foreground="{StaticResource AppleBlue}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Border Width="44" Height="44" CornerRadius="12" Background="#D5F5E3" HorizontalAlignment="Left">
+                        <TextBlock FontFamily="Segoe UI Emoji" Text="🤝" FontSize="26" Foreground="{StaticResource AppleGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <TextBlock Text="Fornecedores Ativos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
                     <TextBlock Text="{Binding Fornecedor.TotalFornecedores, FallbackValue='0'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
-                    <Border Style="{StaticResource BadgeStyle}" Background="#E6F0FF" Margin="0,10,0,0">
-                        <TextBlock Text="Em Conformidade" Foreground="{StaticResource AppleBlue}" FontSize="11" FontWeight="SemiBold"/>
+                    <Border Style="{StaticResource BadgeStyle}" Background="#D5F5E3" Margin="0,10,0,0">
+                        <TextBlock Text="Em Conformidade" Foreground="#27AE60" FontSize="11" FontWeight="SemiBold"/>
                     </Border>
                 </StackPanel>
             </Border>
+
+            <!-- Card 3: Pegada Média (reciclagem) -->
             <Border Grid.Column="2" Style="{StaticResource PremiumCardStyle}" Margin="10,0,0,0" Padding="24">
                 <StackPanel>
-                    <Border Width="40" Height="40" CornerRadius="10" Background="#FFF0E0" HorizontalAlignment="Left">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D9;" FontSize="18" Foreground="{StaticResource AppleOrange}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Border Width="44" Height="44" CornerRadius="12" Background="#D5F5E3" HorizontalAlignment="Left">
+                        <TextBlock FontFamily="Segoe UI Emoji" Text="♻️" FontSize="26" Foreground="#27AE60" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <TextBlock Text="Pegada Média (kg CO2)" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
                     <TextBlock Text="{Binding Dashboard.PegadaMediaFormatada, FallbackValue='0.0K'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
-                    <Border Style="{StaticResource BadgeStyle}" Background="#FFF0E0" Margin="0,10,0,0">
-                        <TextBlock Text="Baseado no Ledger" Foreground="{StaticResource AppleOrange}" FontSize="11" FontWeight="SemiBold"/>
+                    <Border Style="{StaticResource BadgeStyle}" Background="#D5F5E3" Margin="0,10,0,0">
+                        <TextBlock Text="Baseado no Ledger" Foreground="#27AE60" FontSize="11" FontWeight="SemiBold"/>
                     </Border>
                 </StackPanel>
             </Border>
         </Grid>
 
-        <!-- GRÁFICO E TRANSAÇÕES -->
-        <!-- Gráfico de Emissões -->
-        <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="24" MinHeight="350">
+        <!-- GRÁFICO -->
+        <Border Grid.Row="2" Style="{StaticResource PremiumCardStyle}" Padding="24" MinHeight="350">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="Emissões da Cadeia (YTD)" Style="{StaticResource H2}"/>
+                <TextBlock Grid.Row="0" Text="Emissões da Cadeia" Style="{StaticResource H2}"/>
 
                 <lvc:CartesianChart Grid.Row="1" 
                             Series="{Binding Analises.EmissoesSeries}" 
@@ -94,7 +99,6 @@
               FontSize="12"
               LabelFormatter="{Binding Analises.Formatter}"
               MinValue="0">
-                            <!-- FORÇA O EIXO Y A COMEÇAR EM 0 -->
                             <lvc:Axis.Separator>
                                 <lvc:Separator Stroke="{StaticResource ElevatedGray3}" 
                            StrokeDashArray="4" 

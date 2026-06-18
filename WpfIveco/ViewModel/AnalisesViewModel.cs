@@ -216,5 +216,7 @@ namespace WpfIveco.ViewModels
             public double ScoreVerde { get; set; }
             public string Certificado { get; set; }
         }
+
+
     }
 }

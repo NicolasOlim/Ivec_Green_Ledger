@@ -6,29 +6,94 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0">
+
+        <!-- Cabeçalho -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,24">
             <TextBlock Style="{StaticResource H1}" Text="Central de Relatórios"/>
             <TextBlock Style="{StaticResource Subtitle}" Text="Exporte os dados consolidados da cadeia de suprimentos da Iveco em formato PDF oficial."/>
         </StackPanel>
-        <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="30" Margin="0,0,0,20">
+
+        <!-- Card principal -->
+        <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="30">
             <StackPanel>
-                <TextBlock Text="Selecione o tipo de relatório desejado:" Style="{StaticResource H2}" Margin="0,0,0,15"/>
-                <StackPanel Margin="0,0,0,30">
-                    <RadioButton Content="  Relatório Geral de Veículos (Rastreabilidade)" 
-                                 Foreground="{StaticResource TextPrimary}" FontSize="15" Margin="0,0,0,12" 
-                                 IsChecked="True" 
-                                 Command="{Binding Relatorios.MudarTipoRelatorioCommand}" CommandParameter="Veiculos"/>
-                    <RadioButton Content="  Relatório de Fornecedores Cadastrados (Em breve)" 
-                                 Foreground="{StaticResource TextSecondary}" FontSize="15" Margin="0,0,0,12" 
-                                 Command="{Binding Relatorios.MudarTipoRelatorioCommand}" CommandParameter="Fornecedores"/>
-                    <RadioButton Content="  Relatório de Componentes e Peças (Em breve)" 
-                                 Foreground="{StaticResource TextSecondary}" FontSize="15" 
-                                 Command="{Binding Relatorios.MudarTipoRelatorioCommand}" CommandParameter="Pecas"/>
-                </StackPanel>
-                <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding Relatorios.GerarRelatorioPdfCommand}" HorizontalAlignment="Left" Padding="24,14">
+                <TextBlock Text="Selecione o tipo de relatório desejado:" Style="{StaticResource H2}" Margin="0,0,0,20"/>
+
+                <!-- Opção 1: Veículos -->
+                <Border Background="{StaticResource ElevatedGray2}" CornerRadius="12" Padding="16,14" Margin="0,0,0,12" Cursor="Hand">
+                    <RadioButton GroupName="RelatorioGroup" IsChecked="True"
+                                 Checked="RadioButton_Checked" Tag="Veiculos">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="40" Height="40" CornerRadius="8" 
+                                    Background="{StaticResource ElevatedGray3}" Margin="0,0,12,0">
+                                <TextBlock FontFamily="Segoe UI Emoji" Text="🚛" 
+                                           FontSize="20" Foreground="{StaticResource AppleBlue}" 
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Relatório Geral de Veículos" 
+                                           Foreground="{StaticResource TextPrimary}" 
+                                           FontWeight="SemiBold" FontSize="15"/>
+                                <TextBlock Text="Dados completos de rastreabilidade e histórico da frota" 
+                                           Foreground="{StaticResource TextSecondary}" 
+                                           FontSize="12" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </RadioButton>
+                </Border>
+
+                <!-- Opção 2: Fornecedores -->
+                <Border Background="{StaticResource ElevatedGray2}" CornerRadius="12" Padding="16,14" Margin="0,0,0,12" Cursor="Hand">
+                    <RadioButton GroupName="RelatorioGroup" 
+                                 Checked="RadioButton_Checked" Tag="Fornecedores">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="40" Height="40" CornerRadius="8" 
+                                    Background="{StaticResource ElevatedGray3}" Margin="0,0,12,0">
+                                <TextBlock FontFamily="Segoe UI Emoji" Text="🤝" 
+                                           FontSize="20" Foreground="{StaticResource AppleGreen}" 
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Relatório de Fornecedores Cadastrados" 
+                                           Foreground="{StaticResource TextPrimary}" 
+                                           FontWeight="SemiBold" FontSize="15"/>
+                                <TextBlock Text="Lista completa com certificações e pegada de carbono" 
+                                           Foreground="{StaticResource TextSecondary}" 
+                                           FontSize="12" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </RadioButton>
+                </Border>
+
+                <!-- Opção 3: Peças -->
+                <Border Background="{StaticResource ElevatedGray2}" CornerRadius="12" Padding="16,14" Margin="0,0,0,20" Cursor="Hand">
+                    <RadioButton GroupName="RelatorioGroup" 
+                                 Checked="RadioButton_Checked" Tag="Pecas">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="40" Height="40" CornerRadius="8" 
+                                    Background="{StaticResource ElevatedGray3}" Margin="0,0,12,0">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74C;" 
+                                           FontSize="20" Foreground="{StaticResource AppleOrange}" 
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Relatório de Componentes e Peças" 
+                                           Foreground="{StaticResource TextPrimary}" 
+                                           FontWeight="SemiBold" FontSize="15"/>
+                                <TextBlock Text="Inventário detalhado com origem e sustentabilidade" 
+                                           Foreground="{StaticResource TextSecondary}" 
+                                           FontSize="12" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </RadioButton>
+                </Border>
+
+                <!-- Botão Gerar Relatório -->
+                <Button Style="{StaticResource PrimaryButtonStyle}" 
+                        Command="{Binding Relatorios.GerarRelatorioPdfCommand}" 
+                        HorizontalAlignment="Left" Padding="24,14">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Processar e Baixar Relatório" FontSize="15" VerticalAlignment="Center" FontWeight="Bold"/>
+                        <TextBlock Text="Gerar e Baixar Relatório PDF" FontSize="15" VerticalAlignment="Center" FontWeight="Bold"/>
                     </StackPanel>
                 </Button>
             </StackPanel>

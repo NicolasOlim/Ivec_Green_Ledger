@@ -7,13 +7,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Cabeçalho -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,24">
+        <StackPanel Grid.Row="0">
             <TextBlock Style="{StaticResource H1}" Text="Gestão de Fornecedores"/>
             <TextBlock Style="{StaticResource Subtitle}" Text="Cadastre parceiros na rede permissionada do Ledger."/>
         </StackPanel>
 
-        <!-- Card principal -->
         <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="30">
             <Grid>
                 <Grid.RowDefinitions>
@@ -21,13 +19,12 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Título -->
-                <TextBlock Grid.Row="0" Text="Integração Receita Federal" Style="{StaticResource H2}" Margin="0,0,0,20"/>
+                <TextBlock Grid.Row="0" Text="Integração Receita Federal" Style="{StaticResource H2}"/>
 
-                <!-- Linha de busca -->
-                <Grid Grid.Row="1" Margin="0,0,0,24">
+                <Grid Grid.Row="1" Margin="0,0,0,30">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -64,137 +61,51 @@
                     </Button>
                 </Grid>
 
-                <!-- Área de resultados (alterna entre dados e mensagem informativa) -->
-                <Grid Grid.Row="2">
-                    <!-- ========== PAINEL DE DADOS (quando encontrado) ========== -->
-                    <Grid>
-                        <Grid.Style>
-                            <Style TargetType="Grid">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Fornecedor.CnpjEncontrado}" Value="True">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
+                <Grid Grid.Row="2" Margin="0,0,0,30">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Razão Social" Foreground="{StaticResource TextSecondary}" 
+                                   FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
+                                 Text="{Binding Fornecedor.NomeFornecedorEncontrado}" 
+                                 IsReadOnly="True" Background="#F9F9FB"/>
+                        <TextBlock Text="Status RFB" Foreground="{StaticResource TextSecondary}" 
+                                   FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="ATIVA" 
+                                 IsReadOnly="True" Foreground="{StaticResource AppleGreen}" Background="#F9F9FB"/>
+                    </StackPanel>
 
-                        <!-- Coluna esquerda -->
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Razão Social" Foreground="{StaticResource TextSecondary}" 
-                                       FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
-                                     Text="{Binding Fornecedor.NomeFornecedorEncontrado}" 
-                                     IsReadOnly="True" Background="#F9F9FB"/>
-
-                            <TextBlock Text="Status RFB" Foreground="{StaticResource TextSecondary}" 
-                                       FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
-                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="ATIVA" 
-                                     IsReadOnly="True" Foreground="{StaticResource AppleGreen}" Background="#F9F9FB"/>
-                        </StackPanel>
-
-                        <!-- Coluna direita -->
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="Endereço Sede" Foreground="{StaticResource TextSecondary}" 
-                                       FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
-                                     Text="{Binding Fornecedor.LocalizacaoFornecedorEncontrado}" 
-                                     IsReadOnly="True" Background="#F9F9FB"/>
-
-                            <TextBlock Text="Categoria ESG (Atribuída)" Foreground="{StaticResource TextSecondary}" 
-                                       FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
-                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="Pendente de Auditoria" 
-                                     IsReadOnly="True" Foreground="{StaticResource AppleOrange}" Background="#F9F9FB"/>
-                        </StackPanel>
-                    </Grid>
-
-                    <!-- ========== CARD INFORMATIVO (quando NÃO encontrado) ========== -->
-                    <Border Background="{StaticResource ElevatedGray1}" 
-                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1" 
-                            CornerRadius="12" Padding="20">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Fornecedor.CnpjEncontrado}" Value="False">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <!-- Ícone -->
-                            <Border Grid.Column="0" Width="48" Height="48" CornerRadius="24" 
-                                    Background="{StaticResource AppleBlue}">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE721;" 
-                                           FontSize="24" Foreground="White" 
-                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-
-                            <!-- Texto -->
-                            <StackPanel Grid.Column="1" Margin="16,0,20,0" VerticalAlignment="Center">
-                                <TextBlock Text="CNPJ não localizado na base da Receita Federal" 
-                                           FontWeight="SemiBold" FontSize="15" 
-                                           Foreground="{StaticResource TextPrimary}"/>
-                                <TextBlock Text="Para continuar, registre este fornecedor manualmente no Ledger. 
-                                               Os dados serão validados internamente." 
-                                           FontSize="13" Foreground="{StaticResource TextSecondary}" 
-                                           TextWrapping="Wrap" Margin="0,4,0,0"/>
-                            </StackPanel>
-
-                            <!-- Botão de ação (já existe no rodapé, mas mantemos aqui para agilidade) -->
-                            <Button Grid.Column="2" Command="{Binding Fornecedor.SalvarFornecedorCommand}" 
-                                    Background="{StaticResource AppleGreen}" Padding="16,10" 
-                                    Cursor="Hand" BorderThickness="0" VerticalAlignment="Center">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="8">
-                                            <TextBlock Text="Registrar no Ledger" FontWeight="SemiBold" 
-                                                       FontSize="14" Foreground="White" Padding="16,10"/>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="border" Property="Opacity" Value="0.85"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                        </Grid>
-                    </Border>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Endereço Sede" Foreground="{StaticResource TextSecondary}" 
+                                   FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
+                                 Text="{Binding Fornecedor.LocalizacaoFornecedorEncontrado}" 
+                                 IsReadOnly="True" Background="#F9F9FB"/>
+                        <TextBlock Text="Categoria ESG (Atribuída)" Foreground="{StaticResource TextSecondary}" 
+                                   FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="Pendente de Auditoria" 
+                                 IsReadOnly="True" Foreground="{StaticResource AppleOrange}" Background="#F9F9FB"/>
+                    </StackPanel>
                 </Grid>
 
-                <!-- Linha separadora -->
                 <Border Grid.Row="3" BorderBrush="{StaticResource ElevatedGray3}" 
-                        BorderThickness="0,0,0,1" Margin="0,20,0,20"/>
+                        BorderThickness="0,0,0,1" Margin="0,0,0,20"/>
 
-                <!-- Rodapé com mensagem e botão de registro -->
-                <Grid Grid.Row="3">
+                <Grid Grid.Row="4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Mensagem de status (sucesso ou informativa) -->
                     <TextBlock Grid.Column="0" Text="{Binding Fornecedor.MensagemCadastro}" 
                                Foreground="{StaticResource AppleGreen}" FontSize="14" 
-                               VerticalAlignment="Center" FontWeight="Medium" 
-                               Margin="0,0,16,0" TextWrapping="Wrap"/>
+                               VerticalAlignment="Center" FontWeight="Medium"/>
 
-                    <!-- Botão de registro (sempre visível, mas pode ser desabilitado se necessário) -->
                     <Button Grid.Column="1" Command="{Binding Fornecedor.SalvarFornecedorCommand}" 
                             Cursor="Hand" BorderThickness="0">
                         <Button.Template>

@@ -42,6 +42,15 @@ namespace WpfIveco
                 this.WindowState = WindowState.Maximized;
             else
                 this.WindowState = WindowState.Normal;
+
+        }
+
+        private void SenhaPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel viewModel)
+            {
+                viewModel.LoginSenha = ((PasswordBox)sender).Password;
+            }
         }
 
         /// <summary>
