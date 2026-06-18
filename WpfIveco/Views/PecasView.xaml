@@ -49,7 +49,7 @@
                                                VerticalAlignment="Center"
                                                IsHitTestVisible="False"/>
 
-                                    <!-- Conteúdo selecionado (CORRIGIDO) -->
+                                    <!-- Conteúdo selecionado -->
                                     <ContentPresenter x:Name="ContentPresenter"
                                                       Grid.Column="1"
                                                       Content="{TemplateBinding SelectionBoxItem}"
@@ -59,21 +59,19 @@
 
                                     <!-- Seta dropdown -->
                                     <ToggleButton x:Name="PART_DropDownToggle"
-              Grid.Column="2"
-              Focusable="False"
-              ClickMode="Press"
-              Background="Transparent"
-              BorderThickness="0"
-              HorizontalAlignment="Right"
-              Margin="0,0,14,0"
-              VerticalAlignment="Center"
-              
-              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
-
+                                                  Grid.Column="2"
+                                                  Focusable="False"
+                                                  ClickMode="Press"
+                                                  Background="Transparent"
+                                                  BorderThickness="0"
+                                                  HorizontalAlignment="Right"
+                                                  Margin="0,0,14,0"
+                                                  VerticalAlignment="Center"
+                                                  IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
                                         <Path Fill="{StaticResource TextSecondary}"
-          Data="M0,0 L5,5 L10,0 Z"
-          Width="12" Height="7"
-          Stretch="Fill"/>
+                                              Data="M0,0 L5,5 L10,0 Z"
+                                              Width="12" Height="7"
+                                              Stretch="Fill"/>
                                     </ToggleButton>
                                 </Grid>
                             </Border>
@@ -188,14 +186,16 @@
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0">
+                    <!-- 4 COLUNAS: VIN | FORNECEDOR | NOME | PESO -->
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
                     <!-- VIN (ComboBox) -->
-                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
                         <TextBlock Text="Chassi do Veículo (VIN)" Foreground="{StaticResource TextSecondary}" 
                                    FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
                         <ComboBox Style="{StaticResource PremiumComboBoxStyle}"
@@ -204,8 +204,20 @@
                                   MaxDropDownHeight="200"/>
                     </StackPanel>
 
+                    <!-- FORNECEDOR -->
+                    <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                        <TextBlock Text="Fornecedor" Foreground="{StaticResource TextSecondary}" 
+               FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <ComboBox Style="{StaticResource PremiumComboBoxStyle}"
+              ItemsSource="{Binding Pecas.ListaFornecedores}"
+              SelectedItem="{Binding Pecas.FornecedorSelecionado, Mode=TwoWay}"
+              DisplayMemberPath="Nome"
+              MaxDropDownHeight="200"/>
+                    </StackPanel>
+
+
                     <!-- NOME -->
-                    <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                    <StackPanel Grid.Column="2" Margin="0,0,12,0">
                         <TextBlock Text="Nome/Descrição da Peça" Foreground="{StaticResource TextSecondary}" 
                                    FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
                         <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
@@ -213,7 +225,7 @@
                     </StackPanel>
 
                     <!-- PESO -->
-                    <StackPanel Grid.Column="2">
+                    <StackPanel Grid.Column="3">
                         <TextBlock Text="Peso da peça (kg)" Foreground="{StaticResource TextSecondary}" 
                                    FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
                         <TextBox Style="{StaticResource PremiumTextBoxStyle}" 

@@ -22,6 +22,7 @@ namespace WpfIveco.Models
         public string NomePeca { get; set; }
         public string VinAssociado { get; set; }
         public double PesoKg { get; set; }
+        public string FornecedorId { get; set; } // <-- NOVO
     }
 
     // Esta classe mapeia o JSON retornado pela API em /api/dados/componentes
@@ -32,5 +33,6 @@ namespace WpfIveco.Models
         public string Fk_Veiculo_Vin { get; set; }
         public string Fk_LoteMateriaPrima_Id { get; set; }
         public double PesoKg { get; set; }
+        public string Fk_Fornecedor_Id { get; internal set; }
     }
 }
