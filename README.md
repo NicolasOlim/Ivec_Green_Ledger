@@ -141,6 +141,40 @@ O Diagrama de Sequência do Iveco Green Ledger descreve a ordem cronológica em 
 - **Persistência e Confirmação (Firestore):** O back-end grava os dados consolidados no Firebase Firestore de forma assíncrona. O banco confirma a gravação para a API, que responde com status HTTP 200 para o cliente WPF, atualizando instantaneamente os gráficos do LiveCharts2.
 
 ---
+
+## Arquitetura do Projeto
+ 
+O projeto segue rigorosamente o padrão **MVVM (Model-View-ViewModel)** na camada de apresentação e uma arquitetura de **serviços desacoplados** na API REST.
+ 
+```
+Ivec_Green_Ledger/
+├── ApiIveco/                  # Backend principal — ASP.NET Core REST API
+│   ├── Controllers/           # Endpoints HTTP (CRUD completo)
+│   ├── Data/                  # Configuração do Firebase Client
+│   ├── Models/                # Entidades do domínio
+│   ├── Services/              # Regras de negócio e acesso ao Firebase
+│   └── Program.cs             # Configuração da aplicação, DI, Swagger, CORS
+│
+├── WpfIveco/                  # Frontend — WPF Desktop (MVVM)
+│   ├── Commands/              # RelayCommand (padrão Command do MVVM)
+│   ├── Converters/            # IValueConverter para binding de UI
+│   ├── Imgs/                  # Recursos de imagem
+│   ├── Models/                # Espelho das entidades do domínio
+│   ├── Services/              # Serviços de negócio e integrações
+│   │   └── Interface/         # Interfaces dos serviços
+│   ├── Styles/                # Estilos XAML globais
+│   ├── ViewModels/            # Lógica de apresentação
+│   └── Views/                 # Janelas e controles XAML
+│       └── Controls/          # Dashboard, Rastreabilidade, Análises, ESG, Relatórios...
+│
+├── Documentaçao/              # Documentação técnica
+├── Banco de Dados/            # Scripts e documentação do banco
+├── imagens/                   # Recursos visuais (logos, diagramas)
+├── Ivec_Green_Ledger.sln      # Solução .NET unificada
+└── README.md                  # Este arquivo
+```
+
+---
 ## Arquitetura de Persistência de Dados:
 
 O trânsito da informação entre as duas camadas de persistência obedece a um fluxo síncrono-assíncrono controlado por software:
