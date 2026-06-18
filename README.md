@@ -154,6 +154,34 @@ O trânsito da informação entre as duas camadas de persistência obedece a um 
 Essa arquitetura híbrida garante que o Iveco Green Ledger ofereça o melhor de dois mundos: a robustez analítica e a segurança centralizada de um banco de dados em nuvem estruturado para governança ESG, sem sacrificar a resiliência e a continuidade operacional exigidas no chão de fábrica de uma montadora automotiva de grande porte.
 
 ---
+
+## Dicionário de Dados do SQLite (Persistência Local):
+
+#### Tabela – Estrutura Relacional de Contingência (SQLite - Local / WpfIveco)
+
+| Tabela | Coluna | Tipo | Restrição | Descrição |
+| :--- | :--- | :--- | :--- | :--- |
+| **tb_componentes_contingencia** | id_componente | TEXT | PRIMARY KEY | Identificador único (GUID) gerado no chão de fábrica. |
+| | fk_veiculo_vin | TEXT | NOT NULL | Código de chassi de 17 caracteres que receberá a peça. |
+| | nome_componente | TEXT | NOT NULL | Descrição ou nome do insumo logístico associado. |
+| | tipo_material | TEXT | NOT NULL | Categoria do material para o GHG Protocol (ex: Aço, Alumínio). |
+| | peso_kg | REAL | NOT NULL | Massa física total aferida no recebimento de pátio. |
+| | total_co2e | REAL | NOT NULL | Pré-cálculo local e temporário da pegada ecológica. |
+| | data_recebimento | TEXT | NOT NULL | Registro de data e hora (Timestamp) da operação local. |
+| | is_sincronizado | INTEGER | DEFAULT 0 | Flag de controle de rede (0 = Pendente de envio, 1 = Sincronizado na Nuvem). |
+
+#### Tabela – Catálogo de Endpoints da API RESTful (ApiIveco)
+
+| Método | Endpoint URI | Payload (Request) | Resposta (Response) | Descrição Operacional e Integração |
+| :--- | :--- | :--- | :--- | :--- |
+| **POST** | `/api/auth/login` | JSON: `{"email": "...", "senha": "..."}` | JSON: `{"token": "...", "perfil": "..."}` | Realiza a autenticação e valida as permissões de acesso do operador ou administrador na base de usuários. |
+| **POST** | `/api/fornecedores` | JSON: `{"cnpj": "..."}` | JSON: `{"id": "...", "razaoSocial": "...", "status": "Ativo"}` + HTTP 201 | Cadastra fornecedores parceiros consumindo síncronamente a **BrasilAPI** para automatizar os dados da Receita Federal. |
+| **POST** | `/api/dados/validar-vin` | JSON: `{"vin": "..."}` | JSON: `{"vin": "...", "modelo": "...", "marca": "IVECO"}` + HTTP 200 | Validação de fronteira de chassi (17 caracteres). Consome a API da **NHTSA** para homologar a legitimidade industrial da marca. |
+| **POST** | `/api/dados/calcular-escopo3` | JSON: `{"fk_veiculo_vin": "...", "componentes": [...]}` | JSON: `{"vin": "...", "totalEmissaoScope3": 142.50}` + HTTP 200 | Executa o motor algorítmico do **GHG Protocol** baseado na massa física e persiste o documento final no **Firebase Firestore**. |
+| **GET** | `/api/relatorios/dossie/{vin}` | Parâmetro de Rota: `vin` (String) | Stream de Arquivo: `Dossie_Ambiental.pdf` + HTTP 200 | Varre a árvore de componentes daquele chassi e renderiza sob demanda o relatório fiscal paginado utilizando a engine do **QuestPDF**. |
+
+---
+
 ## Viabilidade Técnica:
 
 A análise de viabilidade técnica do ecossistema Iveco Green Ledger foi estruturada para comprovar a capacidade de execução, escalabilidade e resiliência do sistema dentro do ambiente industrial dinâmico da montadora. Abaixo estão detalhados os componentes que sustentam a viabilidade tecnológica da solução.
