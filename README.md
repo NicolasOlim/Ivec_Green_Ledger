@@ -438,6 +438,46 @@ return pegadaTotalVeiculo;
 
 ---
 
+### 1. Atualização do `ExceptionMiddleware`
+Para garantir uma comunicação eficiente e transparente entre a API e a Interface Desktop (WPF), o comportamento de tratamento de erros foi atualizado.
+*   **Comportamento Anterior:** Qualquer erro interno, de validação ou de lógica de negócios, resultava numa devolução de mensagens genéricas.
+*   **Comportamento Atualizado:** Para os códigos de erro associados à semântica das requisições — `400 Bad Request` (validação de dados) e `422 Unprocessable Entity` (violações à lógica de domínio) —, o middleware agora propaga a **mensagem exata** gerada pela exceção, permitindo que a UI forneça um contexto claro aos operadores (Ex: alertas visuais). Os erros internos (`500`) continuam a devolver apenas mensagens genéricas para garantir a segurança da infraestrutura.
+
+### 2. Proteção Contra Orfandade de Dados (Fornecedores)
+Foi implementada uma validação ao processo de eliminação de fornecedores.
+*   **Regra Ativa:** É **proibida** a exclusão de um fornecedor caso já exista algum `LoteMateriaPrima` atrelado ao seu ID na base de dados.
+*   **Motivo:** Evitar a criação de "Lotes Órfãos" que distorceriam as cadeias logísticas do passado e comprometeriam cálculos retroativos.
+*   **Exceção Lançada:** `InvalidOperationException` (Retorna HTTP 422).
+
+### 3. Validações Físicas e Temporais na Criação de Lotes
+O método de criação de `LoteMateriaPrima` foi blindado contra valores nocivos à integridade ambiental.
+*   **Regras Ativas:**
+    *   Não é permitido o registo de lotes com `QuantidadeKg` menor ou igual a zero.
+    *   Não é permitido o registo de lotes com valor negativo na métrica `PegadaCarbonoPorKg`.
+    *   A `DataProducao` inserida não pode referir-se a um período futuro em relação ao relógio atual da máquina (`DateTime.UtcNow`).
+*   **Exceção Lançada:** `ArgumentException` (Retorna HTTP 400).
+
+### 4. Controle Rígido por Balanço de Massa Logística (Cubagem)
+Implementou-se a "Trava de Cubagem" durante o vínculo de novas peças (`VeiculoComponente`) a lotes.
+*   **Regra Ativa:** Ao tentar registar um componente derivado de um lote específico, o sistema avalia o volume remanescente daquele lote. A soma total dos pesos (Kg) de todas as peças extraídas do lote de origem, incluindo a peça atual, **jamais pode ser maior** que a `QuantidadeKg` total cadastrada no próprio lote.
+*   **Motivo:** Bloquear a proliferação artificial de massa produtiva ("criação de matéria"), forçando um espelhamento da realidade do pátio para dentro do sistema.
+*   **Exceção Lançada:** `InvalidOperationException` (Retorna HTTP 422).
+
+### 5. Selo de Imutabilidade Pós-Montagem (Anti-Fraude)
+Foi adicionada uma trava de edição temporal na manipulação do cadastro de Veículos.
+*   **Regra Ativa:** Se um `Veiculo` possui a sua `DataMontagem` já preenchida (veículo finalizado), qualquer tentativa de executar a atualização (método `AtualizarVeiculo` / endpoint `PUT`) resultará em bloqueio integral.
+*   **Motivo:** Garantir a fidedignidade da cadeia de fornecimento. Assim que a linha de montagem termina o chassi (VIN), o seu registo é congelado e blindado de falsificações, preservando o valor e o peso final documentado no relatório ESG.
+*   **Exceção Lançada:** `InvalidOperationException` (Retorna HTTP 422).
+
+---
+
+## 🏗️ Impactos Arquiteturais
+*   Nenhuma tabela ou documento NoSQL foi alterado na sua estrutura base.
+*   Como a validação depende de contagens no banco de dados (Ex: somar pesos na regra 4), o tempo de processamento de novos `VeiculoComponente` aumenta marginalmente devido a `reads` adicionais no Firestore.
+*   O Client (WPF) não exige refatoração pesada, visto que as mensagens detalhadas de impedimento passarão a surgir nas propriedades de `Response.Content` já consumidas pelo serviço de alertas local.
+
+---
+
 # Resultados e Conclusão:
 
 ## Resultados obtidos
