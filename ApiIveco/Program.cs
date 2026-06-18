@@ -11,6 +11,7 @@ Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "logs"));
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // 1. CONFIGURAÇÃO DO SERILOG
 builder.Host.UseSerilog((context, config) =>
 {
@@ -54,6 +55,15 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 
+// 1. Ativa o uso do IMemoryCache (exigido pelo seu DadosService para gerenciar o "PegadaMediaCache")
+builder.Services.AddMemoryCache();
+
+// 2. Registra a sua classe de conexão com o Firebase 
+// (Recomendado como Singleton para não abrir múltiplas conexões desnecessárias com o Firestore)
+builder.Services.AddSingleton<ApiIveco.Data.FireBaseData>();
+
+// 3. Registra o serviço principal que faz a ponte entre os Controllers e o Banco de Dados
+builder.Services.AddScoped<ApiIveco.Service.DadosService>();
 
 var app = builder.Build();
 
