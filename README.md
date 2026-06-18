@@ -255,7 +255,7 @@ O projeto **Iveco Green Ledger** foi concebido como uma solução tecnológica d
 
 ---
 
-# 📖 Regra de Negócio: Validação Restritiva de Chassis (VIN)
+# Regra de Negócio: Validação Restritiva de Chassis (VIN)
 
 ## 1. Visão Geral
 No contexto do ecossistema **Iveco Green Ledger**, é estritamente proibido o registo de componentes logísticos ou a geração de métricas ambientais (Escopo 3) para veículos que não pertençam à fabricante **IVECO**. Esta regra garante a integridade dos relatórios ESG e evita a contaminação da base de dados corporativa com veículos de terceiros.
@@ -310,6 +310,7 @@ if (string.IsNullOrEmpty(marca) || !marca.ToUpper().Contains("IVECO"))
     throw new Exception($"VIN inválido para este sistema. A marca detetada foi: {marca ?? "Desconhecida"}. Apenas veículos IVECO são permitidos.");
 }
 
+```
 ---
 
 # 📖 Regra de Negócio: Cálculo Ambiental e Emissões
@@ -371,7 +372,31 @@ foreach (var comp in componentesDoVeiculo)
 
 return pegadaTotalVeiculo;
 
-  
+  ```
+
+---
+
+# Resultados e Conclusão:
+
+## Resultados obtidos
+A validação prática do ecossistema Iveco Green Ledger comprovou a eficiência da arquitetura distribuída proposta, consolidando os objetivos técnicos, operacionais e ecológicos estabelecidos no início do projeto. Os principais resultados gerados pela integração entre os projetos ApiIveco e WpfIveco são detalhados a seguir:
+
+- **Resiliência Industrial Homologada (Offline-Safe):** Durante os testes de estresse de infraestrutura, simulou-se a perda total de conectividade com a internet no terminal de pátio logístico. A aplicação WpfIveco isolou o erro de rede e ativou com sucesso o buffer local do banco de dados embutido SQLite. O pátio continuou registrando as entradas de insumos e cubagem sem qualquer travamento de interface ou lentidão. Assim que o link de rede foi restabelecido, a rotina assíncrona transmitiu os payloads em lotes via HTTP POST para a ApiIveco, garantindo zero perda de dados e protegendo a montadora contra paradas onerosas na linha de montagem.
+
+- **Precisão Matemática no Cálculo do Escopo 3:** O motor algorítmico codificado em ASP.NET Core 8 eliminou a necessidade de planilhas manuais e estimativas genéricas de carbono. Ao integrar os dados físicos de massa (Kg) extraídos no pátio logístico aos fatores normativos do GHG Protocol armazenados no Firebase Firestore, o sistema passou a discriminar a pegada de carbono equivalente ($CO_2e$) com precisão cirúrgica por componente, vinculando o impacto ambiental diretamente ao código VIN (chassi) consultado e validado na API da NHTSA.
+
+- **Automatização de Processos e Redução de Erros Humanos:** A implementação das validações de fronteira em tempo real transformou a rotina operacional. A integração com a BrasilAPI permitiu que a inserção do CNPJ de um novo fornecedor preenchesse os metadados fiscais e de localização de forma automatizada, enquanto a API da NHTSA bloqueou com sucesso tentativas de cadastro de chassis falsos ou incompatíveis com a frota Iveco. Essas barreiras reduziram drasticamente o tempo de triagem de materiais e anularam erros humanos de digitação.
+
+- **Transparência Analítica e Compliance ESG:** A camada visual alimentada pela biblioteca LiveCharts2 entregou painéis gerenciais dinâmicos e reativos (via padrão MVVM), permitindo que a diretoria da Iveco monitore instantaneamente o balanço de emissões indiretas da cadeia de suprimentos. Complementarmente, o módulo QuestPDF cumpriu seu papel de compliance ao gerar, de forma rápida e ilimitada, relatórios de auditoria paginados e indexados por chassi, prontos para fiscalizações e certificações climáticas externas.
+
+
+## Conclusão:
+
+O desenvolvimento do Iveco Green Ledger cumpriu com êxito o propósito de desenhar uma solução tecnológica economicamente viável (com custo total estimado de R$ 3.900,00) e arquiteturalmente robusta para responder aos desafios modernos de governança climática na indústria automobilística pesada.
+
+Ao unir o poder de processamento em nuvem e a flexibilidade NoSQL do Firebase Firestore à segurança local serverless do SQLite, o projeto provou que é perfeitamente possível projetar softwares de alta performance que respeitem a dinâmica e a hostilidade do chão de fábrica, sem abrir mão da centralização analítica exigida pelas diretrizes globais de ESG.
+
+O ecossistema não apenas otimizou o monitoramento logístico de insumos, mas transformou dados brutos de manufatura em ativos estratégicos de conformidade socioambiental. A amarração indissociável da pegada de carbono de Escopo 3 ao código VIN estabelece um novo patamar de transparência industrial para o grupo Iveco, permitindo rastrear o histórico ecológico de cada veículo comercial desde a sua matéria-prima até a conclusão na linha de montagem.
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
 *Última atualização: 16 de junho de 2026.*
