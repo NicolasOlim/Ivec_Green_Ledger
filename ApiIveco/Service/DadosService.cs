@@ -180,17 +180,29 @@ namespace ApiIveco.Service
 
         public async Task ExcluirFornecedor(string id)
         {
-            if (string.IsNullOrEmpty(id)) throw new ArgumentException("O ID do fornecedor não pode ser nulo ou vazio.");
+            if (string.IsNullOrEmpty(id))
+                throw new ArgumentException("O ID do fornecedor não pode ser nulo ou vazio.");
+
+            // REGRA DE NEGÓCIO: Impedir exclusão de fornecedores com lotes ativos
+            var lotesAtivos = await ListarLoteMateriaPrima();
+            bool possuiLotes = lotesAtivos.Any(l => l.fk_Fornecedor_Id == id);
+
+            if (possuiLotes)
+            {
+                // Vai gerar um HTTP 422
+                throw new InvalidOperationException("Operação Bloqueada: Este fornecedor possui lotes de matéria-prima associados. A exclusão comprometeria a rastreabilidade do Escopo 3.");
+            }
+
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionFornecedor).Document(id);
             await docRef.DeleteAsync();
         }
 
-        
+
         /// <summary>
         /// MÉTODOS FIREBASE: LOTES MATÉRIA-PRIMA
         /// </summary>
         /// <returns></returns>
-        
+
         public async Task<List<LoteMateriaPrima>> ListarLoteMateriaPrima()
         {
             CollectionReference collection = _firestoreDb.Db.Collection(_collectionLote);
@@ -210,6 +222,16 @@ namespace ApiIveco.Service
 
         public async Task<LoteMateriaPrima> CriarLoteMateriaPrima(LoteMateriaPrima lote)
         {
+            /// REGRAS DE NEGÓCIO: Validações físicas e temporais
+            if (lote.QuantidadeKg <= 0)
+                throw new ArgumentException("A quantidade de matéria-prima (Kg) deve ser maior que zero.");
+
+            if (lote.PegadaCarbonoPorKg < 0)
+                throw new ArgumentException("O fator de Pegada de Carbono não pode ser um número negativo.");
+
+            if (lote.DataProducao.HasValue && lote.DataProducao.Value > DateTime.UtcNow)
+                throw new ArgumentException("Violação Temporal: A data de produção do lote não pode estar no futuro.");
+
             int novoId = await GerarProximoId("contador_lote");
             lote.Id = novoId.ToString();
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionLote).Document(lote.Id);
@@ -253,12 +275,38 @@ namespace ApiIveco.Service
 
         public async Task<VeiculoComponente> CriarVeiculoComponente(VeiculoComponente componente)
         {
+            /// REGRA DE NEGÓCIO: Peso válido
+            if (componente.PesoKg <= 0)
+                throw new ArgumentException("O peso da peça deve ser maior que zero.");
+
+            /// REGRA DE NEGÓCIO: Balanço de Massa do Lote (evitar criar matéria infinita)
+            if (!string.IsNullOrEmpty(componente.fk_LoteMateriaPrima_Id))
+            {
+                var lotes = await ListarLoteMateriaPrima();
+                var loteOrigem = lotes.FirstOrDefault(l => l.Id == componente.fk_LoteMateriaPrima_Id);
+
+                if (loteOrigem != null)
+                {
+                    var componentesExistentes = await ListarVeiculoComponente();
+
+                    /// Soma o peso de todas as peças que já consumiram deste mesmo lote
+                    double pesoJaConsumido = componentesExistentes
+                        .Where(c => c.fk_LoteMateriaPrima_Id == loteOrigem.Id)
+                        .Sum(c => c.PesoKg);
+
+                    if ((pesoJaConsumido + componente.PesoKg) > loteOrigem.QuantidadeKg)
+                    {
+                        throw new InvalidOperationException($"Capacidade excedida: O lote {loteOrigem.Id} possui apenas {(loteOrigem.QuantidadeKg - pesoJaConsumido):F2} Kg disponíveis. Tentou associar uma peça de {componente.PesoKg} Kg.");
+                    }
+                }
+            }
+
             int novoId = await GerarProximoId("contador_componente");
             componente.Id = novoId.ToString();
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionComponente).Document(componente.Id);
             await docRef.SetAsync(componente);
 
-            /// Invalida cache
+            // Invalida cache
             _cache.Remove("PegadaMediaCache");
 
             return componente;
@@ -453,6 +501,14 @@ namespace ApiIveco.Service
 
             /// Verifica se o veículo existe antes de atualizar
             if (!snapshot.Exists) return null;
+
+            var veiculoExistente = snapshot.ConvertTo<Veiculo>();
+
+            /// REGRA DE NEGÓCIO: Proteção contra fraude em veículos já montados
+            if (veiculoExistente.DataMontagem.HasValue)
+            {
+                throw new InvalidOperationException($"Auditoria Violada: O veículo {vin} já teve a sua montagem concluída a {veiculoExistente.DataMontagem.Value:dd/MM/yyyy}. Os dados não podem ser alterados para preservar a auditoria ESG.");
+            }
 
             /// Mantém a integridade da chave primária (o VIN original da URL)
             veiculoAtualizado.Vin = vin;
