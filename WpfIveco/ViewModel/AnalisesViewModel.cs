@@ -3,7 +3,6 @@ using LiveCharts.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -53,8 +52,8 @@ namespace WpfIveco.ViewModels
 
         public AnalisesViewModel()
         {
-            InicializarDadosExemplo();
-            InicializarDadosESGExemplo();
+            // Inicializa com coleções vazias (sem dados de exemplo)
+            InicializarVazio();
         }
 
         public AnalisesViewModel(HttpClient httpClient) : this()
@@ -62,15 +61,18 @@ namespace WpfIveco.ViewModels
             _httpClient = httpClient;
         }
 
-        private void InicializarDadosExemplo()
+        /// <summary>
+        /// Inicializa os gráficos com coleções vazias (sem dados de exemplo).
+        /// </summary>
+        private void InicializarVazio()
         {
-            MesesLabels = new[] { "Jan/2025", "Fev/2025", "Mar/2025", "Abr/2025", "Mai/2025", "Jun/2025" };
+            MesesLabels = Array.Empty<string>();
             EmissoesSeries = new SeriesCollection
             {
                 new ColumnSeries
                 {
                     Title = "Processo Fabril Iveco",
-                    Values = new ChartValues<double> { 12.5, 15.2, 14.8, 18.5, 20.1, 22.0 },
+                    Values = new ChartValues<double>(),
                     Fill = new SolidColorBrush(Color.FromRgb(0, 120, 200)),
                     DataLabels = true,
                     LabelPoint = point => $"{point.Y:N1} t"
@@ -78,56 +80,20 @@ namespace WpfIveco.ViewModels
                 new ColumnSeries
                 {
                     Title = "Cadeia de Fornecedores",
-                    Values = new ChartValues<double> { 8.0, 9.5, 8.8, 12.0, 14.5, 16.0 },
+                    Values = new ChartValues<double>(),
                     Fill = new SolidColorBrush(Color.FromRgb(255, 150, 50)),
                     DataLabels = true,
                     LabelPoint = point => $"{point.Y:N1} t"
                 }
             };
+
+            DistribuicaoSeries = new SeriesCollection();
+            TopFornecedores = new List<FornecedorVerdeDto>();
         }
 
-        private void InicializarDadosESGExemplo()
+        public async Task AtualizarAsync()
         {
-            DistribuicaoSeries = new SeriesCollection
-            {
-                new PieSeries
-                {
-                    Title = "Escopo 1 (Fábrica)",
-                    Values = new ChartValues<double> { 45 },
-                    Fill = new SolidColorBrush(Color.FromRgb(0, 120, 200)),
-                    DataLabels = true,
-                    LabelPoint = point => $"{point.Y}%"
-                },
-                new PieSeries
-                {
-                    Title = "Escopo 2 (Energia)",
-                    Values = new ChartValues<double> { 30 },
-                    Fill = new SolidColorBrush(Color.FromRgb(100, 200, 100)),
-                    DataLabels = true,
-                    LabelPoint = point => $"{point.Y}%"
-                },
-                new PieSeries
-                {
-                    Title = "Escopo 3 (Fornecedores)",
-                    Values = new ChartValues<double> { 25 },
-                    Fill = new SolidColorBrush(Color.FromRgb(255, 150, 50)),
-                    DataLabels = true,
-                    LabelPoint = point => $"{point.Y}%"
-                }
-            };
-
-            TopFornecedores = new List<FornecedorVerdeDto>
-            {
-                new FornecedorVerdeDto { Nome = "Robert Bosch", Localizacao = "Campinas - SP", TotalPecas = 450, PegadaMedia = 2.3, ScoreVerde = 85.5, Certificado = "ISO 14001" },
-                new FornecedorVerdeDto { Nome = "Continental", Localizacao = "São Bernardo - SP", TotalPecas = 320, PegadaMedia = 3.1, ScoreVerde = 72.0, Certificado = "ISO 14001" },
-                new FornecedorVerdeDto { Nome = "ZF do Brasil", Localizacao = "São Paulo - SP", TotalPecas = 280, PegadaMedia = 4.0, ScoreVerde = 65.2, Certificado = "Pendente" },
-                new FornecedorVerdeDto { Nome = "Dana", Localizacao = "Curitiba - PR", TotalPecas = 210, PegadaMedia = 5.2, ScoreVerde = 58.8, Certificado = "Pendente" }
-            };
-        }
-
-        public async Task AtualizarAsync(List<VeiculoModel> veiculos)
-        {
-            // 1. Gráfico YTD
+            // 1. Gráfico YTD – dados reais
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/grafico-emissoes");
@@ -144,23 +110,31 @@ namespace WpfIveco.ViewModels
                     }
                     else
                     {
-                        InicializarDadosExemplo();
-                        Debug.WriteLine("[Atualizar] YTD vazio. Fallback.");
+                        // Dados reais vieram vazios – mantém coleções vazias
+                        MesesLabels = Array.Empty<string>();
+                        EmissoesSeries[0].Values = new ChartValues<double>();
+                        EmissoesSeries[1].Values = new ChartValues<double>();
+                        Debug.WriteLine("[Atualizar] YTD vazio (sem dados reais).");
                     }
                 }
                 else
                 {
-                    Debug.WriteLine($"[Atualizar] YTD HTTP {(int)response.StatusCode}");
-                    InicializarDadosExemplo();
+                    Debug.WriteLine($"[Atualizar] YTD HTTP {(int)response.StatusCode} – sem dados.");
+                    // Mantém vazio
+                    MesesLabels = Array.Empty<string>();
+                    EmissoesSeries[0].Values = new ChartValues<double>();
+                    EmissoesSeries[1].Values = new ChartValues<double>();
                 }
             }
             catch
             {
-                Debug.WriteLine("[Atualizar] YTD erro. Fallback.");
-                InicializarDadosExemplo();
+                Debug.WriteLine("[Atualizar] YTD erro – mantendo vazio.");
+                MesesLabels = Array.Empty<string>();
+                EmissoesSeries[0].Values = new ChartValues<double>();
+                EmissoesSeries[1].Values = new ChartValues<double>();
             }
 
-            // 2. Dados ESG
+            // 2. Dados ESG – reais
             try
             {
                 var responseEsg = await _httpClient.GetAsync("api/dados/analises-esg");
@@ -191,8 +165,9 @@ namespace WpfIveco.ViewModels
                     }
                     else
                     {
-                        InicializarDadosESGExemplo();
-                        Debug.WriteLine("[Atualizar] Distribuição vazia. Fallback.");
+                        // Sem dados reais – coleção vazia
+                        DistribuicaoSeries = new SeriesCollection();
+                        Debug.WriteLine("[Atualizar] Distribuição vazia (sem dados reais).");
                     }
 
                     if (dadosEsg?.TopFornecedoresVerdes != null && dadosEsg.TopFornecedoresVerdes.Any())
@@ -202,19 +177,21 @@ namespace WpfIveco.ViewModels
                     else
                     {
                         TopFornecedores = new List<FornecedorVerdeDto>();
-                        Debug.WriteLine("[Atualizar] Nenhum fornecedor verde.");
+                        Debug.WriteLine("[Atualizar] Nenhum fornecedor verde (sem dados reais).");
                     }
                 }
                 else
                 {
-                    Debug.WriteLine($"[Atualizar] ESG HTTP {(int)responseEsg.StatusCode}");
-                    InicializarDadosESGExemplo();
+                    Debug.WriteLine($"[Atualizar] ESG HTTP {(int)responseEsg.StatusCode} – sem dados.");
+                    DistribuicaoSeries = new SeriesCollection();
+                    TopFornecedores = new List<FornecedorVerdeDto>();
                 }
             }
             catch
             {
-                Debug.WriteLine("[Atualizar] ESG erro. Fallback.");
-                InicializarDadosESGExemplo();
+                Debug.WriteLine("[Atualizar] ESG erro – mantendo vazio.");
+                DistribuicaoSeries = new SeriesCollection();
+                TopFornecedores = new List<FornecedorVerdeDto>();
             }
         }
     }
