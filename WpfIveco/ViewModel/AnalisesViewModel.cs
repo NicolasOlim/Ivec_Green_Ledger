@@ -2,6 +2,7 @@
 using LiveCharts.Wpf;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
@@ -133,36 +134,58 @@ namespace WpfIveco.ViewModels
 
         public async Task AtualizarAsync(List<VeiculoModel> veiculos)
         {
-            /// Atualiza o gráfico de barras (já existente)
+            // ============================================================
+            // 1. ATUALIZAR GRÁFICO DE BARRAS (YTD)
+            // ============================================================
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/grafico-emissoes");
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    var dados = JsonSerializer.Deserialize<GraficoEmissoesDto>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    var dados = JsonSerializer.Deserialize<GraficoEmissoesDto>(json,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     if (dados != null && dados.Meses != null && dados.Meses.Length > 0)
                     {
                         MesesLabels = dados.Meses;
                         EmissoesSeries[0].Values = new ChartValues<double>(dados.ValoresFabrica);
                         EmissoesSeries[1].Values = new ChartValues<double>(dados.ValoresCadeia);
                     }
+                    else
+                    {
+                        // Resposta OK mas sem dados – fallback
+                        InicializarDadosExemplo();
+                        Debug.WriteLine("[Atualizar] Dados do gráfico YTD vazios. Fallback ativado.");
+                    }
+                }
+                else
+                {
+                    // Erro HTTP – fallback
+                    Debug.WriteLine($"[Atualizar] Falha no gráfico YTD: HTTP {(int)response.StatusCode}");
+                    InicializarDadosExemplo();
                 }
             }
-            catch { /* Fallback mantém dados de exemplo */ }
+            catch
+            {
+                // Qualquer erro – fallback sem expor detalhes
+                Debug.WriteLine("[Atualizar] Erro ao carregar gráfico YTD. Fallback ativado.");
+                InicializarDadosExemplo();
+            }
 
-            /// Atualiza os dados ESG (Distribuição e Top Fornecedores)
+            // ============================================================
+            // 2. ATUALIZAR DADOS ESG (Distribuição e Top Fornecedores)
+            // ============================================================
             try
             {
                 var responseEsg = await _httpClient.GetAsync("api/dados/analises-esg");
                 if (responseEsg.IsSuccessStatusCode)
                 {
                     var jsonEsg = await responseEsg.Content.ReadAsStringAsync();
-                    var dadosEsg = JsonSerializer.Deserialize<AnalisesESGDto>(jsonEsg, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    var dadosEsg = JsonSerializer.Deserialize<AnalisesESGDto>(jsonEsg,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                     if (dadosEsg != null && dadosEsg.DistribuicaoEmissoes != null && dadosEsg.DistribuicaoEmissoes.Any())
                     {
-                        /// Atualiza gráfico de pizza
                         var series = new SeriesCollection();
                         foreach (var item in dadosEsg.DistribuicaoEmissoes)
                         {
@@ -180,16 +203,33 @@ namespace WpfIveco.ViewModels
                         }
                         DistribuicaoSeries = series;
                     }
+                    else
+                    {
+                        // Resposta OK sem distribuição – fallback
+                        InicializarDadosESGExemplo();
+                        Debug.WriteLine("[Atualizar] Distribuição de emissões vazia. Fallback ativado.");
+                    }
 
-                    if (dadosEsg.TopFornecedoresVerdes != null)
+                    if (dadosEsg?.TopFornecedoresVerdes != null && dadosEsg.TopFornecedoresVerdes.Any())
                     {
                         TopFornecedores = dadosEsg.TopFornecedoresVerdes;
                     }
+                    else
+                    {
+                        TopFornecedores = new List<FornecedorVerdeDto>();
+                        Debug.WriteLine("[Atualizar] Nenhum fornecedor verde retornado.");
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine($"[Atualizar] Falha no ESG: HTTP {(int)responseEsg.StatusCode}");
+                    InicializarDadosESGExemplo();
                 }
             }
             catch
             {
-                /// Mantém dados de exemplo
+                Debug.WriteLine("[Atualizar] Erro ao carregar dados ESG. Fallback ativado.");
+                InicializarDadosESGExemplo();
             }
         }
 
