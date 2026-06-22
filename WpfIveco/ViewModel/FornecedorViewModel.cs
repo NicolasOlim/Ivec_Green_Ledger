@@ -151,7 +151,7 @@ namespace WpfIveco.ViewModels
                 /// ================================================
                 var fornecedor = new
                 {
-                    Id = "",  // <-- LINHA ADICIONADA
+                    Id = "",  
                     Nome = NomeFornecedorEncontrado,
                     Localizacao = LocalizacaoFornecedorEncontrado,
                     Cnpj = CnpjBusca.Replace(".", "").Replace("/", "").Replace("-", "")

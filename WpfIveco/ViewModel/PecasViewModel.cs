@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using WpfIveco.DTO;
 using WpfIveco.Models;
 using WpfIveco.ViewModels;
 
@@ -18,7 +19,7 @@ namespace WpfIveco.ViewModel
     {
         private readonly HttpClient _httpClient;
 
-        /// Lista de VINs
+        // Lista de VINs
         private ObservableCollection<string> _listaVins = new();
         public ObservableCollection<string> ListaVins
         {
@@ -54,7 +55,7 @@ namespace WpfIveco.ViewModel
             set { _listaPecas = value; OnPropertyChanged(); }
         }
 
-        /// Fornecedores
+        // Fornecedores
         private ObservableCollection<FornecedorModel> _listaFornecedores = new();
         public ObservableCollection<FornecedorModel> ListaFornecedores
         {
@@ -95,10 +96,10 @@ namespace WpfIveco.ViewModel
                     if (ListaVins.Any()) VinSelecionado = ListaVins.First();
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[ERRO VINS] {ex.Message}");
-                MessageBox.Show($"Erro ao carregar VINs: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                Debug.WriteLine("[ERRO VINS] Falha ao carregar VINs.");
+                MessageBox.Show("Erro ao carregar VINs.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -119,10 +120,10 @@ namespace WpfIveco.ViewModel
                     if (ListaFornecedores.Any()) FornecedorSelecionado = ListaFornecedores.First();
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[ERRO FORNECEDORES] {ex.Message}");
-                MessageBox.Show($"Erro ao carregar fornecedores: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                Debug.WriteLine("[ERRO FORNECEDORES] Falha ao carregar fornecedores.");
+                MessageBox.Show("Erro ao carregar fornecedores.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -134,7 +135,7 @@ namespace WpfIveco.ViewModel
                 if (!response.IsSuccessStatusCode) return;
 
                 var json = await response.Content.ReadAsStringAsync();
-                var componentesApi = JsonSerializer.Deserialize<List<VeiculoComponenteApi>>(json,
+                var componentesApi = JsonSerializer.Deserialize<List<VeiculoComponenteApiDto>>(json,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 if (componentesApi != null)
@@ -153,9 +154,9 @@ namespace WpfIveco.ViewModel
                     ListaPecas = new ObservableCollection<PecaModel>(listaMapeada);
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[ERRO PEÇAS] {ex.Message}");
+                Debug.WriteLine("[ERRO PEÇAS] Falha ao carregar peças.");
             }
         }
 
@@ -192,7 +193,7 @@ namespace WpfIveco.ViewModel
                 Fk_Veiculo_Vin = VinSelecionado,
                 Fk_LoteMateriaPrima_Id = "LOTE-MANUAL-" + DateTime.Now.ToString("yyyyMMdd"),
                 PesoKg = NovaPecaPesoKg,
-                Fk_Fornecedor_Id = FornecedorSelecionado?.Id ?? "" 
+                Fk_Fornecedor_Id = FornecedorSelecionado.Id
             };
 
             try
@@ -219,24 +220,11 @@ namespace WpfIveco.ViewModel
                     MessageBox.Show("Erro ao registrar peça.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[ERRO] {ex.Message}");
+                Debug.WriteLine("[ERRO] Falha ao adicionar peça.");
                 MessageBox.Show("Erro de conexão.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-    }
-
-    /// <summary>
-    /// DTO para a API
-    /// </summary>
-    public class VeiculoComponenteApi
-    {
-        public string Id { get; set; }
-        public string NomePeca { get; set; }
-        public string Fk_Veiculo_Vin { get; set; }
-        public string Fk_LoteMateriaPrima_Id { get; set; }
-        public string Fk_Fornecedor_Id { get; set; }
-        public double PesoKg { get; set; }
     }
 }
