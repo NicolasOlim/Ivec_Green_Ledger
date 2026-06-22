@@ -1,0 +1,94 @@
+{"Timestamp":"2026-06-22 20:05:53.285","Level":"INFO","Source":"MAIN","Message":"Construtor iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:05:54.220","Level":"INFO","Source":"MAIN","Message":"Inicializando HttpClient com base: https://apiivecogreenledger.runasp.net/","ThreadId":1}
+{"Timestamp":"2026-06-22 20:05:54.279","Level":"INFO","Source":"DASH","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:05:54.299","Level":"INFO","Source":"RASTREAB","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:05:54.318","Level":"INFO","Source":"FORNEC","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:05:54.338","Level":"INFO","Source":"PECAS","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:05:54.359","Level":"INFO","Source":"ANALISES","Message":"Construtor padr\u00E3o \u2013 inicializando vazio","ThreadId":1}
+{"Timestamp":"2026-06-22 20:05:54.428","Level":"INFO","Source":"ANALISES","Message":"Construtor com HttpClient","ThreadId":1}
+{"Timestamp":"2026-06-22 20:05:54.470","Level":"INFO","Source":"RELAT","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:05:54.491","Level":"INFO","Source":"MAIN","Message":"Construtor finalizado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:29.142","Level":"INFO","Source":"LOGIN","Message":"Tentativa para admin","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:30.595","Level":"INFO","Source":"LOGIN","Message":"Resposta HTTP: 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:30.628","Level":"INFO","Source":"LOGIN","Message":"Sucesso \u2013 Usu\u00E1rio: admin, Perfil: Usuario","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:30.650","Level":"INFO","Source":"CARREGAR","Message":"Carregando todos os dados...","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:30.673","Level":"INFO","Source":"DASH","Message":"Atualizando pegada m\u00E9dia...","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:30.926","Level":"INFO","Source":"DASH","Message":"GET pegada-media \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:30.951","Level":"INFO","Source":"DASH","Message":"Pegada m\u00E9dia: 590,4 kg CO2","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:30.974","Level":"INFO","Source":"RASTREAB","Message":"CarregarVeiculosAsync iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:31.507","Level":"INFO","Source":"RASTREAB","Message":"GET Ve\u00EDculos \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:31.548","Level":"INFO","Source":"RASTREAB","Message":"15 ve\u00EDculos carregados","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:31.570","Level":"INFO","Source":"FORNEC","Message":"CarregarFornecedoresAsync iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:32.075","Level":"INFO","Source":"FORNEC","Message":"GET Fornecedores \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:32.100","Level":"INFO","Source":"FORNEC","Message":"10 fornecedores carregados","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:32.125","Level":"INFO","Source":"PECAS","Message":"CarregarFornecedoresAsync iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:32.602","Level":"INFO","Source":"PECAS","Message":"GET Fornecedores \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:32.626","Level":"INFO","Source":"PECAS","Message":"10 fornecedores carregados","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:32.650","Level":"INFO","Source":"PECAS","Message":"CarregarVinsAsync iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:33.149","Level":"INFO","Source":"PECAS","Message":"GET VINs \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:33.174","Level":"INFO","Source":"PECAS","Message":"15 VINs carregados","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:33.198","Level":"INFO","Source":"PECAS","Message":"CarregarPecasAsync iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:33.687","Level":"INFO","Source":"PECAS","Message":"GET Pe\u00E7as \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:33.724","Level":"INFO","Source":"PECAS","Message":"6 pe\u00E7as carregadas","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:33.748","Level":"INFO","Source":"ANALISES","Message":"AtualizarAsync iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:33.769","Level":"INFO","Source":"ANALISES","Message":"Buscando dados do gr\u00E1fico YTD...","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:34.742","Level":"INFO","Source":"ANALISES","Message":"GET YTD \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:34.775","Level":"INFO","Source":"ANALISES","Message":"YTD atualizado com 1 meses","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:34.798","Level":"INFO","Source":"ANALISES","Message":"Buscando dados ESG...","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:36.160","Level":"INFO","Source":"ANALISES","Message":"GET ESG \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:36.196","Level":"INFO","Source":"ANALISES","Message":"Distribui\u00E7\u00E3o atualizada com 3 escopos","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:36.218","Level":"INFO","Source":"ANALISES","Message":"TopFornecedores atualizado com 10 fornecedores","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:36.240","Level":"INFO","Source":"ANALISES","Message":"AtualizarAsync conclu\u00EDdo","ThreadId":1}
+{"Timestamp":"2026-06-22 20:06:36.260","Level":"INFO","Source":"CARREGAR","Message":"Carregamento conclu\u00EDdo.","ThreadId":1}
+{"Timestamp":"2026-06-22 20:16:19.604","Level":"INFO","Source":"MAIN","Message":"Construtor iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:16:19.798","Level":"INFO","Source":"MAIN","Message":"Inicializando HttpClient com base: https://apiivecogreenledger.runasp.net/","ThreadId":1}
+{"Timestamp":"2026-06-22 20:16:19.875","Level":"INFO","Source":"DASH","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:16:19.899","Level":"INFO","Source":"RASTREAB","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:16:19.932","Level":"INFO","Source":"FORNEC","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:16:19.960","Level":"INFO","Source":"PECAS","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:16:19.983","Level":"INFO","Source":"ANALISES","Message":"Construtor padr\u00E3o \u2013 inicializando vazio","ThreadId":1}
+{"Timestamp":"2026-06-22 20:16:20.056","Level":"INFO","Source":"ANALISES","Message":"Construtor com HttpClient","ThreadId":1}
+{"Timestamp":"2026-06-22 20:16:20.083","Level":"INFO","Source":"RELAT","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:16:20.108","Level":"INFO","Source":"MAIN","Message":"Construtor finalizado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:18:47.186","Level":"INFO","Source":"MAIN","Message":"Construtor iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:18:47.349","Level":"INFO","Source":"MAIN","Message":"Inicializando HttpClient com base: https://apiivecogreenledger.runasp.net/","ThreadId":1}
+{"Timestamp":"2026-06-22 20:18:47.412","Level":"INFO","Source":"DASH","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:18:47.437","Level":"INFO","Source":"RASTREAB","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:18:47.460","Level":"INFO","Source":"FORNEC","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:18:47.483","Level":"INFO","Source":"PECAS","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:18:47.507","Level":"INFO","Source":"ANALISES","Message":"Construtor padr\u00E3o \u2013 inicializando vazio","ThreadId":1}
+{"Timestamp":"2026-06-22 20:18:47.573","Level":"INFO","Source":"ANALISES","Message":"Construtor com HttpClient","ThreadId":1}
+{"Timestamp":"2026-06-22 20:18:47.596","Level":"INFO","Source":"RELAT","Message":"Construtor","ThreadId":1}
+{"Timestamp":"2026-06-22 20:18:47.618","Level":"INFO","Source":"MAIN","Message":"Construtor finalizado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:02.048","Level":"INFO","Source":"LOGIN","Message":"Tentativa para admin","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:04.460","Level":"INFO","Source":"LOGIN","Message":"Resposta HTTP: 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:04.497","Level":"INFO","Source":"LOGIN","Message":"Sucesso \u2013 Usu\u00E1rio: admin, Perfil: Usuario","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:04.521","Level":"INFO","Source":"CARREGAR","Message":"Carregando todos os dados...","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:04.545","Level":"INFO","Source":"DASH","Message":"Atualizando pegada m\u00E9dia...","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:06.152","Level":"INFO","Source":"DASH","Message":"GET pegada-media \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:06.182","Level":"INFO","Source":"DASH","Message":"Pegada m\u00E9dia: 590,4 kg CO2","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:06.212","Level":"INFO","Source":"RASTREAB","Message":"CarregarVeiculosAsync iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:06.697","Level":"INFO","Source":"RASTREAB","Message":"GET Ve\u00EDculos \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:06.749","Level":"INFO","Source":"RASTREAB","Message":"15 ve\u00EDculos carregados","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:06.782","Level":"INFO","Source":"FORNEC","Message":"CarregarFornecedoresAsync iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:07.824","Level":"INFO","Source":"FORNEC","Message":"GET Fornecedores \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:07.855","Level":"INFO","Source":"FORNEC","Message":"10 fornecedores carregados","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:07.880","Level":"INFO","Source":"PECAS","Message":"CarregarFornecedoresAsync iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:08.384","Level":"INFO","Source":"PECAS","Message":"GET Fornecedores \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:08.408","Level":"INFO","Source":"PECAS","Message":"10 fornecedores carregados","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:08.434","Level":"INFO","Source":"PECAS","Message":"CarregarVinsAsync iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:09.384","Level":"INFO","Source":"PECAS","Message":"GET VINs \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:09.417","Level":"INFO","Source":"PECAS","Message":"15 VINs carregados","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:09.440","Level":"INFO","Source":"PECAS","Message":"CarregarPecasAsync iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:09.965","Level":"INFO","Source":"PECAS","Message":"GET Pe\u00E7as \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:10.002","Level":"INFO","Source":"PECAS","Message":"6 pe\u00E7as carregadas","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:10.027","Level":"INFO","Source":"ANALISES","Message":"AtualizarAsync iniciado","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:10.048","Level":"INFO","Source":"ANALISES","Message":"Buscando dados do gr\u00E1fico YTD...","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:12.175","Level":"INFO","Source":"ANALISES","Message":"GET YTD \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:12.215","Level":"INFO","Source":"ANALISES","Message":"YTD atualizado com 1 meses","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:12.235","Level":"INFO","Source":"ANALISES","Message":"Buscando dados ESG...","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:14.464","Level":"INFO","Source":"ANALISES","Message":"GET ESG \u2192 200","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:14.497","Level":"INFO","Source":"ANALISES","Message":"Distribui\u00E7\u00E3o atualizada com 3 escopos","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:14.518","Level":"INFO","Source":"ANALISES","Message":"TopFornecedores atualizado com 10 fornecedores","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:14.543","Level":"INFO","Source":"ANALISES","Message":"AtualizarAsync conclu\u00EDdo","ThreadId":1}
+{"Timestamp":"2026-06-22 20:19:14.563","Level":"INFO","Source":"CARREGAR","Message":"Carregamento conclu\u00EDdo.","ThreadId":1}

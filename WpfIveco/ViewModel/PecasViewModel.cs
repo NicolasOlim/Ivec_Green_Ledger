@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -72,22 +71,21 @@ namespace WpfIveco.ViewModel
 
         public PecasViewModel(HttpClient httpClient)
         {
-            Debug.WriteLine("[PECAS] Construtor");
+            App.LogInfo("Construtor", "PECAS");
             _httpClient = httpClient;
             AdicionarPecaManualCommand = new RelayCommand(async p => await AdicionarPecaAsync());
         }
 
         public async Task CarregarVinsAsync()
         {
-            Debug.WriteLine("[PECAS] CarregarVinsAsync iniciado.");
+            App.LogInfo("CarregarVinsAsync iniciado", "PECAS");
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/veiculos");
-                Debug.WriteLine($"[PECAS] GET VINs → {(int)response.StatusCode}");
+                App.LogInfo($"GET VINs → {(int)response.StatusCode}", "PECAS");
                 if (!response.IsSuccessStatusCode) return;
 
                 var json = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine("[PECAS] JSON VINs recebido.");
                 var veiculos = JsonSerializer.Deserialize<List<VeiculoModel>>(json,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
@@ -96,28 +94,27 @@ namespace WpfIveco.ViewModel
                     var vinList = veiculos.Select(v => v.Vin).Where(vin => !string.IsNullOrEmpty(vin)).Distinct().ToList();
                     ListaVins = new ObservableCollection<string>(vinList);
                     if (ListaVins.Any()) VinSelecionado = ListaVins.First();
-                    Debug.WriteLine($"[PECAS] {vinList.Count} VINs carregados.");
+                    App.LogInfo($"{vinList.Count} VINs carregados", "PECAS");
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[PECAS] ERRO VINs: {ex.Message}");
-                Debug.WriteLine(ex.StackTrace);
+                App.LogError("Erro ao carregar VINs – lista vazia", "PECAS");
+                ListaVins = new ObservableCollection<string>();
                 MessageBox.Show("Erro ao carregar VINs.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         public async Task CarregarFornecedoresAsync()
         {
-            Debug.WriteLine("[PECAS] CarregarFornecedoresAsync iniciado.");
+            App.LogInfo("CarregarFornecedoresAsync iniciado", "PECAS");
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/fornecedores");
-                Debug.WriteLine($"[PECAS] GET Fornecedores → {(int)response.StatusCode}");
+                App.LogInfo($"GET Fornecedores → {(int)response.StatusCode}", "PECAS");
                 if (!response.IsSuccessStatusCode) return;
 
                 var json = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine("[PECAS] JSON Fornecedores recebido.");
                 var fornecedores = JsonSerializer.Deserialize<List<FornecedorModel>>(json,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
@@ -125,28 +122,27 @@ namespace WpfIveco.ViewModel
                 {
                     ListaFornecedores = new ObservableCollection<FornecedorModel>(fornecedores);
                     if (ListaFornecedores.Any()) FornecedorSelecionado = ListaFornecedores.First();
-                    Debug.WriteLine($"[PECAS] {fornecedores.Count} fornecedores carregados.");
+                    App.LogInfo($"{fornecedores.Count} fornecedores carregados", "PECAS");
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[PECAS] ERRO Fornecedores: {ex.Message}");
-                Debug.WriteLine(ex.StackTrace);
+                App.LogError("Erro ao carregar fornecedores – lista vazia", "PECAS");
+                ListaFornecedores = new ObservableCollection<FornecedorModel>();
                 MessageBox.Show("Erro ao carregar fornecedores.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         public async Task CarregarPecasAsync()
         {
-            Debug.WriteLine("[PECAS] CarregarPecasAsync iniciado.");
+            App.LogInfo("CarregarPecasAsync iniciado", "PECAS");
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/componentes");
-                Debug.WriteLine($"[PECAS] GET Peças → {(int)response.StatusCode}");
+                App.LogInfo($"GET Peças → {(int)response.StatusCode}", "PECAS");
                 if (!response.IsSuccessStatusCode) return;
 
                 var json = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine("[PECAS] JSON Peças recebido.");
                 var componentesApi = JsonSerializer.Deserialize<List<VeiculoComponenteApiDto>>(json,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
@@ -164,43 +160,43 @@ namespace WpfIveco.ViewModel
                         .ToList();
 
                     ListaPecas = new ObservableCollection<PecaModel>(listaMapeada);
-                    Debug.WriteLine($"[PECAS] {listaMapeada.Count} peças carregadas.");
+                    App.LogInfo($"{listaMapeada.Count} peças carregadas", "PECAS");
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[PECAS] ERRO Peças: {ex.Message}");
-                Debug.WriteLine(ex.StackTrace);
+                App.LogError("Erro ao carregar peças – lista vazia", "PECAS");
+                ListaPecas = new ObservableCollection<PecaModel>();
             }
         }
 
         private async Task AdicionarPecaAsync()
         {
-            Debug.WriteLine("[PECAS] AdicionarPecaAsync iniciado.");
+            App.LogInfo("AdicionarPecaAsync iniciado", "PECAS");
             if (string.IsNullOrWhiteSpace(VinSelecionado))
             {
-                Debug.WriteLine("[PECAS] VIN não selecionado.");
+                App.LogWarning("VIN não selecionado", "PECAS");
                 MessageBox.Show("Selecione um veículo.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(NovaPecaNome))
             {
-                Debug.WriteLine("[PECAS] Nome da peça vazio.");
+                App.LogWarning("Nome da peça vazio", "PECAS");
                 MessageBox.Show("Preencha o nome da peça.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             if (NovaPecaPesoKg <= 0)
             {
-                Debug.WriteLine($"[PECAS] Peso inválido: {NovaPecaPesoKg}");
+                App.LogWarning($"Peso inválido: {NovaPecaPesoKg}", "PECAS");
                 MessageBox.Show("Informe um peso > 0 kg.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             if (FornecedorSelecionado == null || string.IsNullOrWhiteSpace(FornecedorSelecionado.Id))
             {
-                Debug.WriteLine("[PECAS] Fornecedor não selecionado.");
+                App.LogWarning("Fornecedor não selecionado", "PECAS");
                 MessageBox.Show("Selecione um fornecedor.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -215,12 +211,12 @@ namespace WpfIveco.ViewModel
                 Fk_Fornecedor_Id = FornecedorSelecionado.Id
             };
 
-            Debug.WriteLine($"[PECAS] Enviando peça: {NovaPecaNome} (VIN: {VinSelecionado}, Fornecedor: {FornecedorSelecionado.Nome})");
+            App.LogInfo($"Enviando peça: {NovaPecaNome} (VIN: {VinSelecionado}, Fornecedor: {FornecedorSelecionado.Nome})", "PECAS");
 
             try
             {
                 var response = await _httpClient.PostAsJsonAsync("api/dados/componentes", novaPeca);
-                Debug.WriteLine($"[PECAS] POST Peça → {(int)response.StatusCode}");
+                App.LogInfo($"POST Peça → {(int)response.StatusCode}", "PECAS");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -234,21 +230,20 @@ namespace WpfIveco.ViewModel
 
                     NovaPecaNome = "";
                     NovaPecaPesoKg = 0;
-                    Debug.WriteLine("[PECAS] Peça registrada com sucesso!");
+                    App.LogInfo("Peça registrada com sucesso!", "PECAS");
                     MessageBox.Show("Peça registrada com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"[PECAS] Falha POST: {erro}");
+                    App.LogError($"Falha POST: {erro}", "PECAS");
                     MessageBox.Show("Erro ao registrar peça.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[PECAS] ERRO POST: {ex.Message}");
-                Debug.WriteLine(ex.StackTrace);
-                MessageBox.Show("Erro de conexão.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                App.LogError("Erro de conexão ao registrar peça", "PECAS");
+                MessageBox.Show("Erro de conexão. Verifique sua rede.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

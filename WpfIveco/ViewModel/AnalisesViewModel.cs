@@ -2,7 +2,6 @@
 using LiveCharts.Wpf;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -16,7 +15,6 @@ namespace WpfIveco.ViewModels
     {
         private readonly HttpClient _httpClient;
 
-        // Gráfico YTD
         private SeriesCollection _emissoesSeries;
         private string[] _mesesLabels;
 
@@ -34,7 +32,6 @@ namespace WpfIveco.ViewModels
 
         public Func<double, string> Formatter => value => $"{value:N1} t";
 
-        // Gráfico de pizza
         private SeriesCollection _distribuicaoSeries;
         public SeriesCollection DistribuicaoSeries
         {
@@ -42,7 +39,6 @@ namespace WpfIveco.ViewModels
             set { _distribuicaoSeries = value; OnPropertyChanged(); }
         }
 
-        // Top Fornecedores
         private List<FornecedorVerdeDto> _topFornecedores;
         public List<FornecedorVerdeDto> TopFornecedores
         {
@@ -52,14 +48,14 @@ namespace WpfIveco.ViewModels
 
         public AnalisesViewModel()
         {
-            Debug.WriteLine("[ANALISES] Construtor padrão – inicializando vazio.");
+            App.LogInfo("Construtor padrão – inicializando vazio", "ANALISES");
             InicializarVazio();
         }
 
         public AnalisesViewModel(HttpClient httpClient) : this()
         {
             _httpClient = httpClient;
-            Debug.WriteLine("[ANALISES] Construtor com HttpClient.");
+            App.LogInfo("Construtor com HttpClient", "ANALISES");
         }
 
         private void InicializarVazio()
@@ -90,19 +86,18 @@ namespace WpfIveco.ViewModels
 
         public async Task AtualizarAsync()
         {
-            Debug.WriteLine("[ANALISES] AtualizarAsync iniciado.");
+            App.LogInfo("AtualizarAsync iniciado", "ANALISES");
 
             // 1. Gráfico YTD
             try
             {
-                Debug.WriteLine("[ANALISES] Buscando dados do gráfico YTD...");
+                App.LogInfo("Buscando dados do gráfico YTD...", "ANALISES");
                 var response = await _httpClient.GetAsync("api/dados/grafico-emissoes");
-                Debug.WriteLine($"[ANALISES] GET YTD → {(int)response.StatusCode}");
+                App.LogInfo($"GET YTD → {(int)response.StatusCode}", "ANALISES");
 
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine("[ANALISES] JSON YTD recebido.");
                     var dados = JsonSerializer.Deserialize<GraficoEmissoesDto>(json,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     if (dados != null && dados.Meses != null && dados.Meses.Length > 0)
@@ -110,11 +105,11 @@ namespace WpfIveco.ViewModels
                         MesesLabels = dados.Meses;
                         EmissoesSeries[0].Values = new ChartValues<double>(dados.ValoresFabrica);
                         EmissoesSeries[1].Values = new ChartValues<double>(dados.ValoresCadeia);
-                        Debug.WriteLine($"[ANALISES] YTD atualizado com {dados.Meses.Length} meses.");
+                        App.LogInfo($"YTD atualizado com {dados.Meses.Length} meses", "ANALISES");
                     }
                     else
                     {
-                        Debug.WriteLine("[ANALISES] YTD vazio (sem dados).");
+                        App.LogWarning("YTD vazio (sem dados).", "ANALISES");
                         MesesLabels = Array.Empty<string>();
                         EmissoesSeries[0].Values = new ChartValues<double>();
                         EmissoesSeries[1].Values = new ChartValues<double>();
@@ -122,16 +117,15 @@ namespace WpfIveco.ViewModels
                 }
                 else
                 {
-                    Debug.WriteLine($"[ANALISES] Falha YTD: HTTP {response.StatusCode}");
+                    App.LogError($"Falha YTD: HTTP {response.StatusCode}", "ANALISES");
                     MesesLabels = Array.Empty<string>();
                     EmissoesSeries[0].Values = new ChartValues<double>();
                     EmissoesSeries[1].Values = new ChartValues<double>();
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[ANALISES] ERRO YTD: {ex.GetType().Name} – {ex.Message}");
-                Debug.WriteLine(ex.StackTrace);
+                App.LogError("Erro ao carregar gráfico YTD – usando valores vazios", "ANALISES");
                 MesesLabels = Array.Empty<string>();
                 EmissoesSeries[0].Values = new ChartValues<double>();
                 EmissoesSeries[1].Values = new ChartValues<double>();
@@ -140,14 +134,13 @@ namespace WpfIveco.ViewModels
             // 2. Dados ESG
             try
             {
-                Debug.WriteLine("[ANALISES] Buscando dados ESG...");
+                App.LogInfo("Buscando dados ESG...", "ANALISES");
                 var responseEsg = await _httpClient.GetAsync("api/dados/analises-esg");
-                Debug.WriteLine($"[ANALISES] GET ESG → {(int)responseEsg.StatusCode}");
+                App.LogInfo($"GET ESG → {(int)responseEsg.StatusCode}", "ANALISES");
 
                 if (responseEsg.IsSuccessStatusCode)
                 {
                     var jsonEsg = await responseEsg.Content.ReadAsStringAsync();
-                    Debug.WriteLine("[ANALISES] JSON ESG recebido.");
                     var dadosEsg = JsonSerializer.Deserialize<AnalisesESGDto>(jsonEsg,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
@@ -169,41 +162,40 @@ namespace WpfIveco.ViewModels
                             });
                         }
                         DistribuicaoSeries = series;
-                        Debug.WriteLine($"[ANALISES] Distribuição atualizada com {series.Count} escopos.");
+                        App.LogInfo($"Distribuição atualizada com {series.Count} escopos", "ANALISES");
                     }
                     else
                     {
-                        Debug.WriteLine("[ANALISES] Distribuição vazia (sem dados).");
+                        App.LogWarning("Distribuição vazia (sem dados).", "ANALISES");
                         DistribuicaoSeries = new SeriesCollection();
                     }
 
                     if (dadosEsg?.TopFornecedoresVerdes != null && dadosEsg.TopFornecedoresVerdes.Any())
                     {
                         TopFornecedores = dadosEsg.TopFornecedoresVerdes;
-                        Debug.WriteLine($"[ANALISES] TopFornecedores atualizado com {TopFornecedores.Count} fornecedores.");
+                        App.LogInfo($"TopFornecedores atualizado com {TopFornecedores.Count} fornecedores", "ANALISES");
                     }
                     else
                     {
-                        Debug.WriteLine("[ANALISES] Nenhum fornecedor verde.");
+                        App.LogWarning("Nenhum fornecedor verde.", "ANALISES");
                         TopFornecedores = new List<FornecedorVerdeDto>();
                     }
                 }
                 else
                 {
-                    Debug.WriteLine($"[ANALISES] Falha ESG: HTTP {responseEsg.StatusCode}");
+                    App.LogError($"Falha ESG: HTTP {responseEsg.StatusCode}", "ANALISES");
                     DistribuicaoSeries = new SeriesCollection();
                     TopFornecedores = new List<FornecedorVerdeDto>();
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[ANALISES] ERRO ESG: {ex.GetType().Name} – {ex.Message}");
-                Debug.WriteLine(ex.StackTrace);
+                App.LogError("Erro ao carregar dados ESG – usando valores vazios", "ANALISES");
                 DistribuicaoSeries = new SeriesCollection();
                 TopFornecedores = new List<FornecedorVerdeDto>();
             }
 
-            Debug.WriteLine("[ANALISES] AtualizarAsync concluído.");
+            App.LogInfo("AtualizarAsync concluído", "ANALISES");
         }
     }
 }
