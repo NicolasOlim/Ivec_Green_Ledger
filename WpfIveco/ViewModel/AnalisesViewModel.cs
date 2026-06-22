@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using WpfIveco.DTO;
 using WpfIveco.Models;
 
 namespace WpfIveco.ViewModels
@@ -16,9 +17,7 @@ namespace WpfIveco.ViewModels
     {
         private readonly HttpClient _httpClient;
 
-        /// <summary>
-        /// Dados do gráfico de barras (Já existentes)
-        /// </summary>
+        // Gráfico YTD
         private SeriesCollection _emissoesSeries;
         private string[] _mesesLabels;
 
@@ -36,9 +35,7 @@ namespace WpfIveco.ViewModels
 
         public Func<double, string> Formatter => value => $"{value:N1} t";
 
-        /// <summary>
-        /// Dados do gráfico de pizza (Distribuição de Emissões)
-        /// </summary>
+        // Gráfico de pizza
         private SeriesCollection _distribuicaoSeries;
         public SeriesCollection DistribuicaoSeries
         {
@@ -46,9 +43,7 @@ namespace WpfIveco.ViewModels
             set { _distribuicaoSeries = value; OnPropertyChanged(); }
         }
 
-        /// <summary>
-        /// Top Fornecedores Verdes
-        /// </summary>
+        // Top Fornecedores
         private List<FornecedorVerdeDto> _topFornecedores;
         public List<FornecedorVerdeDto> TopFornecedores
         {
@@ -93,7 +88,6 @@ namespace WpfIveco.ViewModels
 
         private void InicializarDadosESGExemplo()
         {
-            /// Dados de exemplo para o gráfico de pizza
             DistribuicaoSeries = new SeriesCollection
             {
                 new PieSeries
@@ -122,7 +116,6 @@ namespace WpfIveco.ViewModels
                 }
             };
 
-            /// Dados de exemplo para fornecedores verdes
             TopFornecedores = new List<FornecedorVerdeDto>
             {
                 new FornecedorVerdeDto { Nome = "Robert Bosch", Localizacao = "Campinas - SP", TotalPecas = 450, PegadaMedia = 2.3, ScoreVerde = 85.5, Certificado = "ISO 14001" },
@@ -134,9 +127,7 @@ namespace WpfIveco.ViewModels
 
         public async Task AtualizarAsync(List<VeiculoModel> veiculos)
         {
-            // ============================================================
-            // 1. ATUALIZAR GRÁFICO DE BARRAS (YTD)
-            // ============================================================
+            // 1. Gráfico YTD
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/grafico-emissoes");
@@ -153,28 +144,23 @@ namespace WpfIveco.ViewModels
                     }
                     else
                     {
-                        // Resposta OK mas sem dados – fallback
                         InicializarDadosExemplo();
-                        Debug.WriteLine("[Atualizar] Dados do gráfico YTD vazios. Fallback ativado.");
+                        Debug.WriteLine("[Atualizar] YTD vazio. Fallback.");
                     }
                 }
                 else
                 {
-                    // Erro HTTP – fallback
-                    Debug.WriteLine($"[Atualizar] Falha no gráfico YTD: HTTP {(int)response.StatusCode}");
+                    Debug.WriteLine($"[Atualizar] YTD HTTP {(int)response.StatusCode}");
                     InicializarDadosExemplo();
                 }
             }
             catch
             {
-                // Qualquer erro – fallback sem expor detalhes
-                Debug.WriteLine("[Atualizar] Erro ao carregar gráfico YTD. Fallback ativado.");
+                Debug.WriteLine("[Atualizar] YTD erro. Fallback.");
                 InicializarDadosExemplo();
             }
 
-            // ============================================================
-            // 2. ATUALIZAR DADOS ESG (Distribuição e Top Fornecedores)
-            // ============================================================
+            // 2. Dados ESG
             try
             {
                 var responseEsg = await _httpClient.GetAsync("api/dados/analises-esg");
@@ -205,9 +191,8 @@ namespace WpfIveco.ViewModels
                     }
                     else
                     {
-                        // Resposta OK sem distribuição – fallback
                         InicializarDadosESGExemplo();
-                        Debug.WriteLine("[Atualizar] Distribuição de emissões vazia. Fallback ativado.");
+                        Debug.WriteLine("[Atualizar] Distribuição vazia. Fallback.");
                     }
 
                     if (dadosEsg?.TopFornecedoresVerdes != null && dadosEsg.TopFornecedoresVerdes.Any())
@@ -217,52 +202,20 @@ namespace WpfIveco.ViewModels
                     else
                     {
                         TopFornecedores = new List<FornecedorVerdeDto>();
-                        Debug.WriteLine("[Atualizar] Nenhum fornecedor verde retornado.");
+                        Debug.WriteLine("[Atualizar] Nenhum fornecedor verde.");
                     }
                 }
                 else
                 {
-                    Debug.WriteLine($"[Atualizar] Falha no ESG: HTTP {(int)responseEsg.StatusCode}");
+                    Debug.WriteLine($"[Atualizar] ESG HTTP {(int)responseEsg.StatusCode}");
                     InicializarDadosESGExemplo();
                 }
             }
             catch
             {
-                Debug.WriteLine("[Atualizar] Erro ao carregar dados ESG. Fallback ativado.");
+                Debug.WriteLine("[Atualizar] ESG erro. Fallback.");
                 InicializarDadosESGExemplo();
             }
         }
-
-        public class GraficoEmissoesDto
-        {
-            public string[] Meses { get; set; }
-            public double[] ValoresFabrica { get; set; }
-            public double[] ValoresCadeia { get; set; }
-        }
-
-        public class AnalisesESGDto
-        {
-            public List<EscopoEmissaoDto> DistribuicaoEmissoes { get; set; }
-            public List<FornecedorVerdeDto> TopFornecedoresVerdes { get; set; }
-        }
-
-        public class EscopoEmissaoDto
-        {
-            public string Escopo { get; set; }
-            public double Porcentagem { get; set; }
-        }
-
-        public class FornecedorVerdeDto
-        {
-            public string Id { get; set; }
-            public string Nome { get; set; }
-            public string Localizacao { get; set; }
-            public int TotalPecas { get; set; }
-            public double PegadaMedia { get; set; }
-            public double ScoreVerde { get; set; }
-            public string Certificado { get; set; }
-        }
-
-
     }
 }
