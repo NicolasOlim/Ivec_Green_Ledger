@@ -29,8 +29,12 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0" FontFamily="Segoe MDL2 Assets" Text="&#xE74C;" FontSize="16" 
                                                Foreground="{StaticResource TextSecondary}" Margin="12,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
-                                    <ContentPresenter x:Name="ContentPresenter" Grid.Column="1" Content="{TemplateBinding SelectionBoxItem}"
+
+                                    <ContentPresenter x:Name="ContentPresenter" Grid.Column="1" 
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                                                       Margin="8,0,12,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
+
                                     <ToggleButton x:Name="PART_DropDownToggle" Grid.Column="2" Focusable="False" ClickMode="Press"
                                                   Background="Transparent" BorderThickness="0" HorizontalAlignment="Right" Margin="0,0,14,0"
                                                   VerticalAlignment="Center" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
@@ -112,13 +116,11 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- TÍTULO -->
         <StackPanel Grid.Row="0">
             <TextBlock Style="{StaticResource H1}" Text="Gestão de Componentes"/>
             <TextBlock Style="{StaticResource Subtitle}" Text="Adicione peças manualmente e associe ao Chassi (VIN) de um veículo no Ledger."/>
         </StackPanel>
 
-        <!-- FORMULÁRIO -->
         <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="24" Margin="0,0,0,20">
             <Grid>
                 <Grid.RowDefinitions>
@@ -134,7 +136,6 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- VIN -->
                     <StackPanel Grid.Column="0" Margin="0,0,12,0">
                         <TextBlock Text="Chassi do Veículo (VIN)" Foreground="{StaticResource TextSecondary}" 
                                    FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
@@ -144,18 +145,32 @@
                                   MaxDropDownHeight="200"/>
                     </StackPanel>
 
-                    <!-- FORNECEDOR (ComboBox com DisplayMemberPath) -->
                     <StackPanel Grid.Column="1" Margin="0,0,12,0">
                         <TextBlock Text="Fornecedor" Foreground="{StaticResource TextSecondary}" 
-               FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                   FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
                         <ComboBox Style="{StaticResource PremiumComboBoxStyle}"
-              ItemsSource="{Binding Pecas.ListaFornecedores}"
-              SelectedItem="{Binding Pecas.FornecedorSelecionado, Mode=TwoWay}"
-              DisplayMemberPath="Nome"
-              MaxDropDownHeight="200"/>
+                                  ItemsSource="{Binding Pecas.ListaFornecedores}"
+                                  SelectedItem="{Binding Pecas.FornecedorSelecionado, Mode=TwoWay}"
+                                  MaxDropDownHeight="200">
+
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="2,0">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" 
+                                                   Text="&#xE81E;" 
+                                                   FontSize="14"
+                                                   Foreground="{StaticResource TextSecondary}"
+                                                   Margin="0,0,8,0" 
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Nome}" 
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                     </StackPanel>
 
-                    <!-- NOME -->
                     <StackPanel Grid.Column="2" Margin="0,0,12,0">
                         <TextBlock Text="Nome/Descrição da Peça" Foreground="{StaticResource TextSecondary}" 
                                    FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
@@ -163,7 +178,6 @@
                                  Text="{Binding Pecas.NovaPecaNome, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
 
-                    <!-- PESO -->
                     <StackPanel Grid.Column="3">
                         <TextBlock Text="Peso da peça (kg)" Foreground="{StaticResource TextSecondary}" 
                                    FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
@@ -185,7 +199,6 @@
             </Grid>
         </Border>
 
-        <!-- LISTA DE PEÇAS -->
         <Border Grid.Row="2" Style="{StaticResource PremiumCardStyle}" Padding="24" MinHeight="300">
             <Grid>
                 <Grid.RowDefinitions>
