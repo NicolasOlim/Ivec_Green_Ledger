@@ -16,11 +16,10 @@ namespace WpfIveco.ViewModel
     {
         private readonly HttpClient _httpClient;
 
-        
         /// <summary>
         /// PROPRIEDADES
         /// </summary>
-        
+
         private string _pesquisaVin = "";
         public string PesquisaVin
         {
@@ -42,31 +41,28 @@ namespace WpfIveco.ViewModel
             set { _listaVeiculos = value; OnPropertyChanged(); }
         }
 
-        
         /// <summary>
         /// COMANDOS
         /// </summary>
-        
+
         public ICommand PesquisarVinCommand { get; }
 
-        
         /// <summary>
         /// CONSTRUTOR
         /// </summary>
         /// <param name="httpClient"></param>
-        
+
         public RastreabilidadeViewModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
             PesquisarVinCommand = new RelayCommand(async p => await PesquisarVinAsync());
         }
 
-        
         /// <summary>
         /// CARREGAR VEÍCULOS
         /// </summary>
         /// <returns></returns>
-        
+
         public async Task CarregarVeiculosAsync()
         {
             try
@@ -89,18 +85,17 @@ namespace WpfIveco.ViewModel
                     TotalVeiculos = veiculos.Count.ToString();
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[ERRO INESPERADO VEÍCULOS] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                Debug.WriteLine("[ERRO INESPERADO] Falha ao carregar veículos.");
             }
         }
 
-        
         /// <summary>
         /// PESQUISAR VIN
         /// </summary>
         /// <returns></returns>
-        
+
         private async Task PesquisarVinAsync()
         {
             if (string.IsNullOrWhiteSpace(PesquisaVin) || PesquisaVin.Length != 17)
@@ -117,10 +112,10 @@ namespace WpfIveco.ViewModel
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    using var doc = System.Text.Json.JsonDocument.Parse(json);
+                    using var doc = JsonDocument.Parse(json);
                     var veiculoJson = doc.RootElement.GetProperty("veiculo").GetRawText();
 
-                    var content = new System.Net.Http.StringContent(
+                    var content = new StringContent(
                         veiculoJson, System.Text.Encoding.UTF8, "application/json");
                     var resSalvar = await _httpClient.PostAsync("api/dados/veiculos", content);
 
@@ -139,7 +134,7 @@ namespace WpfIveco.ViewModel
                     else
                     {
                         var erro = await resSalvar.Content.ReadAsStringAsync();
-                        Debug.WriteLine($"[ERRO SALVAR VIN] HTTP {(int)resSalvar.StatusCode} -> {erro}");
+                        Debug.WriteLine($"[ERRO SALVAR VIN] HTTP {(int)resSalvar.StatusCode} - {erro}");
                         MessageBox.Show("Não foi possível guardar o veículo.\nTente novamente.",
                             "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
@@ -147,14 +142,14 @@ namespace WpfIveco.ViewModel
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"[ERRO VALIDAR VIN] HTTP {(int)response.StatusCode} -> {erro}");
+                    Debug.WriteLine($"[ERRO VALIDAR VIN] HTTP {(int)response.StatusCode} - {erro}");
                     MessageBox.Show("Este VIN não pertence a um veículo Iveco válido.",
                         "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            catch (HttpRequestException ex)
+            catch (HttpRequestException)
             {
-                Debug.WriteLine($"[ERRO CONEXÃO VIN] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                Debug.WriteLine("[ERRO CONEXÃO] Falha ao validar VIN. Modo offline ativado.");
 
                 /// IMPLEMENTAÇÃO OFFLINE-SAFE
                 MessageBox.Show("Modo Offline ativado. O veículo será guardado localmente e sincronizado quando a rede for restabelecida.",
@@ -165,9 +160,9 @@ namespace WpfIveco.ViewModel
 
                 PesquisaVin = "";
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[ERRO INESPERADO VIN] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                Debug.WriteLine("[ERRO INESPERADO] Falha ao pesquisar VIN.");
                 MessageBox.Show("Ocorreu um erro inesperado.\nTente novamente ou contacte o suporte.",
                     "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
