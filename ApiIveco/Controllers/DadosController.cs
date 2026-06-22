@@ -1,13 +1,14 @@
-﻿using ApiIveco.Models;
+﻿using ApiIveco.DTO;
+using ApiIveco.Models;
 using ApiIveco.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ApiIveco.Controllers
 {
@@ -28,15 +29,22 @@ namespace ApiIveco.Controllers
             _logger = logger;
         }
 
-
+        /// =====================================================================
         /// VEÍCULOS
+        /// =====================================================================
 
-
-        /// <summary>Lista todos os veículos.</summary>
-        /// <remarks>Recupera a coleção elástica NoSQL de veículos armazenados diretamente no repositório Firestore.</remarks>
+        /// <summary>
+        /// Lista todos os veículos cadastrados.
+        /// </summary>
+        /// <remarks>
+        /// Retorna a coleção completa de veículos armazenados no Firestore.
+        /// </remarks>
         /// <response code="200">Lista de veículos (pode ser vazia).</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Veículos")]
         [HttpGet("veiculos")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetVeiculos()
         {
             _logger.LogInformation("[GET] Listando todos os veículos.");
@@ -44,14 +52,23 @@ namespace ApiIveco.Controllers
             return Ok(veiculos);
         }
 
-        /// <summary>Busca um veículo pelo VIN.</summary>
-        /// <remarks>Efetua a busca linear por correspondência exata baseando-se no identificador único do documento (VIN).</remarks>
+        /// <summary>
+        /// Busca um veículo pelo seu VIN.
+        /// </summary>
+        /// <remarks>
+        /// Efetua a busca linear por correspondência exata baseando-se no identificador único do documento (VIN).
+        /// </remarks>
         /// <param name="vin">VIN do veículo (17 caracteres).</param>
         /// <response code="200">Veículo encontrado.</response>
-        /// <response code="400">VIN inválido.</response>
-        /// <response code="404">Não encontrado.</response>
+        /// <response code="400">VIN inválido (vazio ou formato incorreto).</response>
+        /// <response code="404">Veículo não encontrado.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Veículos")]
         [HttpGet("veiculos/{vin}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetVeiculoByVin(string vin)
         {
             _logger.LogInformation("[GET] Buscando veículo. VIN: {vin}", vin);
@@ -66,14 +83,32 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Veículo encontrado", veiculo });
         }
 
-        /// <summary>Cadastra um novo veículo.</summary>
-        /// <remarks>O VIN deve ser único. Em caso de duplicidade, retorna 409 Conflict antes de processar a inserção na nuvem.</remarks>
+        /// <summary>
+        /// Cadastra um novo veículo.
+        /// </summary>
+        /// <remarks>
+        /// O VIN deve ser único. Em caso de duplicidade, retorna 409 Conflict.
+        /// 
+        /// Exemplo de corpo:
+        /// 
+        ///     {
+        ///        "vin": "ZCFA1E02008123456",
+        ///        "modelo": "Daily 50C14",
+        ///        "dataMontagem": "2024-01-15T10:00:00Z"
+        ///     }
+        /// 
+        /// </remarks>
         /// <param name="veiculo">Dados do veículo.</param>
-        /// <response code="200">Veículo criado.</response>
-        /// <response code="400">Dados inválidos.</response>
+        /// <response code="200">Veículo criado com sucesso.</response>
+        /// <response code="400">Dados inválidos ou VIN ausente.</response>
         /// <response code="409">VIN já cadastrado.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Veículos")]
         [HttpPost("veiculos")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PostVeiculo([FromBody] Veiculo veiculo)
         {
             _logger.LogInformation("[POST] Criando novo veículo.");
@@ -88,32 +123,48 @@ namespace ApiIveco.Controllers
                 return Conflict(new { Mensagem = $"Veículo com VIN '{veiculo.Vin}' já cadastrado." });
             }
 
-            /// Cria o veículo
             var criado = await _dadosService.CriarVeiculo(veiculo);
 
-            /// NOVA IMPLEMENTAÇÃO: Gera e vincula automaticamente os componentes associados a este VIN
+            /// Tenta vincular componentes automaticamente (fallback silencioso)
             try
             {
                 await _dadosService.GerarComponentesParaVeiculoAsync(criado.Vin);
             }
-            catch (Exception ex)
+            catch
             {
-                _logger.LogError("Veículo criado, mas falhou ao vincular peças: {erro}", ex.Message);
-                /// Pode optar por devolver um aviso sem quebrar a criação do veículo
+                _logger.LogWarning("Veículo criado, mas falhou ao vincular peças automaticamente.");
             }
 
-            return Ok(new { mensagem = "Veículo registado e peças vinculadas com sucesso!", veiculo = criado });
+            return Ok(new { mensagem = "Veículo registrado e peças vinculadas com sucesso!", veiculo = criado });
         }
 
-        /// <summary>Atualiza um veículo existente.</summary>
-        /// <remarks>Utiliza o método SetAsync com a diretiva MergeAll do Firestore para mesclar os novos dados com as propriedades existentes sem corromper o histórico do documento.</remarks>
-        /// <param name="vin">VIN do veículo a ser updated.</param>
-        /// <param name="veiculo">Novos dados.</param>
-        /// <response code="200">Atualizado com sucesso.</response>
-        /// <response code="400">VIN da URL não confere com o corpo.</response>
+        /// <summary>
+        /// Atualiza um veículo existente.
+        /// </summary>
+        /// <remarks>
+        /// Utiliza o método SetAsync com a diretiva MergeAll do Firestore para mesclar os novos dados com as propriedades existentes.
+        /// 
+        /// Exemplo de corpo:
+        /// 
+        ///     {
+        ///        "vin": "ZCFA1E02008123456",
+        ///        "modelo": "Daily 70C16 Atualizado",
+        ///        "dataMontagem": "2024-01-15T10:00:00Z"
+        ///     }
+        /// 
+        /// </remarks>
+        /// <param name="vin">VIN do veículo a ser atualizado (deve corresponder ao VIN no corpo).</param>
+        /// <param name="veiculo">Novos dados do veículo.</param>
+        /// <response code="200">Veículo atualizado com sucesso.</response>
+        /// <response code="400">VIN da URL não confere com o corpo ou dados inválidos.</response>
         /// <response code="404">Veículo não encontrado.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Veículos")]
         [HttpPut("veiculos/{vin}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutVeiculo(string vin, [FromBody] Veiculo veiculo)
         {
             _logger.LogInformation("[PUT] Atualizando veículo. VIN: {vin}", vin);
@@ -128,13 +179,19 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Veículo atualizado com sucesso!", veiculo = atualizado });
         }
 
-        /// <summary>Remove um veículo do banco de dados.</summary>
-        /// <remarks>Realiza a deleção física do documento mapeado pelo VIN na coleção do Firebase Firestore.</remarks>
-        /// <param name="vin">VIN do veículo.</param>
-        /// <response code="200">Excluído com sucesso.</response>
+        /// <summary>
+        /// Remove um veículo do banco de dados.
+        /// </summary>
+        /// <remarks>Realiza a deleção física do documento mapeado pelo VIN na coleção do Firestore.</remarks>
+        /// <param name="vin">VIN do veículo a ser removido.</param>
+        /// <response code="200">Veículo excluído com sucesso.</response>
         /// <response code="404">Veículo não encontrado.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Veículos")]
         [HttpDelete("veiculos/{vin}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteVeiculo(string vin)
         {
             _logger.LogInformation("[DELETE] Excluindo veículo. VIN: {vin}", vin);
@@ -147,14 +204,23 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Veículo deletado com sucesso." });
         }
 
-        /// <summary>Valida se o VIN pertence à marca IVECO.</summary>
-        /// <remarks>Dispara uma requisição HTTP assíncrona para a API governamental da NHTSA, processa o JSON e valida de forma estrita se os metadados de fabricação contêm a marca IVECO.</remarks>
+        /// <summary>
+        /// Valida se o VIN pertence à marca IVECO.
+        /// </summary>
+        /// <remarks>
+        /// Dispara uma requisição HTTP assíncrona para a API governamental da NHTSA, processa o JSON e valida se os metadados de fabricação contêm a marca IVECO.
+        /// </remarks>
         /// <param name="vin">VIN de 17 caracteres.</param>
         /// <response code="200">VIN válido para IVECO.</response>
         /// <response code="400">VIN com tamanho incorreto.</response>
-        /// <response code="404">Não é IVECO ou não encontrado.</response>
+        /// <response code="404">VIN não encontrado ou não é IVECO.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Veículos")]
         [HttpGet("veiculos/validar-vin/{vin}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> ValidarVinIveco(string vin)
         {
             _logger.LogInformation("[GET] Validando VIN IVECO: {vin}", vin);
@@ -164,27 +230,29 @@ namespace ApiIveco.Controllers
 
             try
             {
-                /// Se não for IVECO, o service dispara uma Exception
                 var veiculoIveco = await _dadosService.BuscarEValidarVinIvecoAsync(vin);
-
                 if (veiculoIveco == null)
                     return NotFound(new { Mensagem = "O recurso solicitado não foi encontrado na NHTSA." });
 
                 return Ok(new { mensagem = "Veículo IVECO validado com sucesso!", veiculo = veiculoIveco });
             }
-            catch (Exception ex)
+            catch
             {
-                /// Captura a rejeição da marca e devolve para o WPF de forma controlada
-                _logger.LogWarning("[GET] Rejeição de VIN: {mensagem}", ex.Message);
-                return BadRequest(new { Mensagem = ex.Message });
+                _logger.LogWarning("[GET] Rejeição de VIN: {vin}", vin);
+                return BadRequest(new { Mensagem = "O VIN informado não pertence a um veículo IVECO válido." });
             }
         }
 
-        /// <summary>Gera um relatório PDF com todos os veículos.</summary>
+        /// <summary>
+        /// Gera um relatório PDF com todos os veículos.
+        /// </summary>
         /// <remarks>Usa a biblioteca QuestPDF sob licença comunitária. Compila os dados dinamicamente estruturando uma tabela A4 que é convertida e retornada em fluxo de bytes binários.</remarks>
         /// <response code="200">PDF gerado com sucesso.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Veículos")]
         [HttpGet("relatorios/veiculos/pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GerarRelatorioVeiculosPdf()
         {
             _logger.LogInformation("[GET] Gerando relatório PDF de veículos.");
@@ -244,14 +312,20 @@ namespace ApiIveco.Controllers
             return File(pdfBytes, "application/pdf", "Relatorio_Veiculos.pdf");
         }
 
-
+        /// =====================================================================
         /// FORNECEDORES
+        ///=====================================================================
 
-
-        /// <summary>Lista todos os fornecedores.</summary>
+        /// <summary>
+        /// Lista todos os fornecedores.
+        /// </summary>
         /// <remarks>Mapeia de forma assíncrona todos os documentos da coleção "fornecedores" injetando os IDs internos do Firebase de volta nas propriedades dos modelos.</remarks>
+        /// <response code="200">Lista de fornecedores (pode ser vazia).</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Fornecedores")]
         [HttpGet("fornecedores")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetFornecedores()
         {
             _logger.LogInformation("[GET] Listando fornecedores.");
@@ -259,14 +333,23 @@ namespace ApiIveco.Controllers
             return Ok(fornecedores);
         }
 
-        /// <summary>Busca dados de um CNPJ na Receita Federal via BrasilAPI.</summary>
-        /// <remarks>Encapsula regras industriais com User-Agent blindado para consultar informações de cadastro nacional e sanitizar strings de endereçamento de sede corporativa.</remarks>
-        /// <param name="cnpj">CNPJ da empresa.</param>
-        /// <response code="200">Dados encontrados.</response>
+        /// <summary>
+        /// Busca dados de um CNPJ na Receita Federal via BrasilAPI.
+        /// </summary>
+        /// <remarks>
+        /// Encapsula regras industriais com User-Agent blindado para consultar informações de cadastro nacional e sanitizar strings de endereçamento de sede corporativa.
+        /// </remarks>
+        /// <param name="cnpj">CNPJ da empresa (apenas números).</param>
+        /// <response code="200">Dados do CNPJ encontrados.</response>
         /// <response code="400">CNPJ vazio.</response>
         /// <response code="404">CNPJ não encontrado.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Fornecedores")]
         [HttpGet("fornecedores/buscar-cnpj/{cnpj}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetFornecedorCnpj(string cnpj)
         {
             _logger.LogInformation("[GET] Buscando CNPJ: {cnpj}", cnpj);
@@ -281,11 +364,30 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Fornecedor localizado com sucesso!", fornecedor });
         }
 
-        /// <summary>Cadastra um novo fornecedor.</summary>
-        /// <remarks>Aciona uma transação atômica síncrona no Firestore para computar e incrementar o ID sequencial na coleção de contadores do banco NoSQL.</remarks>
+        /// <summary>
+        /// Cadastra um novo fornecedor.
+        /// </summary>
+        /// <remarks>
+        /// Aciona uma transação atômica síncrona no Firestore para computar e incrementar o ID sequencial na coleção de contadores do banco NoSQL.
+        /// 
+        /// Exemplo de corpo:
+        /// 
+        ///     {
+        ///        "nome": "Robert Bosch Limitada",
+        ///        "localizacao": "Campinas - SP",
+        ///        "cnpj": "45990181000189"
+        ///     }
+        /// 
+        /// </remarks>
         /// <param name="fornecedor">Dados do fornecedor.</param>
+        /// <response code="200">Fornecedor criado com sucesso.</response>
+        /// <response code="400">Dados inválidos.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Fornecedores")]
         [HttpPost("fornecedores")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PostFornecedor([FromBody] Fornecedor fornecedor)
         {
             _logger.LogInformation("[POST] Criando fornecedor.");
@@ -297,11 +399,19 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Fornecedor registrado com sucesso!", fornecedor = criado });
         }
 
-        /// <summary>Exclui um fornecedor pelo ID do Firebase.</summary>
+        /// <summary>
+        /// Exclui um fornecedor pelo seu ID.
+        /// </summary>
         /// <remarks>Exclui fisicamente o nó do documento de fornecedor com base em sua chave primária textual indexada na nuvem.</remarks>
         /// <param name="id">ID interno do fornecedor.</param>
+        /// <response code="200">Fornecedor excluído com sucesso.</response>
+        /// <response code="404">Fornecedor não encontrado.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Fornecedores")]
         [HttpDelete("fornecedores/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteFornecedor(string id)
         {
             _logger.LogInformation("[DELETE] Excluindo fornecedor. ID: {id}", id);
@@ -309,14 +419,20 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Fornecedor deletado com sucesso." });
         }
 
-
+        /// =====================================================================
         /// LOTES
+        /// =====================================================================
 
-
-        /// <summary>Lista todos os lotes de matéria-prima.</summary>
-        /// <remarks>Retorna os lotes de suprimentos incluindo as métricas ambientais corporativas críticas de cálculo da pegada ecológica por quilograma (kg CO2).</remarks>
+        /// <summary>
+        /// Lista todos os lotes de matéria-prima.
+        /// </summary>
+        /// <remarks>Retorna os lotes de suprimentos incluindo as métricas ambientais corporativas críticas de cálculo da pegada ecológica por quilograma (kg CO₂).</remarks>
+        /// <response code="200">Lista de lotes (pode ser vazia).</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Lotes e Componentes")]
         [HttpGet("lotes")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetLotes()
         {
             _logger.LogInformation("[GET] Listando lotes.");
@@ -324,11 +440,32 @@ namespace ApiIveco.Controllers
             return Ok(lotes);
         }
 
-        /// <summary>Cadastra um novo lote.</summary>
-        /// <remarks>Gera de maneira transacional controlada um identificador incremental do tipo 'contador_lote' antes de persistir o mapeamento de massa de insumos.</remarks>
+        /// <summary>
+        /// Cadastra um novo lote de matéria-prima.
+        /// </summary>
+        /// <remarks>
+        /// Gera de maneira transacional controlada um identificador incremental do tipo 'contador_lote' antes de persistir o mapeamento de massa de insumos.
+        /// 
+        /// Exemplo de corpo:
+        /// 
+        ///     {
+        ///        "tipoMaterial": "Aço",
+        ///        "dataProducao": "2024-01-15T10:00:00Z",
+        ///        "quantidadeKg": 5000,
+        ///        "pegadaCarbonoPorKg": 1.8,
+        ///        "fk_Fornecedor_Id": "1"
+        ///     }
+        /// 
+        /// </remarks>
         /// <param name="lote">Dados do lote.</param>
+        /// <response code="200">Lote criado com sucesso.</response>
+        /// <response code="400">Dados inválidos.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Lotes e Componentes")]
         [HttpPost("lotes")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PostLote([FromBody] LoteMateriaPrima lote)
         {
             _logger.LogInformation("[POST] Criando lote.");
@@ -340,11 +477,19 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Lote registrado com sucesso!", lote = criado });
         }
 
-        /// <summary>Exclui um lote pelo ID.</summary>
+        /// <summary>
+        /// Exclui um lote pelo seu ID.
+        /// </summary>
         /// <remarks>Remove o documento correspondente da coleção "lotes_materia_prima" interrompendo o elo lógico relacional de rastreabilidade do Ledger.</remarks>
         /// <param name="id">ID do lote.</param>
+        /// <response code="200">Lote excluído com sucesso.</response>
+        /// <response code="404">Lote não encontrado.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Lotes e Componentes")]
         [HttpDelete("lotes/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteLote(string id)
         {
             _logger.LogInformation("[DELETE] Excluindo lote. ID: {id}", id);
@@ -352,14 +497,20 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Lote deletado com sucesso." });
         }
 
-
+        /// =====================================================================
         /// COMPONENTES
+        /// =====================================================================
 
-
-        /// <summary>Lista todos os componentes de veículos.</summary>
+        /// <summary>
+        /// Lista todos os componentes (peças) de veículos.
+        /// </summary>
         /// <remarks>Retorna o acervo de subcomponentes estruturais e peças que se encontram associados a um determinado chassi (VIN).</remarks>
+        /// <response code="200">Lista de componentes (pode ser vazia).</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Lotes e Componentes")]
         [HttpGet("componentes")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetComponentes()
         {
             _logger.LogInformation("[GET] Listando componentes.");
@@ -367,11 +518,32 @@ namespace ApiIveco.Controllers
             return Ok(componentes);
         }
 
-        /// <summary>Cadastra um novo componente.</summary>
-        /// <remarks>Salva uma nova instância de montagem na coleção "veiculo_componentes" utilizando IDs computados dinamicamente de forma incremental.</remarks>
+        /// <summary>
+        /// Cadastra um novo componente (peça) e associa a um veículo e, opcionalmente, a um fornecedor.
+        /// </summary>
+        /// <remarks>
+        /// Salva uma nova instância de montagem na coleção "veiculo_componentes" utilizando IDs computados dinamicamente de forma incremental.
+        /// 
+        /// Exemplo de corpo:
+        /// 
+        ///     {
+        ///        "nomePeca": "Bloco do motor",
+        ///        "fk_Veiculo_Vin": "ZCFA1E02008123456",
+        ///        "fk_LoteMateriaPrima_Id": "LOTE-MANUAL-20240617",
+        ///        "fk_Fornecedor_Id": "1",
+        ///        "pesoKg": 350.0
+        ///     }
+        /// 
+        /// </remarks>
         /// <param name="componente">Dados do componente.</param>
+        /// <response code="200">Componente criado com sucesso.</response>
+        /// <response code="400">Dados inválidos.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Lotes e Componentes")]
         [HttpPost("componentes")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PostComponente([FromBody] VeiculoComponente componente)
         {
             _logger.LogInformation("[POST] Criando componente.");
@@ -383,11 +555,19 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Componente registrado com sucesso!", componente = criado });
         }
 
-        /// <summary>Exclui um componente pelo ID.</summary>
+        /// <summary>
+        /// Exclui um componente pelo seu ID.
+        /// </summary>
         /// <remarks>Efetua a limpeza de registro de peça física e encerra o vínculo logístico da linha de produção fabril.</remarks>
         /// <param name="id">ID do componente.</param>
+        /// <response code="200">Componente excluído com sucesso.</response>
+        /// <response code="404">Componente não encontrado.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Lotes e Componentes")]
         [HttpDelete("componentes/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteComponente(string id)
         {
             _logger.LogInformation("[DELETE] Excluindo componente. ID: {id}", id);
@@ -395,17 +575,35 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Componente deletado com sucesso." });
         }
 
-
+        /// =====================================================================
         /// AUTENTICAÇÃO
+        /// =====================================================================
 
-
-        /// <summary>Cadastra um novo usuário no Firebase.</summary>
-        /// <remarks>Valida preventivamente a duplicidade eletrônica de e-mail na nuvem. Trata as credenciais e remove a senha em texto puro do objeto serializado retornado como resposta de segurança.</remarks>
+        /// <summary>
+        /// Cadastra um novo usuário no Firebase.
+        /// </summary>
+        /// <remarks>
+        /// Valida preventivamente a duplicidade eletrônica de e-mail na nuvem. Trata as credenciais e remove a senha em texto puro do objeto serializado retornado como resposta de segurança.
+        /// 
+        /// Exemplo de corpo:
+        /// 
+        ///     {
+        ///        "nome": "João Silva",
+        ///        "email": "joao@example.com",
+        ///        "senha": "123456",
+        ///        "acesso": "Usuario"
+        ///     }
+        /// 
+        /// </remarks>
         /// <param name="usuario">Objeto com Nome, Email, Senha e Acesso (opcional).</param>
         /// <response code="200">Usuário criado (senha removida da resposta).</response>
         /// <response code="400">Email ou senha ausentes.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Autenticação")]
         [HttpPost("cadastrar")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Cadastrar([FromBody] ApiIveco.Models.Usuario usuario)
         {
             _logger.LogInformation("[POST] Cadastro solicitado. E-mail: {email}", usuario?.Email);
@@ -421,15 +619,32 @@ namespace ApiIveco.Controllers
             return Ok(new { mensagem = "Usuário cadastrado com sucesso!", usuario = criado });
         }
 
-        /// <summary>Autentica um usuário com email e senha.</summary>
-        /// <remarks>Efetua a varredura e o mapeamento manual reativo nos documentos Firestore, aplicando comparações que evitam gargalos de indexação NoSQL. A senha é ocultada pós-autenticação.</remarks>
+        /// <summary>
+        /// Autentica um usuário com email e senha.
+        /// </summary>
+        /// <remarks>
+        /// Efetua a varredura e o mapeamento manual reativo nos documentos Firestore, aplicando comparações que evitam gargalos de indexação NoSQL. A senha é ocultada pós-autenticação.
+        /// 
+        /// Exemplo de corpo:
+        /// 
+        ///     {
+        ///        "email": "joao@example.com",
+        ///        "senha": "123456"
+        ///     }
+        /// 
+        /// </remarks>
         /// <param name="credenciais">Objeto com Email e Senha.</param>
-        /// <response code="200">Login bem‑sucedido.</response>
+        /// <response code="200">Login bem-sucedido.</response>
         /// <response code="400">Credenciais não informadas.</response>
         /// <response code="401">Email ou senha incorretos.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Autenticação")]
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest credenciais)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Login([FromBody] LoginDto credenciais) // <-- ALTERADO
         {
             _logger.LogInformation("[POST] Tentativa de login. E-mail: {email}", credenciais?.Email);
 
@@ -446,12 +661,22 @@ namespace ApiIveco.Controllers
             usuario.Senha = "";
             return Ok(new { mensagem = "Login efetuado com sucesso!", usuario });
         }
+        /// =====================================================================
+        /// DASHBOARD / ESG
+        /// =====================================================================
 
-        /// <summary>Retorna a pegada de carbono média (kg CO₂) calculada com base nos dados do Ledger.</summary>
-        /// <remarks>O cálculo consome os lotes de matéria-prima e componentes cadastrados, priorizando os lotes quando disponíveis. O resultado é armazenado em cache por 5 minutos para otimizar o desempenho em consultas repetidas do Dashboard.</remarks>
+        /// <summary>
+        /// Retorna a pegada de carbono média (kg CO₂) calculada com base nos dados do Ledger.
+        /// </summary>
+        /// <remarks>
+        /// O cálculo consome os lotes de matéria-prima e componentes cadastrados, priorizando os lotes quando disponíveis. O resultado é armazenado em cache por 5 minutos para otimizar o desempenho em consultas repetidas do Dashboard.
+        /// </remarks>
         /// <response code="200">Pegada média calculada com sucesso (pode ser 0 se não houver dados).</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Dashboard")]
         [HttpGet("pegada-media")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPegadaMedia()
         {
             _logger.LogInformation("[GET] Calculando pegada média.");
@@ -459,32 +684,42 @@ namespace ApiIveco.Controllers
             return Ok(new { pegadaMedia = media });
         }
 
-        /// <summary>Retorna os dados de emissões por mês para o gráfico YTD (Year‑To‑Date).</summary>
-        /// <remarks>Agrupa as emissões calculadas a partir dos componentes dos veículos (Processo Fabril) e dos lotes de matéria-prima (Cadeia de Fornecedores), organizando os dados por mês/ano com base nas datas de montagem e produção. Em caso de ausência de dados, retorna um conjunto de exemplo para demonstração.</remarks>
+        /// <summary>
+        /// Retorna os dados de emissões por mês para o gráfico YTD (Year‑To‑Date).
+        /// </summary>
+        /// <remarks>
+        /// Agrupa as emissões calculadas a partir dos componentes dos veículos (Processo Fabril) e dos lotes de matéria-prima (Cadeia de Fornecedores), organizando os dados por mês/ano com base nas datas de montagem e produção. Em caso de ausência de dados, retorna um conjunto de exemplo para demonstração.
+        /// </remarks>
         /// <response code="200">Dados do gráfico gerados com sucesso (inclui meses, valores da fábrica e valores da cadeia).</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Dashboard")]
         [HttpGet("grafico-emissoes")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetDadosGrafico()
         {
             var dados = await _dadosService.ObterDadosGraficoAsync();
             return Ok(dados);
         }
 
-        /// <summary>Obtém os indicadores ESG para a página de Análise de Sustentabilidade.</summary>
-        /// <remarks>Calcula a distribuição percentual das emissões por escopo (Escopo 1 – Fábrica, Escopo 2 – Energia, Escopo 3 – Fornecedores) com base nos componentes e lotes cadastrados. Também gera o ranking dos 10 melhores fornecedores verdes, ordenados por um score que considera a quantidade de peças fornecidas e a pegada média por peça.</remarks>
+        /// <summary>
+        /// Obtém os indicadores ESG para a página de Análise de Sustentabilidade.
+        /// </summary>
+        /// <remarks>
+        /// Calcula a distribuição percentual das emissões por escopo (Escopo 1 – Fábrica, Escopo 2 – Energia, Escopo 3 – Fornecedores) com base nos componentes e lotes cadastrados. Também gera o ranking dos 10 melhores fornecedores verdes, ordenados por um score que considera a quantidade de peças fornecidas e a pegada média por peça.
+        /// </remarks>
         /// <response code="200">Dados ESG retornados com sucesso (distribuição de emissões e top fornecedores verdes).</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [Tags("Dashboard")]
         [HttpGet("analises-esg")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetDadosAnalisesESG()
         {
             var dados = await _dadosService.ObterDadosAnalisesESGAsync();
             return Ok(dados);
         }
 
-        public class LoginRequest
-        {
-            public string Email { get; set; }
-            public string Senha { get; set; }
-        }
+       
     }
 }
