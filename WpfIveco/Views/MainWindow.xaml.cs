@@ -101,5 +101,20 @@ namespace WpfIveco
                 textBox.TextChanged += CnpjTextBox_TextChanged;
             }
         }
+        private void RevelarSenha_Click(object sender, RoutedEventArgs e)
+        {
+            if (SenhaPasswordBox.Visibility == Visibility.Visible)
+            {
+                // Mostra o texto puro e esconde o PasswordBox
+                SenhaVisivelTextBox.Visibility = Visibility.Visible;
+                SenhaPasswordBox.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                // Volta a esconder o texto e mostra o PasswordBox
+                SenhaVisivelTextBox.Visibility = Visibility.Collapsed;
+                SenhaPasswordBox.Visibility = Visibility.Visible;
+            }
+        }
     }
 }
