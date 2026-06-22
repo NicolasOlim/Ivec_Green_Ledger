@@ -101,5 +101,33 @@ namespace WpfIveco
                 textBox.TextChanged += CnpjTextBox_TextChanged;
             }
         }
+     
+
+        private void BtnMostrarSenha_Click(object sender, RoutedEventArgs e)
+        {
+            if (SenhaVisivelTextBox.Visibility == Visibility.Collapsed)
+            {
+                // Alterna para MODO VISÍVEL (Mostra o texto)
+                SenhaVisivelTextBox.Text = SenhaPasswordBox.Password;
+                SenhaVisivelTextBox.Visibility = Visibility.Visible;
+                SenhaPasswordBox.Visibility = Visibility.Collapsed;
+
+                // Troca o ícone para "Olho Fechado/Riscado"
+                IconeOlho.Text = "\uED1A";
+            }
+            else
+            {
+                // Alterna para MODO OCULTO (Mostra as bolinhas)
+                SenhaPasswordBox.Password = SenhaVisivelTextBox.Text;
+                SenhaVisivelTextBox.Visibility = Visibility.Collapsed;
+                SenhaPasswordBox.Visibility = Visibility.Visible;
+
+                // Troca o ícone de volta para "Olho Aberto"
+                IconeOlho.Text = "\uE18B";
+            }
+        }
+
     }
+
+
 }

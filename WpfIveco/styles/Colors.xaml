@@ -1,19 +1,20 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <SolidColorBrush x:Key="AppBackground" Color="#F4F5F7"/>
     <SolidColorBrush x:Key="OledBlack" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="AppBackground" Color="#F5F5F7"/>
     <SolidColorBrush x:Key="ElevatedGray1" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="ElevatedGray2" Color="#E9E9EF"/>
-    <SolidColorBrush x:Key="ElevatedGray3" Color="#C6C6C8"/>
-    <SolidColorBrush x:Key="TextPrimary" Color="#1C1C1E"/>
-    <SolidColorBrush x:Key="TextSecondary" Color="#6C6C70"/>
-    <SolidColorBrush x:Key="TextTertiary" Color="#8E8E93"/>
+    <SolidColorBrush x:Key="ElevatedGray2" Color="#F9FAFB"/>
+    <SolidColorBrush x:Key="ElevatedGray3" Color="#E5E7EB"/>
+    <SolidColorBrush x:Key="CardBorder" Color="#E5E7EB"/>
+    <SolidColorBrush x:Key="TextPrimary" Color="#111827"/>
+    <SolidColorBrush x:Key="TextSecondary" Color="#6B7280"/>
+    <SolidColorBrush x:Key="TextTertiary" Color="#9CA3AF"/>
+
     <SolidColorBrush x:Key="AppleBlue" Color="#007AFF"/>
     <SolidColorBrush x:Key="AppleBlueHover" Color="#0055CC"/>
-    <SolidColorBrush x:Key="AppleGreen" Color="#34C759"/>
-    <SolidColorBrush x:Key="AppleRed" Color="#FF3B30"/>
-    <SolidColorBrush x:Key="AppleOrange" Color="#FF9500"/>
-    <SolidColorBrush x:Key="CardBorder" Color="#E5E5EA"/>
+    <SolidColorBrush x:Key="AppleGreen" Color="#0A5B43"/>
+    <SolidColorBrush x:Key="AppleRed" Color="#EF4444"/>
+    <SolidColorBrush x:Key="AppleOrange" Color="#F59E0B"/>
 
 </ResourceDictionary>
