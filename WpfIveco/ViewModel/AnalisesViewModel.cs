@@ -52,18 +52,16 @@ namespace WpfIveco.ViewModels
 
         public AnalisesViewModel()
         {
-            // Inicializa com coleções vazias (sem dados de exemplo)
+            Debug.WriteLine("[ANALISES] Construtor padrão – inicializando vazio.");
             InicializarVazio();
         }
 
         public AnalisesViewModel(HttpClient httpClient) : this()
         {
             _httpClient = httpClient;
+            Debug.WriteLine("[ANALISES] Construtor com HttpClient.");
         }
 
-        /// <summary>
-        /// Inicializa os gráficos com coleções vazias (sem dados de exemplo).
-        /// </summary>
         private void InicializarVazio()
         {
             MesesLabels = Array.Empty<string>();
@@ -86,20 +84,25 @@ namespace WpfIveco.ViewModels
                     LabelPoint = point => $"{point.Y:N1} t"
                 }
             };
-
             DistribuicaoSeries = new SeriesCollection();
             TopFornecedores = new List<FornecedorVerdeDto>();
         }
 
         public async Task AtualizarAsync()
         {
-            // 1. Gráfico YTD – dados reais
+            Debug.WriteLine("[ANALISES] AtualizarAsync iniciado.");
+
+            // 1. Gráfico YTD
             try
             {
+                Debug.WriteLine("[ANALISES] Buscando dados do gráfico YTD...");
                 var response = await _httpClient.GetAsync("api/dados/grafico-emissoes");
+                Debug.WriteLine($"[ANALISES] GET YTD → {(int)response.StatusCode}");
+
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
+                    Debug.WriteLine("[ANALISES] JSON YTD recebido.");
                     var dados = JsonSerializer.Deserialize<GraficoEmissoesDto>(json,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     if (dados != null && dados.Meses != null && dados.Meses.Length > 0)
@@ -107,40 +110,44 @@ namespace WpfIveco.ViewModels
                         MesesLabels = dados.Meses;
                         EmissoesSeries[0].Values = new ChartValues<double>(dados.ValoresFabrica);
                         EmissoesSeries[1].Values = new ChartValues<double>(dados.ValoresCadeia);
+                        Debug.WriteLine($"[ANALISES] YTD atualizado com {dados.Meses.Length} meses.");
                     }
                     else
                     {
-                        // Dados reais vieram vazios – mantém coleções vazias
+                        Debug.WriteLine("[ANALISES] YTD vazio (sem dados).");
                         MesesLabels = Array.Empty<string>();
                         EmissoesSeries[0].Values = new ChartValues<double>();
                         EmissoesSeries[1].Values = new ChartValues<double>();
-                        Debug.WriteLine("[Atualizar] YTD vazio (sem dados reais).");
                     }
                 }
                 else
                 {
-                    Debug.WriteLine($"[Atualizar] YTD HTTP {(int)response.StatusCode} – sem dados.");
-                    // Mantém vazio
+                    Debug.WriteLine($"[ANALISES] Falha YTD: HTTP {response.StatusCode}");
                     MesesLabels = Array.Empty<string>();
                     EmissoesSeries[0].Values = new ChartValues<double>();
                     EmissoesSeries[1].Values = new ChartValues<double>();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Debug.WriteLine("[Atualizar] YTD erro – mantendo vazio.");
+                Debug.WriteLine($"[ANALISES] ERRO YTD: {ex.GetType().Name} – {ex.Message}");
+                Debug.WriteLine(ex.StackTrace);
                 MesesLabels = Array.Empty<string>();
                 EmissoesSeries[0].Values = new ChartValues<double>();
                 EmissoesSeries[1].Values = new ChartValues<double>();
             }
 
-            // 2. Dados ESG – reais
+            // 2. Dados ESG
             try
             {
+                Debug.WriteLine("[ANALISES] Buscando dados ESG...");
                 var responseEsg = await _httpClient.GetAsync("api/dados/analises-esg");
+                Debug.WriteLine($"[ANALISES] GET ESG → {(int)responseEsg.StatusCode}");
+
                 if (responseEsg.IsSuccessStatusCode)
                 {
                     var jsonEsg = await responseEsg.Content.ReadAsStringAsync();
+                    Debug.WriteLine("[ANALISES] JSON ESG recebido.");
                     var dadosEsg = JsonSerializer.Deserialize<AnalisesESGDto>(jsonEsg,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
@@ -162,37 +169,41 @@ namespace WpfIveco.ViewModels
                             });
                         }
                         DistribuicaoSeries = series;
+                        Debug.WriteLine($"[ANALISES] Distribuição atualizada com {series.Count} escopos.");
                     }
                     else
                     {
-                        // Sem dados reais – coleção vazia
+                        Debug.WriteLine("[ANALISES] Distribuição vazia (sem dados).");
                         DistribuicaoSeries = new SeriesCollection();
-                        Debug.WriteLine("[Atualizar] Distribuição vazia (sem dados reais).");
                     }
 
                     if (dadosEsg?.TopFornecedoresVerdes != null && dadosEsg.TopFornecedoresVerdes.Any())
                     {
                         TopFornecedores = dadosEsg.TopFornecedoresVerdes;
+                        Debug.WriteLine($"[ANALISES] TopFornecedores atualizado com {TopFornecedores.Count} fornecedores.");
                     }
                     else
                     {
+                        Debug.WriteLine("[ANALISES] Nenhum fornecedor verde.");
                         TopFornecedores = new List<FornecedorVerdeDto>();
-                        Debug.WriteLine("[Atualizar] Nenhum fornecedor verde (sem dados reais).");
                     }
                 }
                 else
                 {
-                    Debug.WriteLine($"[Atualizar] ESG HTTP {(int)responseEsg.StatusCode} – sem dados.");
+                    Debug.WriteLine($"[ANALISES] Falha ESG: HTTP {responseEsg.StatusCode}");
                     DistribuicaoSeries = new SeriesCollection();
                     TopFornecedores = new List<FornecedorVerdeDto>();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Debug.WriteLine("[Atualizar] ESG erro – mantendo vazio.");
+                Debug.WriteLine($"[ANALISES] ERRO ESG: {ex.GetType().Name} – {ex.Message}");
+                Debug.WriteLine(ex.StackTrace);
                 DistribuicaoSeries = new SeriesCollection();
                 TopFornecedores = new List<FornecedorVerdeDto>();
             }
+
+            Debug.WriteLine("[ANALISES] AtualizarAsync concluído.");
         }
     }
 }
