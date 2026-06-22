@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="logs.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
     <PackageReference Include="QuestPDF" Version="2026.5.0" />
     <PackageReference Include="Serilog.Sinks.Logtail" Version="0.0.1" />

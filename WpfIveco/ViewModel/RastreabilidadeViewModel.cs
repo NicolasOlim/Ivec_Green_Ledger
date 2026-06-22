@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -15,10 +14,6 @@ namespace WpfIveco.ViewModel
     public class RastreabilidadeViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
-
-        /// <summary>
-        /// PROPRIEDADES
-        /// </summary>
 
         private string _pesquisaVin = "";
         public string PesquisaVin
@@ -41,39 +36,23 @@ namespace WpfIveco.ViewModel
             set { _listaVeiculos = value; OnPropertyChanged(); }
         }
 
-        /// <summary>
-        /// COMANDOS
-        /// </summary>
-
         public ICommand PesquisarVinCommand { get; }
-
-        /// <summary>
-        /// CONSTRUTOR
-        /// </summary>
-        /// <param name="httpClient"></param>
 
         public RastreabilidadeViewModel(HttpClient httpClient)
         {
+            App.LogInfo("Construtor", "RASTREAB");
             _httpClient = httpClient;
             PesquisarVinCommand = new RelayCommand(async p => await PesquisarVinAsync());
         }
 
-        /// <summary>
-        /// CARREGAR VEÍCULOS
-        /// </summary>
-        /// <returns></returns>
-
         public async Task CarregarVeiculosAsync()
         {
+            App.LogInfo("CarregarVeiculosAsync iniciado", "RASTREAB");
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/veiculos");
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    Debug.WriteLine($"[ERRO CARREGAR VEÍCULOS] HTTP {(int)response.StatusCode}");
-                    return;
-                }
+                App.LogInfo($"GET Veículos → {(int)response.StatusCode}", "RASTREAB");
+                if (!response.IsSuccessStatusCode) return;
 
                 var json = await response.Content.ReadAsStringAsync();
                 var veiculos = JsonSerializer.Deserialize<List<VeiculoModel>>(json,
@@ -83,31 +62,31 @@ namespace WpfIveco.ViewModel
                 {
                     ListaVeiculos = new ObservableCollection<VeiculoModel>(veiculos);
                     TotalVeiculos = veiculos.Count.ToString();
+                    App.LogInfo($"{veiculos.Count} veículos carregados", "RASTREAB");
                 }
             }
             catch
             {
-                Debug.WriteLine("[ERRO INESPERADO] Falha ao carregar veículos.");
+                App.LogError("Erro ao carregar veículos – lista vazia", "RASTREAB");
+                ListaVeiculos = new ObservableCollection<VeiculoModel>();
+                TotalVeiculos = "0";
             }
         }
 
-        /// <summary>
-        /// PESQUISAR VIN
-        /// </summary>
-        /// <returns></returns>
-
         private async Task PesquisarVinAsync()
         {
+            App.LogInfo($"Pesquisando VIN: {PesquisaVin}", "RASTREAB");
             if (string.IsNullOrWhiteSpace(PesquisaVin) || PesquisaVin.Length != 17)
             {
-                MessageBox.Show("Introduza um VIN válido com 17 caracteres.", "Aviso",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                App.LogWarning("VIN inválido", "RASTREAB");
+                MessageBox.Show("Introduza um VIN válido com 17 caracteres.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             try
             {
                 var response = await _httpClient.GetAsync($"api/dados/veiculos/validar-vin/{PesquisaVin}");
+                App.LogInfo($"GET validar-vin → {(int)response.StatusCode}", "RASTREAB");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -115,56 +94,47 @@ namespace WpfIveco.ViewModel
                     using var doc = JsonDocument.Parse(json);
                     var veiculoJson = doc.RootElement.GetProperty("veiculo").GetRawText();
 
-                    var content = new StringContent(
-                        veiculoJson, System.Text.Encoding.UTF8, "application/json");
+                    var content = new StringContent(veiculoJson, System.Text.Encoding.UTF8, "application/json");
                     var resSalvar = await _httpClient.PostAsync("api/dados/veiculos", content);
+                    App.LogInfo($"POST veiculos → {(int)resSalvar.StatusCode}", "RASTREAB");
 
                     if (resSalvar.IsSuccessStatusCode)
                     {
-                        MessageBox.Show("Veículo IVECO rastreado e guardado no Ledger!",
-                            "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                        App.LogInfo("Veículo rastreado e guardado!", "RASTREAB");
+                        MessageBox.Show("Veículo IVECO rastreado e guardado no Ledger!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
                         PesquisaVin = "";
                         await CarregarVeiculosAsync();
                     }
                     else if (resSalvar.StatusCode == System.Net.HttpStatusCode.Conflict)
                     {
-                        MessageBox.Show("Veículo autêntico, mas já estava registado no sistema.",
-                            "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        App.LogWarning("Veículo já registado", "RASTREAB");
+                        MessageBox.Show("Veículo autêntico, mas já estava registado no sistema.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                     else
                     {
                         var erro = await resSalvar.Content.ReadAsStringAsync();
-                        Debug.WriteLine($"[ERRO SALVAR VIN] HTTP {(int)resSalvar.StatusCode} - {erro}");
-                        MessageBox.Show("Não foi possível guardar o veículo.\nTente novamente.",
-                            "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                        App.LogError($"Falha ao salvar: {erro}", "RASTREAB");
+                        MessageBox.Show("Não foi possível guardar o veículo.\nTente novamente.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"[ERRO VALIDAR VIN] HTTP {(int)response.StatusCode} - {erro}");
-                    MessageBox.Show("Este VIN não pertence a um veículo Iveco válido.",
-                        "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Error);
+                    App.LogError($"Falha na validação: {erro}", "RASTREAB");
+                    MessageBox.Show("Este VIN não pertence a um veículo Iveco válido.", "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (HttpRequestException)
             {
-                Debug.WriteLine("[ERRO CONEXÃO] Falha ao validar VIN. Modo offline ativado.");
-
-                /// IMPLEMENTAÇÃO OFFLINE-SAFE
+                App.LogWarning("Modo offline ativado", "RASTREAB");
                 MessageBox.Show("Modo Offline ativado. O veículo será guardado localmente e sincronizado quando a rede for restabelecida.",
                     "Aviso de Contingência", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                /// Aqui chamaria o seu serviço de SQLite local:
-                /// await _sqliteService.SalvarVeiculoLocalAsync(new VeiculoModel { Vin = PesquisaVin, is_sintonizado = false });
-
                 PesquisaVin = "";
             }
             catch
             {
-                Debug.WriteLine("[ERRO INESPERADO] Falha ao pesquisar VIN.");
-                MessageBox.Show("Ocorreu um erro inesperado.\nTente novamente ou contacte o suporte.",
-                    "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                App.LogError("Erro inesperado ao pesquisar VIN", "RASTREAB");
+                MessageBox.Show("Ocorreu um erro inesperado.\nTente novamente ou contacte o suporte.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

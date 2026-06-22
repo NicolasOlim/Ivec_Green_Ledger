@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -10,14 +8,13 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using WpfIveco.Models;
+using WpfIveco.ViewModels;
 
 namespace WpfIveco.ViewModels
 {
     public class FornecedorViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
-
-        /// Propriedades
 
         private string _cnpjBusca = "";
         public string CnpjBusca
@@ -56,12 +53,12 @@ namespace WpfIveco.ViewModels
 
         public int TotalFornecedores => ListaFornecedores?.Count ?? 0;
 
-        /// Comandos
         public ICommand ConsultarCnpjCommand { get; }
         public ICommand SalvarFornecedorCommand { get; }
 
         public FornecedorViewModel(HttpClient httpClient)
         {
+            App.LogInfo("Construtor", "FORNEC");
             _httpClient = httpClient;
             ConsultarCnpjCommand = new RelayCommand(async p => await ConsultarCnpjAsync());
             SalvarFornecedorCommand = new RelayCommand(async p => await SalvarFornecedorAsync());
@@ -69,14 +66,12 @@ namespace WpfIveco.ViewModels
 
         public async Task CarregarFornecedoresAsync()
         {
+            App.LogInfo("CarregarFornecedoresAsync iniciado", "FORNEC");
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/fornecedores");
-                if (!response.IsSuccessStatusCode)
-                {
-                    Debug.WriteLine($"[ERRO CARREGAR FORNECEDORES] HTTP {(int)response.StatusCode}");
-                    return;
-                }
+                App.LogInfo($"GET Fornecedores → {(int)response.StatusCode}", "FORNEC");
+                if (!response.IsSuccessStatusCode) return;
 
                 var json = await response.Content.ReadAsStringAsync();
                 var fornecedores = JsonSerializer.Deserialize<List<FornecedorModel>>(json,
@@ -85,18 +80,22 @@ namespace WpfIveco.ViewModels
                 if (fornecedores != null)
                 {
                     ListaFornecedores = new ObservableCollection<FornecedorModel>(fornecedores);
+                    App.LogInfo($"{fornecedores.Count} fornecedores carregados", "FORNEC");
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[ERRO CARREGAR FORNECEDORES] {ex.Message}");
+                App.LogError("Erro ao carregar fornecedores – lista vazia", "FORNEC");
+                ListaFornecedores = new ObservableCollection<FornecedorModel>();
             }
         }
 
         private async Task ConsultarCnpjAsync()
         {
+            App.LogInfo($"Consultando CNPJ: {CnpjBusca}", "FORNEC");
             if (string.IsNullOrWhiteSpace(CnpjBusca))
             {
+                App.LogWarning("CNPJ vazio", "FORNEC");
                 MessageBox.Show("Digite um CNPJ para consultar.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -105,6 +104,7 @@ namespace WpfIveco.ViewModels
             {
                 var cnpjLimpo = CnpjBusca.Replace(".", "").Replace("/", "").Replace("-", "");
                 var response = await _httpClient.GetAsync($"api/dados/fornecedores/buscar-cnpj/{cnpjLimpo}");
+                App.LogInfo($"GET buscar-cnpj → {(int)response.StatusCode}", "FORNEC");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -115,9 +115,11 @@ namespace WpfIveco.ViewModels
                     NomeFornecedorEncontrado = fornecedor.GetProperty("nome").GetString();
                     LocalizacaoFornecedorEncontrado = fornecedor.GetProperty("localizacao").GetString();
                     MensagemCadastro = "Fornecedor encontrado! Clique em 'Registrar no Ledger' para salvar.";
+                    App.LogInfo($"Fornecedor encontrado: {NomeFornecedorEncontrado}", "FORNEC");
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
+                    App.LogWarning("CNPJ não encontrado", "FORNEC");
                     MensagemCadastro = "CNPJ não encontrado na Receita Federal.";
                     NomeFornecedorEncontrado = "";
                     LocalizacaoFornecedorEncontrado = "";
@@ -125,42 +127,43 @@ namespace WpfIveco.ViewModels
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"[ERRO CONSULTAR CNPJ] {erro}");
+                    App.LogError($"Erro na consulta: {erro}", "FORNEC");
                     MensagemCadastro = "Erro ao consultar CNPJ. Tente novamente.";
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[ERRO CONSULTAR CNPJ] {ex.Message}");
+                App.LogError("Erro de conexão na consulta CNPJ", "FORNEC");
                 MensagemCadastro = "Erro de conexão. Verifique sua internet.";
             }
         }
 
         private async Task SalvarFornecedorAsync()
         {
+            App.LogInfo($"Salvando fornecedor: {NomeFornecedorEncontrado}", "FORNEC");
             if (string.IsNullOrWhiteSpace(NomeFornecedorEncontrado))
             {
+                App.LogWarning("Nome vazio – abortando", "FORNEC");
                 MensagemCadastro = "Consulte um CNPJ válido primeiro.";
                 return;
             }
 
             try
             {
-                /// ================================================
-                ///CORREÇÃO: Adicionado o campo "Id" com valor vazio
-                /// ================================================
                 var fornecedor = new
                 {
-                    Id = "",  
+                    Id = "",
                     Nome = NomeFornecedorEncontrado,
                     Localizacao = LocalizacaoFornecedorEncontrado,
                     Cnpj = CnpjBusca.Replace(".", "").Replace("/", "").Replace("-", "")
                 };
 
                 var response = await _httpClient.PostAsJsonAsync("api/dados/fornecedores", fornecedor);
+                App.LogInfo($"POST Fornecedor → {(int)response.StatusCode}", "FORNEC");
 
                 if (response.IsSuccessStatusCode)
                 {
+                    App.LogInfo("Fornecedor registrado com sucesso!", "FORNEC");
                     MensagemCadastro = "Fornecedor registrado com sucesso!";
                     CnpjBusca = "";
                     NomeFornecedorEncontrado = "";
@@ -170,38 +173,14 @@ namespace WpfIveco.ViewModels
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"[ERRO SALVAR FORNECEDOR] HTTP {(int)response.StatusCode} -> {erro}");
-
-                    ///Tratamento específico para erro de validação
-                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                    {
-                        try
-                        {
-                            using var doc = JsonDocument.Parse(erro);
-                            if (doc.RootElement.TryGetProperty("errors", out var errors))
-                            {
-                                var mensagem = "Erro de validação:\n";
-                                foreach (var prop in errors.EnumerateObject())
-                                {
-                                    var field = prop.Name;
-                                    var messages = prop.Value.EnumerateArray().Select(x => x.GetString());
-                                    mensagem += $"- {field}: {string.Join(", ", messages)}\n";
-                                }
-                                MensagemCadastro = mensagem;
-                            }
-                        }
-                        catch { }
-                    }
-                    else
-                    {
-                        MensagemCadastro = $"Erro ao salvar: {erro}";
-                    }
+                    App.LogError($"Falha ao salvar: {erro}", "FORNEC");
+                    MensagemCadastro = $"Erro ao salvar: {erro}";
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"[ERRO SALVAR FORNECEDOR] {ex.Message}");
-                MensagemCadastro = $"Erro de conexão: {ex.Message}";
+                App.LogError("Erro de conexão ao salvar fornecedor", "FORNEC");
+                MensagemCadastro = "Erro de conexão. Verifique sua rede.";
             }
         }
     }
