@@ -1,243 +1,168 @@
 ﻿using LiveCharts;
 using LiveCharts.Wpf;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Net.Http;
-using System.Text.Json;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using WpfIveco.DTO;
-using WpfIveco.Models;
 
 namespace WpfIveco.ViewModels
 {
-    /// <summary>
-    /// ViewModel para a página de Análise ESG.
-    /// Gerencia gráficos YTD, distribuição de emissões e ranking de fornecedores verdes.
-    /// </summary>
-    public class AnalisesViewModel : ViewModelBase
+
+    public class AnalisesViewModel : INotifyPropertyChanged
+
     {
         private readonly HttpClient _httpClient;
 
-        // ============================================================
-        // GRÁFICO YTD (Emissões por mês)
-        // ============================================================
-
-        private SeriesCollection _emissoesSeries;
-        private string[] _mesesLabels;
-
-        /// <summary>Séries do gráfico YTD (Processo Fabril e Cadeia de Fornecedores).</summary>
-        public SeriesCollection EmissoesSeries
+        // ==========================================
+        // 1. PROPRIEDADES DOS CARDS SUPERIORES
+        // ==========================================
+        private int _totalEmissoes;
+        public int TotalEmissoes
         {
-            get => _emissoesSeries;
-            set { _emissoesSeries = value; OnPropertyChanged(); }
+            get => _totalEmissoes;
+            set { _totalEmissoes = value; OnPropertyChanged(); }
         }
 
-        /// <summary>Rótulos dos meses no gráfico YTD.</summary>
-        public string[] MesesLabels
+        private int _fornecedoresVerdes;
+        public int FornecedoresVerdes
         {
-            get => _mesesLabels;
-            set { _mesesLabels = value; OnPropertyChanged(); }
+            get => _fornecedoresVerdes;
+            set { _fornecedoresVerdes = value; OnPropertyChanged(); }
         }
 
-        /// <summary>Formatador do eixo Y para exibir valores em toneladas.</summary>
-        public Func<double, string> Formatter => value => $"{value:N1} t";
-
-        // ============================================================
-        // GRÁFICO DE PIZZA (Distribuição de Emissões por Escopo)
-        // ============================================================
-
-        private SeriesCollection _distribuicaoSeries;
-
-        /// <summary>Séries do gráfico de pizza (Escopo 1, 2, 3).</summary>
-        public SeriesCollection DistribuicaoSeries
+        private int _pecasReaproveitadas;
+        public int PecasReaproveitadas
         {
-            get => _distribuicaoSeries;
-            set { _distribuicaoSeries = value; OnPropertyChanged(); }
+            get => _pecasReaproveitadas;
+            set { _pecasReaproveitadas = value; OnPropertyChanged(); }
         }
 
-        // ============================================================
-        // RANKING DE FORNECEDORES VERDES
-        // ============================================================
-
-        private List<FornecedorVerdeDto> _topFornecedores;
-
-        /// <summary>Lista dos top 10 fornecedores verdes.</summary>
-        public List<FornecedorVerdeDto> TopFornecedores
+        private string _economiaGerada;
+        public string EconomiaGerada
         {
-            get => _topFornecedores;
-            set { _topFornecedores = value; OnPropertyChanged(); }
+            get => _economiaGerada;
+            set { _economiaGerada = value; OnPropertyChanged(); }
         }
 
-        // ============================================================
-        // CONSTRUTORES
-        // ============================================================
+        // ==========================================
+        // 2. PROPRIEDADES DOS GRÁFICOS (LiveCharts)
+        // ==========================================
+        public SeriesCollection GraficoPizzaSeries { get; set; }
+        public SeriesCollection GraficoBarrasSeries { get; set; }
+        public string[] MesesLabels { get; set; }
 
-        /// <summary>Construtor padrão, inicializa com dados vazios.</summary>
+        // ==========================================
+        // 3. COLEÇÕES DAS TABELAS E LISTAS
+        // ==========================================
+        public ObservableCollection<AvaliacaoFornecedor> UltimasAvaliacoes { get; set; }
+        public ObservableCollection<FornecedorSustentavel> TopFornecedores { get; set; }
+
+        // ==========================================
+        // CONSTRUTORES (CORRIGIDOS)
+        // ==========================================
+
+        // Construtor padrão
         public AnalisesViewModel()
         {
-            App.LogInfo("Construtor padrão – inicializando vazio", "ANALISES");
-            InicializarVazio();
+            CarregarDadosFalsos();
         }
 
-        /// <summary>Construtor com HttpClient para comunicação com a API.</summary>
+        // Construtor com 1 argumento (o que o MainViewModel estava sentindo falta!)
         public AnalisesViewModel(HttpClient httpClient) : this()
         {
             _httpClient = httpClient;
-            App.LogInfo("Construtor com HttpClient", "ANALISES");
         }
 
-        // ============================================================
-        // MÉTODOS PRIVADOS
-        // ============================================================
+        // ==========================================
+        // MÉTODOS (CORRIGIDOS)
+        // ==========================================
 
-        /// <summary>Inicializa os gráficos com coleções vazias (sem dados de exemplo).</summary>
-        private void InicializarVazio()
-        {
-            MesesLabels = Array.Empty<string>();
-            EmissoesSeries = new SeriesCollection
-            {
-                new ColumnSeries
-                {
-                    Title = "Processo Fabril Iveco",
-                    Values = new ChartValues<double>(),
-                    Fill = new SolidColorBrush(Color.FromRgb(0, 120, 200)),
-                    DataLabels = true,
-                    LabelPoint = point => $"{point.Y:N1} t"
-                },
-                new ColumnSeries
-                {
-                    Title = "Cadeia de Fornecedores",
-                    Values = new ChartValues<double>(),
-                    Fill = new SolidColorBrush(Color.FromRgb(255, 150, 50)),
-                    DataLabels = true,
-                    LabelPoint = point => $"{point.Y:N1} t"
-                }
-            };
-            DistribuicaoSeries = new SeriesCollection();
-            TopFornecedores = new List<FornecedorVerdeDto>();
-        }
-
-        // ============================================================
-        // MÉTODO PÚBLICO DE ATUALIZAÇÃO
-        // ============================================================
-
-        /// <summary>
-        /// Atualiza todos os dados da página: gráfico YTD e dados ESG.
-        /// Consome as APIs /grafico-emissoes e /analises-esg.
-        /// </summary>
+        // O método que o MainViewModel tenta chamar para atualizar os dados
         public async Task AtualizarAsync()
         {
-            App.LogInfo("AtualizarAsync iniciado", "ANALISES");
-
-            // 1. Gráfico YTD
-            try
-            {
-                App.LogInfo("Buscando dados do gráfico YTD...", "ANALISES");
-                var response = await _httpClient.GetAsync("api/dados/grafico-emissoes");
-                App.LogInfo($"GET YTD → {(int)response.StatusCode}", "ANALISES");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    var dados = JsonSerializer.Deserialize<GraficoEmissoesDto>(json,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (dados != null && dados.Meses != null && dados.Meses.Length > 0)
-                    {
-                        MesesLabels = dados.Meses;
-                        EmissoesSeries[0].Values = new ChartValues<double>(dados.ValoresFabrica);
-                        EmissoesSeries[1].Values = new ChartValues<double>(dados.ValoresCadeia);
-                        App.LogInfo($"YTD atualizado com {dados.Meses.Length} meses", "ANALISES");
-                    }
-                    else
-                    {
-                        App.LogWarning("YTD vazio (sem dados).", "ANALISES");
-                        MesesLabels = Array.Empty<string>();
-                        EmissoesSeries[0].Values = new ChartValues<double>();
-                        EmissoesSeries[1].Values = new ChartValues<double>();
-                    }
-                }
-                else
-                {
-                    App.LogError($"Falha YTD: HTTP {response.StatusCode}", "ANALISES");
-                    MesesLabels = Array.Empty<string>();
-                    EmissoesSeries[0].Values = new ChartValues<double>();
-                    EmissoesSeries[1].Values = new ChartValues<double>();
-                }
-            }
-            catch
-            {
-                App.LogError("Erro ao carregar gráfico YTD – usando valores vazios", "ANALISES");
-                MesesLabels = Array.Empty<string>();
-                EmissoesSeries[0].Values = new ChartValues<double>();
-                EmissoesSeries[1].Values = new ChartValues<double>();
-            }
-
-            // 2. Dados ESG
-            try
-            {
-                App.LogInfo("Buscando dados ESG...", "ANALISES");
-                var responseEsg = await _httpClient.GetAsync("api/dados/analises-esg");
-                App.LogInfo($"GET ESG → {(int)responseEsg.StatusCode}", "ANALISES");
-
-                if (responseEsg.IsSuccessStatusCode)
-                {
-                    var jsonEsg = await responseEsg.Content.ReadAsStringAsync();
-                    var dadosEsg = JsonSerializer.Deserialize<AnalisesESGDto>(jsonEsg,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                    if (dadosEsg != null && dadosEsg.DistribuicaoEmissoes != null && dadosEsg.DistribuicaoEmissoes.Any())
-                    {
-                        var series = new SeriesCollection();
-                        foreach (var item in dadosEsg.DistribuicaoEmissoes)
-                        {
-                            var cor = item.Escopo.Contains("Escopo 1") ? Color.FromRgb(0, 120, 200) :
-                                      item.Escopo.Contains("Escopo 2") ? Color.FromRgb(100, 200, 100) :
-                                      Color.FromRgb(255, 150, 50);
-                            series.Add(new PieSeries
-                            {
-                                Title = item.Escopo,
-                                Values = new ChartValues<double> { item.Porcentagem },
-                                Fill = new SolidColorBrush(cor),
-                                DataLabels = true,
-                                LabelPoint = point => $"{point.Y}%"
-                            });
-                        }
-                        DistribuicaoSeries = series;
-                        App.LogInfo($"Distribuição atualizada com {series.Count} escopos", "ANALISES");
-                    }
-                    else
-                    {
-                        App.LogWarning("Distribuição vazia (sem dados).", "ANALISES");
-                        DistribuicaoSeries = new SeriesCollection();
-                    }
-
-                    if (dadosEsg?.TopFornecedoresVerdes != null && dadosEsg.TopFornecedoresVerdes.Any())
-                    {
-                        TopFornecedores = dadosEsg.TopFornecedoresVerdes;
-                        App.LogInfo($"TopFornecedores atualizado com {TopFornecedores.Count} fornecedores", "ANALISES");
-                    }
-                    else
-                    {
-                        App.LogWarning("Nenhum fornecedor verde.", "ANALISES");
-                        TopFornecedores = new List<FornecedorVerdeDto>();
-                    }
-                }
-                else
-                {
-                    App.LogError($"Falha ESG: HTTP {responseEsg.StatusCode}", "ANALISES");
-                    DistribuicaoSeries = new SeriesCollection();
-                    TopFornecedores = new List<FornecedorVerdeDto>();
-                }
-            }
-            catch
-            {
-                App.LogError("Erro ao carregar dados ESG – usando valores vazios", "ANALISES");
-                DistribuicaoSeries = new SeriesCollection();
-                TopFornecedores = new List<FornecedorVerdeDto>();
-            }
-
-            App.LogInfo("AtualizarAsync concluído", "ANALISES");
+            // Por enquanto, vamos apenas simular um tempo de carregamento de API (200ms)
+            // e carregar os dados falsos. Futuramente você pode colocar suas requisições
+            // _httpClient.GetAsync(...) aqui dentro novamente!
+            await Task.Delay(200);
+            CarregarDadosFalsos();
         }
+
+        private void CarregarDadosFalsos()
+        {
+            TotalEmissoes = 14250;
+            FornecedoresVerdes = 48;
+            PecasReaproveitadas = 12400;
+            EconomiaGerada = "R$ 1.2M";
+
+            GraficoPizzaSeries = new SeriesCollection
+            {
+                new PieSeries { Title = "Logística", Values = new ChartValues<double> { 45 }, Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0A5B43")) },
+                new PieSeries { Title = "Produção", Values = new ChartValues<double> { 35 }, Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1B7055")) },
+                new PieSeries { Title = "Fornecedores", Values = new ChartValues<double> { 15 }, Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4BAC50")) },
+                new PieSeries { Title = "Administrativo", Values = new ChartValues<double> { 5 }, Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#A7F3D0")) }
+            };
+
+            GraficoBarrasSeries = new SeriesCollection
+            {
+                new ColumnSeries
+                {
+                    Title = "Redução (ton)",
+                    Values = new ChartValues<double> { 120, 150, 210, 180, 290, 320 },
+                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1B7055")),
+                    MaxColumnWidth = 30
+                }
+            };
+            MesesLabels = new[] { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun" };
+
+            UltimasAvaliacoes = new ObservableCollection<AvaliacaoFornecedor>
+            {
+                new AvaliacaoFornecedor { Fornecedor = "BOSCH Sistemas", Material = "Injeção Eletrônica", PegadaCarbono = 12.5, DataAvaliacao = DateTime.Now.AddDays(-2), Status = "ISO 14001" },
+                new AvaliacaoFornecedor { Fornecedor = "Pirelli Pneus", Material = "Borracha Sintética", PegadaCarbono = 45.2, DataAvaliacao = DateTime.Now.AddDays(-5), Status = "ISO 14001" },
+                new AvaliacaoFornecedor { Fornecedor = "Aço Frio S/A", Material = "Chapas Metálicas", PegadaCarbono = 110.0, DataAvaliacao = DateTime.Now.AddDays(-10), Status = "Pendente" },
+                new AvaliacaoFornecedor { Fornecedor = "Vidros Auto", Material = "Para-brisas", PegadaCarbono = 22.1, DataAvaliacao = DateTime.Now.AddDays(-12), Status = "Em Análise" }
+            };
+
+            TopFornecedores = new ObservableCollection<FornecedorSustentavel>
+            {
+                new FornecedorSustentavel { Posicao = 1, Nome = "EcoParts Ltda", Categoria = "Selo Ouro - Emissão Zero", PontuacaoESG = 98, CorDestaque = "#F59E0B" },
+                new FornecedorSustentavel { Posicao = 2, Nome = "BOSCH Sistemas", Categoria = "Selo Prata - Circular", PontuacaoESG = 92, CorDestaque = "#9CA3AF" },
+                new FornecedorSustentavel { Posicao = 3, Nome = "TechGreen", Categoria = "Selo Bronze - Limpa", PontuacaoESG = 88, CorDestaque = "#B45309" },
+                new FornecedorSustentavel { Posicao = 4, Nome = "Pirelli Pneus", Categoria = "Certificado ISO 14001", PontuacaoESG = 82, CorDestaque = "#10B981" },
+                new FornecedorSustentavel { Posicao = 5, Nome = "Alumínios Sustentáveis", Categoria = "Certificado ISO 14001", PontuacaoESG = 79, CorDestaque = "#10B981" }
+            };
+        }
+
+        // ==========================================
+        // IMPLEMENTAÇÃO DO INOTIFYPROPERTYCHANGED
+        // ==========================================
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    // ==========================================
+    // CLASSES DE MODELO
+    // ==========================================
+    public class AvaliacaoFornecedor
+    {
+        public string Fornecedor { get; set; }
+        public string Material { get; set; }
+        public double PegadaCarbono { get; set; }
+        public DateTime DataAvaliacao { get; set; }
+        public string Status { get; set; }
+    }
+
+    public class FornecedorSustentavel
+    {
+        public int Posicao { get; set; }
+        public string Nome { get; set; }
+        public string Categoria { get; set; }
+        public int PontuacaoESG { get; set; }
+        public string CorDestaque { get; set; }
     }
 }

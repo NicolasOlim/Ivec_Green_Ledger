@@ -110,7 +110,7 @@
                 <TextBlock Grid.Row="0" Text="Emissões da Cadeia" Style="{StaticResource H2}"/>
 
                 <lvc:CartesianChart Grid.Row="1" 
-                                    Series="{Binding Analises.EmissoesSeries}" 
+                                    Series="{Binding Analises.GraficoBarrasSeries}" 
                                     Margin="0,10,0,0" 
                                     LegendLocation="Top">
 
@@ -128,7 +128,6 @@
                         <lvc:Axis Title="Ton CO₂" 
                                   Foreground="{StaticResource TextSecondary}"
                                   FontSize="12"
-                                  LabelFormatter="{Binding Analises.Formatter}"
                                   MinValue="0">
                             <lvc:Axis.Separator>
                                 <lvc:Separator Stroke="{StaticResource ElevatedGray3}" 

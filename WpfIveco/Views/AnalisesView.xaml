@@ -4,64 +4,93 @@
              xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              TextOptions.TextFormattingMode="Display"
              TextOptions.TextRenderingMode="ClearType"
-             FontFamily="Segoe UI Variable, Segoe UI, Helvetica Neue, sans-serif">
-    <Grid>
-        <!-- Fundo Decorativo com Folhas (Tema Green Ledger) -->
-        <Canvas Opacity="0.4" IsHitTestVisible="False">
-            <TextBlock Text="🌿" FontSize="200" Foreground="#E5F3ED" Opacity="0.6" Canvas.Right="-50" Canvas.Top="-50">
-                <TextBlock.RenderTransform>
-                    <RotateTransform Angle="25" CenterX="100" CenterY="100"/>
-                </TextBlock.RenderTransform>
-            </TextBlock>
-            <TextBlock Text="🌿" FontSize="120" Foreground="#E5F3ED" Opacity="0.4" Canvas.Left="-30" Canvas.Bottom="100">
-                <TextBlock.RenderTransform>
-                    <RotateTransform Angle="-45" CenterX="60" CenterY="60"/>
-                </TextBlock.RenderTransform>
-            </TextBlock>
-        </Canvas>
+             FontFamily="Segoe UI Variable, Segoe UI, Helvetica Neue, sans-serif"
+             Background="#F3F4F6">
 
-        <Grid Margin="10">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <!-- Header -->
+                <RowDefinition Height="Auto"/>
+                <!-- Cards Superiores -->
+                <RowDefinition Height="Auto"/>
+                <!-- Gráficos -->
                 <RowDefinition Height="*"/>
+                <!-- Tabelas e Listas -->
             </Grid.RowDefinitions>
 
-            <!-- TÍTULO COM ÍCONE -->
-            <StackPanel Grid.Row="0" Margin="0,0,0,24" Orientation="Horizontal">
-                <Border Width="56" Height="56" CornerRadius="16" Background="#ECFDF5" BorderBrush="#D1FAE5" BorderThickness="1" Margin="0,0,16,0">
-                    <TextBlock Text="🌿" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="Análise de Sustentabilidade" FontSize="28" FontWeight="Bold" Foreground="#0A5B43"/>
-                    <TextBlock Text="Métricas detalhadas para emissão de relatórios corporativos ESG." FontSize="15" Foreground="#6B7280" Margin="0,2,0,0"/>
-                </StackPanel>
-            </StackPanel>
+            <!-- HEADER -->
+            <TextBlock Grid.Row="0" Text="Dashboard ESG" FontSize="28" FontWeight="Bold" Foreground="#0A5B43" Margin="0,0,0,24"/>
 
-            <!-- CONTEÚDO -->
-            <Grid Grid.Row="1">
+            <!-- 4 CARDS DE RESUMO -->
+            <Grid Grid.Row="1" Margin="0,0,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Background="#0A5B43" CornerRadius="12" Padding="20" Height="100" Margin="0,0,12,0">
+                    <Border.Effect>
+                        <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.1" Color="Black"/>
+                    </Border.Effect>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding TotalEmissoes, StringFormat={}{0:N0} ton}" FontSize="22" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Emissões de CO2 Totais" FontSize="13" Foreground="#D1FAE5" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Background="#1B7055" CornerRadius="12" Padding="20" Height="100" Margin="6,0,6,0">
+                    <Border.Effect>
+                        <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.1" Color="Black"/>
+                    </Border.Effect>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding FornecedoresVerdes}" FontSize="22" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Fornecedores Certificados" FontSize="13" Foreground="#D1FAE5" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Background="#2E8B57" CornerRadius="12" Padding="20" Height="100" Margin="6,0,6,0">
+                    <Border.Effect>
+                        <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.1" Color="Black"/>
+                    </Border.Effect>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding PecasReaproveitadas}" FontSize="22" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Peças Reaproveitadas" FontSize="13" Foreground="#D1FAE5" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="3" Background="#4BAC50" CornerRadius="12" Padding="20" Height="100" Margin="12,0,0,0">
+                    <Border.Effect>
+                        <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.1" Color="Black"/>
+                    </Border.Effect>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding EconomiaGerada}" FontSize="22" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Economia Estimada" FontSize="13" Foreground="#ECFDF5" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- GRÁFICOS -->
+            <Grid Grid.Row="2" Margin="0,0,0,24">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- GRÁFICO DE PIZZA (CARD ESQUERDO) -->
-                <Border Grid.Column="0" Background="White" CornerRadius="16" BorderBrush="#E5E5EA" BorderThickness="1" Margin="0,0,10,0" Padding="24" MinHeight="400">
+                <Border Grid.Column="0" Background="White" CornerRadius="12" Padding="20" Height="320" Margin="0,0,12,0">
                     <Border.Effect>
-                        <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.05" Color="#0A5B43"/>
+                        <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.05" Color="Black"/>
                     </Border.Effect>
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-
-                        <TextBlock Grid.Row="0" Text="Distribuição de Emissões" FontSize="18" FontWeight="Bold" Foreground="#111827"/>
-
-                        <lvc:PieChart Grid.Row="1" 
-                                      Series="{Binding Analises.DistribuicaoSeries}" 
-                                      Margin="0,16,0,0" 
-                                      LegendLocation="Bottom"
-                                      Foreground="#4B5563">
+                        <TextBlock Grid.Row="0" Text="Emissões por Categoria" FontSize="16" FontWeight="Bold" Foreground="#111827" Margin="0,0,0,12"/>
+                        <lvc:PieChart Grid.Row="1" Series="{Binding GraficoPizzaSeries}" LegendLocation="Right" InnerRadius="60">
                             <lvc:PieChart.DataTooltip>
                                 <lvc:DefaultTooltip Background="#111827" Foreground="White" BorderThickness="0" CornerRadius="8" Padding="10"/>
                             </lvc:PieChart.DataTooltip>
@@ -69,10 +98,41 @@
                     </Grid>
                 </Border>
 
-                <!-- TOP FORNECEDORES VERDES (CARD DIREITO) -->
-                <Border Grid.Column="1" Background="White" CornerRadius="16" BorderBrush="#E5E5EA" BorderThickness="1" Margin="10,0,0,0" Padding="24" MinHeight="400">
+                <Border Grid.Column="1" Background="White" CornerRadius="12" Padding="20" Height="320" Margin="12,0,0,0">
                     <Border.Effect>
-                        <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.05" Color="#0A5B43"/>
+                        <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.05" Color="Black"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Redução Mensal de Carbono (ton)" FontSize="16" FontWeight="Bold" Foreground="#111827" Margin="0,0,0,12"/>
+                        <lvc:CartesianChart Grid.Row="1" Series="{Binding GraficoBarrasSeries}" Margin="0,10,0,0">
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Labels="{Binding MesesLabels}" Foreground="#6B7280"/>
+                            </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis MinValue="0" Foreground="#6B7280"/>
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- SESSÃO INFERIOR (DATAGRID + TOP FORNECEDORES) -->
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <!-- Espaço maior para a tabela -->
+                    <ColumnDefinition Width="1*"/>
+                    <!-- Espaço menor para o ranking -->
+                </Grid.ColumnDefinitions>
+
+                <!-- DATAGRID (Últimas Avaliações) -->
+                <Border Grid.Column="0" Background="White" CornerRadius="12" Padding="20" MinHeight="300" Margin="0,0,12,0">
+                    <Border.Effect>
+                        <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.05" Color="Black"/>
                     </Border.Effect>
                     <Grid>
                         <Grid.RowDefinitions>
@@ -80,14 +140,98 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Text="Top Fornecedores Verdes" FontSize="18" FontWeight="Bold" Foreground="#111827" Margin="0,0,0,16"/>
+                        <TextBlock Grid.Row="0" Text="Últimas Avaliações de Fornecedores" FontSize="16" FontWeight="Bold" Foreground="#111827" Margin="0,0,0,16"/>
 
-                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
-                            <ItemsControl ItemsSource="{Binding Analises.TopFornecedores}">
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding UltimasAvaliacoes}" 
+                                  AutoGenerateColumns="False" CanUserAddRows="False"
+                                  Background="Transparent" BorderThickness="0"
+                                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F3F4F6"
+                                  RowHeight="48" IsReadOnly="True" HeadersVisibility="Column">
+
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#ECFDF5"/>
+                                    <Setter Property="Foreground" Value="#0A5B43"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Padding" Value="12,10"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="Background" Value="White"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#F8FAFC"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.RowStyle>
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Fornecedor" Binding="{Binding Fornecedor}" Width="2*">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Margin" Value="12,0,0,0"/>
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <DataGridTextColumn Header="Material" Binding="{Binding Material}" Width="1.5*">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Foreground" Value="#4B5563"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <DataGridTextColumn Header="Pegada (kg CO2)" Binding="{Binding PegadaCarbono}" Width="1.2*">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                            <Setter Property="Foreground" Value="#0A5B43"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <DataGridTextColumn Header="Certificação" Binding="{Binding Status}" Width="1*">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                            <Setter Property="Foreground" Value="#D97706"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+
+                <!-- TOP FORNECEDORES (Ranking) -->
+                <Border Grid.Column="1" Background="White" CornerRadius="12" Padding="20" MinHeight="300" Margin="12,0,0,0">
+                    <Border.Effect>
+                        <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.05" Color="Black"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="🏆 Top Fornecedores" FontSize="16" FontWeight="Bold" Foreground="#111827" Margin="0,0,0,16"/>
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding TopFornecedores}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <!-- Linha do Fornecedor -->
-                                        <Border BorderBrush="#F3F4F6" BorderThickness="0,0,0,1" Padding="0,8,0,16" Margin="0,0,0,8">
+                                        <Border Background="#F9FAFB" CornerRadius="8" Margin="0,0,0,8" Padding="12">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -95,68 +239,22 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
 
-                                                <!-- Ícone Status (Laranja ou Verde Iveco) -->
-                                                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="20" Margin="0,0,16,0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                    <Border.Style>
-                                                        <Style TargetType="Border">
-                                                            <!-- Laranja Mute padrão para Pendente -->
-                                                            <Setter Property="Background" Value="#F59E0B"/>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding Certificado}" Value="ISO 14001">
-                                                                    <!-- Verde Iveco para Certificado -->
-                                                                    <Setter Property="Background" Value="#1B7055"/>
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding Certificado}" Value="Pendente">
-                                                                    <Setter Property="Background" Value="#F59E0B"/>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Border.Style>
-                                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE73E;" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                <!-- Posição -->
+                                                <Border Grid.Column="0" Background="{Binding CorDestaque}" Width="32" Height="32" CornerRadius="16" Margin="0,0,12,0">
+                                                    <TextBlock Text="{Binding Posicao}" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
 
-                                                <!-- Detalhes do Fornecedor -->
+                                                <!-- Info do Fornecedor -->
                                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding Nome}" Foreground="#111827" FontWeight="Bold" FontSize="15"/>
-                                                    <TextBlock Text="{Binding Localizacao}" Foreground="#6B7280" FontSize="12" Margin="0,2,0,4"/>
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <TextBlock Text="Peças: " Foreground="#9CA3AF" FontSize="12"/>
-                                                        <!-- Quantidade de peças no Verde Destaque -->
-                                                        <TextBlock Text="{Binding TotalPecas}" Foreground="#0A5B43" FontSize="12" FontWeight="Bold"/>
-                                                        <TextBlock Text="  •  Pegada: " Foreground="#9CA3AF" FontSize="12"/>
-                                                        <TextBlock Text="{Binding PegadaMedia, StringFormat={}{0:N1} kg CO2}" Foreground="#D97706" FontSize="12" FontWeight="Bold"/>
-                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding Nome}" FontWeight="SemiBold" Foreground="#1F2937" FontSize="14" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding Categoria}" Foreground="#6B7280" FontSize="12" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
                                                 </StackPanel>
 
-                                                <!-- Badge de Certificação -->
-                                                <Border Grid.Column="2" CornerRadius="6" Padding="10,6" VerticalAlignment="Top">
-                                                    <Border.Style>
-                                                        <Style TargetType="Border">
-                                                            <Setter Property="Background" Value="#FEF3C7"/>
-                                                            <!-- Fundo amarelado pendente -->
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding Certificado}" Value="ISO 14001">
-                                                                    <Setter Property="Background" Value="#ECFDF5"/>
-                                                                    <!-- Fundo esverdeado aprovado -->
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Border.Style>
-                                                    <TextBlock Text="{Binding Certificado}" FontSize="11" FontWeight="Bold">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock">
-                                                                <Setter Property="Foreground" Value="#B45309"/>
-                                                                <!-- Texto amarelado pendente -->
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Certificado}" Value="ISO 14001">
-                                                                        <Setter Property="Foreground" Value="#047857"/>
-                                                                        <!-- Texto verde aprovado -->
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
-                                                    </TextBlock>
-                                                </Border>
+                                                <!-- Score -->
+                                                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="8,0,0,0">
+                                                    <TextBlock Text="{Binding PontuacaoESG, StringFormat={}{0} pts}" FontWeight="Bold" Foreground="#0A5B43" FontSize="15" HorizontalAlignment="Right"/>
+                                                    <TextBlock Text="Score" Foreground="#9CA3AF" FontSize="10" HorizontalAlignment="Right"/>
+                                                </StackPanel>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>
@@ -165,7 +263,8 @@
                         </ScrollViewer>
                     </Grid>
                 </Border>
+
             </Grid>
         </Grid>
-    </Grid>
+    </ScrollViewer>
 </UserControl>
