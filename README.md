@@ -461,47 +461,66 @@ A aplicação **WpfIveco** representa a interface homem-máquina (IHM) de monito
 
 ---
 
-### 5.3. Camada de Simulação de Sensores (`SimuladorIveco`)
+### Camada de Simulação de Sensores (`SimuladorIveco`)
 
 O módulo `SimuladorIveco` consiste em um motor utilitário desenvolvido em modo **Console Application**, responsável por simular com fidelidade o comportamento operacional de dispositivos de telemetria automotiva e sensores IoT implantados fisicamente na planta fabril da Iveco (como antenas de identificação por radiofrequência - RFID, balanças eletrônicas automatizadas e scanners industriais de rastreamento de chassis). 
 
 O utilitário faz uso intensivo da biblioteca de paralelismo **Task Parallel Library (TPL)** do .NET para gerar e despachar pacotes sintéticos contendo números de chassi válidos (VIN), peso líquido das cargas transportadas e a classificação tipológica dos insumos recebidos.
 
 ---
+
+## Requisitos Do Sistema E Diretrizes De Instalação
+
+Esta seção descreve os pré-requisitos mínimos e o procedimento técnico para compilar e executar o ecossistema **Iveco Green Ledger** em ambiente de desenvolvimento ou homologação.
+
+### Pré-requisitos de Software e Ambiente
+* **SDK do .NET:** Versão `8.0 LTS` ou superior instalada.
+* **IDE Recomendada:** Visual Studio 2022 (v17.8+), JetBrains Rider ou Visual Studio Code (com as extensões C# Dev Kit).
+* **Banco de Dados Local:** Engine do SQLite instalada (necessária apenas para leitura do arquivo gerado pelo simulador).
+* **Infraestrutura em Nuvem:** Uma conta ativa no Google Cloud Platform com um projeto configurado no **Firebase Firestore**.
+
+### Configuração das Chaves de Segurança (Google Cloud IAM)
+Por motivos de governança e proteção de dados, as credenciais de acesso ao Firebase NoSQL (`firebase-key.json`) **não** estão incluídas no controle de versão público.
+1. Acesse o console do Firebase, vá em *Configurações do Projeto* > *Contas de Serviço*.
+2. Gere uma nova chave privada em formato JSON.
+3. Renomeie o arquivo baixado para `firebase-key.json`.
+4. Cole o arquivo diretamente na raiz do projeto `ApiIveco` (certifique-se de que a propriedade do arquivo esteja configurada como "Copiar se for mais novo" nas propriedades do Visual Studio).
 # Regra de Negócio: Validação Restritiva de Chassis (VIN)
 
-## 1. Visão Geral
+---
+
+## Visão Geral sobre o projeto
 No contexto do ecossistema **Iveco Green Ledger**, é estritamente proibido o registo de componentes logísticos ou a geração de métricas ambientais (Escopo 3) para veículos que não pertençam à fabricante **IVECO**. Esta regra garante a integridade dos relatórios ESG e evita a contaminação da base de dados corporativa com veículos de terceiros.
 
-## 2. Atores e Componentes Envolvidos
+## - Atores e Componentes Envolvidos
 * **Ator:** Operador de Pátio (via cliente desktop WPF).
 * **Sistema Interno:** Back-End em ASP.NET Core 8 (`DadosController` e `DadosService`).
 * **Serviço Externo:** API Pública da NHTSA (National Highway Traffic Safety Administration).
 
-## 3. Fluxo de Validação e Critérios de Aceitação
+## - Fluxo de Validação e Critérios de Aceitação
 A validação de um chassi segue um pipeline de verificações síncronas/assíncronas antes da persistência no banco de dados NoSQL (Firebase Firestore):
 
-### Passo 3.1: Validação de Fronteira (Cliente/API)
+### - Validação de Fronteira (Cliente/API)
 * O utilizador introduz o código VIN.
 * O sistema verifica o tamanho da string.
 * **Critério:** O código VIN deve conter **exatamente 17 caracteres**.
 * **Falha:** Retorna `HTTP 400 (Bad Request)` com a mensagem "O VIN deve ter 17 caracteres."
 
-### Passo 3.2: Higienização de Dados (Sanitization)
+### - Higienização de Dados (Sanitization)
 * Antes de enviar para a entidade externa, o VIN sofre um tratamento.
 * **Ação:** Remoção de espaços em branco (`Trim`) e conversão de todos os caracteres para maiúsculas (`ToUpper`).
 
-### Passo 3.3: Auditoria Industrial Externa (Integração NHTSA)
+### - Auditoria Industrial Externa (Integração NHTSA)
 * O Back-End consome o endpoint `decodevin` da API VPIC da NHTSA.
 * O payload JSON devolvido é analisado em busca da variável correspondente à Marca (`Make`).
 * **Critério de Sucesso:** O valor retornado no campo Marca deve conter obrigatoriamente a substring **"IVECO"**.
 * **Critério de Rejeição:** Se a marca for nula, vazia ou diferente de IVECO (ex: Volvo, Scania, Ford).
 
-### Passo 3.4: Resolução
+### - Resolução
 * **Em caso de Sucesso:** O sistema extrai o modelo do veículo (ou define um genérico caso a API não o forneça) e aprova a transação, avançando para a criação do veículo no Firebase e posterior vínculo das peças/lotes.
 * **Em caso de Falha:** O motor de regras de negócio dispara uma exceção crítica. A camada Controller interceta a exceção de forma amigável e retorna o erro para a aplicação WPF, impedindo instantaneamente a continuação da linha de montagem e exibindo a marca não autorizada detetada.
 
-## 4. Tratamento de Erros e Códigos HTTP
+## - Tratamento de Erros e Códigos HTTP
 
 | Cenário de Erro | Código HTTP Retornado | Comportamento do Sistema |
 | :--- | :---: | :--- |
@@ -510,7 +529,7 @@ A validação de um chassi segue um pipeline de verificações síncronas/assín
 | Marca detetada não é IVECO | `400 Bad Request` | Controller captura a `Exception` do Service e notifica o Operador com a marca incorreta detetada. |
 | Falha na ligação com a NHTSA | `500 / 503` | O sistema notifica indisponibilidade temporária. (Nota: Aqui entra a contingência *Offline-Safe* no lado do Cliente WPF). |
 
-## 5. Implementação Técnica de Referência
+## - Implementação Técnica de Referência
 A salvaguarda desta regra está codificada no serviço `DadosService.cs`, garantindo que a regra nunca seja contornada, independentemente do cliente que chame a API:
 
 ```csharp
