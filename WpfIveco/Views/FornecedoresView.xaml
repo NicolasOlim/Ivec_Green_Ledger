@@ -1,147 +1,255 @@
 ﻿<UserControl x:Class="WpfIveco.Views.FornecedoresView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             TextOptions.TextFormattingMode="Display"
+             TextOptions.TextRenderingMode="ClearType"
+             FontFamily="Segoe UI Variable, Segoe UI, Helvetica Neue, sans-serif">
+
+    <UserControl.Resources>
+        <DropShadowEffect x:Key="DropShadowEffect" BlurRadius="20" ShadowDepth="4" Opacity="0.05" Color="#0A5B43"/>
+
+        <Style x:Key="PremiumTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#111827"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="14,12"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="#0A5B43"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="#0A5B43"/>
+                                <Setter Property="Background" TargetName="border" Value="#F0FDF4"/>
+                            </Trigger>
+                            <Trigger Property="IsReadOnly" Value="True">
+                                <Setter Property="Background" TargetName="border" Value="#F9FAFB"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#E5E5EA"/>
+                                <Setter Property="Foreground" Value="#4B5563"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="37*"/>
+            <ColumnDefinition Width="408*"/>
+        </Grid.ColumnDefinitions>
+        <Canvas Opacity="0.4" IsHitTestVisible="False" Grid.ColumnSpan="2">
+            <TextBlock Text="🌿" FontSize="200" Foreground="#E5F3ED" Opacity="0.6" Canvas.Right="-50" Canvas.Top="-50">
+                <TextBlock.RenderTransform>
+                    <RotateTransform Angle="25" CenterX="100" CenterY="100"/>
+                </TextBlock.RenderTransform>
+            </TextBlock>
+            <TextBlock Text="🌿" FontSize="120" Foreground="#E5F3ED" Opacity="0.4" Canvas.Left="-30" Canvas.Bottom="100">
+                <TextBlock.RenderTransform>
+                    <RotateTransform Angle="-45" CenterX="60" CenterY="60"/>
+                </TextBlock.RenderTransform>
+            </TextBlock>
+        </Canvas>
 
-        <StackPanel Grid.Row="0">
-            <TextBlock Style="{StaticResource H1}" Text="Gestão de Fornecedores"/>
-            <TextBlock Style="{StaticResource Subtitle}" Text="Cadastre parceiros na rede permissionada do Ledger."/>
-        </StackPanel>
+        <Grid Margin="10,10,10,10" Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="30">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Margin="0,0,0,24" Orientation="Horizontal">
+                <Border Width="56" Height="56" CornerRadius="16" Background="#EFF6FF" BorderBrush="#DBEAFE" BorderThickness="1" Margin="0,0,16,0">
+                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE825;" FontSize="24" Foreground="#1D4ED8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Gestão de Fornecedores" FontSize="28" FontWeight="Bold" Foreground="#0A5B43"/>
+                    <TextBlock Text="Cadastre parceiros na rede permissionada do Ledger." FontSize="15" Foreground="#6B7280" Margin="0,2,0,0"/>
+                </StackPanel>
+            </StackPanel>
 
-                <TextBlock Grid.Row="0" Text="Integração Receita Federal" Style="{StaticResource H2}"/>
+            <Border Grid.Row="1" Background="White" CornerRadius="16" BorderBrush="#E5E5EA" BorderThickness="1" Padding="32" Effect="{StaticResource DropShadowEffect}" VerticalAlignment="Top">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                <Grid Grid.Row="1" Margin="0,0,0,30">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Text="Integração Receita Federal" FontSize="18" FontWeight="Bold" Foreground="#111827" Margin="0,0,0,16"/>
 
-                    <Grid Grid.Column="0" Margin="0,0,16,0">
-                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
-                                 Text="{Binding Fornecedor.CnpjBusca, UpdateSourceTrigger=PropertyChanged}"
-                                 TextChanged="CnpjTextBox_TextChanged"
-                                 PreviewTextInput="NumberValidationTextBox"
-                                 MaxLength="18"/>
-                        <TextBlock Text="00.000.000/0000-00" Foreground="{StaticResource TextTertiary}" 
-                                   VerticalAlignment="Center" Margin="14,0,0,0" IsHitTestVisible="False">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Grid Grid.Row="1" Margin="0,0,0,32">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0" Margin="0,0,16,0">
+                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
+                                     Text="{Binding Fornecedor.CnpjBusca, UpdateSourceTrigger=PropertyChanged}"
+                                     TextChanged="CnpjTextBox_TextChanged"
+                                     PreviewTextInput="NumberValidationTextBox"
+                                     MaxLength="18"
+                                     FontFamily="Consolas, Segoe UI" FontWeight="SemiBold" FontSize="15"/>
+
+                            <TextBlock Text="Ex: 00.000.000/0000-00" Foreground="#9CA3AF" FontSize="14" 
+                                       VerticalAlignment="Center" Margin="16,0,0,0" IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Fornecedor.CnpjBusca}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+
+                        <Button Grid.Column="1" Command="{Binding Fornecedor.ConsultarCnpjCommand}" Cursor="Hand">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="searchBorder" Background="#EFF6FF" BorderBrush="#2563EB" BorderThickness="1.5" CornerRadius="8" Padding="20,10">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8B6;" FontSize="16" Foreground="#2563EB" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Consultar CNPJ" Foreground="#2563EB" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="searchBorder" Property="Background" Value="#DBEAFE"/>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="searchBorder" Property="Background" Value="#BFDBFE"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
+
+                    <Grid Grid.Row="2" Margin="0,0,0,32">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="32"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Razão Social" Foreground="#4B5563" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
+                                     Text="{Binding Fornecedor.NomeFornecedorEncontrado}" 
+                                     IsReadOnly="True" FontWeight="SemiBold"/>
+
+                            <TextBlock Text="Status RFB" Foreground="#4B5563" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="ATIVA" 
+                                     IsReadOnly="True" Foreground="#059669" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Endereço Sede" Foreground="#4B5563" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+                            <Border Background="#F9FAFB" CornerRadius="8" Padding="14,12" MinHeight="46" BorderBrush="#E5E5EA" BorderThickness="1.5">
+                                <TextBlock Text="{Binding Fornecedor.LocalizacaoFornecedorEncontrado}" 
+                                           Foreground="#4B5563" FontSize="14" FontWeight="Medium"
+                                           TextWrapping="Wrap" VerticalAlignment="Center"/>
+                            </Border>
+
+                            <TextBlock Text="Categoria ESG (Atribuída)" Foreground="#4B5563" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="Pendente de Auditoria" 
+                                     IsReadOnly="True" Foreground="#D97706" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Separator Grid.Row="3" Margin="0,0,0,24" Background="#E5E5EA"/>
+
+                    <Grid Grid.Row="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Fornecedor.CnpjBusca}" Value="">
-                                            <Setter Property="Visibility" Value="Visible"/>
+                                        <DataTrigger Binding="{Binding Fornecedor.MensagemCadastro}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Fornecedor.MensagemCadastro}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </Grid>
+                            </StackPanel.Style>
 
-                    <Button Grid.Column="1" Style="{StaticResource PrimaryButtonStyle}" 
-                            Command="{Binding Fornecedor.ConsultarCnpjCommand}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8B6;" FontSize="14" 
-                                       Margin="0,0,8,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Consultar CNPJ" VerticalAlignment="Center"/>
+                            <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="18" Margin="0,0,8,0" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="&#xE73E;"/>
+                                        <Setter Property="Foreground" Value="#10B981"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Fornecedor.IsErro}" Value="True">
+                                                <Setter Property="Text" Value="&#xEA39;"/>
+                                                <Setter Property="Foreground" Value="#EF4444"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+
+                            <TextBlock Text="{Binding Fornecedor.MensagemCadastro}" FontSize="14" VerticalAlignment="Center" FontWeight="SemiBold">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#10B981"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Fornecedor.IsErro}" Value="True">
+                                                <Setter Property="Foreground" Value="#EF4444"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </StackPanel>
-                    </Button>
+
+                        <Button Grid.Column="1" Command="{Binding Fornecedor.SalvarFornecedorCommand}" Cursor="Hand">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="border" Background="#0A5B43" CornerRadius="8" Padding="32,14">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74E;" FontSize="16" Foreground="White" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Registrar no Ledger" Foreground="White" FontWeight="Bold" FontSize="15" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="border" Property="Background" Value="#1B7055"/>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="border" Property="Background" Value="#114736"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
                 </Grid>
-
-                <Grid Grid.Row="2" Margin="0,0,0,30">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="20"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="Razão Social" Foreground="{StaticResource TextSecondary}" 
-                                   FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
-                                 Text="{Binding Fornecedor.NomeFornecedorEncontrado}" 
-                                 IsReadOnly="True" Background="#F9F9FB"/>
-
-                        <TextBlock Text="Status RFB" Foreground="{StaticResource TextSecondary}" 
-                                   FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
-                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="ATIVA" 
-                                 IsReadOnly="True" Foreground="{StaticResource AppleGreen}" Background="#F9F9FB"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="Endereço Sede" Foreground="{StaticResource TextSecondary}" 
-                                   FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-
-                        <!-- CAMPO CORRIGIDO: usando Border + TextBlock com TextWrapping -->
-                        <Border Background="#F9F9FB" CornerRadius="8" Padding="12,10" MinHeight="40">
-                            <TextBlock Text="{Binding Fornecedor.LocalizacaoFornecedorEncontrado}" 
-                                       Foreground="{StaticResource TextPrimary}" 
-                                       FontSize="13" 
-                                       TextWrapping="Wrap" 
-                                       VerticalAlignment="Center"/>
-                        </Border>
-
-                        <TextBlock Text="Categoria ESG (Atribuída)" Foreground="{StaticResource TextSecondary}" 
-                                   FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
-                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="Pendente de Auditoria" 
-                                 IsReadOnly="True" Foreground="{StaticResource AppleOrange}" Background="#F9F9FB"/>
-                    </StackPanel>
-                </Grid>
-
-                <Border Grid.Row="3" BorderBrush="{StaticResource ElevatedGray3}" 
-                        BorderThickness="0,0,0,1" Margin="0,0,0,20"/>
-
-                <Grid Grid.Row="4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Grid.Column="0" Text="{Binding Fornecedor.MensagemCadastro}" 
-                               Foreground="{StaticResource AppleGreen}" FontSize="14" 
-                               VerticalAlignment="Center" FontWeight="Medium"/>
-
-                    <Button Grid.Column="1" Command="{Binding Fornecedor.SalvarFornecedorCommand}" 
-                            Cursor="Hand" BorderThickness="0">
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <Border x:Name="border" Background="{StaticResource AppleGreen}" 
-                                        CornerRadius="12" Padding="32,14">
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" 
-                                                VerticalAlignment="Center">
-                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74E;" 
-                                                   FontSize="16" Foreground="White" Margin="0,0,10,0" 
-                                                   VerticalAlignment="Center"/>
-                                        <TextBlock Text="Registrar no Ledger" Foreground="White" 
-                                                   FontWeight="Bold" FontSize="15" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="border" Property="Opacity" Value="0.85"/>
-                                    </Trigger>
-                                    <Trigger Property="IsPressed" Value="True">
-                                        <Setter TargetName="border" Property="Opacity" Value="0.65"/>
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Button.Template>
-                    </Button>
-                </Grid>
-            </Grid>
-        </Border>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

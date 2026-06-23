@@ -12,7 +12,9 @@
         TextOptions.TextRenderingMode="ClearType"
         FontFamily="Segoe UI Variable, Segoe UI, Helvetica Neue, sans-serif">
     <Grid>
-        <!-- Painel Principal (logado) -->
+        <!-- ========================================== -->
+        <!-- Painel Principal (logado)                   -->
+        <!-- ========================================== -->
         <Border Background="{StaticResource AppBackground}" CornerRadius="20" BorderBrush="#E5E5EA" BorderThickness="1" Margin="10">
             <Border.Style>
                 <Style TargetType="Border">
@@ -168,7 +170,7 @@
                                 </StackPanel>
                             </Button>
 
-                            <!-- Seção Admin (visível apenas para IsAdmin) -->
+                            <!-- Seção Admin -->
                             <StackPanel>
                                 <StackPanel.Style>
                                     <Style TargetType="StackPanel">
@@ -200,7 +202,7 @@
                             </StackPanel>
                         </StackPanel>
 
-                        <!-- Perfil do usuário (com ícone) -->
+                        <!-- Perfil do usuário -->
                         <Grid Grid.Row="3">
                             <ToggleButton x:Name="BtnMenuPerfil" Background="Transparent" BorderThickness="0" Cursor="Hand"
                                           AutomationProperties.Name="Abrir menu do perfil">
@@ -214,7 +216,7 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
 
-                                                <!-- Ícone de usuário (substitui o Ellipse) -->
+                                                <!-- Ícone de usuário -->
                                                 <Border Grid.Column="0" Width="32" Height="32" CornerRadius="16" Background="#D1D1D6">
                                                     <TextBlock FontFamily="Segoe MDL2 Assets" 
                                                                Text="&#xE77B;" 
@@ -233,7 +235,6 @@
                                                 <TextBlock Grid.Column="2" FontFamily="Segoe MDL2 Assets" Text="&#xE70D;" Foreground="{StaticResource TextSecondary}" FontSize="12" VerticalAlignment="Center" Margin="10,0,0,0"/>
                                             </Grid>
                                         </Border>
-
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
                                                 <Setter TargetName="BgBorder" Property="Opacity" Value="0.8"/>
@@ -265,7 +266,9 @@
                                         <TextBlock Text="Nível de Acesso" FontSize="11" Foreground="#6B7280"/>
                                         <TextBlock Text="{Binding PerfilUsuario, FallbackValue='Administrador'}" FontSize="13" Foreground="#111827" FontWeight="Medium" Margin="0,2,0,16"/>
                                         <Separator Background="#E5E5EA" Margin="0,0,0,12"/>
-                                        <Button Command="{Binding FazerLogoutCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand" HorizontalAlignment="Left" ToolTip="Terminar Sessão">
+
+                                        <!-- Botão que ABRE o modal (substituído) -->
+                                        <Button Click="BtnAbrirModalSair_Click" Background="Transparent" BorderThickness="0" Cursor="Hand" HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xF3B1;" Foreground="#EF4444" FontSize="16" VerticalAlignment="Center"/>
                                                 <TextBlock Text="Encerrar Sessão" Foreground="#EF4444" FontSize="13" FontWeight="SemiBold" Margin="8,0,0,0" VerticalAlignment="Center"/>
@@ -339,7 +342,9 @@
             </Grid>
         </Border>
 
-        <!-- Tela de Login (deslogado) -->
+        <!-- ========================================== -->
+        <!-- Tela de Login (deslogado)                   -->
+        <!-- ========================================== -->
         <Border Background="White" CornerRadius="20" BorderBrush="#E5E5EA" BorderThickness="1" Margin="10">
             <Border.Style>
                 <Style TargetType="Border">
@@ -354,7 +359,6 @@
             <Border.Effect>
                 <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.1"/>
             </Border.Effect>
-
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -386,14 +390,12 @@
                                 </TextBlock.RenderTransform>
                             </TextBlock>
                         </Canvas>
-
                         <Grid Margin="50">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-
                             <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <Border Width="90" Height="90" CornerRadius="25" Background="#1B7055" HorizontalAlignment="Center" Margin="0,0,0,24">
                                     <Border.Effect>
@@ -405,7 +407,6 @@
                                 <TextBlock Text="Green Ledger" Foreground="#A3D1C2" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,16"/>
                                 <Border Width="40" Height="3" Background="#1B7055" CornerRadius="1" HorizontalAlignment="Center"/>
                             </StackPanel>
-
                             <TextBlock Grid.Row="2" Text="© 2026 Iveco S.p.A." Foreground="#8CBFA3" FontSize="13" HorizontalAlignment="Center"/>
                         </Grid>
                     </Grid>
@@ -480,5 +481,68 @@
                 </Grid>
             </Grid>
         </Border>
+
+        <!-- ========================================== -->
+        <!-- MODAL DE CONFIRMAÇÃO DE SAÍDA               -->
+        <!-- ========================================== -->
+        <Grid x:Name="ModalConfirmacaoSair" Visibility="Collapsed" Background="#80000000" Panel.ZIndex="999">
+            <Border Background="White" CornerRadius="16" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="24" Width="450">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="25" ShadowDepth="4" Opacity="0.2" Color="Black"/>
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Ícone amarelo/laranja -->
+                    <Border Grid.Row="0" Grid.Column="0" Width="64" Height="64" CornerRadius="32" Background="#FFFBEB" BorderBrush="#FEF3C7" BorderThickness="1" VerticalAlignment="Top" Margin="0,0,16,0">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xF3B1;" FontSize="28" Foreground="#F59E0B" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                    </Border>
+
+                    <!-- Textos -->
+                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,4,0,24">
+                        <TextBlock Text="Confirmar Saída" FontSize="22" FontWeight="Bold" Foreground="#1E293B" Margin="0,0,0,8"/>
+                        <TextBlock Text="Você realmente deseja encerrar sua sessão atual e voltar para a tela de login?" FontSize="15" Foreground="#64748B" TextWrapping="Wrap" LineHeight="22"/>
+                    </StackPanel>
+
+                    <!-- Botões -->
+                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <!-- Cancelar -->
+                        <Button Click="BtnFecharModalSair_Click" Background="White" Cursor="Hand" Margin="0,0,12,0">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="8" Padding="24,10">
+                                        <TextBlock Text="Cancelar" Foreground="#475569" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <!-- Sair -->
+                        <Button Click="BtnConfirmarSaida_Click" Background="#1D4ED8" Cursor="Hand">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="bgBorder" Background="{TemplateBinding Background}" CornerRadius="8" Padding="32,10">
+                                        <TextBlock Text="Sair" Foreground="White" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="bgBorder" Property="Background" Value="#1E40AF"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

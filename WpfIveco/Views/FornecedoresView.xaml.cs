@@ -54,5 +54,6 @@ namespace WpfIveco.Views
                 textBox.TextChanged += CnpjTextBox_TextChanged;
             }
         }
+
     }
 }

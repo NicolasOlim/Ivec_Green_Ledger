@@ -1,50 +1,82 @@
 ﻿<UserControl x:Class="WpfIveco.Views.PecasView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             TextOptions.TextFormattingMode="Display"
+             TextOptions.TextRenderingMode="ClearType"
+             FontFamily="Segoe UI Variable, Segoe UI, Helvetica Neue, sans-serif">
 
     <UserControl.Resources>
-        <DropShadowEffect x:Key="DropShadowEffect" BlurRadius="12" ShadowDepth="2" Opacity="0.12" Color="Black"/>
+        <DropShadowEffect x:Key="DropShadowEffect" BlurRadius="20" ShadowDepth="4" Opacity="0.05" Color="#0A5B43"/>
 
-        <Style x:Key="PremiumComboBoxStyle" TargetType="ComboBox">
+        <!-- ESTILO DO TEXTBOX -->
+        <Style x:Key="PremiumTextBoxStyle" TargetType="TextBox">
             <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#111827"/>
+            <Setter Property="FontSize" Value="13"/>
             <Setter Property="Padding" Value="14,12"/>
             <Setter Property="BorderThickness" Value="1.5"/>
-            <Setter Property="BorderBrush" Value="{StaticResource ElevatedGray3}"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="#0A5B43"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="#0A5B43"/>
+                                <Setter Property="Background" TargetName="border" Value="#F0FDF4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ESTILO DO COMBOBOX -->
+        <Style x:Key="PremiumComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#111827"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="14,12"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="FontFamily" Value="Segoe UI, sans-serif"/>
             <Setter Property="Height" Value="46"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBox">
                         <Grid>
                             <Border x:Name="Border" Background="{TemplateBinding Background}" 
-                                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10">
+                                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" FontFamily="Segoe MDL2 Assets" Text="&#xE74C;" FontSize="16" 
-                                               Foreground="{StaticResource TextSecondary}" Margin="12,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
 
-                                    <ContentPresenter x:Name="ContentPresenter" Grid.Column="1" 
+                                    <!-- ContentPresenter puro, respeitando o DataTemplate de cada item -->
+                                    <ContentPresenter x:Name="ContentPresenter" Grid.Column="0" 
                                                       Content="{TemplateBinding SelectionBoxItem}"
                                                       ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                                      Margin="8,0,12,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                                                      Margin="12,0,12,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
 
-                                    <ToggleButton x:Name="PART_DropDownToggle" Grid.Column="2" Focusable="False" ClickMode="Press"
+                                    <ToggleButton x:Name="PART_DropDownToggle" Grid.Column="1" Focusable="False" ClickMode="Press"
                                                   Background="Transparent" BorderThickness="0" HorizontalAlignment="Right" Margin="0,0,14,0"
                                                   VerticalAlignment="Center" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
-                                        <Path Fill="{StaticResource TextSecondary}" Data="M0,0 L5,5 L10,0 Z" Width="12" Height="7" Stretch="Fill"/>
+                                        <Path Fill="#6B7280" Data="M0,0 L5,5 L10,0 Z" Width="12" Height="7" Stretch="Fill"/>
                                     </ToggleButton>
                                 </Grid>
                             </Border>
                             <Popup x:Name="PART_Popup" Placement="Bottom" IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                    MaxHeight="250" AllowsTransparency="True" StaysOpen="False">
-                                <Border Background="White" CornerRadius="12" BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="1"
+                                <Border Background="White" CornerRadius="8" BorderBrush="#E5E5EA" BorderThickness="1"
                                         Margin="0,6,0,0" Padding="6" Effect="{StaticResource DropShadowEffect}">
                                     <ScrollViewer>
                                         <ItemsPresenter/>
@@ -54,17 +86,15 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AppleBlue}"/>
-                                <Setter TargetName="Border" Property="Background" Value="#F8FAFF"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#0A5B43"/>
+                                <Setter TargetName="Border" Property="Background" Value="#F0FDF4"/>
                             </Trigger>
                             <Trigger Property="IsFocused" Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AppleBlue}"/>
-                                <Setter TargetName="Border" Property="Background" Value="#F0F8FF"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#0A5B43"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ElevatedGray2}"/>
-                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource ElevatedGray3}"/>
-                                <Setter Property="Foreground" Value="{StaticResource TextTertiary}"/>
+                                <Setter TargetName="Border" Property="Background" Value="#F3F4F6"/>
+                                <Setter Property="Foreground" Value="#9CA3AF"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -75,29 +105,21 @@
                     <Style TargetType="ComboBoxItem">
                         <Setter Property="Padding" Value="14,10"/>
                         <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                        <Setter Property="Foreground" Value="#111827"/>
                         <Setter Property="Cursor" Value="Hand"/>
-                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="FontSize" Value="13"/>
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ComboBoxItem">
-                                    <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" FontFamily="Segoe MDL2 Assets" Text="&#xE74C;" FontSize="14" 
-                                                       Foreground="{StaticResource AppleBlue}" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                                            <ContentPresenter Grid.Column="1" VerticalAlignment="Center"/>
-                                        </Grid>
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter VerticalAlignment="Center"/>
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsHighlighted" Value="True">
-                                            <Setter Property="Background" Value="{StaticResource ElevatedGray2}"/>
+                                            <Setter Property="Background" Value="#F3F4F6"/>
                                         </Trigger>
                                         <Trigger Property="IsSelected" Value="True">
-                                            <Setter Property="Background" Value="#E6F0FF"/>
+                                            <Setter Property="Background" Value="#ECFDF5"/>
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
@@ -110,162 +132,208 @@
     </UserControl.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <!-- Fundo Decorativo -->
+        <Canvas Opacity="0.4" IsHitTestVisible="False">
+            <TextBlock Text="🌿" FontSize="200" Foreground="#E5F3ED" Opacity="0.6" Canvas.Right="-50" Canvas.Top="-50">
+                <TextBlock.RenderTransform>
+                    <RotateTransform Angle="25" CenterX="100" CenterY="100"/>
+                </TextBlock.RenderTransform>
+            </TextBlock>
+            <TextBlock Text="🌿" FontSize="120" Foreground="#E5F3ED" Opacity="0.4" Canvas.Left="-30" Canvas.Bottom="100">
+                <TextBlock.RenderTransform>
+                    <RotateTransform Angle="-45" CenterX="60" CenterY="60"/>
+                </TextBlock.RenderTransform>
+            </TextBlock>
+        </Canvas>
 
-        <StackPanel Grid.Row="0">
-            <TextBlock Style="{StaticResource H1}" Text="Gestão de Componentes"/>
-            <TextBlock Style="{StaticResource Subtitle}" Text="Adicione peças manualmente e associe ao Chassi (VIN) de um veículo no Ledger."/>
-        </StackPanel>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <Border Grid.Row="1" Style="{StaticResource PremiumCardStyle}" Padding="24" Margin="0,0,0,20">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
-                        <TextBlock Text="Chassi do Veículo (VIN)" Foreground="{StaticResource TextSecondary}" 
-                                   FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                        <ComboBox Style="{StaticResource PremiumComboBoxStyle}"
-                                  ItemsSource="{Binding Pecas.ListaVins}"
-                                  SelectedItem="{Binding Pecas.VinSelecionado, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                  MaxDropDownHeight="200"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" Margin="0,0,12,0">
-                        <TextBlock Text="Fornecedor" Foreground="{StaticResource TextSecondary}" 
-                                   FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-
-                        <ComboBox Style="{StaticResource PremiumComboBoxStyle}"
-                                  ItemsSource="{Binding Pecas.ListaFornecedores}"
-                                  SelectedItem="{Binding Pecas.FornecedorSelecionado, Mode=TwoWay}"
-                                  MaxDropDownHeight="200">
-
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Margin="2,0">
-                                        <TextBlock FontFamily="Segoe MDL2 Assets" 
-                                                   Text="&#xE81E;" 
-                                                   FontSize="14"
-                                                   Foreground="{StaticResource TextSecondary}"
-                                                   Margin="0,0,8,0" 
-                                                   VerticalAlignment="Center"/>
-                                        <TextBlock Text="{Binding Nome}" 
-                                                   VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="2" Margin="0,0,12,0">
-                        <TextBlock Text="Nome/Descrição da Peça" Foreground="{StaticResource TextSecondary}" 
-                                   FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
-                                 Text="{Binding Pecas.NovaPecaNome, UpdateSourceTrigger=PropertyChanged}"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="3">
-                        <TextBlock Text="Peso da peça (kg)" Foreground="{StaticResource TextSecondary}" 
-                                   FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                        <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
-                                 Text="{Binding Pecas.NovaPecaPesoKg, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:F2}}"
-                                 InputScope="Number"/>
-                    </StackPanel>
-                </Grid>
-
-                <Button Grid.Row="1" Style="{StaticResource PrimaryButtonStyle}" 
-                        Command="{Binding Pecas.AdicionarPecaManualCommand}"
-                        HorizontalAlignment="Right" Margin="0,16,0,0" Padding="28,14"
-                        FontSize="15" FontWeight="SemiBold">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE710;" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Registrar Peça" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-            </Grid>
-        </Border>
-
-        <Border Grid.Row="2" Style="{StaticResource PremiumCardStyle}" Padding="24" MinHeight="300">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
-                    <TextBlock Text="Últimas Peças Registradas" Style="{StaticResource H2}" Margin="0,0,16,0"/>
-                    <Border Background="{StaticResource ElevatedGray2}" CornerRadius="12" Padding="8,4" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding Pecas.ListaPecas.Count, StringFormat='Total: {0} peças'}" 
-                                   Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="SemiBold"/>
-                    </Border>
+            <!-- TÍTULO COM ÍCONE DE ENGRENAGEM -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,24" Orientation="Horizontal">
+                <Border Width="56" Height="56" CornerRadius="16" Background="#ECFDF5" BorderBrush="#D1FAE5" BorderThickness="1" Margin="0,0,16,0">
+                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" FontSize="24" Foreground="#0A5B43" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Gestão de Componentes" FontSize="28" FontWeight="Bold" Foreground="#0A5B43"/>
+                    <TextBlock Text="Adicione peças manualmente e associe ao Chassi (VIN) de um veículo no Ledger." FontSize="15" Foreground="#6B7280" Margin="0,2,0,0"/>
                 </StackPanel>
+            </StackPanel>
 
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <ItemsControl ItemsSource="{Binding Pecas.ListaPecas}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border BorderBrush="{StaticResource ElevatedGray3}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Border Grid.Column="0" Width="40" Height="40" CornerRadius="10" Background="#FFF0E0" Margin="0,0,14,0">
-                                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9A1;" FontSize="20" Foreground="{StaticResource AppleOrange}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </Border>
-                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding NomePeca}" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" FontSize="15"/>
-                                                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                                                    <TextBlock Text="VIN: " Foreground="{StaticResource TextSecondary}" FontSize="12"/>
-                                                    <TextBlock Text="{Binding VinAssociado}" Foreground="{StaticResource AppleBlue}" FontSize="12" FontWeight="Medium"/>
-                                                    <TextBlock Text=" • " Foreground="{StaticResource TextSecondary}" FontSize="12"/>
-                                                    <TextBlock Text="{Binding PesoKg, StringFormat='Peso: {0:N2} kg'}" Foreground="{StaticResource AppleOrange}" FontSize="12" FontWeight="Medium"/>
-                                                </StackPanel>
-                                            </StackPanel>
-                                            <Border Grid.Column="2" Background="#E6F0FF" CornerRadius="6" Padding="10,4" VerticalAlignment="Center">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="✓ " Foreground="{StaticResource AppleGreen}" FontSize="12" FontWeight="Bold"/>
-                                                    <TextBlock Text="Gravado no Ledger" Foreground="{StaticResource AppleBlue}" FontSize="11" FontWeight="Bold"/>
-                                                </StackPanel>
-                                            </Border>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        <TextBlock Text="Nenhuma peça registrada ainda. Adicione a primeira peça no formulário acima." 
-                                   Foreground="{StaticResource TextTertiary}" FontSize="14"
-                                   VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,20,0,0">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Pecas.ListaPecas.Count}" Value="0">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+            <!-- FORMULÁRIO DE REGISTRO -->
+            <Border Grid.Row="1" Background="White" CornerRadius="16" BorderBrush="#E5E5EA" BorderThickness="1" Padding="24" Margin="0,0,0,20" Effect="{StaticResource DropShadowEffect}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Campo: VIN COM NOVO ÍCONE DE VEÍCULO -->
+                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                            <TextBlock Text="Chassi do Veículo (VIN)" Foreground="#4B5563" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                            <ComboBox Style="{StaticResource PremiumComboBoxStyle}"
+                                      ItemsSource="{Binding Pecas.ListaVins}"
+                                      SelectedItem="{Binding Pecas.VinSelecionado, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                      MaxDropDownHeight="200">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Margin="2,0">
+                                            <!-- Ícone de Veículo/Carro para o Chassi -->
+                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE804;" FontSize="14" Foreground="#9CA3AF" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Campo: Fornecedor -->
+                        <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                            <TextBlock Text="Fornecedor" Foreground="#4B5563" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                            <ComboBox Style="{StaticResource PremiumComboBoxStyle}"
+                                      ItemsSource="{Binding Pecas.ListaFornecedores}"
+                                      SelectedItem="{Binding Pecas.FornecedorSelecionado, Mode=TwoWay}"
+                                      MaxDropDownHeight="200">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Margin="2,0">
+                                            <!-- Ícone de Fábrica/Empresa -->
+                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE825;" FontSize="14" Foreground="#9CA3AF" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Nome}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Campo: Nome da Peça -->
+                        <StackPanel Grid.Column="2" Margin="0,0,16,0">
+                            <TextBlock Text="Nome/Descrição da Peça" Foreground="#4B5563" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
+                                     Text="{Binding Pecas.NovaPecaNome, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+
+                        <!-- Campo: Peso -->
+                        <StackPanel Grid.Column="3">
+                            <TextBlock Text="Peso da peça (kg)" Foreground="#4B5563" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" 
+                                     Text="{Binding Pecas.NovaPecaPesoKg, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:F2}}"
+                                     InputScope="Number"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Botão Registrar -->
+                    <Button Grid.Row="1" Command="{Binding Pecas.AdicionarPecaManualCommand}" HorizontalAlignment="Right" Margin="0,20,0,0" Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="bgBorder" Background="#0A5B43" CornerRadius="8" Padding="28,12">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE710;" FontSize="16" Foreground="White" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Registrar Peça" Foreground="White" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="bgBorder" Property="Background" Value="#1B7055"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- LISTAGEM DAS ÚLTIMAS PEÇAS -->
+            <Border Grid.Row="2" Background="White" CornerRadius="16" BorderBrush="#E5E5EA" BorderThickness="1" Padding="24" Effect="{StaticResource DropShadowEffect}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Cabeçalho da Lista -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Últimas Peças Registradas" FontSize="18" FontWeight="Bold" Foreground="#111827" Margin="0,0,16,0"/>
+                        <Border Background="#F3F4F6" CornerRadius="8" Padding="10,4" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Pecas.ListaPecas.Count, StringFormat='Total: {0} peças'}" 
+                                       Foreground="#6B7280" FontSize="12" FontWeight="SemiBold"/>
+                        </Border>
                     </StackPanel>
-                </ScrollViewer>
-            </Grid>
-        </Border>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                        <StackPanel>
+                            <!-- Lista de Itens -->
+                            <ItemsControl ItemsSource="{Binding Pecas.ListaPecas}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#F3F4F6" BorderThickness="0,0,0,1" Padding="0,0,0,16" Margin="0,0,0,16">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Ícone Verde da Peça (Engrenagem) -->
+                                                <Border Grid.Column="0" Width="44" Height="44" CornerRadius="12" Background="#ECFDF5" Margin="0,0,16,0">
+                                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" FontSize="18" Foreground="#0A5B43" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+
+                                                <!-- Detalhes -->
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding NomePeca}" Foreground="#111827" FontWeight="Bold" FontSize="15"/>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                                        <TextBlock Text="VIN: " Foreground="#6B7280" FontSize="13"/>
+                                                        <TextBlock Text="{Binding VinAssociado}" Foreground="#1B7055" FontSize="13" FontWeight="Bold"/>
+                                                        <TextBlock Text="  •  " Foreground="#D1D5DB" FontSize="13"/>
+                                                        <TextBlock Text="{Binding PesoKg, StringFormat='Peso: {0:N2} kg'}" Foreground="#D97706" FontSize="13" FontWeight="SemiBold"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+
+                                                <!-- Badge Status Ledger -->
+                                                <Border Grid.Column="2" Background="#ECFDF5" CornerRadius="6" Padding="12,6" VerticalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE73E;" Foreground="#10B981" FontSize="12" FontWeight="Bold" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                                        <TextBlock Text="Gravado no Ledger" Foreground="#047857" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- Mensagem Vazia -->
+                            <TextBlock Text="Nenhuma peça registrada ainda. Adicione a primeira peça no formulário acima." 
+                                       Foreground="#9CA3AF" FontSize="14"
+                                       VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,30,0,0">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Pecas.ListaPecas.Count}" Value="0">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>
