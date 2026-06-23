@@ -110,7 +110,7 @@ O desenvolvimento do ecossistema distribuído do Iveco Green Ledger foi estrutur
 
 
 <div class="logo-container">
-    <img src="imagens/diagrama de fluxo.png" alt="Logo Iveco Green Ledger" class="logo-img">
+    <img src="imagens/Diagrama_de_fluxo_atualizado.png" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 
 O ecossistema Iveco Green Ledger opera por meio de um fluxo sequencial e rígido de validações automatizadas que estruturam a lógica do seu diagrama de fluxo:
@@ -125,20 +125,24 @@ O ecossistema Iveco Green Ledger opera por meio de um fluxo sequencial e rígido
 
 
   ---
-**Diagrama de Sequência**
+**Diagrama do modelo físico**
   
 <div class="logo-container">
-    <img src="imagens/diagrama de sequencia.png" alt="Logo Iveco Green Ledger" class="logo-img">
+    <img src="imagens/Modelo_Físico_atualizado.jpg" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
-O Diagrama de Sequência do Iveco Green Ledger descreve a ordem cronológica em que as requisições e dados trafegam pelas camadas da arquitetura distribuída:
+O Diagrama do Modelo Físico do Iveco Green Ledger descreve a modelagem de dados relacional e as restrições de integridade mapeadas no banco embutido SQLite, estruturadas estrategicamente para suportar a resiliência no chão de fábrica:
 
-- **Início na Interface (WPF):** O operador insere o VIN e os dados das peças na RastreabilidadeView. Ao salvar, a ViewModel dispara uma requisição assíncrona via HTTP POST contendo o payload em JSON para a API (ApiIveco).
+Centralização de Credenciais (USUARIO): A tabela armazena as chaves de identidade, dados de contato e o hash de segurança das senhas (senhaHash). Ela valida o escopo de atuação do usuário via coluna perfil diretamente na borda industrial, permitindo o login e o controle de acessos (RBAC) mesmo se o terminal perder a conectividade com a nuvem.
 
-- **Validação de Fronteira (NHTSA):** O DadosController repassa os dados para o DadosService, que consome a API externa da NHTSA. Se o chassi não for validado como original da Iveco, o fluxo é interrompido com um erro HTTP 400; caso contrário, o fluxo avança.
+Governança da Cadeia de Suprimentos (FORNECEDOR): Atua como o cadastro base dos parceiros comerciais. A coluna cnpj possui a restrição UNIQUE NOT NULL para impedir qualquer duplicidade de registro de fabricante. O campo status adota o valor padrão 'Ativo', alinhando a persistência local com os retornos automatizados da BrasilAPI.
 
-- **Processamento e Cálculo (API):** Com o chassi validado, a camada de serviço busca os fatores de emissão dos lotes das peças no banco de dados e executa o motor matemático para calcular a pegada de carbono de Escopo 3 do veículo.
+Rastreabilidade Climática de Insumos (LOTE_MATERIA_PRIMA): Mapeia os lotes de matéria-prima que entram no pátio logístico. A tabela armazena a volumetria física em quantidadeKg e o índice ecológico em pegadaCarbonoPorKg (fator de emissão do material). Ela possui uma chave estrangeira ligada ao fornecedor com a restrição ON DELETE RESTRICT, impedindo que um fornecedor seja excluído se houver lotes de materiais vinculados a ele.
 
-- **Persistência e Confirmação (Firestore):** O back-end grava os dados consolidados no Firebase Firestore de forma assíncrona. O banco confirma a gravação para a API, que responde com status HTTP 200 para o cliente WPF, atualizando instantaneamente os gráficos do LiveCharts2.
+Ancoragem do Produto Final (VEICULO): Representa os caminhões comerciais da linha de produção. Utiliza o chassi (vin) de 17 caracteres como chave primária (PRIMARY KEY). O campo marca possui o valor padrão fixado como 'IVECO', servindo de barreira para garantir que o motor de cálculo só processe produtos da montadora homologada.
+
+Coração da Resiliência Industrial (VEICULO_COMPONENTE): Esta tabela associativa quebra a relação de muitos para muitos entre o veículo e o lote de matéria-prima, registrando a montagem exata de cada peça. Ela guarda a massa (pesoKg) e o resultado matemático local do GHG Protocol (totalC02eCalculado).
+
+⚠️ Mecanismo de Sincronização e Integridade: A coluna is_sincronizado (padrão 0) controla a fila de envio para a nuvem. A tabela possui duas chaves estrangeiras cruciais: uma ligada ao lote (ON DELETE RESTRICT) e outra ligada ao chassi com a diretriz ON DELETE CASCADE. Isso garante que, se um chassi de teste for descartado, toda a sua árvore de componentes locais seja eliminada automaticamente, limpando o cache e evitando dados órfãos no terminal de pátio.
 
 ---
 
