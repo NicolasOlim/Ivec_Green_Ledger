@@ -14,11 +14,20 @@ using WpfIveco.ViewModels;
 
 namespace WpfIveco.ViewModel
 {
+    /// <summary>
+    /// ViewModel para a geração de relatórios PDF.
+    /// Gerencia a seleção do tipo de relatório e a exportação de dados.
+    /// </summary>
     public class RelatoriosViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
 
+        // ============================================================
+        // PROPRIEDADES
+        // ============================================================
+
         private string _tipoRelatorio = "Veiculos";
+        /// <summary>Tipo de relatório selecionado (Veiculos, Fornecedores, Pecas).</summary>
         public string TipoRelatorio
         {
             get => _tipoRelatorio;
@@ -26,15 +35,28 @@ namespace WpfIveco.ViewModel
         }
 
         private bool _isGerandoPdf = false;
+        /// <summary>Indica se um PDF está sendo gerado (para bloquear múltiplas gerações).</summary>
         public bool IsGerandoPdf
         {
             get => _isGerandoPdf;
             set { _isGerandoPdf = value; OnPropertyChanged(); }
         }
 
+        // ============================================================
+        // COMANDOS
+        // ============================================================
+
+        /// <summary>Comando para gerar o relatório PDF.</summary>
         public ICommand GerarRelatorioPdfCommand { get; }
+
+        /// <summary>Comando para alterar o tipo de relatório.</summary>
         public ICommand MudarTipoRelatorioCommand { get; }
 
+        // ============================================================
+        // CONSTRUTOR
+        // ============================================================
+
+        /// <summary>Inicializa o ViewModel com o HttpClient.</summary>
         public RelatoriosViewModel(HttpClient httpClient)
         {
             App.LogInfo("Construtor", "RELAT");
@@ -43,6 +65,14 @@ namespace WpfIveco.ViewModel
             MudarTipoRelatorioCommand = new RelayCommand(p => TipoRelatorio = p as string ?? "Veiculos");
         }
 
+        // ============================================================
+        // MÉTODO PÚBLICO
+        // ============================================================
+
+        /// <summary>
+        /// Gera e baixa o relatório PDF.
+        /// Obtém os dados da API, exibe um diálogo para salvar e gera o PDF.
+        /// </summary>
         public async Task BaixarRelatorioPdfAsync()
         {
             App.LogInfo($"Gerando relatório PDF: {TipoRelatorio}", "RELAT");

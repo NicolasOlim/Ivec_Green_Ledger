@@ -11,11 +11,20 @@ using WpfIveco.ViewModels;
 
 namespace WpfIveco.ViewModel
 {
+    /// <summary>
+    /// ViewModel para a rastreabilidade de veículos.
+    /// Gerencia a listagem de veículos e a pesquisa/validação de VINs via API da NHTSA.
+    /// </summary>
     public class RastreabilidadeViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
 
+        // ============================================================
+        // PROPRIEDADES
+        // ============================================================
+
         private string _pesquisaVin = "";
+        /// <summary>VIN digitado pelo usuário para pesquisa.</summary>
         public string PesquisaVin
         {
             get => _pesquisaVin;
@@ -23,6 +32,7 @@ namespace WpfIveco.ViewModel
         }
 
         private string _totalVeiculos = "0";
+        /// <summary>Total de veículos cadastrados.</summary>
         public string TotalVeiculos
         {
             get => _totalVeiculos;
@@ -30,14 +40,25 @@ namespace WpfIveco.ViewModel
         }
 
         private ObservableCollection<VeiculoModel> _listaVeiculos = new();
+        /// <summary>Lista de veículos cadastrados.</summary>
         public ObservableCollection<VeiculoModel> ListaVeiculos
         {
             get => _listaVeiculos;
             set { _listaVeiculos = value; OnPropertyChanged(); }
         }
 
+        // ============================================================
+        // COMANDOS
+        // ============================================================
+
+        /// <summary>Comando para pesquisar e validar um VIN.</summary>
         public ICommand PesquisarVinCommand { get; }
 
+        // ============================================================
+        // CONSTRUTOR
+        // ============================================================
+
+        /// <summary>Inicializa o ViewModel com o HttpClient.</summary>
         public RastreabilidadeViewModel(HttpClient httpClient)
         {
             App.LogInfo("Construtor", "RASTREAB");
@@ -45,6 +66,11 @@ namespace WpfIveco.ViewModel
             PesquisarVinCommand = new RelayCommand(async p => await PesquisarVinAsync());
         }
 
+        // ============================================================
+        // MÉTODOS PÚBLICOS
+        // ============================================================
+
+        /// <summary>Carrega a lista de veículos da API.</summary>
         public async Task CarregarVeiculosAsync()
         {
             App.LogInfo("CarregarVeiculosAsync iniciado", "RASTREAB");
@@ -73,6 +99,14 @@ namespace WpfIveco.ViewModel
             }
         }
 
+        // ============================================================
+        // MÉTODOS PRIVADOS
+        // ============================================================
+
+        /// <summary>
+        /// Pesquisa e valida um VIN na API da NHTSA.
+        /// Se válido, salva o veículo no sistema.
+        /// </summary>
         private async Task PesquisarVinAsync()
         {
             App.LogInfo($"Pesquisando VIN: {PesquisaVin}", "RASTREAB");

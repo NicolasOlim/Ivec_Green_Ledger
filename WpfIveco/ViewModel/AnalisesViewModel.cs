@@ -11,53 +11,87 @@ using WpfIveco.Models;
 
 namespace WpfIveco.ViewModels
 {
+    /// <summary>
+    /// ViewModel para a página de Análise ESG.
+    /// Gerencia gráficos YTD, distribuição de emissões e ranking de fornecedores verdes.
+    /// </summary>
     public class AnalisesViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
 
+        // ============================================================
+        // GRÁFICO YTD (Emissões por mês)
+        // ============================================================
+
         private SeriesCollection _emissoesSeries;
         private string[] _mesesLabels;
 
+        /// <summary>Séries do gráfico YTD (Processo Fabril e Cadeia de Fornecedores).</summary>
         public SeriesCollection EmissoesSeries
         {
             get => _emissoesSeries;
             set { _emissoesSeries = value; OnPropertyChanged(); }
         }
 
+        /// <summary>Rótulos dos meses no gráfico YTD.</summary>
         public string[] MesesLabels
         {
             get => _mesesLabels;
             set { _mesesLabels = value; OnPropertyChanged(); }
         }
 
+        /// <summary>Formatador do eixo Y para exibir valores em toneladas.</summary>
         public Func<double, string> Formatter => value => $"{value:N1} t";
 
+        // ============================================================
+        // GRÁFICO DE PIZZA (Distribuição de Emissões por Escopo)
+        // ============================================================
+
         private SeriesCollection _distribuicaoSeries;
+
+        /// <summary>Séries do gráfico de pizza (Escopo 1, 2, 3).</summary>
         public SeriesCollection DistribuicaoSeries
         {
             get => _distribuicaoSeries;
             set { _distribuicaoSeries = value; OnPropertyChanged(); }
         }
 
+        // ============================================================
+        // RANKING DE FORNECEDORES VERDES
+        // ============================================================
+
         private List<FornecedorVerdeDto> _topFornecedores;
+
+        /// <summary>Lista dos top 10 fornecedores verdes.</summary>
         public List<FornecedorVerdeDto> TopFornecedores
         {
             get => _topFornecedores;
             set { _topFornecedores = value; OnPropertyChanged(); }
         }
 
+        // ============================================================
+        // CONSTRUTORES
+        // ============================================================
+
+        /// <summary>Construtor padrão, inicializa com dados vazios.</summary>
         public AnalisesViewModel()
         {
             App.LogInfo("Construtor padrão – inicializando vazio", "ANALISES");
             InicializarVazio();
         }
 
+        /// <summary>Construtor com HttpClient para comunicação com a API.</summary>
         public AnalisesViewModel(HttpClient httpClient) : this()
         {
             _httpClient = httpClient;
             App.LogInfo("Construtor com HttpClient", "ANALISES");
         }
 
+        // ============================================================
+        // MÉTODOS PRIVADOS
+        // ============================================================
+
+        /// <summary>Inicializa os gráficos com coleções vazias (sem dados de exemplo).</summary>
         private void InicializarVazio()
         {
             MesesLabels = Array.Empty<string>();
@@ -84,6 +118,14 @@ namespace WpfIveco.ViewModels
             TopFornecedores = new List<FornecedorVerdeDto>();
         }
 
+        // ============================================================
+        // MÉTODO PÚBLICO DE ATUALIZAÇÃO
+        // ============================================================
+
+        /// <summary>
+        /// Atualiza todos os dados da página: gráfico YTD e dados ESG.
+        /// Consome as APIs /grafico-emissoes e /analises-esg.
+        /// </summary>
         public async Task AtualizarAsync()
         {
             App.LogInfo("AtualizarAsync iniciado", "ANALISES");

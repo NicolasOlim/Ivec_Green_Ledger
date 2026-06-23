@@ -1,4 +1,5 @@
 ﻿using ApiIveco.Data;
+using ApiIveco.DTOs;
 using ApiIveco.Models;
 using Google.Cloud.Firestore;
 using Microsoft.Extensions.Caching.Memory;
@@ -12,17 +13,48 @@ using System.Threading.Tasks;
 
 namespace ApiIveco.Service
 {
+    /// <summary>
+    /// Camada de serviço que orquestra as operações de negócio do sistema Iveco Green Ledger.
+    /// Gerencia persistência no Firebase Firestore, integrações com APIs externas (BrasilAPI, NHTSA, Mercado Livre)
+    /// e aplica regras de negócio para validação de dados, auditoria ESG e cálculo de pegada de carbono.
+    /// </summary>
     public class DadosService
     {
+        // ================================================================
+        // DEPENDÊNCIAS E CONSTANTES
+        // ================================================================
+
+        /// <summary>Logger para rastreamento de eventos e erros.</summary>
         private readonly ILogger<DadosService> _logger;
+
+        /// <summary>Conexão com o Firebase Firestore.</summary>
         private readonly FireBaseData _firestoreDb;
+
+        /// <summary>Cache em memória para otimização de consultas.</summary>
         private readonly IMemoryCache _cache;
 
+        /// <summary>Nome da coleção de fornecedores no Firestore.</summary>
         private readonly string _collectionFornecedor = "fornecedores";
+
+        /// <summary>Nome da coleção de lotes de matéria-prima no Firestore.</summary>
         private readonly string _collectionLote = "lotes_materia_prima";
+
+        /// <summary>Nome da coleção de veículos no Firestore.</summary>
         private readonly string _collectionVeiculo = "veiculos";
+
+        /// <summary>Nome da coleção de componentes (peças) no Firestore.</summary>
         private readonly string _collectionComponente = "veiculo_componentes";
 
+        // ================================================================
+        // CONSTRUTOR
+        // ================================================================
+
+        /// <summary>
+        /// Inicializa o serviço com as dependências injetadas.
+        /// </summary>
+        /// <param name="logger">Logger para rastreamento de eventos e erros.</param>
+        /// <param name="firestoreDb">Conexão com o Firebase Firestore.</param>
+        /// <param name="memoryCache">Cache em memória para otimizar consultas repetidas.</param>
         public DadosService(ILogger<DadosService> logger, FireBaseData firestoreDb, IMemoryCache memoryCache)
         {
             _logger = logger;
@@ -30,22 +62,31 @@ namespace ApiIveco.Service
             _cache = memoryCache;
         }
 
-        
+        // ================================================================
+        // MÉTODOS EXTERNOS - INTEGRAÇÕES COM APIs TERCEIRAS
+        // ================================================================
+
         /// <summary>
-        /// MÉTODO EXTERNO: BUSCAR NA BRASILAPI (CNPJ)
+        /// Consulta a BrasilAPI para obter dados cadastrais de um CNPJ.
         /// </summary>
-        /// <param name="cnpj"></param>
-        /// <returns></returns>
-        
+        /// <remarks>
+        /// Utiliza User-Agent personalizado para evitar bloqueios.
+        /// </remarks>
+        /// <param name="cnpj">CNPJ (com ou sem formatação).</param>
+        /// <returns>
+        /// Objeto <see cref="Fornecedor"/> preenchido com os dados da Receita Federal,
+        /// ou <c>null</c> se o CNPJ não for encontrado ou houver erro na consulta.
+        /// </returns>
         public async Task<Fornecedor> BuscarFornecedorPorCnpjAsync(string cnpj)
         {
             try
             {
+                // Remove caracteres não numéricos para padronização
                 var cnpjLimpo = new string(cnpj.Where(char.IsDigit).ToArray());
                 var url = $"https://brasilapi.com.br/api/cnpj/v1/{cnpjLimpo}";
 
                 using var client = new HttpClient();
-                /// BLINDAGEM: Diz à Receita Federal que somos um software legítimo para não sermos bloqueados
+                // Headers para simular navegador e evitar bloqueios
                 client.DefaultRequestHeaders.Add("User-Agent", "IvecoApp/1.0");
 
                 var response = await client.GetAsync(url);
@@ -58,16 +99,17 @@ namespace ApiIveco.Service
 
                     if (data != null)
                     {
-                        /// Atualizado com os novos nomes da Model
+                        // Prioriza nome fantasia, fallback para razão social
                         string nomeEmpresa = !string.IsNullOrWhiteSpace(data.NomeFantasia)
                             ? data.NomeFantasia
                             : data.RazaoSocial;
 
+                        // Monta endereço completo
                         string moradaCompleta = $"{data.Logradouro}, {data.Numero} - {data.Bairro}, {data.Municipio} - {data.Uf}";
 
                         return new Fornecedor
                         {
-                            Id = string.Empty,
+                            Id = string.Empty, // Será gerado pelo Firestore
                             Nome = nomeEmpresa,
                             Localizacao = moradaCompleta,
                             Cnpj = cnpjLimpo
@@ -75,7 +117,7 @@ namespace ApiIveco.Service
                     }
                 }
 
-                /// Se o código chegar aqui, imprime o erro real no terminal da API
+                // Log da falha com detalhes da resposta HTTP
                 Console.WriteLine($"[FALHA BRASIL API]: HTTP {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
                 return null;
             }
@@ -86,21 +128,25 @@ namespace ApiIveco.Service
             }
         }
 
-        
         /// <summary>
-        /// MÉTODO EXTERNO: DESCODIFICAR VIN (NHTSA) COM VALIDAÇÃO IVECO
+        /// Decodifica um VIN usando a API da NHTSA (National Highway Traffic Safety Administration).
         /// </summary>
-        /// <param name="vin"></param>
-        /// <returns></returns>
-        
+        /// <remarks>
+        /// Valida se o veículo pertence à marca IVECO.
+        /// </remarks>
+        /// <param name="vin">VIN de 17 caracteres.</param>
+        /// <returns>
+        /// Objeto <see cref="Veiculo"/> validado, ou <c>null</c> se não encontrado.
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Lançada quando o VIN não pertence a um veículo IVECO.
+        /// </exception>
         public async Task<Veiculo> BuscarEValidarVinIvecoAsync(string vin)
         {
             try
             {
-                /// Limpa o VIN para garantir que não tem espaços
+                // Normaliza o VIN (maiúsculas e sem espaços)
                 var vinLimpo = vin.Trim().ToUpper();
-
-                /// URL oficial da API do Governo Americano
                 var url = $"https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/{vinLimpo}?format=json";
 
                 using var client = new HttpClient();
@@ -113,43 +159,43 @@ namespace ApiIveco.Service
 
                     if (data != null && data.Results != null)
                     {
-                        /// 1. Procura a Marca (Make)
+                        // Extrai a marca do veículo
                         var marca = data.Results.FirstOrDefault(r => r.Variable == "Make")?.Value;
 
-                        /// VALIDAÇÃO CRÍTICA: Se não for Iveco, rejeita imediatamente!
+                        // VALIDAÇÃO CRÍTICA: Rejeita se não for IVECO
                         if (string.IsNullOrEmpty(marca) || !marca.ToUpper().Contains("IVECO"))
                         {
                             throw new Exception($"VIN inválido para este sistema. A marca detetada foi: {marca ?? "Desconhecida"}. Apenas veículos IVECO são permitidos.");
                         }
 
-                        /// Se for Iveco, extraímos o Modelo 
+                        // Extrai o modelo (fallback para genérico)
                         var modelo = data.Results.FirstOrDefault(r => r.Variable == "Model")?.Value;
 
-                        /// Retorna os dados formatados (Agora preenche tudo e não dá erro de validação!)
                         return new Veiculo
                         {
                             Vin = vinLimpo,
-                            /// Se a API americana não souber o modelo exato, colocamos um genérico
                             Modelo = string.IsNullOrWhiteSpace(modelo) ? "Iveco Não Especificado" : modelo,
-                            DataMontagem = DateTime.UtcNow // Regista a data e hora atual
+                            DataMontagem = DateTime.UtcNow // Data atual como referência de validação
                         };
                     }
                 }
                 return null;
             }
-            catch (Exception ex)
+            catch
             {
-                /// Deixa o erro subir para o Controller para mostrar a mensagem ao utilizador
+                // Propaga a exceção para o Controller tratar e exibir mensagem ao usuário
                 throw;
             }
         }
 
-        
+        // ================================================================
+        // MÉTODOS FIREBASE: FORNECEDORES
+        // ================================================================
+
         /// <summary>
-        /// MÉTODOS FIREBASE: FORNECEDORES
+        /// Lista todos os fornecedores cadastrados no Firestore.
         /// </summary>
-        /// <returns></returns>
-       
+        /// <returns>Lista de objetos <see cref="Fornecedor"/>.</returns>
         public async Task<List<Fornecedor>> ListarFornecedor()
         {
             CollectionReference collection = _firestoreDb.Db.Collection(_collectionFornecedor);
@@ -161,13 +207,18 @@ namespace ApiIveco.Service
                 if (document.Exists)
                 {
                     var fornecedor = document.ConvertTo<Fornecedor>();
-                    fornecedor.Id = document.Id;
+                    fornecedor.Id = document.Id; // Preenche o ID com o identificador do documento
                     fornecedores.Add(fornecedor);
                 }
             }
             return fornecedores;
         }
 
+        /// <summary>
+        /// Cria um novo fornecedor no Firestore com ID incremental.
+        /// </summary>
+        /// <param name="fornecedor">Dados do fornecedor (Id será gerado).</param>
+        /// <returns>Fornecedor criado com o ID atribuído.</returns>
         public async Task<Fornecedor> CriarFornecedor(Fornecedor fornecedor)
         {
             int novoId = await GerarProximoId("contador_fornecedor");
@@ -178,6 +229,15 @@ namespace ApiIveco.Service
             return fornecedor;
         }
 
+        /// <summary>
+        /// Exclui um fornecedor do Firestore, validando se não possui lotes associados.
+        /// </summary>
+        /// <remarks>
+        /// Regra de negócio: não permite exclusão de fornecedores com vínculo a lotes para manter rastreabilidade ESG.
+        /// </remarks>
+        /// <param name="id">ID do fornecedor.</param>
+        /// <exception cref="ArgumentException">ID inválido.</exception>
+        /// <exception cref="InvalidOperationException">Fornecedor possui lotes ativos.</exception>
         public async Task ExcluirFornecedor(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -189,7 +249,7 @@ namespace ApiIveco.Service
 
             if (possuiLotes)
             {
-                // Vai gerar um HTTP 422
+                // Vai gerar um HTTP 422 (Unprocessable Entity) ou 400
                 throw new InvalidOperationException("Operação Bloqueada: Este fornecedor possui lotes de matéria-prima associados. A exclusão comprometeria a rastreabilidade do Escopo 3.");
             }
 
@@ -197,17 +257,20 @@ namespace ApiIveco.Service
             await docRef.DeleteAsync();
         }
 
+        // ================================================================
+        // MÉTODOS FIREBASE: LOTES DE MATÉRIA-PRIMA
+        // ================================================================
 
         /// <summary>
-        /// MÉTODOS FIREBASE: LOTES MATÉRIA-PRIMA
+        /// Lista todos os lotes de matéria-prima cadastrados no Firestore.
         /// </summary>
-        /// <returns></returns>
-
+        /// <returns>Lista de objetos <see cref="LoteMateriaPrima"/>.</returns>
         public async Task<List<LoteMateriaPrima>> ListarLoteMateriaPrima()
         {
             CollectionReference collection = _firestoreDb.Db.Collection(_collectionLote);
             QuerySnapshot snapshot = await collection.GetSnapshotAsync();
             List<LoteMateriaPrima> lotes = new List<LoteMateriaPrima>();
+
             foreach (DocumentSnapshot document in snapshot.Documents)
             {
                 if (document.Exists)
@@ -220,9 +283,18 @@ namespace ApiIveco.Service
             return lotes;
         }
 
+        /// <summary>
+        /// Cria um novo lote de matéria-prima no Firestore com validações de negócio.
+        /// </summary>
+        /// <remarks>
+        /// Regras: Quantidade &gt; 0, Pegada &gt;= 0, DataProducao não pode ser futura.
+        /// </remarks>
+        /// <param name="lote">Dados do lote.</param>
+        /// <returns>Lote criado com ID atribuído.</returns>
+        /// <exception cref="ArgumentException">Dados inválidos.</exception>
         public async Task<LoteMateriaPrima> CriarLoteMateriaPrima(LoteMateriaPrima lote)
         {
-            /// REGRAS DE NEGÓCIO: Validações físicas e temporais
+            // REGRAS DE NEGÓCIO: Validações físicas e temporais
             if (lote.QuantidadeKg <= 0)
                 throw new ArgumentException("A quantidade de matéria-prima (Kg) deve ser maior que zero.");
 
@@ -237,30 +309,39 @@ namespace ApiIveco.Service
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionLote).Document(lote.Id);
             await docRef.SetAsync(lote);
 
-            /// Invalida cache
+            // Invalida cache de pegada média
             _cache.Remove("PegadaMediaCache");
 
             return lote;
         }
 
+        /// <summary>
+        /// Exclui um lote de matéria-prima do Firestore.
+        /// </summary>
+        /// <param name="id">ID do lote.</param>
+        /// <exception cref="ArgumentException">ID inválido.</exception>
         public async Task ExcluirLoteMateriaPrima(string id)
         {
-            if (string.IsNullOrEmpty(id)) throw new ArgumentException("O ID não pode ser nulo ou vazio.");
+            if (string.IsNullOrEmpty(id))
+                throw new ArgumentException("O ID não pode ser nulo ou vazio.");
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionLote).Document(id);
             await docRef.DeleteAsync();
         }
 
-        
+        // ================================================================
+        // MÉTODOS FIREBASE: COMPONENTES (PEÇAS)
+        // ================================================================
+
         /// <summary>
-        /// MÉTODOS FIREBASE: VEÍCULO COMPONENTES
+        /// Lista todos os componentes (peças) cadastrados no Firestore.
         /// </summary>
-        /// <returns></returns>
-        
+        /// <returns>Lista de objetos <see cref="VeiculoComponente"/>.</returns>
         public async Task<List<VeiculoComponente>> ListarVeiculoComponente()
         {
             CollectionReference collection = _firestoreDb.Db.Collection(_collectionComponente);
             QuerySnapshot snapshot = await collection.GetSnapshotAsync();
             List<VeiculoComponente> componentes = new List<VeiculoComponente>();
+
             foreach (DocumentSnapshot document in snapshot.Documents)
             {
                 if (document.Exists)
@@ -273,13 +354,23 @@ namespace ApiIveco.Service
             return componentes;
         }
 
+        /// <summary>
+        /// Cria um novo componente (peça) no Firestore com validações de negócio.
+        /// </summary>
+        /// <remarks>
+        /// Regras: Peso &gt; 0; se associado a um lote, valida o balanço de massa (não pode exceder o lote).
+        /// </remarks>
+        /// <param name="componente">Dados do componente.</param>
+        /// <returns>Componente criado com ID atribuído.</returns>
+        /// <exception cref="ArgumentException">Peso inválido.</exception>
+        /// <exception cref="InvalidOperationException">Balanço de massa excedido.</exception>
         public async Task<VeiculoComponente> CriarVeiculoComponente(VeiculoComponente componente)
         {
-            /// REGRA DE NEGÓCIO: Peso válido
+            // REGRA DE NEGÓCIO: Peso válido
             if (componente.PesoKg <= 0)
                 throw new ArgumentException("O peso da peça deve ser maior que zero.");
 
-            /// REGRA DE NEGÓCIO: Balanço de Massa do Lote (evitar criar matéria infinita)
+            // REGRA DE NEGÓCIO: Balanço de Massa do Lote
             if (!string.IsNullOrEmpty(componente.fk_LoteMateriaPrima_Id))
             {
                 var lotes = await ListarLoteMateriaPrima();
@@ -288,8 +379,6 @@ namespace ApiIveco.Service
                 if (loteOrigem != null)
                 {
                     var componentesExistentes = await ListarVeiculoComponente();
-
-                    /// Soma o peso de todas as peças que já consumiram deste mesmo lote
                     double pesoJaConsumido = componentesExistentes
                         .Where(c => c.fk_LoteMateriaPrima_Id == loteOrigem.Id)
                         .Sum(c => c.PesoKg);
@@ -306,36 +395,48 @@ namespace ApiIveco.Service
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionComponente).Document(componente.Id);
             await docRef.SetAsync(componente);
 
-            // Invalida cache
+            // Invalida cache de pegada média
             _cache.Remove("PegadaMediaCache");
 
             return componente;
         }
 
+        /// <summary>
+        /// Exclui um componente (peça) do Firestore.
+        /// </summary>
+        /// <param name="id">ID do componente.</param>
+        /// <exception cref="ArgumentException">ID inválido.</exception>
         public async Task ExcluirVeiculoComponente(string id)
         {
-            if (string.IsNullOrEmpty(id)) throw new ArgumentException("O ID não pode ser nulo ou vazio.");
+            if (string.IsNullOrEmpty(id))
+                throw new ArgumentException("O ID não pode ser nulo ou vazio.");
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionComponente).Document(id);
             await docRef.DeleteAsync();
         }
 
-        
+        // ================================================================
+        // MÉTODOS FIREBASE: VEÍCULOS
+        // ================================================================
+
         /// <summary>
-        /// MÉTODOS FIREBASE: VEÍCULOS
+        /// Lista todos os veículos cadastrados no Firestore.
         /// </summary>
-        /// <returns></returns>
-        
+        /// <remarks>
+        /// O VIN é utilizado como ID do documento.
+        /// </remarks>
+        /// <returns>Lista de objetos <see cref="Veiculo"/>.</returns>
         public async Task<List<Veiculo>> ListarVeiculo()
         {
             CollectionReference collection = _firestoreDb.Db.Collection(_collectionVeiculo);
             QuerySnapshot snapshot = await collection.GetSnapshotAsync();
             List<Veiculo> veiculos = new List<Veiculo>();
+
             foreach (DocumentSnapshot document in snapshot.Documents)
             {
                 if (document.Exists)
                 {
                     var veiculo = document.ConvertTo<Veiculo>();
-                    veiculo.Vin = document.Id;
+                    veiculo.Vin = document.Id; // VIN é o ID do documento
                     veiculos.Add(veiculo);
                 }
             }
@@ -343,20 +444,23 @@ namespace ApiIveco.Service
         }
 
         /// <summary>
-        /// Busca peças reais no Mercado Livre para um determinado VIN e associa ao veículo.
+        /// Busca peças reais no Mercado Livre para um VIN específico e as retorna como lista de componentes.
         /// </summary>
+        /// <remarks>
+        /// Utiliza a API do Mercado Livre para obter títulos de produtos como nomes de peças.
+        /// </remarks>
+        /// <param name="vin">VIN do veículo.</param>
+        /// <returns>Lista de componentes simulados a partir de anúncios do Mercado Livre.</returns>
         public async Task<List<VeiculoComponente>> GerarComponentesParaVeiculoAsync(string vin)
         {
             var componentes = new List<VeiculoComponente>();
 
             using (var httpClient = new HttpClient())
             {
-                /// Pesquisa 5 peças reais de caminhão Iveco no Mercado Livre (Brasil)
                 string url = "https://api.mercadolibre.com/sites/MLB/search?q=peca+caminhao+iveco&limit=5";
 
                 try
                 {
-                    /// Faz a requisição à API do Mercado Livre
                     var response = await httpClient.GetAsync(url);
 
                     if (response.IsSuccessStatusCode)
@@ -364,30 +468,19 @@ namespace ApiIveco.Service
                         var jsonResult = await response.Content.ReadAsStringAsync();
                         using var doc = JsonDocument.Parse(jsonResult);
 
-                        /// Entra na lista de resultados da pesquisa
                         var resultados = doc.RootElement.GetProperty("results");
 
                         foreach (var item in resultados.EnumerateArray())
                         {
-                            /// Cria a peça baseada nos dados REAIS do anúncio
                             var novaPeca = new VeiculoComponente
                             {
-                                /// Gera um ID único para o nosso banco juntando o ID do anúncio com um Guid
                                 Id = item.GetProperty("id").GetString() + "-" + Guid.NewGuid().ToString().Substring(0, 5),
-
-                                /// Pega o Título real do anúncio no Mercado Livre
                                 NomePeca = item.GetProperty("title").GetString(),
-
                                 fk_Veiculo_Vin = vin,
-
-                                /// Associa a um lote fictício para manter a integridade da sua arquitetura
                                 fk_LoteMateriaPrima_Id = "LOTE-ML-" + DateTime.Now.ToString("yyyyMMdd")
                             };
 
                             componentes.Add(novaPeca);
-
-                            /// AQUI: Se você tem um método para salvar direto no Firebase, chame-o!
-                            /// await CriarVeiculoComponente(novaPeca); 
                         }
                     }
                     else
@@ -404,34 +497,92 @@ namespace ApiIveco.Service
 
             return componentes;
         }
+
+        /// <summary>
+        /// Cria um novo veículo no Firestore (VIN como ID).
+        /// </summary>
+        /// <param name="veiculo">Dados do veículo.</param>
+        /// <returns>Veículo criado.</returns>
         public async Task<Veiculo> CriarVeiculo(Veiculo veiculo)
         {
-            if (string.IsNullOrEmpty(veiculo.Vin)) throw new ArgumentException("O veículo deve possuir um VIN válido.");
+            if (string.IsNullOrEmpty(veiculo.Vin))
+                throw new ArgumentException("O veículo deve possuir um VIN válido.");
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionVeiculo).Document(veiculo.Vin);
             await docRef.SetAsync(veiculo);
             return veiculo;
         }
 
+        /// <summary>
+        /// Obtém um veículo específico pelo VIN.
+        /// </summary>
+        /// <param name="vin">VIN do veículo.</param>
+        /// <returns>Veículo encontrado, ou <c>null</c>.</returns>
         public async Task<Veiculo> ObterVeiculoPorVin(string vin)
         {
             var veiculos = await ListarVeiculo();
             return veiculos.FirstOrDefault(v => v.Vin.Equals(vin, StringComparison.OrdinalIgnoreCase));
         }
 
+        /// <summary>
+        /// Exclui um veículo do Firestore.
+        /// </summary>
+        /// <param name="vin">VIN do veículo.</param>
         public async Task ExcluirVeiculo(string vin)
         {
-            if (string.IsNullOrEmpty(vin)) throw new ArgumentException("O VIN não pode ser nulo ou vazio.");
+            if (string.IsNullOrEmpty(vin))
+                throw new ArgumentException("O VIN não pode ser nulo ou vazio.");
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionVeiculo).Document(vin);
             await docRef.DeleteAsync();
         }
 
-        
         /// <summary>
-        /// MÉTODO AUXILIAR: GERADOR DE IDS NO FIREBASE
+        /// Atualiza um veículo existente, com regra de auditoria.
         /// </summary>
-        /// <param name="nomeContador"></param>
-        /// <returns></returns>
-        
+        /// <remarks>
+        /// Não permite alteração após montagem concluída para preservar a auditoria ESG.
+        /// </remarks>
+        /// <param name="vin">VIN do veículo.</param>
+        /// <param name="veiculoAtualizado">Novos dados.</param>
+        /// <returns>Veículo atualizado.</returns>
+        /// <exception cref="ArgumentException">VIN inválido.</exception>
+        /// <exception cref="InvalidOperationException">Veículo já montado (auditoria ESG).</exception>
+        public async Task<Veiculo> AtualizarVeiculo(string vin, Veiculo veiculoAtualizado)
+        {
+            if (string.IsNullOrEmpty(vin))
+                throw new ArgumentException("O VIN não pode ser nulo ou vazio.");
+
+            DocumentReference docRef = _firestoreDb.Db.Collection(_collectionVeiculo).Document(vin);
+            DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+
+            if (!snapshot.Exists)
+                return null;
+
+            var veiculoExistente = snapshot.ConvertTo<Veiculo>();
+
+            // REGRA DE NEGÓCIO: Proteção contra fraude em veículos já montados
+            if (veiculoExistente.DataMontagem.HasValue)
+            {
+                throw new InvalidOperationException($"Auditoria Violada: O veículo {vin} já teve a sua montagem concluída a {veiculoExistente.DataMontagem.Value:dd/MM/yyyy}. Os dados não podem ser alterados para preservar a auditoria ESG.");
+            }
+
+            veiculoAtualizado.Vin = vin;
+            await docRef.SetAsync(veiculoAtualizado, SetOptions.MergeAll);
+
+            return veiculoAtualizado;
+        }
+
+        // ================================================================
+        // MÉTODO AUXILIAR: GERADOR DE IDS INCREMENTAIS
+        // ================================================================
+
+        /// <summary>
+        /// Gera um ID sequencial para coleções que não possuem chave natural.
+        /// </summary>
+        /// <remarks>
+        /// Utiliza uma transação atômica no Firestore para garantir concorrência.
+        /// </remarks>
+        /// <param name="nomeContador">Nome do contador no Firestore.</param>
+        /// <returns>Próximo ID disponível.</returns>
         private async Task<int> GerarProximoId(string nomeContador)
         {
             DocumentReference contadorId = _firestoreDb.Db.Collection("contadores").Document(nomeContador);
@@ -439,7 +590,8 @@ namespace ApiIveco.Service
             {
                 DocumentSnapshot snapshot = await transaction.GetSnapshotAsync(contadorId);
                 int idAtual = 0;
-                if (snapshot.Exists) snapshot.TryGetValue("ultimoId", out idAtual);
+                if (snapshot.Exists)
+                    snapshot.TryGetValue("ultimoId", out idAtual);
 
                 int proximoId = idAtual + 1;
                 Dictionary<string, object> atualizacaoContador = new Dictionary<string, object> { { "ultimoId", proximoId } };
@@ -448,36 +600,34 @@ namespace ApiIveco.Service
             });
         }
 
-        
+        // ================================================================
+        // MÉTODOS DE AUTENTICAÇÃO (USUÁRIOS)
+        // ================================================================
+
         /// <summary>
-        /// MÉTODOS DE AUTENTICAÇÃO (USUÁRIOS)
+        /// Cadastra um novo usuário no Firestore com validação de e-mail único.
         /// </summary>
-        /// <param name="novoUsuario"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        
+        /// <param name="novoUsuario">Dados do usuário.</param>
+        /// <returns>Usuário criado.</returns>
+        /// <exception cref="Exception">E-mail já cadastrado.</exception>
         public async Task<Usuario> CadastrarUsuario(Usuario novoUsuario)
         {
             var usuariosRef = _firestoreDb.Db.Collection("Usuarios");
 
-            /// Verifica se email já existe
-            var query = await usuariosRef
-                .WhereEqualTo("Email", novoUsuario.Email)
-                .GetSnapshotAsync();
+            // Verifica se email já existe
+            var query = await usuariosRef.WhereEqualTo("Email", novoUsuario.Email).GetSnapshotAsync();
 
             if (query.Documents.Count > 0)
                 throw new Exception("Já existe um usuário cadastrado com este e-mail.");
 
-            /// Garante valor padrão
+            // Garante valor padrão
             if (string.IsNullOrWhiteSpace(novoUsuario.Acesso))
                 novoUsuario.Acesso = "Usuario";
 
-            /// Gera ID incremental
             int novoId = await GerarProximoId("contador_usuario");
             novoUsuario.Id = novoId.ToString();
             novoUsuario.DataCriacao = DateTime.UtcNow;
 
-            /// Salva — Id NÃO será campo do documento pois não tem [FirestoreProperty]
             DocumentReference docRef = usuariosRef.Document(novoUsuario.Id);
             await docRef.SetAsync(novoUsuario);
 
@@ -485,47 +635,19 @@ namespace ApiIveco.Service
         }
 
         /// <summary>
-        /// Em ApiIveco/Service/DadosService.cs
+        /// Autentica um usuário por e-mail e senha.
         /// </summary>
-        /// <param name="vin"></param>
-        /// <param name="veiculoAtualizado"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
-
-        public async Task<Veiculo> AtualizarVeiculo(string vin, Veiculo veiculoAtualizado)
-        {
-            if (string.IsNullOrEmpty(vin)) throw new ArgumentException("O VIN não pode ser nulo ou vazio.");
-
-            DocumentReference docRef = _firestoreDb.Db.Collection(_collectionVeiculo).Document(vin);
-            DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
-
-            /// Verifica se o veículo existe antes de atualizar
-            if (!snapshot.Exists) return null;
-
-            var veiculoExistente = snapshot.ConvertTo<Veiculo>();
-
-            /// REGRA DE NEGÓCIO: Proteção contra fraude em veículos já montados
-            if (veiculoExistente.DataMontagem.HasValue)
-            {
-                throw new InvalidOperationException($"Auditoria Violada: O veículo {vin} já teve a sua montagem concluída a {veiculoExistente.DataMontagem.Value:dd/MM/yyyy}. Os dados não podem ser alterados para preservar a auditoria ESG.");
-            }
-
-            /// Mantém a integridade da chave primária (o VIN original da URL)
-            veiculoAtualizado.Vin = vin;
-
-            /// MergeAll mescla os dados novos com os existentes (faz o papel de um PUT/PATCH)
-            await docRef.SetAsync(veiculoAtualizado, SetOptions.MergeAll);
-
-            return veiculoAtualizado;
-        }
-
+        /// <remarks>
+        /// Realiza comparação manual para evitar gargalos de indexação NoSQL.
+        /// </remarks>
+        /// <param name="email">E-mail do usuário.</param>
+        /// <param name="senha">Senha (texto puro).</param>
+        /// <returns>Usuário autenticado, ou <c>null</c>.</returns>
         public async Task<Usuario> FazerLogin(string email, string senha)
         {
             _logger.LogCritical("### LOGIN PARA: {email}", email);
 
             var usuariosRef = _firestoreDb.Db.Collection("Usuarios");
-
-            /// Busca todos e compara manualmente — evita problemas de query
             var snapshot = await usuariosRef.GetSnapshotAsync();
 
             _logger.LogCritical("### TOTAL DOCS: {count}", snapshot.Documents.Count);
@@ -552,9 +674,17 @@ namespace ApiIveco.Service
             return null;
         }
 
+        // ================================================================
+        // MÉTODOS DE CÁLCULO PARA DASHBOARD E ESG
+        // ================================================================
+
         /// <summary>
-        /// Calcula a pegada de carbono média (kg CO2) a partir dos lotes de matéria-prima.
+        /// Calcula a pegada de carbono média (kg CO₂) considerando lotes (prioritário) ou componentes (fallback).
         /// </summary>
+        /// <remarks>
+        /// Utiliza cache de 5 minutos para otimização.
+        /// </remarks>
+        /// <returns>Valor médio da pegada de carbono.</returns>
         public async Task<double> CalcularPegadaMediaAsync()
         {
             const string cacheKey = "PegadaMediaCache";
@@ -566,14 +696,19 @@ namespace ApiIveco.Service
             _cache.Set(cacheKey, resultado, TimeSpan.FromMinutes(5));
             return resultado;
         }
+
         /// <summary>
-        /// Cálculo real (sem cache) – chamado internamente
+        /// Cálculo real (sem cache) – chamado internamente.
         /// </summary>
+        /// <remarks>
+        /// Prioriza lotes; se não houver, usa componentes com fator de emissão padrão (2.5 kg CO2/kg).
+        /// </remarks>
+        /// <returns>Valor médio calculado, ou 0 em caso de erro ou dados ausentes.</returns>
         private async Task<double> CalcularPegadaMediaInternoAsync()
         {
             try
             {
-               /// 1. Tenta calcular a partir dos lotes de matéria-prima
+                // 1. Tenta calcular a partir dos lotes de matéria-prima
                 var lotes = await ListarLoteMateriaPrima();
                 if (lotes != null && lotes.Count > 0)
                 {
@@ -585,12 +720,12 @@ namespace ApiIveco.Service
                     return somaPegada / lotes.Count;
                 }
 
-                /// 2. Se não há lotes, calcula a partir dos componentes (peças)
+                // 2. Se não há lotes, calcula a partir dos componentes (peças)
                 var componentes = await ListarVeiculoComponente();
                 if (componentes == null || componentes.Count == 0)
                     return 0;
 
-                const double FatorEmissaoPadrao = 2.5;
+                const double FatorEmissaoPadrao = 2.5; // kg CO2/kg (média para metais)
                 var grupos = componentes.GroupBy(c => c.fk_Veiculo_Vin);
                 double somaPegadaPorVeiculo = 0;
                 int totalVeiculosComPecas = 0;
@@ -610,46 +745,50 @@ namespace ApiIveco.Service
             }
             catch
             {
-                /// Em caso de erro, retorna 0 (nunca lança exceção)
+                // Em caso de erro, retorna 0 (nunca lança exceção)
                 return 0;
             }
         }
 
         /// <summary>
-        /// Retorna dados de emissões por mês para o gráfico YTD.
+        /// Obtém dados mensais de emissões para o gráfico YTD.
         /// </summary>
+        /// <remarks>
+        /// Combina dados de veículos (Processo Fabril) e lotes (Cadeia de Fornecedores).
+        /// Se não houver dados, retorna um conjunto de exemplo para demonstração.
+        /// </remarks>
+        /// <returns>DTO com meses, valores da fábrica e valores da cadeia.</returns>
         public async Task<GraficoEmissoesDto> ObterDadosGraficoAsync()
         {
             var resultado = new GraficoEmissoesDto();
 
-            /// 1. Buscar veículos com DataMontagem
+            // 1. Buscar veículos com DataMontagem
             var veiculos = await ListarVeiculo();
             if (veiculos == null || !veiculos.Any())
             {
-                /// Fallback: dados de exemplo
                 return ObterDadosExemplo();
             }
 
-            /// 2. Buscar componentes
+            // 2. Buscar componentes e agrupar por VIN
             var componentes = await ListarVeiculoComponente();
-            var di1ctComponentesPorVin = componentes?
+            var dictComponentesPorVin = componentes?
                 .GroupBy(c => c.fk_Veiculo_Vin)
                 .ToDictionary(g => g.Key, g => g.ToList()) ?? new Dictionary<string, List<VeiculoComponente>>();
 
             // 3. Calcular emissão por veículo (soma dos componentes)
-            const double fatorEmissaoPadrao = 2.5; // kg CO2/kg
+            const double fatorEmissaoPadrao = 2.5;
             var emissaoPorVeiculo = new Dictionary<string, double>();
             foreach (var v in veiculos)
             {
                 double somaPeso = 0;
-                if (di1ctComponentesPorVin.TryGetValue(v.Vin, out var comps))
+                if (dictComponentesPorVin.TryGetValue(v.Vin, out var comps))
                 {
                     somaPeso = comps.Sum(c => c.PesoKg);
                 }
                 emissaoPorVeiculo[v.Vin] = somaPeso * fatorEmissaoPadrao;
             }
 
-            ///4. Agrupar por mês/ano com base em DataMontagem (apenas veículos com data)
+            // 4. Agrupar por mês/ano com base em DataMontagem
             var veiculosComData = veiculos
                 .Where(v => v.DataMontagem.HasValue)
                 .Select(v => new
@@ -668,17 +807,17 @@ namespace ApiIveco.Service
                 })
                 .ToList();
 
-            ///5. Se não houver dados com data, usar exemplo
+            // 5. Se não houver dados com data, usar exemplo
             if (!veiculosComData.Any())
             {
                 return ObterDadosExemplo();
             }
 
-            ///6. Preencher resultado
+            // 6. Preencher resultado com dados dos veículos
             resultado.Meses = veiculosComData.Select(x => $"{x.Mes}/{x.Ano}").ToArray();
             resultado.ValoresFabrica = veiculosComData.Select(x => Math.Round(x.TotalEmissao, 1)).ToArray();
 
-            ///7. Cadeia de Fornecedores (baseado em lotes)
+            // 7. Adicionar dados da cadeia de fornecedores (baseado em lotes)
             var lotes = await ListarLoteMateriaPrima();
             if (lotes != null && lotes.Any())
             {
@@ -690,11 +829,11 @@ namespace ApiIveco.Service
                     {
                         Mes = g.Key.ToString("MMM"),
                         Ano = g.Key.Year,
-                        TotalEmissao = g.Sum(l => l.QuantidadeKg * l.PegadaCarbonoPorKg) / 1000 // toneladas
+                        TotalEmissao = g.Sum(l => l.QuantidadeKg * l.PegadaCarbonoPorKg) / 1000
                     })
                     .ToList();
 
-                /// Unificar os meses (usar todos os meses de veículos e lotes)
+                // Unificar meses de veículos e lotes
                 var todosMeses = veiculosComData
                     .Select(x => new { x.Mes, x.Ano })
                     .Union(lotesPorMes.Select(x => new { x.Mes, x.Ano }))
@@ -702,7 +841,6 @@ namespace ApiIveco.Service
                     .OrderBy(x => x.Ano).ThenBy(x => x.Mes)
                     .ToList();
 
-                /// Recalcular séries para ter os mesmos meses
                 resultado.Meses = todosMeses.Select(x => $"{x.Mes}/{x.Ano}").ToArray();
                 resultado.ValoresFabrica = todosMeses.Select(m =>
                     veiculosComData.FirstOrDefault(x => x.Mes == m.Mes && x.Ano == m.Ano)?.TotalEmissao ?? 0
@@ -713,11 +851,10 @@ namespace ApiIveco.Service
             }
             else
             {
-                /// Se não houver lotes, usar zeros
                 resultado.ValoresCadeia = resultado.Meses.Select(_ => 0.0).ToArray();
             }
 
-            /// Garantir que não haja valores negativos
+            // Garantir que não haja valores negativos
             resultado.ValoresFabrica = resultado.ValoresFabrica.Select(v => v < 0 ? 0 : v).ToArray();
             resultado.ValoresCadeia = resultado.ValoresCadeia.Select(v => v < 0 ? 0 : v).ToArray();
 
@@ -725,8 +862,9 @@ namespace ApiIveco.Service
         }
 
         /// <summary>
-        /// Dados de exemplo (fallback)
+        /// Dados de exemplo para fallback (usado quando não há dados reais no banco).
         /// </summary>
+        /// <returns>DTO com dados de exemplo.</returns>
         private GraficoEmissoesDto ObterDadosExemplo()
         {
             return new GraficoEmissoesDto
@@ -737,33 +875,29 @@ namespace ApiIveco.Service
             };
         }
 
-        public class GraficoEmissoesDto
-        {
-            public string[] Meses { get; set; } = Array.Empty<string>();
-            public double[] ValoresFabrica { get; set; } = Array.Empty<double>();
-            public double[] ValoresCadeia { get; set; } = Array.Empty<double>();
-        }
-
-
-
         /// <summary>
-        /// Retorna dados para a página Análise ESG: distribuição de emissões por escopo e top fornecedores verdes.
-        /// Agora baseado em componentes (peças) associados a fornecedores.
+        /// Obtém dados consolidados para a página de Análise ESG.
         /// </summary>
+        /// <remarks>
+        /// Retorna:
+        /// - Distribuição percentual de emissões por escopo (1, 2, 3)
+        /// - Ranking dos Top 10 Fornecedores Verdes
+        /// </remarks>
+        /// <returns>DTO com distribuição de emissões e lista de fornecedores verdes.</returns>
         public async Task<AnalisesESGDto> ObterDadosAnalisesESGAsync()
         {
             var resultado = new AnalisesESGDto();
 
-            ///Buscar dados
+            // Buscar dados
             var veiculos = await ListarVeiculo();
             var componentes = await ListarVeiculoComponente();
             var fornecedores = await ListarFornecedor();
 
             const double fatorEmissaoPadrao = 2.5;
 
-            /// ============================================================
-            /// 1. Calcular emissões por fornecedor (baseado nos componentes)
-            /// ============================================================
+            // ============================================================
+            // 1. Calcular emissões por fornecedor (baseado nos componentes)
+            // ============================================================
             var dictFornecedorEmissao = new Dictionary<string, double>();
             var dictFornecedorPecas = new Dictionary<string, int>();
 
@@ -782,9 +916,9 @@ namespace ApiIveco.Service
                 }
             }
 
-            /// ============================================================
-            /// 2. Distribuição de Emissões (Escopo 1, 2, 3)
-            /// ============================================================
+            // ============================================================
+            // 2. Distribuição de Emissões (Escopo 1, 2, 3)
+            // ============================================================
             double emissaoVeiculos = 0;
             foreach (var v in veiculos)
             {
@@ -801,25 +935,25 @@ namespace ApiIveco.Service
             if (total > 0)
             {
                 resultado.DistribuicaoEmissoes = new List<EscopoEmissaoDto>
-        {
-            new EscopoEmissaoDto { Escopo = "Escopo 1 (Fábrica)", Porcentagem = Math.Round((emissaoVeiculos / total) * 100, 1) },
-            new EscopoEmissaoDto { Escopo = "Escopo 2 (Energia)", Porcentagem = Math.Round((emissaoLotes / total) * 100, 1) },
-            new EscopoEmissaoDto { Escopo = "Escopo 3 (Fornecedores)", Porcentagem = Math.Round((emissaoFornecedores / total) * 100, 1) }
-        };
+                {
+                    new EscopoEmissaoDto { Escopo = "Escopo 1 (Fábrica)", Porcentagem = Math.Round((emissaoVeiculos / total) * 100, 1) },
+                    new EscopoEmissaoDto { Escopo = "Escopo 2 (Energia)", Porcentagem = Math.Round((emissaoLotes / total) * 100, 1) },
+                    new EscopoEmissaoDto { Escopo = "Escopo 3 (Fornecedores)", Porcentagem = Math.Round((emissaoFornecedores / total) * 100, 1) }
+                };
             }
             else
             {
                 resultado.DistribuicaoEmissoes = new List<EscopoEmissaoDto>
-        {
-            new EscopoEmissaoDto { Escopo = "Escopo 1 (Fábrica)", Porcentagem = 0 },
-            new EscopoEmissaoDto { Escopo = "Escopo 2 (Energia)", Porcentagem = 0 },
-            new EscopoEmissaoDto { Escopo = "Escopo 3 (Fornecedores)", Porcentagem = 0 }
-        };
+                {
+                    new EscopoEmissaoDto { Escopo = "Escopo 1 (Fábrica)", Porcentagem = 0 },
+                    new EscopoEmissaoDto { Escopo = "Escopo 2 (Energia)", Porcentagem = 0 },
+                    new EscopoEmissaoDto { Escopo = "Escopo 3 (Fornecedores)", Porcentagem = 0 }
+                };
             }
 
-            /// ============================================================
-            /// 3. Top Fornecedores Verdes (baseado em componentes)
-            /// ============================================================
+            // ============================================================
+            // 3. Top Fornecedores Verdes (baseado em componentes)
+            // ============================================================
             var fornecedoresComDados = new List<FornecedorVerdeDto>();
             if (fornecedores != null)
             {
@@ -860,28 +994,5 @@ namespace ApiIveco.Service
 
             return resultado;
         }
-
-        public class AnalisesESGDto
-        {
-            public List<EscopoEmissaoDto> DistribuicaoEmissoes { get; set; }
-            public List<FornecedorVerdeDto> TopFornecedoresVerdes { get; set; }
-        }
-
-        public class EscopoEmissaoDto
-        {
-            public string Escopo { get; set; }
-            public double Porcentagem { get; set; }
-        }
-
-        public class FornecedorVerdeDto
-        {
-            public string Id { get; set; }
-            public string Nome { get; set; }
-            public string Localizacao { get; set; }
-            public int TotalPecas { get; set; }
-            public double PegadaMedia { get; set; }
-            public double ScoreVerde { get; set; }
-            public string Certificado { get; set; }
-        }
     }
- }
+}

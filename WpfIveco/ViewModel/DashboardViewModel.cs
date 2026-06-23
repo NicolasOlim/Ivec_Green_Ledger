@@ -6,23 +6,38 @@ using WpfIveco.ViewModels;
 
 namespace WpfIveco.ViewModels
 {
+    /// <summary>
+    /// ViewModel para o Dashboard principal.
+    /// Gerencia a exibição da pegada média de carbono.
+    /// </summary>
     public class DashboardViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
         private string _pegadaMediaFormatada = "Carregando...";
 
+        /// <summary>
+        /// Pegada média de carbono formatada para exibição (ex: "560.3K" ou "160.6 kg CO2").
+        /// </summary>
         public string PegadaMediaFormatada
         {
             get => _pegadaMediaFormatada;
             set { _pegadaMediaFormatada = value; OnPropertyChanged(); }
         }
 
+        /// <summary>
+        /// Inicializa o ViewModel com o HttpClient para comunicação com a API.
+        /// </summary>
+        /// <param name="httpClient">Cliente HTTP para requisições à API.</param>
         public DashboardViewModel(HttpClient httpClient)
         {
             App.LogInfo("Construtor", "DASH");
             _httpClient = httpClient;
         }
 
+        /// <summary>
+        /// Atualiza a pegada média de carbono consultando o endpoint /pegada-media.
+        /// Formata o valor com sufixo K (milhar) ou kg CO2.
+        /// </summary>
         public async Task AtualizarPegadaMediaAsync()
         {
             App.LogInfo("Atualizando pegada média...", "DASH");
@@ -37,6 +52,7 @@ namespace WpfIveco.ViewModels
                     using var doc = JsonDocument.Parse(json);
                     var media = doc.RootElement.GetProperty("pegadaMedia").GetDouble();
 
+                    // Formata o valor com base no tamanho
                     if (media >= 1000)
                         PegadaMediaFormatada = (media / 1000).ToString("N1") + "K";
                     else if (media > 0)

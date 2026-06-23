@@ -14,11 +14,20 @@ using WpfIveco.ViewModels;
 
 namespace WpfIveco.ViewModel
 {
+    /// <summary>
+    /// ViewModel para a gestão de peças e componentes.
+    /// Gerencia listas de VINs, fornecedores, peças e o registro de novas peças.
+    /// </summary>
     public class PecasViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
 
+        // ============================================================
+        // PROPRIEDADES
+        // ============================================================
+
         private ObservableCollection<string> _listaVins = new();
+        /// <summary>Lista de VINs disponíveis para seleção.</summary>
         public ObservableCollection<string> ListaVins
         {
             get => _listaVins;
@@ -26,6 +35,7 @@ namespace WpfIveco.ViewModel
         }
 
         private string _vinSelecionado = "";
+        /// <summary>VIN selecionado no ComboBox.</summary>
         public string VinSelecionado
         {
             get => _vinSelecionado;
@@ -33,6 +43,7 @@ namespace WpfIveco.ViewModel
         }
 
         private string _novaPecaNome = "";
+        /// <summary>Nome da nova peça a ser registrada.</summary>
         public string NovaPecaNome
         {
             get => _novaPecaNome;
@@ -40,6 +51,7 @@ namespace WpfIveco.ViewModel
         }
 
         private double _novaPecaPesoKg = 0;
+        /// <summary>Peso da nova peça em kg.</summary>
         public double NovaPecaPesoKg
         {
             get => _novaPecaPesoKg;
@@ -47,6 +59,7 @@ namespace WpfIveco.ViewModel
         }
 
         private ObservableCollection<PecaModel> _listaPecas = new();
+        /// <summary>Lista de peças já registradas.</summary>
         public ObservableCollection<PecaModel> ListaPecas
         {
             get => _listaPecas;
@@ -54,6 +67,7 @@ namespace WpfIveco.ViewModel
         }
 
         private ObservableCollection<FornecedorModel> _listaFornecedores = new();
+        /// <summary>Lista de fornecedores disponíveis.</summary>
         public ObservableCollection<FornecedorModel> ListaFornecedores
         {
             get => _listaFornecedores;
@@ -61,14 +75,25 @@ namespace WpfIveco.ViewModel
         }
 
         private FornecedorModel _fornecedorSelecionado;
+        /// <summary>Fornecedor selecionado para a nova peça.</summary>
         public FornecedorModel FornecedorSelecionado
         {
             get => _fornecedorSelecionado;
             set { _fornecedorSelecionado = value; OnPropertyChanged(nameof(FornecedorSelecionado)); }
         }
 
+        // ============================================================
+        // COMANDOS
+        // ============================================================
+
+        /// <summary>Comando para registrar uma nova peça.</summary>
         public ICommand AdicionarPecaManualCommand { get; }
 
+        // ============================================================
+        // CONSTRUTOR
+        // ============================================================
+
+        /// <summary>Inicializa o ViewModel com o HttpClient.</summary>
         public PecasViewModel(HttpClient httpClient)
         {
             App.LogInfo("Construtor", "PECAS");
@@ -76,6 +101,11 @@ namespace WpfIveco.ViewModel
             AdicionarPecaManualCommand = new RelayCommand(async p => await AdicionarPecaAsync());
         }
 
+        // ============================================================
+        // MÉTODOS PÚBLICOS
+        // ============================================================
+
+        /// <summary>Carrega a lista de VINs disponíveis da API.</summary>
         public async Task CarregarVinsAsync()
         {
             App.LogInfo("CarregarVinsAsync iniciado", "PECAS");
@@ -105,6 +135,7 @@ namespace WpfIveco.ViewModel
             }
         }
 
+        /// <summary>Carrega a lista de fornecedores da API.</summary>
         public async Task CarregarFornecedoresAsync()
         {
             App.LogInfo("CarregarFornecedoresAsync iniciado", "PECAS");
@@ -133,6 +164,7 @@ namespace WpfIveco.ViewModel
             }
         }
 
+        /// <summary>Carrega a lista de peças da API.</summary>
         public async Task CarregarPecasAsync()
         {
             App.LogInfo("CarregarPecasAsync iniciado", "PECAS");
@@ -170,6 +202,11 @@ namespace WpfIveco.ViewModel
             }
         }
 
+        // ============================================================
+        // MÉTODOS PRIVADOS
+        // ============================================================
+
+        /// <summary>Registra uma nova peça associada a um VIN e fornecedor.</summary>
         private async Task AdicionarPecaAsync()
         {
             App.LogInfo("AdicionarPecaAsync iniciado", "PECAS");

@@ -11,10 +11,18 @@ using WpfIveco.ViewModels;
 
 namespace WpfIveco.ViewModel
 {
+    /// <summary>
+    /// ViewModel principal da aplicação. Gerencia autenticação, navegação entre abas,
+    /// inicialização dos sub-ViewModels e carregamento global de dados.
+    /// </summary>
     public class MainViewModel : ViewModelBase
     {
         private HttpClient _httpClient;
         private readonly DispatcherTimer _timer;
+
+        // ============================================================
+        // SUB-VIEWMODELS
+        // ============================================================
 
         public DashboardViewModel Dashboard { get; }
         public RastreabilidadeViewModel Rastreabilidade { get; }
@@ -23,32 +31,58 @@ namespace WpfIveco.ViewModel
         public AnalisesViewModel Analises { get; }
         public RelatoriosViewModel Relatorios { get; }
 
+        // ============================================================
+        // ESTADO DE LOGIN
+        // ============================================================
+
         private bool _isBusy = false;
+        /// <summary>Indica se há uma operação em andamento (loading).</summary>
         public bool IsBusy { get => _isBusy; set { _isBusy = value; OnPropertyChanged(); } }
+
         private bool _isLoggedIn = false;
+        /// <summary>Indica se o usuário está autenticado.</summary>
         public bool IsLoggedIn { get => _isLoggedIn; set { _isLoggedIn = value; OnPropertyChanged(); } }
+
         private bool _isAdmin = false;
+        /// <summary>Indica se o usuário possui perfil Administrador.</summary>
         public bool IsAdmin { get => _isAdmin; set { _isAdmin = value; OnPropertyChanged(); } }
+
         private bool _modoCadastro = false;
+        /// <summary>Alterna entre modo login e cadastro.</summary>
         public bool ModoCadastro { get => _modoCadastro; set { _modoCadastro = value; OnPropertyChanged(); } }
+
+        // ============================================================
+        // CAMPOS DE LOGIN E CADASTRO
+        // ============================================================
 
         private string _loginEmail = "";
         public string LoginEmail { get => _loginEmail; set { _loginEmail = value; OnPropertyChanged(); } }
+
         private string _loginSenha = "";
         public string LoginSenha { get => _loginSenha; set { _loginSenha = value; OnPropertyChanged(); } }
+
         private string _cadastroNome = "";
         public string CadastroNome { get => _cadastroNome; set { _cadastroNome = value; OnPropertyChanged(); } }
+
         private string _cadastroPerfil = "Usuario";
         public string CadastroPerfil { get => _cadastroPerfil; set { _cadastroPerfil = value; OnPropertyChanged(); } }
+
         private string _nomeUsuario = "Visitante";
         public string NomeUsuario { get => _nomeUsuario; set { _nomeUsuario = value; OnPropertyChanged(); } }
+
         private string _perfilUsuario = "Sessão não iniciada";
         public string PerfilUsuario { get => _perfilUsuario; set { _perfilUsuario = value; OnPropertyChanged(); } }
 
+        // ============================================================
+        // NAVEGAÇÃO E CONFIGURAÇÕES
+        // ============================================================
+
         private string _abaAtiva = "Dashboard";
+        /// <summary>Nome da aba atualmente exibida.</summary>
         public string AbaAtiva { get => _abaAtiva; set { _abaAtiva = value; OnPropertyChanged(); } }
 
         private string _apiUrlConfig = "https://apiivecogreenledger.runasp.net/";
+        /// <summary>URL base da API.</summary>
         public string ApiUrlConfig
         {
             get => _apiUrlConfig;
@@ -63,6 +97,10 @@ namespace WpfIveco.ViewModel
         private string _statusSimulador = "Desativado";
         public string StatusSimulador { get => _statusSimulador; set { _statusSimulador = value; OnPropertyChanged(); } }
 
+        // ============================================================
+        // COMANDOS
+        // ============================================================
+
         public ICommand FazerLoginCommand { get; }
         public ICommand FazerCadastroCommand { get; }
         public ICommand FazerLogoutCommand { get; }
@@ -70,6 +108,11 @@ namespace WpfIveco.ViewModel
         public ICommand MudarAbaCommand { get; }
         public ICommand LigarDesligarSimuladorCommand { get; }
 
+        // ============================================================
+        // CONSTRUTOR
+        // ============================================================
+
+        /// <summary>Inicializa o ViewModel, sub-ViewModels, comandos e timer.</summary>
         public MainViewModel()
         {
             App.LogInfo("Construtor iniciado", "MAIN");
@@ -97,6 +140,11 @@ namespace WpfIveco.ViewModel
             App.LogInfo("Construtor finalizado", "MAIN");
         }
 
+        // ============================================================
+        // MÉTODOS PRIVADOS
+        // ============================================================
+
+        /// <summary>Inicializa o HttpClient com a URL base fornecida.</summary>
         private void InicializarHttpClient(string baseUrl)
         {
             App.LogInfo($"Inicializando HttpClient com base: {baseUrl}", "MAIN");
@@ -108,6 +156,7 @@ namespace WpfIveco.ViewModel
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "IvecoWpfApp/1.0");
         }
 
+        /// <summary>Executa o login do usuário via API.</summary>
         private async Task ExecutarLoginAsync()
         {
             App.LogInfo($"Tentativa para {LoginEmail}", "LOGIN");
@@ -160,6 +209,7 @@ namespace WpfIveco.ViewModel
             }
         }
 
+        /// <summary>Executa o cadastro de um novo usuário via API.</summary>
         private async Task ExecutarCadastroAsync()
         {
             App.LogInfo($"Tentativa para {LoginEmail}", "CADASTRO");
@@ -204,6 +254,7 @@ namespace WpfIveco.ViewModel
             }
         }
 
+        /// <summary>Desconecta o usuário e limpa o estado da sessão.</summary>
         private void ExecutarLogout()
         {
             App.LogInfo($"Usuário {NomeUsuario} desconectado", "LOGOUT");
@@ -216,6 +267,7 @@ namespace WpfIveco.ViewModel
             _timer.Stop();
         }
 
+        /// <summary>Carrega todos os dados dos sub-ViewModels.</summary>
         private async Task CarregarTudoAsync()
         {
             App.LogInfo("Carregando todos os dados...", "CARREGAR");

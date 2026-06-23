@@ -12,11 +12,20 @@ using WpfIveco.ViewModels;
 
 namespace WpfIveco.ViewModels
 {
+    /// <summary>
+    /// ViewModel para a gestão de fornecedores.
+    /// Gerencia consulta de CNPJ, cadastro e listagem de fornecedores.
+    /// </summary>
     public class FornecedorViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
 
+        // ============================================================
+        // PROPRIEDADES
+        // ============================================================
+
         private string _cnpjBusca = "";
+        /// <summary>CNPJ digitado pelo usuário para consulta.</summary>
         public string CnpjBusca
         {
             get => _cnpjBusca;
@@ -24,6 +33,7 @@ namespace WpfIveco.ViewModels
         }
 
         private string _nomeFornecedorEncontrado = "";
+        /// <summary>Nome do fornecedor retornado pela consulta.</summary>
         public string NomeFornecedorEncontrado
         {
             get => _nomeFornecedorEncontrado;
@@ -31,6 +41,7 @@ namespace WpfIveco.ViewModels
         }
 
         private string _localizacaoFornecedorEncontrado = "";
+        /// <summary>Localização do fornecedor retornada pela consulta.</summary>
         public string LocalizacaoFornecedorEncontrado
         {
             get => _localizacaoFornecedorEncontrado;
@@ -38,6 +49,7 @@ namespace WpfIveco.ViewModels
         }
 
         private string _mensagemCadastro = "";
+        /// <summary>Mensagem de feedback para o usuário (sucesso/erro).</summary>
         public string MensagemCadastro
         {
             get => _mensagemCadastro;
@@ -45,17 +57,31 @@ namespace WpfIveco.ViewModels
         }
 
         private ObservableCollection<FornecedorModel> _listaFornecedores = new();
+        /// <summary>Lista de fornecedores cadastrados.</summary>
         public ObservableCollection<FornecedorModel> ListaFornecedores
         {
             get => _listaFornecedores;
             set { _listaFornecedores = value; OnPropertyChanged(); }
         }
 
+        /// <summary>Total de fornecedores cadastrados.</summary>
         public int TotalFornecedores => ListaFornecedores?.Count ?? 0;
 
+        // ============================================================
+        // COMANDOS
+        // ============================================================
+
+        /// <summary>Comando para consultar CNPJ na BrasilAPI.</summary>
         public ICommand ConsultarCnpjCommand { get; }
+
+        /// <summary>Comando para salvar fornecedor no Firestore.</summary>
         public ICommand SalvarFornecedorCommand { get; }
 
+        // ============================================================
+        // CONSTRUTOR
+        // ============================================================
+
+        /// <summary>Inicializa o ViewModel com o HttpClient.</summary>
         public FornecedorViewModel(HttpClient httpClient)
         {
             App.LogInfo("Construtor", "FORNEC");
@@ -64,6 +90,11 @@ namespace WpfIveco.ViewModels
             SalvarFornecedorCommand = new RelayCommand(async p => await SalvarFornecedorAsync());
         }
 
+        // ============================================================
+        // MÉTODOS PÚBLICOS
+        // ============================================================
+
+        /// <summary>Carrega a lista de fornecedores da API.</summary>
         public async Task CarregarFornecedoresAsync()
         {
             App.LogInfo("CarregarFornecedoresAsync iniciado", "FORNEC");
@@ -90,6 +121,11 @@ namespace WpfIveco.ViewModels
             }
         }
 
+        // ============================================================
+        // MÉTODOS PRIVADOS
+        // ============================================================
+
+        /// <summary>Consulta um CNPJ na BrasilAPI e preenche os campos do fornecedor.</summary>
         private async Task ConsultarCnpjAsync()
         {
             App.LogInfo($"Consultando CNPJ: {CnpjBusca}", "FORNEC");
@@ -138,6 +174,7 @@ namespace WpfIveco.ViewModels
             }
         }
 
+        /// <summary>Salva o fornecedor encontrado no Firestore via API.</summary>
         private async Task SalvarFornecedorAsync()
         {
             App.LogInfo($"Salvando fornecedor: {NomeFornecedorEncontrado}", "FORNEC");
