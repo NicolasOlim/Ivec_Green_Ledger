@@ -81,6 +81,14 @@ O desenvolvimento do ecossistema distribuído do Iveco Green Ledger foi estrutur
 
 - **Sistema de Telemetria, Geração de Dossiês e Testes de Integração:** A fase final consistiu na implementação de recursos avançados de auditoria e robustez de software. Configurou-se um middleware de log corporativo com o Serilog para monitorar o tempo de resposta e latência de cada requisição no servidor. Paralelamente, utilizou-se a engine do QuestPDF para desenhar o módulo de exportação de dados, capaz de compilar relatórios fiscais paginados que contêm códigos de integridade hash. Por fim, testes funcionais de ponta a ponta validaram a exatidão matemática do algoritmo de pegada de carbono por quilo de insumo, concluindo a homologação técnica do ecossistema.
 
+
+| Componente | Tecnologia | Padrão / Framework | Função no Ecossistema |
+| :--- | :--- | :--- | :--- |
+| **ApiIveco** *(Back-End)* | .NET 8 / ASP.NET | REST API | Centraliza as regras de negócio e isola o acesso seguro ao banco de dados global. |
+| **WpfIveco** *(Front-End)* | C# / WPF | MVVM Toolkit | Interface visual reativa para monitoramento, controle estatístico e exibição de dados. |
+| **SimuladorIveco** *(Utilitário)* | C# (Console) | Task Parallel Library | Simula dados de telemetria de sensores industriais e faz contingência local via SQLite. |
+| **Firebase Firestore** *(Banco)* | Google Cloud NoSQL | Document Architecture | Persistência escalável, distribuída e assíncrona orientada a documentos JSON. |
+
   ---
 
 ## Modelagem do Sistema:
@@ -110,7 +118,7 @@ O desenvolvimento do ecossistema distribuído do Iveco Green Ledger foi estrutur
 
 
 <div class="logo-container">
-    <img src="imagens/diagrama de fluxo.png" alt="Logo Iveco Green Ledger" class="logo-img">
+    <img src="imagens/Diagrama_de_fluxo_atualizado.png" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 
 O ecossistema Iveco Green Ledger opera por meio de um fluxo sequencial e rígido de validações automatizadas que estruturam a lógica do seu diagrama de fluxo:
@@ -125,20 +133,25 @@ O ecossistema Iveco Green Ledger opera por meio de um fluxo sequencial e rígido
 
 
   ---
-**Diagrama de Sequência**
+**Diagrama do modelo físico**
   
 <div class="logo-container">
-    <img src="imagens/diagrama de sequencia.png" alt="Logo Iveco Green Ledger" class="logo-img">
+    <img src="imagens/Modelo_Físico_atualizado.jpg" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
-O Diagrama de Sequência do Iveco Green Ledger descreve a ordem cronológica em que as requisições e dados trafegam pelas camadas da arquitetura distribuída:
 
-- **Início na Interface (WPF):** O operador insere o VIN e os dados das peças na RastreabilidadeView. Ao salvar, a ViewModel dispara uma requisição assíncrona via HTTP POST contendo o payload em JSON para a API (ApiIveco).
+O Diagrama do Modelo Físico do Iveco Green Ledger descreve a modelagem de dados relacional e as restrições de integridade mapeadas no banco embutido SQLite, estruturadas estrategicamente para suportar a resiliência no chão de fábrica:
 
-- **Validação de Fronteira (NHTSA):** O DadosController repassa os dados para o DadosService, que consome a API externa da NHTSA. Se o chassi não for validado como original da Iveco, o fluxo é interrompido com um erro HTTP 400; caso contrário, o fluxo avança.
+**Centralização de Credenciais (USUARIO):** A tabela armazena as chaves de identidade, dados de contato e o hash de segurança das senhas (senhaHash). Ela valida o escopo de atuação do usuário via coluna perfil diretamente na borda industrial, permitindo o login e o controle de acessos (RBAC) mesmo se o terminal perder a conectividade com a nuvem.
 
-- **Processamento e Cálculo (API):** Com o chassi validado, a camada de serviço busca os fatores de emissão dos lotes das peças no banco de dados e executa o motor matemático para calcular a pegada de carbono de Escopo 3 do veículo.
+**Governança da Cadeia de Suprimentos (FORNECEDOR):** Atua como o cadastro base dos parceiros comerciais. A coluna cnpj possui a restrição UNIQUE NOT NULL para impedir qualquer duplicidade de registro de fabricante. O campo status adota o valor padrão 'Ativo', alinhando a persistência local com os retornos automatizados da BrasilAPI.
 
-- **Persistência e Confirmação (Firestore):** O back-end grava os dados consolidados no Firebase Firestore de forma assíncrona. O banco confirma a gravação para a API, que responde com status HTTP 200 para o cliente WPF, atualizando instantaneamente os gráficos do LiveCharts2.
+**Rastreabilidade Climática de Insumos (LOTE_MATERIA_PRIMA):** Mapeia os lotes de matéria-prima que entram no pátio logístico. A tabela armazena a volumetria física em quantidadeKg e o índice ecológico em pegadaCarbonoPorKg (fator de emissão do material). Ela possui uma chave estrangeira ligada ao fornecedor com a restrição ON DELETE RESTRICT, impedindo que um fornecedor seja excluído se houver lotes de materiais vinculados a ele.
+
+**Ancoragem do Produto Final (VEICULO):** Representa os caminhões comerciais da linha de produção. Utiliza o chassi (vin) de 17 caracteres como chave primária (PRIMARY KEY). O campo marca possui o valor padrão fixado como 'IVECO', servindo de barreira para garantir que o motor de cálculo só processe produtos da montadora homologada.
+
+**Coração da Resiliência Industrial (VEICULO_COMPONENTE):** Esta tabela associativa quebra a relação de muitos para muitos entre o veículo e o lote de matéria-prima, registrando a montagem exata de cada peça. Ela guarda a massa (pesoKg) e o resultado matemático local do GHG Protocol (totalC02eCalculado).
+
+**Mecanismo de Sincronização e Integridade:** A coluna is_sincronizado (padrão 0) controla a fila de envio para a nuvem. A tabela possui duas chaves estrangeiras cruciais: uma ligada ao lote (ON DELETE RESTRICT) e outra ligada ao chassi com a diretriz ON DELETE CASCADE. Isso garante que, se um chassi de teste for descartado, toda a sua árvore de componentes locais seja eliminada automaticamente, limpando o cache e evitando dados órfãos no terminal de pátio.
 
 ---
 
@@ -187,6 +200,85 @@ O trânsito da informação entre as duas camadas de persistência obedece a um 
 
 Essa arquitetura híbrida garante que o Iveco Green Ledger ofereça o melhor de dois mundos: a robustez analítica e a segurança centralizada de um banco de dados em nuvem estruturado para governança ESG, sem sacrificar a resiliência e a continuidade operacional exigidas no chão de fábrica de uma montadora automotiva de grande porte.
 
+---
+
+### Reestruturação do Modelo de Dados para NoSQL (Firebase Firestore)
+
+A transição da infraestrutura de armazenamento — migrando de um modelo relacional clássico estruturado em Terceira Forma Normal (3NF) para uma arquitetura orientada a documentos não relacionais (NoSQL) — exigiu uma quebra profunda de paradigma na modelagem das entidades do ecossistema. Em ambientes industriais de alta concorrência, tabelas rígidas com restrições severas de chaves estrangeiras (`FOREIGN KEY`) podem gerar gargalos de performance e travamentos de tabelas (*table locking*) durante inserções massivas de telemetria.
+
+Para solucionar essa limitação, a nova arquitetura adota o modelo de coleções elásticas do **Firebase Firestore**. Nele, os dados são persistidos como documentos semiestruturados (similares ao formato JSON), capazes de se expandirem de forma dinâmica e independente. Campos opcionais ou novos metadados de sensores podem ser acoplados a um documento sem a necessidade de executar comandos de alteração estrutural (*ALTER TABLE*) ou paradas programadas no banco de dados.
+
+#### Tabela 4: Paradigma Relacional (SQLite) versus Orientado a Documentos (Firestore)
+
+| Critério Arquitetural | Modelo Relacional Original (3NF) | Modelo NoSQL Atual (Firestore) | Impacto Engenharia / Produção |
+| :--- | :--- | :--- | :--- |
+| **Estrutura de Dados** | Tabelas rígidas, linhas e colunas fixas. | Coleções elásticas e documentos JSON flexíveis. | Adaptação imediata a novas telemetrias sem migrações de esquema (*migration-free*). |
+| **Integridade** | Chaves Estrangeiras (`FK`) e restrições em nível de banco. | Acoplamento lógico via chaves de amarração textual (**UUID v4**). | Redução drástica do overhead de processamento do banco durante inserções concorrentes. |
+| **Consolidação** | Resolução em tempo de execução via operadores `JOIN`. | Estruturas desnormalizadas e subcoleções/arrays embutidos. | Leitura ultra-rápida (sub-50ms) para plotagem instantânea nos gráficos do `LiveCharts2`. |
+| **Escalabilidade** | Vertical (dependente de CPU/Memória do servidor local). | Horizontal nativa (distribuída globalmente pela nuvem Google Cloud). | Suporte a milhares de requisições simultâneas vindas dos simuladores de sensores de pátio. |
+
+---
+
+### Estratégia de Desnormalização e Elo de Amarração Lógica
+
+Para manter a integridade analítica e viabilizar a consolidação de relatórios de auditoria climática (Escopo 3 do GHG Protocol) sem o suporte nativo a operações de cruzamento de tabelas (`JOIN`), a engenharia do projeto aplicou técnicas avançadas de **desnormalização de dados**. 
+
+Os identificadores textuais únicos (**UUID v4 - Universally Unique Identifiers**) foram adotados como elos de amarração lógica entre os documentos. Além disso, em vez de isolar os componentes montados em uma tabela totalmente apartada — o que exigiria múltiplos cruzamentos —, a árvore de peças de um caminhão é injetada diretamente como um vetor de mapas (`Array of Maps`) dentro do próprio documento do veículo. Essa abordagem garante que uma única operação de leitura (`HTTP GET`) recupere o veículo e toda a sua pegada ecológica consolidada de uma só vez.
+
+#### Mapeamento Estrutural das Coleções NoSQL
+
+Abaixo está detalhada a topologia lógica das três coleções principais que governam o motor do **Iveco Green Ledger**:
+
+```js
+// ==========================================
+// 1. COLEÇÃO: fornecedores
+// ==========================================
+{
+  "id_fornecedor": "fb4b6c12-32a1-4b10-8b9f-09e8d7c6b5a4", // UUID v4 de Amarração
+  "cnpj": "12.345.678/0001-99",
+  "razaoSocial": "Metalúrgica Estrutural S.A.",
+  "status": "Ativo",
+  "dataHomologacao": "2026-01-15T10:00:00Z"
+}
+
+// ==========================================
+// 2. COLEÇÃO: lotes
+// ==========================================
+{
+  "id_lote": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d", // UUID v4 de Amarração
+  "fk_fornecedor": "fb4b6c12-32a1-4b10-8b9f-09e8d7c6b5a4", // Elo com o Fornecedor
+  "tipoMaterial": "Aço Estrutural",
+  "quantidadeKg": 5000.00,
+  "pegadaCarbonoPorKg": 1.82, // Coeficiente para cálculo do GHG Protocol
+  "dataProducao": "2026-06-23T19:30:00Z"
+}
+
+// ==========================================
+// 3. COLEÇÃO: veiculos_emissoes
+// ==========================================
+{
+  "_id": "93DIVECO123456789", // O próprio VIN (Chassi de 17 dígitos) atua como ID do Documento
+  "modelo": "Iveco S-Way 540",
+  "marca": "IVECO",
+  "dataMontagem": "2026-06-23T19:34:00Z",
+  "totalEmissaoScope3": 2.73, // tCO2e pré-calculado e consolidado pela ApiIveco
+  "statusAuditoria": "Aprovado",
+  
+  // Árvore de Componentes Embutida (Desnormalização para eliminar JOINs)
+  "componentes_instalados": [
+    {
+      "nomeComponente": "Longarina Esquerda",
+      "fk_loteMateriaPrima_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d", // Elo com o Lote de origem
+      "pesoKg": 750.00
+    },
+    {
+      "nomeComponente": "Longarina Direita",
+      "fk_loteMateriaPrima_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+      "pesoKg": 750.00
+    }
+  ]
+}
+```
 ---
 
 ## Dicionário de Dados do SQLite (Persistência Local):
@@ -273,6 +365,28 @@ A separação e posterior integração dos projetos dentro da mesma solução tr
 - Rastreabilidade e Compliance: A integração nativa do Serilog na camada de serviços permitiu auditar a telemetria e latência de ponta a ponta, enquanto o QuestPDF garantiu a geração automatizada de relatórios com assinaturas digitais imutáveis.
 
 ---
+
+## Arquitetura do Sistema e Stack Tecnológica:
+
+Para atender aos rigorosos requisitos de escalabilidade, alta disponibilidade e isolamento de falhas exigidos pela indústria automobilística moderna, o ecossistema **Iveco Green Ledger** foi projetado sob o paradigma de sistemas distribuídos e arquitetura fracamente acoplada. A transição do modelo monolítico original para uma topologia dividida em subprojetos independentes permitiu a segregação clara de responsabilidades, onde cada componente opera como um nó especializado dentro da rede fabril.
+
+A comunicação entre os módulos baseia-se no estilo arquitetural **REST (Representational State Transfer)**, utilizando cargas de dados estruturadas em formato **JSON** trafegadas via protocolos criptografados HTTP/HTTPS. Enquanto a camada de aquisição e simulação de dados atua na borda física do chão de fábrica, a intermediação lógica e o processamento analítico são centralizados em uma API de alta performance, que por sua vez se comunica de forma nativa e assíncrona (via gRPC protegido) com os servidores de nuvem.
+
+Essa segmentação garante que picos de tráfego gerados pelos sensores de telemetria não impactem a renderização da interface gráfica do operador, e que manutenções evolutivas em qualquer uma das pontas possam ser homologadas sem a necessidade de paradas programadas no ecossistema completo. 
+
+A solução foi dividida estrategicamente em três subprojetos independentes que formam o ecossistema e se comunicam de maneira segura, sob o suporte de um banco de dados hospedado em nuvem corporativa. A tabela abaixo resume as camadas do sistema e as respectivas ferramentas tecnológicas associadas:
+
+#### Tabela 1: Matriz de Componentes e Stack Tecnológica do Ecossistema
+
+| Componente | Tecnologia | Padrão / Framework | Função no Ecossistema |
+| :--- | :--- | :--- | :--- |
+| **ApiIveco** *(Back-End)* | .NET 8 / ASP.NET Core | REST API | Centraliza as regras de negócio, executa o cálculo do Escopo 3 (GHG Protocol) e isola o acesso seguro ao banco de dados global. |
+| **WpfIveco** *(Front-End)* | C# / WPF | MVVM Toolkit | Interface visual reativa e de alta performance para monitoramento analítico e controle estatístico no pátio. |
+| **SimuladorIveco** *(Utilitário)* | C# (Console Application) | Task Parallel Library | Simula dados de telemetria de sensores IoT industriais em tempo real e gerencia a fila de contingência local via SQLite. |
+| **Firebase Firestore** *(Banco)* | Google Cloud NoSQL | Document Architecture | Camada de persistência global altamente escalável, distribuída e assíncrona orientada a documentos JSON. |
+
+---
+
 ## Viabilidade Econômica:
 
 O projeto **Iveco Green Ledger** foi concebido como uma solução tecnológica de alta eficiência e baixo custo de implantação, utilizando componentes de hardware convencionais para pátio logístico e desenvolvimento próprio. Essa abordagem reduz significativamente o investimento inicial quando comparada a sistemas industriais proprietários de telemetria ambiental e rastreabilidade de frotas.
@@ -317,40 +431,96 @@ O projeto **Iveco Green Ledger** foi concebido como uma solução tecnológica d
 
 ---
 
+# Camadas do Projeto:
+
+O ecossistema **Iveco Green Ledger** foi estruturado sob o princípio da separação de conceitos. Cada camada possui fronteiras lógicas bem definidas, comunicando-se por meio de interfaces de programação de aplicações (APIs) e contratos de dados rígidos, o que confere ao sistema modularidade, facilidade de manutenção e alta resiliência.
+
+### Camada de Serviços Intermediários - API (`ApiIveco`)
+
+A **ApiIveco** atua como a inteligência central e o núcleo de governança do ecossistema. Construída com a especificação técnica do **ASP.NET Core Web API** no ambiente **.NET 8 LTS**, ela baseia-se estritamente nas restrições de projeto do estilo arquitetural **REST**. 
+
+#### Características Técnicas e Governança da API:
+* **Isolamento de Persistência:** A API atua como um escudo de segurança (Proxy) para o banco de dados em nuvem. Nenhuma aplicação cliente (seja o terminal WPF ou o simulador de sensores) possui credenciais diretas de gravação no Firebase Firestore. O acesso é centralizado e auditado pelos controladores da API via políticas de controle de acesso do **Google Cloud**.
+  
+* **Contratos de Dados via DTOs:** A comunicação externa opera sobre os protocolos seguros HTTP/HTTPS utilizando Objetos de Transferência de Dados, serializados estritamente no formato **JSON**. O uso de DTOs impede a exposição direta das entidades de domínio do banco, reduz o payload trafegado na rede e protege o sistema contra vulnerabilidades de atribuição em massa.
+  
+* **Motor Integrado:** É nesta camada que reside a implementação algorítmica das equações de conversão do **GHG Protocol (Escopo 3)**. A API intercepta o peso bruto dos insumos em quilogramas enviados pelo pátio, localiza o coeficiente ecológico do lote do material e consolida o valor em toneladas de carbono equivalente antes de disparar o gatilho assíncrono de escrita na nuvem.
+
+---
+
+### Camada da Interface Visual - WPF (`WpfIveco`)
+
+A aplicação **WpfIveco** representa a interface homem-máquina (IHM) de monitoramento e controle administrativo da linha de montagem. O desenvolvimento em WPF adota o padrão de arquitetura MVVM, erradicando o acoplamento entre os elementos gráficos e as regras de negócio.
+
+#### Engenharia de Interface e Performance Visual:
+* **Desacoplamento de Telas:** As interfaces visuais são declaradas puramente em sintaxe (Views). Toda a lógica de estado de tela, manipulação de dados em C# e chamadas de rede fica encapsulada nas (ViewModels). A interceptação de interações (como cliques em botões e gatilhos de gravação) utiliza o padrão *Command* por meio da classe especializada **RelayCommand**, eliminando regras de negócio de dentro dos arquivos de retaguarda das telas (`.xaml.cs`).
+
+* **Sincronização Reativa e Data Binding:** O sincronismo entre as propriedades da ViewModel e os componentes visuais do XAML ocorre em tempo real de forma bidirecional. O mecanismo é governado por notificações estruturadas de mudança de estado, suportadas pela interface de infraestrutura **INotifyPropertyChanged**.
+  
+* **Plotagem de Alta Performance:** Para suportar a taxa de atualização contínua exigida pelo monitoramento industrial, os dados estatísticos coletados são plotados graficamente através da biblioteca **LiveCharts2**. Esta biblioteca opera de forma acelerada via hardware gráfico por meio do motor de renderização vetorial cross-platform, o que preserva a fluidez da linha de renderização e elimina qualquer possibilidade de congelamento visual no terminal do operador.
+
+---
+
+### Camada de Simulação de Sensores (`SimuladorIveco`)
+
+O módulo `SimuladorIveco` consiste em um motor utilitário desenvolvido em modo **Console Application**, responsável por simular com fidelidade o comportamento operacional de dispositivos de telemetria automotiva e sensores IoT implantados fisicamente na planta fabril da Iveco (como antenas de identificação por radiofrequência - RFID, balanças eletrônicas automatizadas e scanners industriais de rastreamento de chassis). 
+
+O utilitário faz uso intensivo da biblioteca de paralelismo **Task Parallel Library (TPL)** do .NET para gerar e despachar pacotes sintéticos contendo números de chassi válidos (VIN), peso líquido das cargas transportadas e a classificação tipológica dos insumos recebidos.
+
+---
+
+## Requisitos Do Sistema E Diretrizes De Instalação
+
+Esta seção descreve os pré-requisitos mínimos e o procedimento técnico para compilar e executar o ecossistema **Iveco Green Ledger** em ambiente de desenvolvimento ou homologação.
+
+### Pré-requisitos de Software e Ambiente
+* **SDK do .NET:** Versão `8.0 LTS` ou superior instalada.
+* **IDE Recomendada:** Visual Studio 2022 (v17.8+), JetBrains Rider ou Visual Studio Code (com as extensões C# Dev Kit).
+* **Banco de Dados Local:** Engine do SQLite instalada (necessária apenas para leitura do arquivo gerado pelo simulador).
+* **Infraestrutura em Nuvem:** Uma conta ativa no Google Cloud Platform com um projeto configurado no **Firebase Firestore**.
+
+### Configuração das Chaves de Segurança (Google Cloud IAM)
+Por motivos de governança e proteção de dados, as credenciais de acesso ao Firebase NoSQL (`firebase-key.json`) **não** estão incluídas no controle de versão público.
+1. Acesse o console do Firebase, vá em *Configurações do Projeto* > *Contas de Serviço*.
+2. Gere uma nova chave privada em formato JSON.
+3. Renomeie o arquivo baixado para `firebase-key.json`.
+4. Cole o arquivo diretamente na raiz do projeto `ApiIveco` (certifique-se de que a propriedade do arquivo esteja configurada como "Copiar se for mais novo" nas propriedades do Visual Studio).
 # Regra de Negócio: Validação Restritiva de Chassis (VIN)
 
-## 1. Visão Geral
+---
+
+## Visão Geral sobre o projeto
 No contexto do ecossistema **Iveco Green Ledger**, é estritamente proibido o registo de componentes logísticos ou a geração de métricas ambientais (Escopo 3) para veículos que não pertençam à fabricante **IVECO**. Esta regra garante a integridade dos relatórios ESG e evita a contaminação da base de dados corporativa com veículos de terceiros.
 
-## 2. Atores e Componentes Envolvidos
+## - Atores e Componentes Envolvidos
 * **Ator:** Operador de Pátio (via cliente desktop WPF).
 * **Sistema Interno:** Back-End em ASP.NET Core 8 (`DadosController` e `DadosService`).
 * **Serviço Externo:** API Pública da NHTSA (National Highway Traffic Safety Administration).
 
-## 3. Fluxo de Validação e Critérios de Aceitação
+## - Fluxo de Validação e Critérios de Aceitação
 A validação de um chassi segue um pipeline de verificações síncronas/assíncronas antes da persistência no banco de dados NoSQL (Firebase Firestore):
 
-### Passo 3.1: Validação de Fronteira (Cliente/API)
+### - Validação de Fronteira (Cliente/API)
 * O utilizador introduz o código VIN.
 * O sistema verifica o tamanho da string.
 * **Critério:** O código VIN deve conter **exatamente 17 caracteres**.
 * **Falha:** Retorna `HTTP 400 (Bad Request)` com a mensagem "O VIN deve ter 17 caracteres."
 
-### Passo 3.2: Higienização de Dados (Sanitization)
+### - Higienização de Dados (Sanitization)
 * Antes de enviar para a entidade externa, o VIN sofre um tratamento.
 * **Ação:** Remoção de espaços em branco (`Trim`) e conversão de todos os caracteres para maiúsculas (`ToUpper`).
 
-### Passo 3.3: Auditoria Industrial Externa (Integração NHTSA)
+### - Auditoria Industrial Externa (Integração NHTSA)
 * O Back-End consome o endpoint `decodevin` da API VPIC da NHTSA.
 * O payload JSON devolvido é analisado em busca da variável correspondente à Marca (`Make`).
 * **Critério de Sucesso:** O valor retornado no campo Marca deve conter obrigatoriamente a substring **"IVECO"**.
 * **Critério de Rejeição:** Se a marca for nula, vazia ou diferente de IVECO (ex: Volvo, Scania, Ford).
 
-### Passo 3.4: Resolução
+### - Resolução
 * **Em caso de Sucesso:** O sistema extrai o modelo do veículo (ou define um genérico caso a API não o forneça) e aprova a transação, avançando para a criação do veículo no Firebase e posterior vínculo das peças/lotes.
 * **Em caso de Falha:** O motor de regras de negócio dispara uma exceção crítica. A camada Controller interceta a exceção de forma amigável e retorna o erro para a aplicação WPF, impedindo instantaneamente a continuação da linha de montagem e exibindo a marca não autorizada detetada.
 
-## 4. Tratamento de Erros e Códigos HTTP
+## - Tratamento de Erros e Códigos HTTP
 
 | Cenário de Erro | Código HTTP Retornado | Comportamento do Sistema |
 | :--- | :---: | :--- |
@@ -359,7 +529,7 @@ A validação de um chassi segue um pipeline de verificações síncronas/assín
 | Marca detetada não é IVECO | `400 Bad Request` | Controller captura a `Exception` do Service e notifica o Operador com a marca incorreta detetada. |
 | Falha na ligação com a NHTSA | `500 / 503` | O sistema notifica indisponibilidade temporária. (Nota: Aqui entra a contingência *Offline-Safe* no lado do Cliente WPF). |
 
-## 5. Implementação Técnica de Referência
+## - Implementação Técnica de Referência
 A salvaguarda desta regra está codificada no serviço `DadosService.cs`, garantindo que a regra nunca seja contornada, independentemente do cliente que chame a API:
 
 ```csharp
