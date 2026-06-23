@@ -59,8 +59,6 @@ namespace WpfIveco
             Debug.WriteLine($"[LOGGER] Arquivo de log principal: {LogFilePath}");
             Debug.WriteLine($"[LOGGER] Arquivo de log fallback: {FallbackLogFilePath}");
 
-            // Exibe o caminho para o usuário (opcional)
-            MessageBox.Show($"Logs serão salvos em:\n{LogFilePath}", "Localização dos Logs", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         /// <summary>
