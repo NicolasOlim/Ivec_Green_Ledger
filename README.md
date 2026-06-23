@@ -81,6 +81,14 @@ O desenvolvimento do ecossistema distribuído do Iveco Green Ledger foi estrutur
 
 - **Sistema de Telemetria, Geração de Dossiês e Testes de Integração:** A fase final consistiu na implementação de recursos avançados de auditoria e robustez de software. Configurou-se um middleware de log corporativo com o Serilog para monitorar o tempo de resposta e latência de cada requisição no servidor. Paralelamente, utilizou-se a engine do QuestPDF para desenhar o módulo de exportação de dados, capaz de compilar relatórios fiscais paginados que contêm códigos de integridade hash. Por fim, testes funcionais de ponta a ponta validaram a exatidão matemática do algoritmo de pegada de carbono por quilo de insumo, concluindo a homologação técnica do ecossistema.
 
+
+| Componente | Tecnologia | Padrão / Framework | Função no Ecossistema |
+| :--- | :--- | :--- | :--- |
+| **ApiIveco** *(Back-End)* | .NET 8 / ASP.NET | REST API | Centraliza as regras de negócio e isola o acesso seguro ao banco de dados global. |
+| **WpfIveco** *(Front-End)* | C# / WPF | MVVM Toolkit | Interface visual reativa para monitoramento, controle estatístico e exibição de dados. |
+| **SimuladorIveco** *(Utilitário)* | C# (Console) | Task Parallel Library | Simula dados de telemetria de sensores industriais e faz contingência local via SQLite. |
+| **Firebase Firestore** *(Banco)* | Google Cloud NoSQL | Document Architecture | Persistência escalável, distribuída e assíncrona orientada a documentos JSON. |
+
   ---
 
 ## Modelagem do Sistema:
@@ -130,19 +138,20 @@ O ecossistema Iveco Green Ledger opera por meio de um fluxo sequencial e rígido
 <div class="logo-container">
     <img src="imagens/Modelo_Físico_atualizado.jpg" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
+
 O Diagrama do Modelo Físico do Iveco Green Ledger descreve a modelagem de dados relacional e as restrições de integridade mapeadas no banco embutido SQLite, estruturadas estrategicamente para suportar a resiliência no chão de fábrica:
 
-Centralização de Credenciais (USUARIO): A tabela armazena as chaves de identidade, dados de contato e o hash de segurança das senhas (senhaHash). Ela valida o escopo de atuação do usuário via coluna perfil diretamente na borda industrial, permitindo o login e o controle de acessos (RBAC) mesmo se o terminal perder a conectividade com a nuvem.
+**Centralização de Credenciais (USUARIO):** A tabela armazena as chaves de identidade, dados de contato e o hash de segurança das senhas (senhaHash). Ela valida o escopo de atuação do usuário via coluna perfil diretamente na borda industrial, permitindo o login e o controle de acessos (RBAC) mesmo se o terminal perder a conectividade com a nuvem.
 
-Governança da Cadeia de Suprimentos (FORNECEDOR): Atua como o cadastro base dos parceiros comerciais. A coluna cnpj possui a restrição UNIQUE NOT NULL para impedir qualquer duplicidade de registro de fabricante. O campo status adota o valor padrão 'Ativo', alinhando a persistência local com os retornos automatizados da BrasilAPI.
+**Governança da Cadeia de Suprimentos (FORNECEDOR):** Atua como o cadastro base dos parceiros comerciais. A coluna cnpj possui a restrição UNIQUE NOT NULL para impedir qualquer duplicidade de registro de fabricante. O campo status adota o valor padrão 'Ativo', alinhando a persistência local com os retornos automatizados da BrasilAPI.
 
-Rastreabilidade Climática de Insumos (LOTE_MATERIA_PRIMA): Mapeia os lotes de matéria-prima que entram no pátio logístico. A tabela armazena a volumetria física em quantidadeKg e o índice ecológico em pegadaCarbonoPorKg (fator de emissão do material). Ela possui uma chave estrangeira ligada ao fornecedor com a restrição ON DELETE RESTRICT, impedindo que um fornecedor seja excluído se houver lotes de materiais vinculados a ele.
+**Rastreabilidade Climática de Insumos (LOTE_MATERIA_PRIMA):** Mapeia os lotes de matéria-prima que entram no pátio logístico. A tabela armazena a volumetria física em quantidadeKg e o índice ecológico em pegadaCarbonoPorKg (fator de emissão do material). Ela possui uma chave estrangeira ligada ao fornecedor com a restrição ON DELETE RESTRICT, impedindo que um fornecedor seja excluído se houver lotes de materiais vinculados a ele.
 
-Ancoragem do Produto Final (VEICULO): Representa os caminhões comerciais da linha de produção. Utiliza o chassi (vin) de 17 caracteres como chave primária (PRIMARY KEY). O campo marca possui o valor padrão fixado como 'IVECO', servindo de barreira para garantir que o motor de cálculo só processe produtos da montadora homologada.
+**Ancoragem do Produto Final (VEICULO):** Representa os caminhões comerciais da linha de produção. Utiliza o chassi (vin) de 17 caracteres como chave primária (PRIMARY KEY). O campo marca possui o valor padrão fixado como 'IVECO', servindo de barreira para garantir que o motor de cálculo só processe produtos da montadora homologada.
 
-Coração da Resiliência Industrial (VEICULO_COMPONENTE): Esta tabela associativa quebra a relação de muitos para muitos entre o veículo e o lote de matéria-prima, registrando a montagem exata de cada peça. Ela guarda a massa (pesoKg) e o resultado matemático local do GHG Protocol (totalC02eCalculado).
+**Coração da Resiliência Industrial (VEICULO_COMPONENTE):** Esta tabela associativa quebra a relação de muitos para muitos entre o veículo e o lote de matéria-prima, registrando a montagem exata de cada peça. Ela guarda a massa (pesoKg) e o resultado matemático local do GHG Protocol (totalC02eCalculado).
 
-⚠️ Mecanismo de Sincronização e Integridade: A coluna is_sincronizado (padrão 0) controla a fila de envio para a nuvem. A tabela possui duas chaves estrangeiras cruciais: uma ligada ao lote (ON DELETE RESTRICT) e outra ligada ao chassi com a diretriz ON DELETE CASCADE. Isso garante que, se um chassi de teste for descartado, toda a sua árvore de componentes locais seja eliminada automaticamente, limpando o cache e evitando dados órfãos no terminal de pátio.
+**Mecanismo de Sincronização e Integridade:** A coluna is_sincronizado (padrão 0) controla a fila de envio para a nuvem. A tabela possui duas chaves estrangeiras cruciais: uma ligada ao lote (ON DELETE RESTRICT) e outra ligada ao chassi com a diretriz ON DELETE CASCADE. Isso garante que, se um chassi de teste for descartado, toda a sua árvore de componentes locais seja eliminada automaticamente, limpando o cache e evitando dados órfãos no terminal de pátio.
 
 ---
 
@@ -277,6 +286,28 @@ A separação e posterior integração dos projetos dentro da mesma solução tr
 - Rastreabilidade e Compliance: A integração nativa do Serilog na camada de serviços permitiu auditar a telemetria e latência de ponta a ponta, enquanto o QuestPDF garantiu a geração automatizada de relatórios com assinaturas digitais imutáveis.
 
 ---
+
+## Arquitetura do Sistema e Stack Tecnológica:
+
+Para atender aos rigorosos requisitos de escalabilidade, alta disponibilidade e isolamento de falhas exigidos pela indústria automobilística moderna, o ecossistema **Iveco Green Ledger** foi projetado sob o paradigma de sistemas distribuídos e arquitetura fracamente acoplada. A transição do modelo monolítico original para uma topologia dividida em subprojetos independentes permitiu a segregação clara de responsabilidades, onde cada componente opera como um nó especializado dentro da rede fabril.
+
+A comunicação entre os módulos baseia-se no estilo arquitetural **REST (Representational State Transfer)**, utilizando cargas de dados estruturadas em formato **JSON** trafegadas via protocolos criptografados HTTP/HTTPS. Enquanto a camada de aquisição e simulação de dados atua na borda física do chão de fábrica, a intermediação lógica e o processamento analítico são centralizados em uma API de alta performance, que por sua vez se comunica de forma nativa e assíncrona (via gRPC protegido) com os servidores de nuvem.
+
+Essa segmentação garante que picos de tráfego gerados pelos sensores de telemetria não impactem a renderização da interface gráfica do operador, e que manutenções evolutivas em qualquer uma das pontas possam ser homologadas sem a necessidade de paradas programadas no ecossistema completo. 
+
+A solução foi dividida estrategicamente em três subprojetos independentes que formam o ecossistema e se comunicam de maneira segura, sob o suporte de um banco de dados hospedado em nuvem corporativa. A tabela abaixo resume as camadas do sistema e as respectivas ferramentas tecnológicas associadas:
+
+#### Tabela 1: Matriz de Componentes e Stack Tecnológica do Ecossistema
+
+| Componente | Tecnologia | Padrão / Framework | Função no Ecossistema |
+| :--- | :--- | :--- | :--- |
+| **ApiIveco** *(Back-End)* | .NET 8 / ASP.NET Core | REST API | Centraliza as regras de negócio, executa o cálculo do Escopo 3 (GHG Protocol) e isola o acesso seguro ao banco de dados global. |
+| **WpfIveco** *(Front-End)* | C# / WPF | MVVM Toolkit | Interface visual reativa e de alta performance para monitoramento analítico e controle estatístico no pátio. |
+| **SimuladorIveco** *(Utilitário)* | C# (Console Application) | Task Parallel Library | Simula dados de telemetria de sensores IoT industriais em tempo real e gerencia a fila de contingência local via SQLite. |
+| **Firebase Firestore** *(Banco)* | Google Cloud NoSQL | Document Architecture | Camada de persistência global altamente escalável, distribuída e assíncrona orientada a documentos JSON. |
+
+---
+
 ## Viabilidade Econômica:
 
 O projeto **Iveco Green Ledger** foi concebido como uma solução tecnológica de alta eficiência e baixo custo de implantação, utilizando componentes de hardware convencionais para pátio logístico e desenvolvimento próprio. Essa abordagem reduz significativamente o investimento inicial quando comparada a sistemas industriais proprietários de telemetria ambiental e rastreabilidade de frotas.
