@@ -101,7 +101,7 @@ namespace WpfIveco
                 textBox.TextChanged += CnpjTextBox_TextChanged;
             }
         }
-     
+
 
         private void BtnMostrarSenha_Click(object sender, RoutedEventArgs e)
         {
@@ -127,6 +127,28 @@ namespace WpfIveco
             }
         }
 
+        private void BtnAbrirModalSair_Click(object sender, RoutedEventArgs e)
+        {
+            ModalConfirmacaoSair.Visibility = Visibility.Visible;
+            // Fecha o popup de perfil (opcional)
+            BtnMenuPerfil.IsChecked = false;
+        }
+
+        private void BtnFecharModalSair_Click(object sender, RoutedEventArgs e)
+        {
+            ModalConfirmacaoSair.Visibility = Visibility.Collapsed;
+        }
+
+        private void BtnConfirmarSaida_Click(object sender, RoutedEventArgs e)
+        {
+            // Executa o logout (chama o comando ou método do ViewModel)
+            if (DataContext is MainViewModel viewModel)
+            {
+                viewModel.FazerLogoutCommand?.Execute(null);
+            }
+            // Fecha o modal
+            ModalConfirmacaoSair.Visibility = Visibility.Collapsed;
+        }
     }
 
 
