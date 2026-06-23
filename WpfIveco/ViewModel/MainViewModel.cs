@@ -36,19 +36,15 @@ namespace WpfIveco.ViewModel
         // ============================================================
 
         private bool _isBusy = false;
-        /// <summary>Indica se há uma operação em andamento (loading).</summary>
         public bool IsBusy { get => _isBusy; set { _isBusy = value; OnPropertyChanged(); } }
 
         private bool _isLoggedIn = false;
-        /// <summary>Indica se o usuário está autenticado.</summary>
         public bool IsLoggedIn { get => _isLoggedIn; set { _isLoggedIn = value; OnPropertyChanged(); } }
 
         private bool _isAdmin = false;
-        /// <summary>Indica se o usuário possui perfil Administrador.</summary>
         public bool IsAdmin { get => _isAdmin; set { _isAdmin = value; OnPropertyChanged(); } }
 
         private bool _modoCadastro = false;
-        /// <summary>Alterna entre modo login e cadastro.</summary>
         public bool ModoCadastro { get => _modoCadastro; set { _modoCadastro = value; OnPropertyChanged(); } }
 
         // ============================================================
@@ -56,7 +52,21 @@ namespace WpfIveco.ViewModel
         // ============================================================
 
         private string _loginEmail = "";
-        public string LoginEmail { get => _loginEmail; set { _loginEmail = value; OnPropertyChanged(); } }
+        public string LoginEmail
+        {
+            get => _loginEmail;
+            set
+            {
+                _loginEmail = value;
+                OnPropertyChanged();
+                // Limpa mensagem de erro ao digitar
+                if (!string.IsNullOrEmpty(EmailError))
+                {
+                    EmailError = "";
+                    EmailValido = false;
+                }
+            }
+        }
 
         private string _loginSenha = "";
         public string LoginSenha { get => _loginSenha; set { _loginSenha = value; OnPropertyChanged(); } }
@@ -74,15 +84,38 @@ namespace WpfIveco.ViewModel
         public string PerfilUsuario { get => _perfilUsuario; set { _perfilUsuario = value; OnPropertyChanged(); } }
 
         // ============================================================
+        // VALIDAÇÃO DE E-MAIL
+        // ============================================================
+
+        private string _emailError = "";
+        public string EmailError
+        {
+            get => _emailError;
+            set { _emailError = value; OnPropertyChanged(); }
+        }
+
+        private bool _emailValido = false;
+        public bool EmailValido
+        {
+            get => _emailValido;
+            set { _emailValido = value; OnPropertyChanged(); }
+        }
+
+        private bool _isValidatingEmail = false;
+        public bool IsValidatingEmail
+        {
+            get => _isValidatingEmail;
+            set { _isValidatingEmail = value; OnPropertyChanged(); }
+        }
+
+        // ============================================================
         // NAVEGAÇÃO E CONFIGURAÇÕES
         // ============================================================
 
         private string _abaAtiva = "Dashboard";
-        /// <summary>Nome da aba atualmente exibida.</summary>
         public string AbaAtiva { get => _abaAtiva; set { _abaAtiva = value; OnPropertyChanged(); } }
 
         private string _apiUrlConfig = "https://apiivecogreenledger.runasp.net/";
-        /// <summary>URL base da API.</summary>
         public string ApiUrlConfig
         {
             get => _apiUrlConfig;
@@ -112,7 +145,6 @@ namespace WpfIveco.ViewModel
         // CONSTRUTOR
         // ============================================================
 
-        /// <summary>Inicializa o ViewModel, sub-ViewModels, comandos e timer.</summary>
         public MainViewModel()
         {
             App.LogInfo("Construtor iniciado", "MAIN");
@@ -144,7 +176,6 @@ namespace WpfIveco.ViewModel
         // MÉTODOS PRIVADOS
         // ============================================================
 
-        /// <summary>Inicializa o HttpClient com a URL base fornecida.</summary>
         private void InicializarHttpClient(string baseUrl)
         {
             App.LogInfo($"Inicializando HttpClient com base: {baseUrl}", "MAIN");
@@ -156,14 +187,79 @@ namespace WpfIveco.ViewModel
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "IvecoWpfApp/1.0");
         }
 
+        /// <summary>
+        /// Valida o e-mail chamando o endpoint da API.
+        /// </summary>
+        private async Task<bool> ValidarEmailAsync(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                EmailError = "O e-mail é obrigatório.";
+                EmailValido = false;
+                return false;
+            }
+
+            IsValidatingEmail = true;
+            EmailError = "Verificando e-mail...";
+
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/dados/validar-email?email={Uri.EscapeDataString(email)}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    using var doc = JsonDocument.Parse(json);
+                    var valido = doc.RootElement.GetProperty("valido").GetBoolean();
+                    var mensagem = doc.RootElement.GetProperty("mensagem").GetString();
+
+                    if (valido)
+                    {
+                        EmailError = "";
+                        EmailValido = true;
+                        return true;
+                    }
+                    else
+                    {
+                        EmailError = mensagem ?? "E-mail inválido.";
+                        EmailValido = false;
+                        return false;
+                    }
+                }
+                else
+                {
+                    EmailError = "Erro ao validar e-mail. Tente novamente.";
+                    EmailValido = false;
+                    return false;
+                }
+            }
+            catch
+            {
+                EmailError = "Erro de conexão. Não foi possível validar o e-mail.";
+                EmailValido = false;
+                return false;
+            }
+            finally
+            {
+                IsValidatingEmail = false;
+            }
+        }
+
         /// <summary>Executa o login do usuário via API.</summary>
         private async Task ExecutarLoginAsync()
         {
             App.LogInfo($"Tentativa para {LoginEmail}", "LOGIN");
-            if (string.IsNullOrWhiteSpace(LoginEmail) || string.IsNullOrWhiteSpace(LoginSenha))
+
+            // 1. Valida o e-mail
+            if (!await ValidarEmailAsync(LoginEmail))
             {
-                App.LogWarning("Campos vazios – abortando", "LOGIN");
-                MessageBox.Show("Preencha o e-mail e a senha.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(EmailError, "E-mail inválido", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(LoginSenha))
+            {
+                App.LogWarning("Senha vazia – abortando", "LOGIN");
+                MessageBox.Show("Preencha a senha.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -213,10 +309,25 @@ namespace WpfIveco.ViewModel
         private async Task ExecutarCadastroAsync()
         {
             App.LogInfo($"Tentativa para {LoginEmail}", "CADASTRO");
-            if (string.IsNullOrWhiteSpace(CadastroNome) || string.IsNullOrWhiteSpace(LoginEmail) || string.IsNullOrWhiteSpace(LoginSenha))
+
+            // 1. Valida o e-mail
+            if (!await ValidarEmailAsync(LoginEmail))
             {
-                App.LogWarning("Campos vazios – abortando", "CADASTRO");
-                MessageBox.Show("Preencha todos os campos para criar a conta.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(EmailError, "E-mail inválido", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(CadastroNome))
+            {
+                App.LogWarning("Nome vazio – abortando", "CADASTRO");
+                MessageBox.Show("Preencha o nome completo.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(LoginSenha))
+            {
+                App.LogWarning("Senha vazia – abortando", "CADASTRO");
+                MessageBox.Show("Preencha a senha.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -254,7 +365,6 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        /// <summary>Desconecta o usuário e limpa o estado da sessão.</summary>
         private void ExecutarLogout()
         {
             App.LogInfo($"Usuário {NomeUsuario} desconectado", "LOGOUT");
@@ -263,11 +373,12 @@ namespace WpfIveco.ViewModel
             NomeUsuario = "Visitante";
             PerfilUsuario = "Sessão não iniciada";
             LoginEmail = "";
+            EmailError = "";
+            EmailValido = false;
             AbaAtiva = "Dashboard";
             _timer.Stop();
         }
 
-        /// <summary>Carrega todos os dados dos sub-ViewModels.</summary>
         private async Task CarregarTudoAsync()
         {
             App.LogInfo("Carregando todos os dados...", "CARREGAR");

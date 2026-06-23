@@ -2,6 +2,7 @@
 using ApiIveco.Data;
 using ApiIveco.Middlewares;       /// RequestResponseLoggingMiddleware
 using ApiIveco.Service;
+using ApiIveco.Services;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -25,6 +26,7 @@ builder.Services.AddScoped<DadosService>();
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<IEmailValidationService, EmailValidationService>();
 
 
 /// 3. SWAGGER

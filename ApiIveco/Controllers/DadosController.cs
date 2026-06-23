@@ -1,6 +1,7 @@
 ﻿using ApiIveco.DTO;
 using ApiIveco.Models;
 using ApiIveco.Service;
+using ApiIveco.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using QuestPDF.Fluent;
@@ -22,11 +23,13 @@ namespace ApiIveco.Controllers
     {
         private readonly DadosService _dadosService;
         private readonly ILogger<DadosController> _logger;
+        private readonly IEmailValidationService _emailValidationService;
 
-        public DadosController(DadosService dadosService, ILogger<DadosController> logger)
+        public DadosController(DadosService dadosService, ILogger<DadosController> logger, IEmailValidationService emailValidationService)
         {
             _dadosService = dadosService;
             _logger = logger;
+            _emailValidationService = emailValidationService;
         }
 
         /// =====================================================================
@@ -661,6 +664,21 @@ namespace ApiIveco.Controllers
             usuario.Senha = "";
             return Ok(new { mensagem = "Login efetuado com sucesso!", usuario });
         }
+
+        [Tags("Autenticação")]
+        [HttpGet("validar-email")]
+        public async Task<IActionResult> ValidarEmail([FromQuery] string email)
+        {
+            _logger.LogInformation("[GET] Validando e-mail: {email}", email);
+            if (string.IsNullOrWhiteSpace(email))
+                return BadRequest(new { Mensagem = "O e-mail é obrigatório." });
+
+            var (isValid, message) = await _emailValidationService.ValidateEmailAsync(email);
+            _logger.LogInformation("[GET] Resultado para {email}: valido={isValid}", email);
+
+            return Ok(new { valido = isValid, mensagem = message });
+        }
+
         /// =====================================================================
         /// DASHBOARD / ESG
         /// =====================================================================
