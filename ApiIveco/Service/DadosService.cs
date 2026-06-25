@@ -206,8 +206,17 @@ namespace ApiIveco.Service
             {
                 if (document.Exists)
                 {
-                    var fornecedor = document.ConvertTo<Fornecedor>();
-                    fornecedor.Id = document.Id; // Preenche o ID com o identificador do documento
+                    // CORRECAO: Leitura manual campo a campo para evitar conflito com o campo
+                    // "Id" gravado dentro do documento (herança de [FirestoreProperty] no modelo).
+                    // ConvertTo<>() falhava silenciosamente quando o campo "Id" interno
+                    // nao correspondia ao tipo esperado, retornando lista vazia [].
+                    var fornecedor = new Fornecedor
+                    {
+                        Id = document.Id,
+                        Nome = document.TryGetValue("Nome", out string nome) ? nome : null,
+                        Localizacao = document.TryGetValue("Localizacao", out string localizacao) ? localizacao : null,
+                        Cnpj = document.TryGetValue("Cnpj", out string cnpj) ? cnpj : null,
+                    };
                     fornecedores.Add(fornecedor);
                 }
             }
@@ -224,8 +233,18 @@ namespace ApiIveco.Service
             int novoId = await GerarProximoId("contador_fornecedor");
             fornecedor.Id = novoId.ToString();
 
+            // CORRECAO: Grava apenas os campos de dados via dicionario explicito,
+            // sem incluir o campo "Id" dentro do documento. O document.Id ja e a
+            // chave primaria — gravar "Id" internamente e redundante e causava o bug.
+            var dados = new Dictionary<string, object>
+            {
+                { "Nome",        fornecedor.Nome        ?? "" },
+                { "Localizacao", fornecedor.Localizacao ?? "" },
+                { "Cnpj",        fornecedor.Cnpj        ?? "" },
+            };
+
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionFornecedor).Document(fornecedor.Id);
-            await docRef.SetAsync(fornecedor);
+            await docRef.SetAsync(dados);
             return fornecedor;
         }
 
@@ -275,8 +294,23 @@ namespace ApiIveco.Service
             {
                 if (document.Exists)
                 {
-                    var lote = document.ConvertTo<LoteMateriaPrima>();
-                    lote.Id = document.Id;
+                    // CORRECAO: Leitura manual para compatibilidade com documentos
+                    // que tenham o campo "Id" gravado internamente.
+                    document.TryGetValue("QuantidadeKg", out double qtd);
+                    document.TryGetValue("PegadaCarbonoPorKg", out double pegada);
+                    DateTime? dataProducao = null;
+                    if (document.TryGetValue("DataProducao", out Timestamp ts))
+                        dataProducao = ts.ToDateTime();
+
+                    var lote = new LoteMateriaPrima
+                    {
+                        Id = document.Id,
+                        TipoMaterial = document.TryGetValue("TipoMaterial", out string tipo) ? tipo : null,
+                        fk_Fornecedor_Id = document.TryGetValue("fk_Fornecedor_Id", out string fkForn) ? fkForn : null,
+                        QuantidadeKg = qtd,
+                        PegadaCarbonoPorKg = pegada,
+                        DataProducao = dataProducao,
+                    };
                     lotes.Add(lote);
                 }
             }
@@ -306,8 +340,21 @@ namespace ApiIveco.Service
 
             int novoId = await GerarProximoId("contador_lote");
             lote.Id = novoId.ToString();
+
+            // CORRECAO: Grava via dicionario para nao incluir campo "Id" interno
+            var dadosLote = new Dictionary<string, object>
+            {
+                { "TipoMaterial",       lote.TipoMaterial       ?? "" },
+                { "fk_Fornecedor_Id",   lote.fk_Fornecedor_Id   ?? "" },
+                { "QuantidadeKg",       lote.QuantidadeKg },
+                { "PegadaCarbonoPorKg", lote.PegadaCarbonoPorKg },
+                { "DataProducao",       lote.DataProducao.HasValue
+                                        ? (object)Timestamp.FromDateTime(lote.DataProducao.Value.ToUniversalTime())
+                                        : null },
+            };
+
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionLote).Document(lote.Id);
-            await docRef.SetAsync(lote);
+            await docRef.SetAsync(dadosLote);
 
             // Invalida cache de pegada média
             _cache.Remove("PegadaMediaCache");
@@ -346,8 +393,18 @@ namespace ApiIveco.Service
             {
                 if (document.Exists)
                 {
-                    var componente = document.ConvertTo<VeiculoComponente>();
-                    componente.Id = document.Id;
+                    // CORRECAO: Leitura manual para compatibilidade com documentos
+                    // que tenham o campo "Id" gravado internamente.
+                    document.TryGetValue("PesoKg", out double peso);
+                    var componente = new VeiculoComponente
+                    {
+                        Id = document.Id,
+                        fk_Veiculo_Vin = document.TryGetValue("fk_Veiculo_Vin", out string vin) ? vin : null,
+                        fk_LoteMateriaPrima_Id = document.TryGetValue("fk_LoteMateriaPrima_Id", out string loteId) ? loteId : null,
+                        fk_Fornecedor_Id = document.TryGetValue("fk_Fornecedor_Id", out string fornId) ? fornId : null,
+                        NomePeca = document.TryGetValue("NomePeca", out string peca) ? peca : null,
+                        PesoKg = peso,
+                    };
                     componentes.Add(componente);
                 }
             }
@@ -392,8 +449,19 @@ namespace ApiIveco.Service
 
             int novoId = await GerarProximoId("contador_componente");
             componente.Id = novoId.ToString();
+
+            // CORRECAO: Grava via dicionario para nao incluir campo "Id" interno
+            var dadosComp = new Dictionary<string, object>
+            {
+                { "fk_Veiculo_Vin",         componente.fk_Veiculo_Vin         ?? "" },
+                { "fk_LoteMateriaPrima_Id", componente.fk_LoteMateriaPrima_Id ?? "" },
+                { "fk_Fornecedor_Id",       componente.fk_Fornecedor_Id       ?? "" },
+                { "NomePeca",               componente.NomePeca               ?? "" },
+                { "PesoKg",                 componente.PesoKg },
+            };
+
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionComponente).Document(componente.Id);
-            await docRef.SetAsync(componente);
+            await docRef.SetAsync(dadosComp);
 
             // Invalida cache de pegada média
             _cache.Remove("PegadaMediaCache");

@@ -5,7 +5,6 @@ namespace ApiIveco.Models
     [FirestoreData]
     public class LoteMateriaPrima
     {
-        [FirestoreProperty]
         public string Id { get; set; }
         [FirestoreProperty]
         public string TipoMaterial { get; set; }

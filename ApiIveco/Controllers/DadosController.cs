@@ -315,6 +315,9 @@ namespace ApiIveco.Controllers
             return File(pdfBytes, "application/pdf", "Relatorio_Veiculos.pdf");
         }
 
+        [HttpGet]
+        public IActionResult Get() => Ok(new { status = "OK", timestamp = DateTime.UtcNow });
+
         /// =====================================================================
         /// FORNECEDORES
         ///=====================================================================

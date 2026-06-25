@@ -101,6 +101,34 @@ app.UseAuthorization();
 app.MapControllers();
 
 
+// ================================================================
+// CARREGAMENTO DAS CREDENCIAIS DO FIREBASE (MÚLTIPLAS TENTATIVAS)
+// ================================================================
+string credPath = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
+if (string.IsNullOrEmpty(credPath) || !File.Exists(credPath))
+{
+    string[] possiveisCaminhos = {
+        Path.Combine(Directory.GetCurrentDirectory(), "chave_Api", "firebase-key.json"),
+        Path.Combine(AppContext.BaseDirectory, "firebase-key.json"),
+        Path.Combine(Directory.GetCurrentDirectory(), "firebase-key.json"),
+        Path.Combine(Directory.GetCurrentDirectory(), "Credentials", "firebase-key.json")
+    };
+
+    foreach (var path in possiveisCaminhos)
+    {
+        if (File.Exists(path))
+        {
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", path);
+            Console.WriteLine($"[INFO] Credenciais carregadas de: {path}");
+            break;
+        }
+    }
+}
+else
+{
+    Console.WriteLine($"[INFO] Credenciais já definidas na variável: {credPath}");
+}
+
 /// 5. INÍCIO
 try
 {

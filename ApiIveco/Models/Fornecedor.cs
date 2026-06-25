@@ -5,7 +5,6 @@ namespace ApiIveco.Models
     [FirestoreData]
     public class Fornecedor
     {
-        [FirestoreProperty]
         public string Id { get; set; }
         [FirestoreProperty]
         public string Nome { get; set; }

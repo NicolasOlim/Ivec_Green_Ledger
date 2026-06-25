@@ -5,7 +5,6 @@ namespace ApiIveco.Models
     [FirestoreData]
     public class VeiculoComponente
     {
-        [FirestoreProperty]
         public string Id { get; set; }
 
         [FirestoreProperty]

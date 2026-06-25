@@ -5,6 +5,11 @@ using System.Text.Json;
 
 namespace ApiIveco
 {
+    /// <summary>
+    /// Middleware global para capturar exceções não tratadas e 
+    /// retornar respostas padronizadas ao cliente, enquanto registra 
+    /// o erro completo nos logs para diagnóstico.
+    /// </summary>
     public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
@@ -24,15 +29,25 @@ namespace ApiIveco
             }
             catch (Exception ex)
             {
-                /// Erro REAL aparece só no Output/terminal da API
+                // 1. Log COMPLETO da exceção (com stack trace) para diagnóstico
                 _logger.LogError(ex,
-                    "[ERRO] {Method} {Path} -> {Tipo}: {Mensagem}",
+                    "[ERRO] {Method} {Path} -> {Tipo}: {Mensagem}\nStackTrace: {StackTrace}",
                     context.Request.Method,
                     context.Request.Path,
                     ex.GetType().Name,
-                    ex.Message);
+                    ex.Message,
+                    ex.StackTrace);
 
-                /// Mensagem GENÉRICA vai para o cliente (WPF)
+                // 2. Se houver inner exception, logue também
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError("Inner Exception: {Inner} - {InnerMsg}\n{InnerStack}",
+                        ex.InnerException.GetType().Name,
+                        ex.InnerException.Message,
+                        ex.InnerException.StackTrace);
+                }
+
+                // 3. Escreve resposta genérica para o cliente
                 await EscreverRespostaGenerica(context, ex);
             }
         }
@@ -41,23 +56,27 @@ namespace ApiIveco
         {
             context.Response.ContentType = "application/json";
 
+            // Define o status HTTP baseado no tipo de exceção
             context.Response.StatusCode = ex switch
             {
-                ArgumentException => (int)HttpStatusCode.BadRequest, /// 400
-                KeyNotFoundException => (int)HttpStatusCode.NotFound, /// 404
-                UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized, /// 401
-                InvalidOperationException => (int)HttpStatusCode.UnprocessableEntity, /// 422
-                HttpRequestException => (int)HttpStatusCode.BadGateway, /// 502
-                _ => (int)HttpStatusCode.InternalServerError /// 500
+                ArgumentException => (int)HttpStatusCode.BadRequest,
+                KeyNotFoundException => (int)HttpStatusCode.NotFound,
+                UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
+                InvalidOperationException => (int)HttpStatusCode.UnprocessableEntity,
+                HttpRequestException => (int)HttpStatusCode.BadGateway,
+                _ => (int)HttpStatusCode.InternalServerError
             };
 
-            ///Se for erro 400 ou 422, enviamos a mensagem real da exceção.
+            // Para erros 400 ou 422, enviamos a mensagem real; 
+            // para outros, mensagem genérica.
             bool enviarMensagemReal = context.Response.StatusCode == 400 || context.Response.StatusCode == 422;
 
             var resposta = new
             {
                 Status = context.Response.StatusCode,
-                Mensagem = enviarMensagemReal ? ex.Message : ObterMensagemGenerica(context.Response.StatusCode)
+                Mensagem = enviarMensagemReal ? ex.Message : ObterMensagemGenerica(context.Response.StatusCode),
+                // Em desenvolvimento, pode incluir mais detalhes
+                // Detalhe = enviarMensagemReal ? ex.StackTrace : null
             };
 
             await context.Response.WriteAsync(JsonSerializer.Serialize(resposta));
