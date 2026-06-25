@@ -95,7 +95,7 @@ O desenvolvimento do ecossistema distribuído do Iveco Green Ledger foi estrutur
 **Diagrama de Caso de Uso**
 
 <div class="logo-container">
-    <img src="imagens/diagrama de caso de uso.png" alt="Logo Iveco Green Ledger" class="logo-img">
+    <img src="imagens/diagramacasodeuso.png" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 
 
