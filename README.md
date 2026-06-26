@@ -436,6 +436,77 @@ O Firebase Firestore constitui a camada principal de persistência global e cons
 
 O padrão arquitetural MVVM (Model-View-ViewModel) foi adotado no desenvolvimento do cliente desktop para garantir o completo desacoplamento entre a interface gráfica com o usuário e as regras de apresentação da aplicação de pátio. Abaixo está o fluxo de comunicação entre as camadas da nossa aplicação.
 
+<div class="logo-container">
+    <img src="imagens/arquitetura MVVM" alt="Logo Iveco Green Ledger" class="logo-img">
+</div>
+
+---
+## Módulos do Sistema:
+
+Iveco Green Ledger é organizado em módulos funcionais isolados através do padrão MVVM, cada um com escopo operacional e status de desenvolvimento bem definidos. A tabela abaixo apresenta o panorama atual da solução:
+
+| Módulo | Descrição | Status |
+| :--- | :--- | :--- | 
+| Mapa | Integração com a API do Mercado Livre para localização geográfica e monitoramento em tempo real dos caminhões de suprimentos | Disponível |
+| Dashboard | KPIs e indicadores ecológicos de pegada de carbono computados em tempo real com base nas diretrizes do GHG Protocol | Disponível |
+| Triagem e Cadastro De Resíduo | Registro, classificação e auditoria automatizada de veículos utilizando a BrasilAPI (CNPJ) e a API da NHTSA (chassi/VIN) | Disponível |
+| Sicronização em Nuvem | Motor de persistência global e consolidação assíncrona de dados estruturados através do Firebase Firestore | Disponível |
+| Contigência Offline | Mecanismo de persistência descentralizada em banco SQLite para garantir a operação contínua do pátio em caso de queda de internet | Implementação Futura |
+| Relatórios | Exportação de históricos operacionais, balanço de emissões de carbono e dados consolidados para auditoria corporativa | Disponível |
+| Central de Notificações | Alertas automáticos na interface WPF sobre inconformidades em chassis, atrasos de cargas ou desvios de rotas logísticas | Implementação Futura |
+
+---
+
+### **Módulo: Mapa**
+
+Este módulo é responsável por monitorar o fluxo logístico externo antes da chegada ao pátio. Permite ao sistema rastrear caminhões de suprimentos e insumos em tempo real, utilizando a API do Mercado Livre (Mercado Envios / Tracking API). Os dados geográficos, históricos de movimentação e previsões de entrega coletados de forma assíncrona são processados e salvos automaticamente no Firebase Firestore para vincular o transporte às metas de emissões de escopo 3.
+
+### **Módulo: Dashboard**
+
+Este módulo centraliza a inteligência ecológica da aplicação através de uma interface analítica e reativa construída em WPF. Ele consome diretamente os endpoints de cálculo da ApiIveco, que processa dados operacionais com base nas diretrizes internacionais do GHG Protocol. Os gráficos e indicadores de pegada de carbono são atualizados em tempo real na tela do operador à medida que novos dados de insumos e transportes entram no sistema.
+
+### **Módulo: Cadastro de Veículos**
+
+Este é o módulo principal de controle de acesso e conformidade do pátio industrial. Ele permite o registro e a auditoria instantânea de veículos na recepção através de uma triagem automatizada: o CNPJ do fornecedor é validado nas bases federais pela BrasilAPI e o número de chassi (VIN) é decodificado tecnicamente via API da NHTSA. O módulo previne erros humanos de digitação e garante que apenas cadastros 100% íntegros sigam para o fluxo de pesagem e cálculo de carbono.
+
+### **Módulo: Sincronização em Nuvem**
+
+Este módulo atua de forma invisível nos bastidores como o motor de persistência global da solução. Ele gerencia as chamadas feitas pela ApiIveco ao Firebase Firestore, garantindo que as coleções NoSQL de documentos estruturados sejam atualizadas de forma escalável e com alta disponibilidade. Ele consolida de maneira definitiva o histórico de auditorias e relatórios ambientais, servindo como a fonte centralizada da verdade de todo o ecossistema.
+
+### **Módulo: Contigência Offline**
+
+Este módulo atua de forma invisível nos bastidores como o motor de persistência global da solução. Ele gerencia as chamadas feitas pela ApiIveco ao Firebase Firestore, garantindo que as coleções NoSQL de documentos estruturados sejam atualizadas de forma escalável e com alta disponibilidade. Ele consolida de maneira definitiva o histórico de auditorias e relatórios ambientais, servindo como a fonte centralizada da verdade de todo o ecossistema.
+
+### **Módulo: Relatórios**
+
+Este módulo consolida de forma analítica todos os dados históricos processados pelo sistema. Ele permite aos gestores e auditores extrair relatórios ambientais completos e balanços consolidados das emissões de carbono geradas pela frota e pela cadeia de suprimentos. As informações, estruturadas sob os parâmetros do GHG Protocol, são recuperadas diretamente do Firebase Firestore através da ApiIveco e apresentadas prontas para exportação corporativa, garantindo transparência e conformidade jurídica para fins de auditoria interna e externa.
+
+### **Módulo: Central de Notificações**
+
+Projetado como uma evolução estratégica para as próximas etapas do sistema, este módulo atuará no monitoramento preditivo e na comunicação em tempo real da interface WPF com o operador de pátio. Ele enviará alertas visuais e sonoros instantâneos em cenários críticos da operação logística, como a identificação de inconformidades estruturais em chassis analisados pela API da NHTSA, inconsistências cadastrais de CNPJ detectadas pela BrasilAPI ou desvios de rotas e atrasos severos de caminhões rastreados pela API do Mercado Livre.
+
+---
+
+### **Processo de Desenvolvimento**
+
+| Fase | Status |
+| :--- | :--- | 
+| Fase 1 - Setup e Infraestrutura | Concluído | 
+| Fase 2 - Core UI e Telas | Concluído | 
+| Fase 3 - API REST e Regras de Negócio | Concluído | 
+| Fase 4 - Integrações e Validações externas | Concluído | 
+| Fase 5 - Persistência na nuvem | Concluído | 
+| Fase 6 - Expansão Futura | Em Progresso | 
+| Central de Notificações |Implementação Futura | 
+
+### **Ambiente de Desenvolvimento**
+
+- **IDE:** Visual Studio
+- **SDK:** NET 8;
+- **Gerenciamento de pacotes:**  NuGet;
+- **Sistema Operacional:** Windows 10 ou Windows 11(64 - bits);
+- **Banco de dados:** Firebase e SQLite.
+
 ```js
 // ==========================================
 // 1. COLEÇÃO: fornecedores
