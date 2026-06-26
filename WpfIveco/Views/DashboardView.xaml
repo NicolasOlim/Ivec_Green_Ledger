@@ -1,143 +1,220 @@
 ﻿<UserControl x:Class="WpfIveco.Views.DashboardView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf">
+             Background="#F5F7FA">
 
     <UserControl.Resources>
-        <Style x:Key="H1" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="28"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-            <Setter Property="Margin" Value="0,0,0,4"/>
-        </Style>
-        <Style x:Key="Subtitle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-            <Setter Property="Margin" Value="0,0,0,24"/>
-        </Style>
-        <Style x:Key="H2" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="20"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-            <Setter Property="Margin" Value="0,0,0,24"/>
-        </Style>
+        <SolidColorBrush x:Key="IvecoGreen" Color="#085A42"/>
+        <SolidColorBrush x:Key="IvecoGreenHover" Color="#06402F"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#1F2937"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#6B7280"/>
+        <SolidColorBrush x:Key="BorderLight" Color="#E5E7EB"/>
+        <SolidColorBrush x:Key="CardBackground" Color="#FFFFFF"/>
 
-        <Style x:Key="PremiumCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="CornerRadius" Value="16"/>
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource CardBackground}"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderLight}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="{StaticResource CardBorder}"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect BlurRadius="15" ShadowDepth="2" Opacity="0.04" Color="Black"/>
+                    <DropShadowEffect Color="#000000" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <Style x:Key="BadgeStyle" TargetType="Border">
-            <Setter Property="CornerRadius" Value="6"/>
-            <Setter Property="Padding" Value="10,4"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderLight}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="Border" CornerRadius="6" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="0"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource IvecoGreen}"/>
+                                <Setter TargetName="Border" Property="BorderThickness" Value="1.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderLight}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style x:Key="BtnPrimary" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource IvecoGreen}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="BtnBorder" Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BtnBorder" Property="Background" Value="{StaticResource IvecoGreenHover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Margin="32">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0">
-            <TextBlock Style="{StaticResource H1}" Text="Visão Geral do Ledger"/>
-            <TextBlock Style="{StaticResource Subtitle}" Text="Acompanhamento em tempo real da cadeia de suprimentos sustentável."/>
-        </StackPanel>
-
-        <Grid Grid.Row="1" Margin="0,0,0,30">
+        <Grid Grid.Row="0" Margin="0,0,0,32">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Style="{StaticResource PremiumCardStyle}" Margin="0,0,10,0" Padding="24">
-                <StackPanel>
-                    <Border Width="44" Height="44" Background="#E1F0FA" HorizontalAlignment="Left" CornerRadius="12">
-                        <TextBlock FontFamily="Segoe UI Emoji" Text="🚚" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <TextBlock Text="Total de Veículos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
-                    <TextBlock Text="{Binding Rastreabilidade.TotalVeiculos, FallbackValue='15'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
-                    <Border Style="{StaticResource BadgeStyle}" Background="#E1F0FA" Margin="0,10,0,0">
-                        <TextBlock Text="Ao Vivo do Firebase" Foreground="#2980B9" FontSize="11" FontWeight="SemiBold"/>
-                    </Border>
-                </StackPanel>
-            </Border>
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock Text="Visão Geral do Sistema" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                <TextBlock Text="Bem-vindo! Aqui está o resumo das suas integrações hoje." FontSize="14" Foreground="{StaticResource TextSecondary}" Margin="0,4,0,0"/>
+            </StackPanel>
 
-            <Border Grid.Column="1" Style="{StaticResource PremiumCardStyle}" Margin="10,0,10,0" Padding="24">
-                <StackPanel>
-                    <Border Width="44" Height="44" CornerRadius="12" Background="#E6F4EA" HorizontalAlignment="Left">
-                        <TextBlock FontFamily="Segoe UI Emoji" Text="🤝" FontSize="24" Foreground="{StaticResource AppleGreen}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <TextBlock Text="Fornecedores Ativos" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
-                    <TextBlock Text="{Binding Fornecedor.TotalFornecedores, FallbackValue='0'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
-                    <Border Style="{StaticResource BadgeStyle}" Background="#E6F4EA" Margin="0,10,0,0">
-                        <TextBlock Text="Em Conformidade" Foreground="#27AE60" FontSize="11" FontWeight="SemiBold"/>
-                    </Border>
-                </StackPanel>
-            </Border>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Status:" FontSize="13" Foreground="{StaticResource TextSecondary}" Margin="0,0,12,0" FontWeight="SemiBold" VerticalAlignment="Center"/>
 
-            <Border Grid.Column="2" Style="{StaticResource PremiumCardStyle}" Margin="10,0,0,0" Padding="24">
-                <StackPanel>
-                    <Border Width="44" Height="44" CornerRadius="12" Background="#E6F4EA" HorizontalAlignment="Left">
-                        <TextBlock FontFamily="Segoe UI Emoji" Text="♻️" FontSize="24" Foreground="#27AE60" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <TextBlock Text="Pegada Média (kg CO2)" Foreground="{StaticResource TextSecondary}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4"/>
-                    <TextBlock Text="{Binding Dashboard.PegadaMediaFormatada, FallbackValue='590,4 kg CO2'}" Foreground="{StaticResource TextPrimary}" FontSize="36" FontWeight="Bold"/>
-                    <Border Style="{StaticResource BadgeStyle}" Background="#E6F4EA" Margin="0,10,0,0">
-                        <TextBlock Text="Baseado no Ledger" Foreground="#27AE60" FontSize="11" FontWeight="SemiBold"/>
-                    </Border>
-                </StackPanel>
-            </Border>
+                <Border Background="White" BorderBrush="{StaticResource BorderLight}" BorderThickness="1" CornerRadius="16" Padding="12,6" Margin="0,0,8,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse x:Name="StatusBrasilApi" Width="8" Height="8" Fill="#10B981" Margin="0,0,8,0"/>
+                        <TextBlock Text="Brasil API" FontSize="13" Foreground="{StaticResource TextPrimary}" FontWeight="Medium"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="White" BorderBrush="{StaticResource BorderLight}" BorderThickness="1" CornerRadius="16" Padding="12,6" Margin="0,0,8,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse x:Name="StatusGooglePlaces" Width="8" Height="8" Fill="#10B981" Margin="0,0,8,0"/>
+                        <TextBlock Text="Places" FontSize="13" Foreground="{StaticResource TextPrimary}" FontWeight="Medium"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="White" BorderBrush="{StaticResource BorderLight}" BorderThickness="1" CornerRadius="16" Padding="12,6" Margin="0,0,8,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse x:Name="StatusNhtsa" Width="8" Height="8" Fill="#10B981" Margin="0,0,8,0"/>
+                        <TextBlock Text="NHTSA" FontSize="13" Foreground="{StaticResource TextPrimary}" FontWeight="Medium"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="White" BorderBrush="{StaticResource BorderLight}" BorderThickness="1" CornerRadius="16" Padding="12,6">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse x:Name="StatusMercadoLivre" Width="8" Height="8" Fill="#EF4444" Margin="0,0,8,0"/>
+                        <TextBlock Text="Mercado Livre" FontSize="13" Foreground="{StaticResource TextPrimary}" FontWeight="Medium"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
         </Grid>
 
-        <Border Grid.Row="2" Style="{StaticResource PremiumCardStyle}" Padding="24" MinHeight="350">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+        <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,32">
+            <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,16,0">
+                <StackPanel>
+                    <TextBlock Text="Consultas Hoje" FontSize="13" Foreground="{StaticResource TextSecondary}" FontWeight="Medium" Margin="0,0,0,8"/>
+                    <TextBlock Text="1.248" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                    <TextBlock Text="↑ 12% vs. ontem" FontSize="12" Foreground="#10B981" Margin="0,8,0,0" FontWeight="Medium"/>
+                </StackPanel>
+            </Border>
 
-                <TextBlock Grid.Row="0" Text="Emissões da Cadeia" Style="{StaticResource H2}"/>
+            <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,16,0">
+                <StackPanel>
+                    <TextBlock Text="Falhas de Integração" FontSize="13" Foreground="{StaticResource TextSecondary}" FontWeight="Medium" Margin="0,0,0,8"/>
+                    <TextBlock Text="0,3%" FontSize="28" FontWeight="Bold" Foreground="#EF4444"/>
+                    <TextBlock Text="2 instabilidades nas últimas 24h" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,8,0,0"/>
+                </StackPanel>
+            </Border>
 
-                <lvc:CartesianChart Grid.Row="1" 
-                                    Series="{Binding Analises.GraficoBarrasSeries}" 
-                                    Margin="0,10,0,0" 
-                                    LegendLocation="Top">
+            <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,16,0">
+                <StackPanel>
+                    <TextBlock Text="Tempo de Resposta (API)" FontSize="13" Foreground="{StaticResource TextSecondary}" FontWeight="Medium" Margin="0,0,0,8"/>
+                    <TextBlock Text="120 ms" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                    <TextBlock Text="Média ideal atingida" FontSize="12" Foreground="#10B981" Margin="0,8,0,0" FontWeight="Medium"/>
+                </StackPanel>
+            </Border>
 
-                    <lvc:CartesianChart.AxisX>
-                        <lvc:Axis Labels="{Binding Analises.MesesLabels}" 
-                                  Foreground="{StaticResource TextSecondary}"
-                                  FontSize="12">
-                            <lvc:Axis.Separator>
-                                <lvc:Separator Step="1" StrokeThickness="0"/>
-                            </lvc:Axis.Separator>
-                        </lvc:Axis>
-                    </lvc:CartesianChart.AxisX>
+            <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,0,0">
+                <StackPanel>
+                    <TextBlock Text="Uso do Servidor" FontSize="13" Foreground="{StaticResource TextSecondary}" FontWeight="Medium" Margin="0,0,0,8"/>
+                    <TextBlock Text="42%" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                    <TextBlock Text="Estável" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,8,0,0"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
 
-                    <lvc:CartesianChart.AxisY>
-                        <lvc:Axis Title="Ton CO₂" 
-                                  Foreground="{StaticResource TextSecondary}"
-                                  FontSize="12"
-                                  MinValue="0">
-                            <lvc:Axis.Separator>
-                                <lvc:Separator Stroke="{StaticResource ElevatedGray3}" 
-                                               StrokeDashArray="4" 
-                                               StrokeThickness="1"/>
-                            </lvc:Axis.Separator>
-                        </lvc:Axis>
-                    </lvc:CartesianChart.AxisY>
-                </lvc:CartesianChart>
-            </Grid>
+        <Border Grid.Row="2" 
+                x:Name="PainelChamado" 
+                Style="{StaticResource CardStyle}"
+                Padding="32"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Width="550">
+
+            <StackPanel>
+                <TextBlock Text="Registrar Solicitação de Suporte" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,4"/>
+                <TextBlock Text="Preencha os dados abaixo. Nossa equipe retornará o mais rápido possível." FontSize="14" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,32"/>
+
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Tipo de Problema" FontSize="13" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8" FontWeight="Medium"/>
+                        <ComboBox x:Name="ComboTipoProblema" SelectedIndex="0" Height="42">
+                            <ComboBoxItem>Problema Técnico</ComboBoxItem>
+                            <ComboBoxItem>API Fora do Ar</ComboBoxItem>
+                            <ComboBoxItem>Suporte Direto</ComboBoxItem>
+                            <ComboBoxItem>Dúvida Operacional</ComboBoxItem>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Prioridade" FontSize="13" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8" FontWeight="Medium"/>
+                        <ComboBox SelectedIndex="1" Height="42">
+                            <ComboBoxItem>Baixa</ComboBoxItem>
+                            <ComboBoxItem>Normal</ComboBoxItem>
+                            <ComboBoxItem>Alta / Urgente</ComboBoxItem>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Text="Nome do Solicitante" FontSize="13" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8" FontWeight="Medium"/>
+                <TextBox x:Name="TxtNome" Margin="0,0,0,16" Height="42" Text="{Binding UsuarioLogadoNome, FallbackValue='Colaborador Padrão'}"/>
+
+                <TextBlock Text="Descrição do Problema" FontSize="13" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8" FontWeight="Medium"/>
+                <TextBox x:Name="TxtDescricao" Height="120" AcceptsReturn="True" TextWrapping="Wrap" Margin="0,0,0,32" VerticalScrollBarVisibility="Auto"/>
+
+                <Button Content="ENVIAR CHAMADO" 
+                        Style="{StaticResource BtnPrimary}" 
+                        Click="EnviarChamado_Click"/>
+            </StackPanel>
         </Border>
     </Grid>
 </UserControl>
