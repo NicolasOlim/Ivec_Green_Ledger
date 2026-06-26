@@ -688,9 +688,6 @@ A marcha lenta de veículos pesados dentro das dependências da fábrica represe
 
 Visando a alta disponibilidade do chão de fábrica, a lógica de armazenamento foi arquitetada para ser tolerante a falhas completas de infraestrutura de rede:
 
-*Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
-*Última atualização: 16 de junho de 2026.*
-
 ---
 ## Considerações Finais:
 
@@ -702,4 +699,25 @@ No aspecto comercial e de negócios, a validação de dados em barreira por meio
 
 A análise de viabilidade econômico-financeira realizada reforça o alto retorno sobre o investimento (ROI) do projeto. Ao confrontar os custos estimados de desenvolvimento e manutenção com a receita indireta projetada de R$ 44.400,00 anuais (provenientes da eliminação de retrabalhos, economia de diesel e automação de auditorias ambientais), constatou-se que o ecossistema recupera integralmente o capital investido em aproximadamente 7 meses de operação real na planta.
 
+---
+## Trabalhos Futuros e Evolução do Sistema:
 
+Como horizontes de evolução e continuidade para o projeto, recomendam-se as seguintes frentes de expansão tecnológica:
+
+- **Integração com Visão Computacional (OCR):** Implementar algoritmos de inteligência artificial para leitura e reconhecimento automático de placas (LPR) e números de chassi através de câmeras na portaria, eliminando totalmente a necessidade de bipagem de QR Codes.
+
+- **Módulo de Rastreamento IoT em Tempo Real:** Integrar sensores de telemetria diretamente nos veículos da frota parceira para monitorar o consumo exato de combustível e as paradas por GPS, substituindo as médias estimadas por dados empíricos de altíssima precisão.
+
+- **Aplicativo Mobile para o Motorista** Desenvolver um módulo móvel focado no motorista terceirizado, permitindo que ele realize um pré-cadastro da carga e agende o horário de chegada (slot logístico) antes mesmo de atingir a barreira física da fábrica.
+
+Conclui-se, portanto, que o Iveco Green Ledger se consolida não apenas como um projeto acadêmico de engenharia, mas como um ativo tecnológico viável, lucrativo e sustentável, perfeitamente alinhado com as demandas de eficiência e responsabilidade climática exigidas pelo mercado global em 2026.
+
+---
+## Referências Bibliográficas:
+
+- https://firebase.google.com/?hl=pt-br;
+- https://learn.microsoft.com/en-us/dotnet/desktop/wpf/
+- https://livecharts.dev/
+
+*Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
+*Última atualização: 16 de junho de 2026.*
