@@ -720,4 +720,4 @@ Conclui-se, portanto, que o Iveco Green Ledger se consolida não apenas como um 
 - https://livecharts.dev/
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
-*Última atualização: 16 de junho de 2026.*
+*Última atualização: 26 de junho de 2026.*
