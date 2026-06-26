@@ -5,7 +5,8 @@
 **Instrutor: Frederico Martins Aguiar**
 
 **Equipe de Desenvolvimento**  
-[🧑‍💻 Nicolas Oliveira Lima](https://github.com/NicolasOlim)  |  [🧑‍💻 Alice Andrade](https://github.com/aliceandradee)  |  [🧑‍💻 Erick Silva](https://github.com/erick190813)  |  [🧑‍💻 Vinicius Augusto](https://github.com/vnxtry)  
+
+[🧑‍💻 Alice Andrade](https://github.com/aliceandradee)  |  [🧑‍💻 Erick Silva](https://github.com/erick190813)  | [🧑‍💻 Nicolas Oliveira Lima](https://github.com/NicolasOlim) | [🧑‍💻 Vinicius Augusto](https://github.com/vnxtry)  
 
 ---
 
@@ -48,26 +49,206 @@ Por fim, a solução consolida essas informações complexas em dashboards anal�
 
 ## Objetivos do Projeto:
 
-Desenvolver e homologar uma plataforma tecnológica híbrida (desktop-nuvem) voltada à gestão inteligente, cubagem volumétrica e rastreabilidade ponta a ponta de insumos automotivos, integrando os dados físicos do chão de fábrica a um motor analítico capaz de automatizar o cálculo e a auditoria das emissões de carbono de Escopo 3 por chassi (VIN) na linha de produção da Iveco.
+### Objetivo Geral:
 
-**Objetivos específicos:**
+Desenvolver uma plataforma tecnológica para a gestão inteligente, cubagem volumétrica e rastreabilidade ambiental de insumos automotivos, composta por uma API, um simulador de sensores IoT industriais e um cliente em WPF estruturado no padrão MVVM, com integração a serviços externos de validação regulatória e persistência em nuvem.
+
+### Objetivos específicos:
 
  - **Projetar e construir a interface de chão de fábrica:** Desenvolver o cliente desktop utilizando o framework WPF sob o padrão arquitetural MVVM (Model-View-ViewModel), garantindo uma experiência de usuário fluida, intuitiva e adaptada à rotina operacional dos operadores de recebimento logístico.
 
-- **Garantir a resiliência operacional offline (Offline-Safe):** Implementar uma camada de persistência relacional local utilizando o banco de dados embutido SQLite, permitindo a continuidade da coleta de dados de cubagem e validação mesmo durante instabilidades ou ausência total de conectividade com a internet.
+ - **Automatizar as validações regulatórias e fiscais:** Integrar o back-end a APIs públicas (como BrasilAPI para dados cadastrais e fiscais de fornecedores e NHTSA para a decodificação técnica do código VIN), eliminando a necessidade de inputs manuais suscetíveis a falhas humanas.
 
 - **Centralizar a inteligência analítica na nuvem:** Estruturar a persistência não relacional (NoSQL) no Firebase Firestore e desenvolver um back-end em ASP.NET Core 8 responsável pelo processamento assíncrono, sincronização dos dados locais e orquestração do ecossistema.
-
-- **Automatizar as validações regulatórias e fiscais:** Integrar o back-end a APIs públicas (como BrasilAPI para dados cadastrais e fiscais de fornecedores e NHTSA para a decodificação técnica do código VIN), eliminando a necessidade de inputs manuais suscetíveis a falhas humanas.
-
-- **Desenvolver o motor de cálculo ecológico:** Codificar o algoritmo matemático para mensuração da pegada de carbono de Escopo 3 com base nos dados físicos de cubagem e nos parâmetros normativos do GHG Protocol.
 
 - **Prover transparência analítica para governança ESG:** Implementar dashboards dinâmicos em tempo real utilizando a biblioteca LiveCharts2, permitindo a geração de relatórios de conformidade ambiental auditáveis para a tomada de decisões gerenciais e estratégicas.
 
 
 ---
 
-## Desenvolvimento do Projeto:
+## Metodologia:
+
+O desenvolvimento do ecossistema foi estruturado de forma interativa, sendo dividido em três fases principais: o levantamento de requisitos e modelagem (Fase 1), focado nas regras de negócio. O desenvolvimento da interface e persistência (Fase 2), voltado à construção do cliente WPF, tabelas pelo SQLite e dashboards analíticos. E a construção da API REST com integridade na nuvem (Fase 3), englobando o motor do GHG Protocol, as logs e as integrações assíncronas com as API's. O controle de versão e o gerenciamento do código-fonte foram centralizados na plataforma GitHub, garantindo um histórico de desenvolvimento consistente, seguro e colaborativo entre a equipe.
+
+---
+
+## Mini Mundo Da Demanda:
+
+Este capítulo descreve o contexto organizacional que motivou o desenvolvimento da Green Ledger, os atores envolvidos e as regras de negócio que orientaram a modelagem do sistema. 
+
+### Contexto Organizacional:
+
+Para sanar os gargalos operacionais e ambientais identificados da empresa Iveco, sendo assim foi padronizado uma arquitetura de serviços desacoplados e persistência balanceada. O ciclo de vida do dado inicia-se com o mapeamento físico de insumos e a validação do chassi no fluxo de montagem, onde o administrador pré-configura os índices de emissão do GHG Protocol e homologa os fornecedores na nuvem. Quando o operador executa o recebimento logístico de um material, o sistema captura suas credenciais a partir da camada de autenticação e cria um registro de telemetria local, realizando o cruzamento de cardinalidade entre os dados de cubagem e a árvore de peças vinculadas ao veículo por meio da tabela associativa.
+
+
+### **Usuário do Sistema**:
+
+- Realiza autenticação no sistema por meio de credenciais cadastradas e validadas;
+- Cadastra os lotes de matéria-prima recebidos, informando os dados de cubagem e massa em quilogramas;
+- Consulta o histórico e o status de sincronização;
+- Associa as peças e os componentes industriais ao número de chassi correspondente por meio do código identificador VIN de 17 caracteres;
+- Monitora indicadores de emissões de carbono nos painéis visuais e gera relatórios em formato PDF.
+
+### **Administrador**:
+
+- Gerencia os usuários do sistema;
+- Gerencia os fornecedores parceiros e os parâmetros de índices referente á emissão;
+- Emite relatórios ambientais e gerencia log.
+
+### **Sistema Green Ledger**:
+
+- Controla a cubagem volumétrica e o inventário de insumos automotivos;
+- Mapeia e vincula e as emissões de carbono a cada chassi de veículo produzido;
+- Sincroniza os registros de forma assíncrona com a nuvem;
+- Valida dados de fornecedores;
+- Gera relatórios em formato PDF.
+
+### Regras de Negócio:
+
+1. Um lote de matéria-prima pertence obrigatoriamente a um fornecedor;
+2. Exige a validação cadastral do CNPJ do fornecedor;
+3. Um componente ou insumo deve estar associado a uma categoria de material; 
+4. Um chassi de veículo deve ser validado por meio do VIN (17 caracteres);
+5. Um lote de matéria-prima pode ser vinculado a múltiplos chassis, assim como um chassi consome múltiplos lotes de materiais;
+6. O sistema registra automaticamente a data, hora exata e o usuário responsável por cada operação;
+7. O ecossistema controla o ciclo de vida e a integridade de cada registro;
+
+---
+
+## Modelagem do banco de dados:
+
+Este capítulo apresenta os três níveis de modelagem do banco de dados do sistema Green Ledger: conceitual, lógico e físico, conforme as metodologias de modelagem relacional adotadas no curso. 
+
+### **Modelo Conceitual (DER) :**
+
+O modelo conceitual representa as entidades do domínio e seus relacionamentos em nível de abstração, sem preocupação com tipos de dados ou chaves de implementação. A modelagem segue a notação do BRModelo, utilizando Diagrama Entidade- Relacionamento (DER). 
+
+### **Entidades e Atributos:**
+
+#### Tabela - USUARIO
+| Atributo | Tipo/papel | Observação |
+| :--- | :--- | :--- |
+| **id** | PK | Identificador único do usuário |
+| **nome** | Atributo | Nome completo do usuário |
+| **email** | Atributo | Email de contato corporativo |
+| **senhaHash** | Atributo | Senha criptografada para acesso |
+| **perfil** | Atributo | Permissão para acesso ao sistema |
+
+---
+
+#### Tabela - FORNECEDOR
+| Atributo | Tipo/papel | Observação |
+| :--- | :--- | :--- |
+| **id** | PK | Identificador único do fornecedor |
+| **cnpj** | Atributo | CNPJ do fornecedor |
+| **razaoSocial** | Atributo | Razão Social ou nome empresarial |
+| **status** | Atributo | Estado lógico do fornecedor no sistema |
+
+---
+
+#### Tabela - LOTE_MATERIA_PRIMA
+| Atributo | Tipo/papel | Observação |
+| :--- | :--- | :--- |
+| **id** | PK | Identificador único do lote |
+| **fk_fornecedor** | FK | Chave estrangeira que referencia da tabela fornecedor |
+| **tipoMaterial** | Atributo | Descrição do material recebido |
+| **quantidadeKg** | Atributo | Massa total do lote em Kg |
+| **pegadaCarbonoPorKg** | Atributo | Fator de emissão de carbono po Kg |
+| **dataProducao** | Atributo | Data e hora em que o lote foi produzido |
+
+---
+
+#### Tabela - Veiculo
+| Atributo | Tipo/papel | Observação |
+| :--- | :--- | :--- |
+| **vin** | PK | Identificação do veículo |
+| **modelo** | Atributo | Nome do veículo |
+| **marca** | Atributo | Fabricante do Veículo |
+| **dataMontagem** | Atributo | Data e Hora que o veículo entrou na linha de montagem |
+
+#### Tabela - Veiculo_Componente
+| Atributo | Tipo/papel | Observação |
+| :--- | :--- | :--- |
+| **id** | PK | Identificação do veículo do componente |
+| **fk_veiculo_vin** | FK | Chave estrangeira que relacionada a tabela VEICULO |
+| **fk_lotemateria_id** | PK | Chave estrangeira que relacionada a tabela LOTE_MATERIA_PRIMA |
+| **nomeComponente** | Atributo | Nome da peça instalada |
+| **pesoKg** | Atributo | Peso Físico da peça e componente |
+| **totalCO2eCalculado** | Atributo | Total de carbono calculado para essa peça |
+
+---
+
+### **Relacionamentos:**
+
+Os relacionamentos entre as entidades do sistema são definidos a seguir: 
+
+| Atributo | Tipo/papel | Semântica |
+| :--- | :--- | :--- |
+| **FORNECEDOR — LOTE_MATERIA_PRIMA** | 1 : N | Um fornecedor pode fornecer vários lotes de matéria-prima, mas um lote pertence obrigatoriamente a um único fornecedor. |
+| **VEICULO — VEICULO_COMPONENTE** | 1 : N | Um veículo pode ser associado a vários componentes na linha de montagem. |
+| **LOTE_MATERIA_PRIMA — VEICULO_COMPONENTE** | 1 : N | Um lote de matéria-prima pode dar origem ou fornecer insumos para vários registros de componentes aplicados. |
+| **VEICULO — LOTE_MATERIA_PRIMA** | N:M | Um veículo consome insumos de vários lotes de matéria-prima, e um lote de matéria-prima pode ser distribuído entre múltiplos veículos. |
+
+---
+
+## Modelo Lógico:
+
+O modelo lógico do ecossistema converte as entidades conceituais em estruturas relacionais normatizadas, definindo as chaves primárias (PK), chaves estrangeiras (FK) e restrições de integridade de cada atributo. A tipagem de identificação foi padronizada como TEXT de forma unificada entre os campos de amarração (id, fk_fornedor, vin, fk_veiculo_vin, fk_loteMateriaPrima_id).
+
+### **Tabela: Usuário**
+
+| Coluna | Chave/Relacionamento | Tipo | Descrição |
+| :--- | :--- | :--- | :--- |
+| **id** | PK | TEXT | Identificador único do usuário |
+| **nome** | - | TEXT | Nome do usuário |
+| **email** | - | TEXT | Email de contato corporativo |
+| **senhaHash** | - | TEXT | Senha para a autenticação |
+| **perfil** | - | TEXT | Nível de permissão |
+
+---
+
+#### Tabela - Fornecedor
+| Coluna | Chave/relacionamento | Tipo | Descrição |
+| :--- | :--- | :--- |
+| **id** | PK | TEXT | Identificador único do fornecedor |
+| **cnpj** | - | TEXT | CNPJ da empresa |
+| **razaosocial** | - | TEXT | Nome empresarial |
+| **status** | - | TEXT | Estado do cadastro |
+| **perfil** | - | TEXT | Nivel de permissão |
+
+---
+
+#### Tabela - Lote Materia Prima
+| Coluna | Chave/relacionamento | Tipo | Descrição |
+| :--- | :--- | :--- |
+| **vin** | PK | TEXT | Número de identificação do chassi (17 caracteres) |
+| **modelo** | - | TEXT | Modelo do veículo comercial |
+| **marca** | - | TEXT | Fabricante do automóvel |
+| **dataMontagem** | - | DATETIME | Data e hora de entrada para a montagem |
+
+---
+
+#### Tabela - Veiculo_componente
+| Coluna | Chave/relacionamento | Tipo | Descrição |
+| :--- | :--- | :--- |
+| **id** | PK | TEXT | Identificador único do veículo |
+| **fk_veiculo_vin** | FK | TEXT | Referencia Veiculo (Vin) |
+| **fk_loteMateriaPrima_id** | FK | TEXT | Referencia Lote_materia_prima |
+| **nomeComponente** | - | REAL | Nome da peça em quilogramas |
+| **pesoKg** | - | REAL | Peso de peça em quilogramas |
+| **totalCO2Calculado** | - | - | Total de carbono calculado para essa peça |
+
+---
+
+## Arquitetura do Sistema:
+
+O Green Ledger adota uma arquitetura distribuída e desacoplada, separando claramente as responsabilidades entre o cliente desktop de pátio, a API REST corporativa e a camada de persistência híbrida. Esta seção descreve cada componente técnico, suas integrações de borda com serviços externos e os padrões de resiliência a falhas de rede.
+
+**Diagrama de Caso de Uso**
+
+<div class="logo-container">
+    <img src="imagens/diagramacasodeuso.png" alt="Logo Iveco Green Ledger" class="logo-img">
+</div>
 
 O desenvolvimento do ecossistema distribuído do Iveco Green Ledger foi estruturado em fases cíclicas e incrementais. Essa abordagem visou garantir o rigor técnico exigido pelas metodologias de auditoria climática e a estabilidade da engenharia de software na integração de sistemas. O fluxo metodológico dividiu-se nas seguintes etapas de engenharia:
 
