@@ -537,6 +537,104 @@ Por tratar-se de um projeto acadêmico focado em inovação industrial, os custo
 | Documentaçãos | 35h |  R$ 50,00 |  R$ 1.750,00 | 
 | Total | 340h |  - |  R$ 2.640,00 | 
 
+---
+Os custos mensais de operação do sistema em produção são estimados abaixo, considerando a volumetria de requisições e processamento de dados para o gerenciamento de pátio, triagem de veículos e monitoramento de emissões da Iveco:
+
+
+| Serviço | Custo no Desenvolvimento | Projeção em Produção | Observação |
+| :--- | :--- | :--- | :--- | 
+| Levantamento de Requisitos | R$ 0,00 |  R$ 0,00 |  Gratuito até 1 GiB de armazenamento, 50k leituras e 20k escritas diárias. Atende perfeitamente o escopo atual | 
+| API de rastreio e Logistica | R$ 0,00 |  R$ 0,00 |  Serviços de dados públicos ou acessados via chaves gratuitas de desenvolvedor | 
+| Hospedagem da API | R$ 0,00 |  R$ 0,00 - 120,00 |  Atualmente rodando em servidores locais e nuvem gratuita. Em produção, pode migrar para planos com maior disponibilidade | 
+| SQLite | R$ 0,00 |  R$ 0,00 |  Banco embutido no cliente desktop WPF, sem dependência de nuvem ou servidor externo | 
+| Domínio e Certificado SSL | R$ 0,00 |  R$ 5,00 - 40,00 |  Comunicação segura via criptografia e SSL gratuito |
+| Total Mensal Atual | R$ 0,00 | - |  Custo zero durante todo o ciclo de desenvolvimento | 
+
+---
+### **Beneficios e Retorno Esperado**
+
+A adoção do Iveco Green Ledger no ecossistema de transporte e triagem de pátio pode gerar benefícios econômicos quantificáveis em múltiplas frentes operacionais e estratégicas. Os valores e métricas abaixo constituem estimativas fundamentadas nas médias do setor de logística automotiva brasileiro e nos gargalos operacionais identificados em pátios industriais de grande porte.
+
+### **Redução da Emissão de CO2**
+
+A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na descarbonização da cadeia logística da Iveco, gerando redução direta e indireta nas emissões de Dióxido de Carbono ($CO_2$) e outros gases de efeito estufa (GEE). O impacto positivo do sistema se consolida em três pilares fundamentais: 
+- Mitigação do Tempo de Marcha Lenta;
+- Otimização de Rotas;
+- Auditoria Confiável.
+
+| Indicador | Sem Green Ledger | Com Green Ledger | 
+| :--- | :--- | :--- |
+| Tempo médio de triagem | 15 min por veículo |  2 minutos por veículo |  
+| Emissão diária de CO2 em marcha lenta | 45,0 kg de CO2 por dia |  6,0 kg - 9,0 kg de CO2 por dia |  
+| Economia mensal de CO2 | - | 900 kg - 1,100 kg de CO2 por dia |  
+| Economia anual estimada de CO2 | - | 10,8 t - 13,2 t de CO2 por ano |  
+| Domínio e Certificado SSL | R$ 0,00 | R$ 5,00 - R$ 40,00 |  
+
+---
+### **Receitas e Materiais**
+
+Para a implantação física do ecossistema Iveco Green Ledger, o consumo de materiais é voltado exclusivamente para a infraestrutura de tecnologia e conectividade nas portarias e balanças do pátio logístico, englobando terminais de chão de fábrica instalados para a execução contínua da interface de usuário (WpfIveco), leitores de código de barras ou QR Code USB para agilizar a entrada de dados operacionais sem digitação manual, além da infraestrutura de rede local existente para garantir a comunicação de dados e a sincronização com a nuvem, operando com custo zero de licenciamento de software por utilizar o framework .NET 8, SQLite e APIs integradas de código aberto. Por tratar-se de um sistema focado em suporte logístico interno e governança ambiental (ESG), o projeto não gera faturamento direto por vendas, mas consolida seu retorno financeiro na forma de receitas indiretas através de uma drástica redução de custos operacionais. 
+
+### **Análise Custo - Benefício**
+
+| Categoria | Tipo | Valor Anual Estimado | 
+| :--- | :--- | :--- |
+| Desenvolvimento | Custo |  R$ 8.800,00 |  
+| Operação / Infraestrutura | Custo |  R$ 0,00 - 1.440,00 |  
+| Manutenção, suporte técnico e suporte offline | Custo | R$ 1.200,00 - 2.400,00 |  
+| Redução de custos | Benefício | R$ 18.000,00 |  
+| Economia operacional com eliminação de erros e retrabalhos administrativos | Benefício | R$ 6.600,00 |  
+| Economia de combustível | Benefício | R$ 7.800,00 |  
+| Economia de combustível | Benefício | R$ 7.800,00 |  
+| Automação | Benefício | R$ 12.000,00 |  
+| Saldo Líquido Estimado | Lucro | R$ 31.600,00 - 34.160,00 |  
+
+---
+
+## Artefatos Técnicos Entregues
+
+Esta seção consolida os artefatos técnicos produzidos e entregues como parte do TCC, conforme os requisitos definidos pelo curso. 
+
+| Artefato | Descrição | Status | 
+| :--- | :--- | :--- |
+| Mini Mundo da Demanda |  Contextualização do problema |  Entregue |  
+| Modelo Lógico | Criação de tabelas |  Entregue |  
+| Modelo Físico | Documentação interativa e detalhada de todos os endpoints REST criados | Entregue |  
+| Swagger | Código-fonte completo com histórico | Entregue |  
+| MVVM | Separação de responsabilidades da interface gráfica WPF | Entregue |  
+| Documentação | Documentação técnica completa contendo levantamento de requisitos | Entregue |  
+
+---
+## Requisitos
+### **Requisitos Funcionais**
+
+Os requisitos funcionais descrevem as ações, facilidades e comportamentos que o sistema Green Ledger deve oferecer:
+
+- **RF - 001: Autenticação de Usuários:** O sistema deve permitir o controle de acesso de operários da portaria, gestores de pátio e analistas ambientais através de login e senha integrados ao Firebase;
+- **RF - 002: Triagem de Entrada de Veículos:** O sistema deve registrar o ingresso de caminhões no pátio logístico da Iveco, capturando dados do motorista, placa e hora de entrada;
+- **RF - 003: Integração e Decodificação de Chassi (VIN):** O sistema deve consumir a API da NHTSA para decodificar automaticamente o número do chassi do veículo, extraindo o modelo, ano de fabricação e especificações de motorização;
+- **RF - 004: RF - 005: Rastreamento de Entregas e Rotas:** O sistema deve integrar-se com a API do Mercado Livre (ou serviços equivalentes de logística) para monitorar o status do trajeto e a quilometragem percorrida pela frota parceira;
+- **RF - 005: Rastreamento de Entregas e Rotas:** O sistema deve integrar-se com a API do Mercado Livre (ou serviços equivalentes de logística) para monitorar o status do trajeto e a quilometragem percorrida pela frota parceira;
+- **RF - 006: Sincronização Híbrida e Operação Offline:** Persistência dos dados localmente no banco SQLite caso haja queda de internet, sincronizando tudo com o Firebase Firestore de forma automática assim que a conexão for restabelecida;
+- **RF - 007: Cálculo da Pegada de Carbono:** O sistema deve calcular as emissões de gases de efeito estufa geradas pela queima de combustível da frota com base nas diretrizes e fatores de emissão;
+- **RF - 008: Monitoramento:** O sistema deve contabilizar o tempo em que o veículo permaneceu parado com o motor ligado no pátio e projetar o desperdício de combustível e emissão de carbono gerados nesse intervalo;
+- **RF - 009: Geração de Relatórios:** O sistema deve emitir relatórios gerenciais consolidados mostrando a redução de emissões, eficiência logística e indicadores ambientais da cadeia de suprimentos da Iveco.
+
+### **Requisitos Não Funcionais**
+
+- **RNF - 001: Arquitetura e Framework Base:** A API do sistema deve ser desenvolvida em ambiente multipataforma utilizando o framework .NET 8 (ASP.NET Core REST API), garantindo escalabilidade e alta performance no processamento das requisições;
+- **RNF - 002: Padrão Arquitetural de Interface:** O aplicativo cliente de desktop (WpfIveco) deve obrigatoriamente seguir o padrão de arquitetura MVVM (Model-View-ViewModel), assegurando a separação limpa entre a interface gráfica (XAML) e a lógica de negócios;
+- **RNF - 003: Persistência:** O sistema deve utilizar uma abordagem de banco de dados híbrido, empregando o SQLite como banco de dados relacional;
+- **RNF - 004: Tempo de Resposta da API:** Os endpoints da ApiIveco devem processar e responder às requisições locais e de cálculo de emissões do GHG Protocol em um tempo máximo de 2 segundos sob condições normais de rede;
+- **RNF - 005:  Segurança e Criptografia de Dados:** Toda a comunicação de rede entre o cliente WPF, a API REST e o Firebase deve trafegar criptografada utilizando o protocolo HTTPS/SSL, impedindo a interceptação de dados sensíveis da Iveco na rede interna;
+- **RNF - 006: Compatibilidade:** O módulo de triagem e controle de pátio (WpfIveco) deve ser totalmente compatível e otimizado para execução em sistemas operacionais;
+- **RNF - 007: Disponibilidade** O ecossistema deve possuir alta tolerância a falhas de conectividade externa;
+- **RNF - 008: Concorrência e Consistência** O banco de dados em nuvem deve suportar o acesso e a escrita simultânea de múltiplos terminais de portaria operando em paralelo, garantindo a sincronização das triagens através de regras de consistência eventual integradas ao Firebase.
+
+---
+## Caso de Uso
+### **Diagrama de Caso de Uso do Sistema Completo**
+
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
 *Última atualização: 16 de junho de 2026.*
