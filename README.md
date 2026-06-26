@@ -507,6 +507,35 @@ Projetado como uma evolução estratégica para as próximas etapas do sistema, 
 - **Sistema Operacional:** Windows 10 ou Windows 11(64 - bits);
 - **Banco de dados:** Firebase e SQLite.
 
+---
+## Business Model Canvas:
+
+<div class="logo-container">
+    <img src="imagens/bussiness model canvas.png" alt="Logo Iveco Green Ledger" class="logo-img">
+</div>
+---
+
+---
+
+## Viabilidade Econômica:
+
+A viabilidade econômica do projeto se consolida pela expressiva redução de custos operacionais e pelo ganho de eficiência logística no pátio industrial da Iveco. Ao automatizar a triagem de veículos com as APIs da NHTSA e BrasilAPI, o sistema elimina os custos decorrentes de erros humanos de digitação, fraudes cadastrais e o tempo ocioso de caminhões em filas de espera. Além disso, a adoção de uma arquitetura Open-Source baseada em .NET 8 e SQLite, combinada à infraestrutura sob demanda e altamente escalável do Firebase Firestore, minimiza o investimento inicial em servidores físicos e licenças de software proprietárias. Sob a ótica estratégica, o motor de cálculo alinhado ao GHG Protocol posiciona a companhia em estrita conformidade com as exigências globais de ESG, mitigando riscos de sanções ambientais e abrindo portas para incentivos fiscais e captação de fundos verdes, o que garante um retorno sobre o investimento.
+
+### **Custos de Desenvolvimento**
+
+Por tratar-se de um projeto acadêmico focado em inovação industrial, os custos de engenharia e desenvolvimento foram essencialmente de tempo, pesquisa e capacitação da equipe. A tabela abaixo projeta esses custos em valores reais de mercado, considerando as horas técnicas investidas e a remuneração média de desenvolvedores Júnior/Pleno no Brasil em 2026 para o desenvolvimento do ecossistema.
+
+| Item | Hora estimada | Valor por Hora | Custo Total |
+| :--- | :--- | :--- | :--- | 
+| Levantamento de Requisitos | 30h |  R$ 60,00 |  R$ 1.800,00 | 
+| Modelagem do banco e Estrutura Relacional | 25h |  R$ 65,00 |  R$ 1.625,00 | 
+| Desenvolvimento da API | 70h |  R$ 90,00 |  R$ 6.300,00 | 
+| Desenvolvimento da WPF | 80h |  R$ 85,00 |  R$ 6.800,00 | 
+| Integração e consumo das API’s | 40h |  R$ 85,00 |  R$ 3.200,00 |
+| Implementação de Lógica e Sincronização | 35h |  R$ 90,00 |  R$ 3.150,00 | 
+| Testes e Validações de Dados | 25h |  R$ 70,00 |  R$ 1.750,00 | 
+| Documentaçãos | 35h |  R$ 50,00 |  R$ 1.750,00 | 
+| Total | 340h |  - |  R$ 2.640,00 | 
 
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
