@@ -51,6 +51,14 @@ namespace WpfIveco.ViewModel
         // CAMPOS DE LOGIN E CADASTRO
         // ============================================================
 
+        /// Armazena mensagens de erro vindas de falhas gerais de autenticação na API
+        private string _loginError = "";
+        public string LoginError
+        {
+            get => _loginError;
+            set { _loginError = value; OnPropertyChanged(); }
+        }
+
         private string _loginEmail = "";
         public string LoginEmail
         {
@@ -59,17 +67,35 @@ namespace WpfIveco.ViewModel
             {
                 _loginEmail = value;
                 OnPropertyChanged();
-                // Limpa mensagem de erro ao digitar
+                /// Limpa mensagem de erro de e-mail ao digitar
                 if (!string.IsNullOrEmpty(EmailError))
                 {
                     EmailError = "";
                     EmailValido = false;
                 }
+                /// Limpa mensagem de erro de login ao alterar o e-mail
+                if (!string.IsNullOrEmpty(LoginError))
+                {
+                    LoginError = "";
+                }
             }
         }
 
         private string _loginSenha = "";
-        public string LoginSenha { get => _loginSenha; set { _loginSenha = value; OnPropertyChanged(); } }
+        public string LoginSenha
+        {
+            get => _loginSenha;
+            set
+            {
+                _loginSenha = value;
+                OnPropertyChanged();
+                /// Limpa mensagem de erro de login geral ao alterar a senha
+                if (!string.IsNullOrEmpty(LoginError))
+                {
+                    LoginError = "";
+                }
+            }
+        }
 
         private string _cadastroNome = "";
         public string CadastroNome { get => _cadastroNome; set { _cadastroNome = value; OnPropertyChanged(); } }
@@ -141,6 +167,9 @@ namespace WpfIveco.ViewModel
         public ICommand MudarAbaCommand { get; }
         public ICommand LigarDesligarSimuladorCommand { get; }
 
+        /// Comando para processar a recuperação de credenciais de acesso
+        public ICommand EsqueciMinhaSenhaCommand { get; }
+
         // ============================================================
         // CONSTRUTOR
         // ============================================================
@@ -165,6 +194,9 @@ namespace WpfIveco.ViewModel
             FazerLoginCommand = new RelayCommand(async p => await ExecutarLoginAsync());
             FazerCadastroCommand = new RelayCommand(async p => await ExecutarCadastroAsync());
             FazerLogoutCommand = new RelayCommand(p => ExecutarLogout());
+
+            /// Inicialização segura do comando de recuperação de senha corporativa
+            EsqueciMinhaSenhaCommand = new RelayCommand(async p => await ExecutarEsqueciSenhaAsync());
 
             _timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(2) };
             _timer.Tick += async (s, e) => await CarregarTudoAsync();
@@ -244,22 +276,23 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        /// <summary>Executa o login do usuário via API.</summary>
+        /// <summary>Executa o login do usuário via API incorporando feedback textual direto.</summary>
         private async Task ExecutarLoginAsync()
         {
             App.LogInfo($"Tentativa para {LoginEmail}", "LOGIN");
+            LoginError = "";
 
-            // 1. Valida o e-mail
+            /// 1. Realiza chamada de validação remota de e-mail corporativo
             if (!await ValidarEmailAsync(LoginEmail))
             {
-                MessageBox.Show(EmailError, "E-mail inválido", MessageBoxButton.OK, MessageBoxImage.Warning);
+                LoginError = EmailError;
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(LoginSenha))
             {
                 App.LogWarning("Senha vazia – abortando", "LOGIN");
-                MessageBox.Show("Preencha a senha.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                LoginError = "Por favor, introduza a sua palavra-passe.";
                 return;
             }
 
@@ -291,13 +324,14 @@ namespace WpfIveco.ViewModel
                 {
                     var erro = await response.Content.ReadAsStringAsync();
                     App.LogError($"Falha: {erro}", "LOGIN");
-                    MessageBox.Show($"Falha no login: {erro}", "Acesso Negado", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    /// Atualiza a propriedade visual vinculada na UI em vez de travar a thread com MessageBox
+                    LoginError = "Credenciais inválidas ou acesso negado à plataforma.";
                 }
             }
             catch
             {
                 App.LogError("Erro de conexão ou resposta inválida no login", "LOGIN");
-                MessageBox.Show("Erro ao conectar ao servidor. Verifique sua rede.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                LoginError = "Erro ao conectar ao servidor. Verifique sua ligação de rede.";
             }
             finally
             {
@@ -373,7 +407,9 @@ namespace WpfIveco.ViewModel
             NomeUsuario = "Visitante";
             PerfilUsuario = "Sessão não iniciada";
             LoginEmail = "";
+            LoginSenha = "";
             EmailError = "";
+            LoginError = "";
             EmailValido = false;
             AbaAtiva = "Dashboard";
             _timer.Stop();
@@ -396,6 +432,41 @@ namespace WpfIveco.ViewModel
             catch
             {
                 App.LogError("Falha ao carregar alguns dados – verifique a API", "CARREGAR");
+            }
+        }
+
+        /// <summary>Dispara a solicitação assíncrona para recuperação da senha corporativa.</summary>
+        private async Task ExecutarEsqueciSenhaAsync()
+        {
+            LoginError = "";
+
+            if (string.IsNullOrWhiteSpace(LoginEmail))
+            {
+                LoginError = "Por favor, preencha o campo de e-mail corporativo para iniciar a redefinição.";
+                return;
+            }
+
+            try
+            {
+                IsBusy = true;
+                var response = await _httpClient.PostAsJsonAsync("api/dados/recuperar-senha", new { Email = LoginEmail });
+
+                if (response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("As instruções de recuperação foram despachadas para o seu e-mail corporativo cadastrado.", "Recuperação", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    LoginError = "O e-mail informado não foi localizado na base da Iveco.";
+                }
+            }
+            catch
+            {
+                LoginError = "Falha na comunicação. Não foi possível registrar a requisição.";
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
     }
