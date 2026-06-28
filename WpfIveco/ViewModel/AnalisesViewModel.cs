@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using WpfIveco.Models;
 
 namespace WpfIveco.ViewModels
 {
@@ -145,24 +146,6 @@ namespace WpfIveco.ViewModels
         }
     }
 
-    // ==========================================
-    // CLASSES DE MODELO
-    // ==========================================
-    public class AvaliacaoFornecedor
-    {
-        public string Fornecedor { get; set; }
-        public string Material { get; set; }
-        public double PegadaCarbono { get; set; }
-        public DateTime DataAvaliacao { get; set; }
-        public string Status { get; set; }
-    }
 
-    public class FornecedorSustentavel
-    {
-        public int Posicao { get; set; }
-        public string Nome { get; set; }
-        public string Categoria { get; set; }
-        public int PontuacaoESG { get; set; }
-        public string CorDestaque { get; set; }
-    }
+   
 }
