@@ -22,9 +22,9 @@ namespace WpfIveco.ViewModel
     {
         private readonly HttpClient _httpClient;
 
-        // ============================================================
-        // PROPRIEDADES
-        // ============================================================
+        /// ============================================================
+        /// PROPRIEDADES
+        /// ============================================================
 
         private ObservableCollection<string> _listaVins = new();
         /// <summary>Lista de VINs disponíveis para seleção.</summary>
@@ -82,16 +82,16 @@ namespace WpfIveco.ViewModel
             set { _fornecedorSelecionado = value; OnPropertyChanged(nameof(FornecedorSelecionado)); }
         }
 
-        // ============================================================
-        // COMANDOS
-        // ============================================================
+        /// ============================================================
+        /// COMANDOS
+        /// ============================================================
 
         /// <summary>Comando para registrar uma nova peça.</summary>
         public ICommand AdicionarPecaManualCommand { get; }
 
-        // ============================================================
-        // CONSTRUTOR
-        // ============================================================
+        /// ============================================================
+        /// CONSTRUTOR
+        /// ============================================================
 
         /// <summary>Inicializa o ViewModel com o HttpClient.</summary>
         public PecasViewModel(HttpClient httpClient)
@@ -101,9 +101,9 @@ namespace WpfIveco.ViewModel
             AdicionarPecaManualCommand = new RelayCommand(async p => await AdicionarPecaAsync());
         }
 
-        // ============================================================
-        // MÉTODOS PÚBLICOS
-        // ============================================================
+        /// ============================================================
+        /// MÉTODOS PÚBLICOS
+        /// ============================================================
 
         /// <summary>Carrega a lista de VINs disponíveis da API.</summary>
         public async Task CarregarVinsAsync()
@@ -202,9 +202,9 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        // ============================================================
-        // MÉTODOS PRIVADOS
-        // ============================================================
+        /// ============================================================
+        /// MÉTODOS PRIVADOS
+        /// ============================================================
 
         /// <summary>Registra uma nova peça associada a um VIN e fornecedor.</summary>
         private async Task AdicionarPecaAsync()

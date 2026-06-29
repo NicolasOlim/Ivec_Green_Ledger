@@ -22,9 +22,9 @@ namespace WpfIveco.ViewModel
     {
         private readonly HttpClient _httpClient;
 
-        // ============================================================
-        // PROPRIEDADES
-        // ============================================================
+        /// ============================================================
+        /// PROPRIEDADES
+        /// ============================================================
 
         private string _tipoRelatorio = "Veiculos";
         /// <summary>Tipo de relatório selecionado (Veiculos, Fornecedores, Pecas).</summary>
@@ -42,9 +42,9 @@ namespace WpfIveco.ViewModel
             set { _isGerandoPdf = value; OnPropertyChanged(); }
         }
 
-        // ============================================================
-        // COMANDOS
-        // ============================================================
+        /// ============================================================
+        /// COMANDOS
+        /// ============================================================
 
         /// <summary>Comando para gerar o relatório PDF.</summary>
         public ICommand GerarRelatorioPdfCommand { get; }
@@ -52,9 +52,9 @@ namespace WpfIveco.ViewModel
         /// <summary>Comando para alterar o tipo de relatório.</summary>
         public ICommand MudarTipoRelatorioCommand { get; }
 
-        // ============================================================
-        // CONSTRUTOR
-        // ============================================================
+        /// ============================================================
+        /// CONSTRUTOR
+        /// ============================================================
 
         /// <summary>Inicializa o ViewModel com o HttpClient.</summary>
         public RelatoriosViewModel(HttpClient httpClient)
@@ -65,9 +65,9 @@ namespace WpfIveco.ViewModel
             MudarTipoRelatorioCommand = new RelayCommand(p => TipoRelatorio = p as string ?? "Veiculos");
         }
 
-        // ============================================================
-        // MÉTODO PÚBLICO
-        // ============================================================
+        /// ============================================================
+        /// MÉTODO PÚBLICO
+        /// ============================================================
 
         /// <summary>
         /// Gera e baixa o relatório PDF.

@@ -9,8 +9,6 @@ namespace WpfIveco.Views
         {
             InitializeComponent();
 
-            // Liga esta tela (View) aos dados que criamos (ViewModel)
-            DataContext = new AnalisesViewModel();
         }
     }
 }

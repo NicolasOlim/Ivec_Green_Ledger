@@ -19,9 +19,9 @@ namespace WpfIveco.ViewModel
     {
         private readonly HttpClient _httpClient;
 
-        // ============================================================
-        // PROPRIEDADES
-        // ============================================================
+        /// ============================================================
+        /// PROPRIEDADES
+        /// ============================================================
 
         private string _pesquisaVin = "";
         /// <summary>VIN digitado pelo usuário para pesquisa.</summary>
@@ -47,16 +47,16 @@ namespace WpfIveco.ViewModel
             set { _listaVeiculos = value; OnPropertyChanged(); }
         }
 
-        // ============================================================
-        // COMANDOS
-        // ============================================================
+        /// ============================================================
+        /// COMANDOS
+        /// ============================================================
 
         /// <summary>Comando para pesquisar e validar um VIN.</summary>
         public ICommand PesquisarVinCommand { get; }
 
-        // ============================================================
-        // CONSTRUTOR
-        // ============================================================
+        /// ============================================================
+        /// CONSTRUTOR
+        /// ============================================================
 
         /// <summary>Inicializa o ViewModel com o HttpClient.</summary>
         public RastreabilidadeViewModel(HttpClient httpClient)
@@ -66,9 +66,9 @@ namespace WpfIveco.ViewModel
             PesquisarVinCommand = new RelayCommand(async p => await PesquisarVinAsync());
         }
 
-        // ============================================================
-        // MÉTODOS PÚBLICOS
-        // ============================================================
+        /// ============================================================
+        /// MÉTODOS PÚBLICOS
+        /// ============================================================
 
         /// <summary>Carrega a lista de veículos da API.</summary>
         public async Task CarregarVeiculosAsync()
@@ -99,9 +99,9 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        // ============================================================
-        // MÉTODOS PRIVADOS
-        // ============================================================
+        /// ============================================================
+        /// MÉTODOS PRIVADOS
+        /// ============================================================
 
         /// <summary>
         /// Pesquisa e valida um VIN na API da NHTSA.

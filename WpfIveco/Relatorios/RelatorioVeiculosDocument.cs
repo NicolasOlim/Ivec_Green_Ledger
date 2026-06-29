@@ -112,14 +112,14 @@ namespace WpfIveco.Relatorios
                     });
                 });
 
-                // Tabela de veículos
+                /// Tabela de veículos
                 column.Item().Column(col =>
                 {
                     col.Item().PaddingBottom(5).BorderBottom(1).BorderColor(BorderGray).Text("Rastreabilidade de Veículos").FontSize(16).SemiBold();
                     col.Item().PaddingTop(10).Element(ComposeTabelaVeiculos);
                 });
 
-                // Tabela de peças
+                /// Tabela de peças
                 column.Item().Column(col =>
                 {
                     col.Item().PaddingBottom(5).BorderBottom(1).BorderColor(BorderGray).Text("Componentes Vinculados (Amostragem)").FontSize(16).SemiBold();
@@ -138,12 +138,12 @@ namespace WpfIveco.Relatorios
                 table.ColumnsDefinition(columns =>
                 {
                     columns.RelativeColumn(2); // VIN
-                    columns.RelativeColumn(2); // Modelo
-                    columns.RelativeColumn(2); // Data
-                    columns.RelativeColumn(2); // Status
+                    columns.RelativeColumn(2); /// Modelo
+                    columns.RelativeColumn(2); /// Data
+                    columns.RelativeColumn(2); /// Status
                 });
 
-                // Headers
+                /// Headers
                 table.Header(header =>
                 {
                     header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray).Text("VIN (Chassi)").SemiBold().FontColor(TextSecondary);
@@ -152,7 +152,7 @@ namespace WpfIveco.Relatorios
                     header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray).Text("Auditoria").SemiBold().FontColor(TextSecondary);
                 });
 
-                // Dados
+                /// Dados
                 foreach (var v in _veiculos)
                 {
                     table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text(v.Vin).SemiBold();
@@ -172,9 +172,9 @@ namespace WpfIveco.Relatorios
             {
                 table.ColumnsDefinition(columns =>
                 {
-                    columns.RelativeColumn(3); // Componente
-                    columns.RelativeColumn(3); // VIN
-                    columns.RelativeColumn(2); // Status
+                    columns.RelativeColumn(3); /// Componente
+                    columns.RelativeColumn(3); /// VIN
+                    columns.RelativeColumn(2); /// Status
                 });
 
                 table.Header(header =>

@@ -1,25 +1,33 @@
 ﻿using LiveCharts;
 using LiveCharts.Wpf;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
+using WpfIveco.DTO;
 using WpfIveco.Models;
 
 namespace WpfIveco.ViewModels
 {
-
+    /// <summary>
+    /// ViewModel para o Dashboard ESG (Análises).
+    /// Força a ligação direta ao Firebase Realtime Database independente de como for instanciada.
+    /// </summary>
     public class AnalisesViewModel : INotifyPropertyChanged
-
     {
         private readonly HttpClient _httpClient;
+        private const string FirebaseEndpoint = "https://projetopim2semestre-default-rtdb.firebaseio.com/dashboard_esg.json";
 
-        // ==========================================
-        // 1. PROPRIEDADES DOS CARDS SUPERIORES
-        // ==========================================
+        /// ==========================================
+        /// 1. PROPRIEDADES DOS CARDS SUPERIORES
+        /// ==========================================
         private int _totalEmissoes;
         public int TotalEmissoes
         {
@@ -41,111 +49,156 @@ namespace WpfIveco.ViewModels
             set { _pecasReaproveitadas = value; OnPropertyChanged(); }
         }
 
-        private string _economiaGerada;
+        private string _economiaGerada = "A carregar...";
         public string EconomiaGerada
         {
             get => _economiaGerada;
             set { _economiaGerada = value; OnPropertyChanged(); }
         }
 
-        // ==========================================
-        // 2. PROPRIEDADES DOS GRÁFICOS (LiveCharts)
-        // ==========================================
-        public SeriesCollection GraficoPizzaSeries { get; set; }
-        public SeriesCollection GraficoBarrasSeries { get; set; }
-        public string[] MesesLabels { get; set; }
+        /// ==========================================
+        /// 2. PROPRIEDADES DOS GRÁFICOS (LIVECHARTS)
+        /// ==========================================
+        private SeriesCollection _emissoesSeries;
+        public SeriesCollection EmissoesSeries
+        {
+            get => _emissoesSeries;
+            set { _emissoesSeries = value; OnPropertyChanged(); }
+        }
 
-        // ==========================================
-        // 3. COLEÇÕES DAS TABELAS E LISTAS
-        // ==========================================
-        public ObservableCollection<AvaliacaoFornecedor> UltimasAvaliacoes { get; set; }
-        public ObservableCollection<FornecedorSustentavel> TopFornecedores { get; set; }
+        private string[] _graficoLabels;
+        public string[] GraficoLabels
+        {
+            get => _graficoLabels;
+            set { _graficoLabels = value; OnPropertyChanged(); }
+        }
 
-        // ==========================================
-        // CONSTRUTORES (CORRIGIDOS)
-        // ==========================================
+        /// ==========================================
+        /// 3. COLEÇÕES PARA AS LISTAS DA UI
+        /// ==========================================
+        private ObservableCollection<FornecedorSustentavel> _fornecedoresSustentaveis = new();
+        public ObservableCollection<FornecedorSustentavel> FornecedoresSustentaveis
+        {
+            get => _fornecedoresSustentaveis;
+            set { _fornecedoresSustentaveis = value; OnPropertyChanged(); }
+        }
 
-        // Construtor padrão
+        /// ==========================================
+        /// CONSTRUTORES (À Prova de Falhas)
+        /// ==========================================
+
+        /// <summary>
+        /// Construtor Padrão (Vazio) - Usado se a View criar a ViewModel diretamente.
+        /// </summary>
         public AnalisesViewModel()
         {
-            CarregarDadosFalsos();
+            // Cria um cliente HTTP próprio caso não seja injetado nenhum externo
+            _httpClient = new HttpClient();
+            InicializarDashboard();
         }
 
-        // Construtor com 1 argumento (o que o MainViewModel estava sentindo falta!)
-        public AnalisesViewModel(HttpClient httpClient) : this()
+        /// <summary>
+        /// Construtor com Parâmetros - Usado se o MainViewModel injetar o HttpClient global.
+        /// </summary>
+        public AnalisesViewModel(HttpClient httpClient)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClient ?? new HttpClient();
+            InicializarDashboard();
         }
 
-        // ==========================================
-        // MÉTODOS (CORRIGIDOS)
-        // ==========================================
-
-        // O método que o MainViewModel tenta chamar para atualizar os dados
-        public async Task AtualizarAsync()
+        private void InicializarDashboard()
         {
-            // Por enquanto, vamos apenas simular um tempo de carregamento de API (200ms)
-            // e carregar os dados falsos. Futuramente você pode colocar suas requisições
-            // _httpClient.GetAsync(...) aqui dentro novamente!
-            await Task.Delay(200);
-            CarregarDadosFalsos();
+            EmissoesSeries = new SeriesCollection();
+            /// Dispara a carga assíncrona dos dados do Firebase eliminando os mocks antigos
+            _ = CarregarDadosFirebaseAsync();
         }
 
-        private void CarregarDadosFalsos()
+        /// ==========================================
+        /// PROCESSO DE CARGA REAL DO FIREBASE
+        /// ==========================================
+        public async Task CarregarDadosFirebaseAsync()
         {
-            TotalEmissoes = 14250;
-            FornecedoresVerdes = 48;
-            PecasReaproveitadas = 12400;
-            EconomiaGerada = "R$ 1.2M";
-
-            GraficoPizzaSeries = new SeriesCollection
+            try
             {
-                new PieSeries { Title = "Logística", Values = new ChartValues<double> { 45 }, Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0A5B43")) },
-                new PieSeries { Title = "Produção", Values = new ChartValues<double> { 35 }, Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1B7055")) },
-                new PieSeries { Title = "Fornecedores", Values = new ChartValues<double> { 15 }, Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4BAC50")) },
-                new PieSeries { Title = "Administrativo", Values = new ChartValues<double> { 5 }, Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#A7F3D0")) }
-            };
+                /// Faz o pedido GET na API REST do Firebase
+                var response = await _httpClient.GetAsync(FirebaseEndpoint);
 
-            GraficoBarrasSeries = new SeriesCollection
-            {
-                new ColumnSeries
+                if (response.IsSuccessStatusCode)
                 {
-                    Title = "Redução (ton)",
-                    Values = new ChartValues<double> { 120, 150, 210, 180, 290, 320 },
-                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1B7055")),
-                    MaxColumnWidth = 30
+                    string jsonString = await response.Content.ReadAsStringAsync();
+
+                    if (string.IsNullOrWhiteSpace(jsonString) || jsonString == "null")
+                    {
+                        EconomiaGerada = "Sem dados no banco";
+                        return;
+                    }
+
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    FirebaseEsgDto dadosReal = JsonSerializer.Deserialize<FirebaseEsgDto>(jsonString, options);
+
+                    if (dadosReal != null)
+                    {
+                        /// Atualiza os Cards com os valores reais salvos no Firebase
+                        TotalEmissoes = dadosReal.TotalEmissoes;
+                        FornecedoresVerdes = dadosReal.FornecedoresVerdes;
+                        PecasReaproveitadas = dadosReal.PecasReaproveitadas;
+                        EconomiaGerada = dadosReal.EconomiaGerada;
+
+                        /// Limpa a lista antiga e insere os fornecedores do banco
+                        FornecedoresSustentaveis.Clear();
+                        if (dadosReal.TopFornecedores != null)
+                        {
+                            foreach (var fornecedor in dadosReal.TopFornecedores)
+                            {
+                                FornecedoresSustentaveis.Add(fornecedor);
+                            }
+                        }
+
+                        /// Atualiza os gráficos de forma segura na Thread da UI
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            EmissoesSeries = new SeriesCollection
+                            {
+                                new PieSeries
+                                {
+                                    Title = "Peças Reaproveitadas",
+                                    Values = new ChartValues<int> { dadosReal.PecasReaproveitadas },
+                                    DataLabels = true,
+                                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"))
+                                },
+                                new PieSeries
+                                {
+                                    Title = "Emissões Evitadas (tCO2e)",
+                                    Values = new ChartValues<int> { dadosReal.TotalEmissoes },
+                                    DataLabels = true,
+                                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EF4444"))
+                                }
+                            };
+
+                            GraficoLabels = new[] { "Métricas de Sustentabilidade" };
+                        });
+                    }
                 }
-            };
-            MesesLabels = new[] { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun" };
-
-            UltimasAvaliacoes = new ObservableCollection<AvaliacaoFornecedor>
+                else
+                {
+                    EconomiaGerada = "Erro de rede";
+                }
+            }
+            catch (Exception)
             {
-                new AvaliacaoFornecedor { Fornecedor = "BOSCH Sistemas", Material = "Injeção Eletrônica", PegadaCarbono = 12.5, DataAvaliacao = DateTime.Now.AddDays(-2), Status = "ISO 14001" },
-                new AvaliacaoFornecedor { Fornecedor = "Pirelli Pneus", Material = "Borracha Sintética", PegadaCarbono = 45.2, DataAvaliacao = DateTime.Now.AddDays(-5), Status = "ISO 14001" },
-                new AvaliacaoFornecedor { Fornecedor = "Aço Frio S/A", Material = "Chapas Metálicas", PegadaCarbono = 110.0, DataAvaliacao = DateTime.Now.AddDays(-10), Status = "Pendente" },
-                new AvaliacaoFornecedor { Fornecedor = "Vidros Auto", Material = "Para-brisas", PegadaCarbono = 22.1, DataAvaliacao = DateTime.Now.AddDays(-12), Status = "Em Análise" }
-            };
-
-            TopFornecedores = new ObservableCollection<FornecedorSustentavel>
-            {
-                new FornecedorSustentavel { Posicao = 1, Nome = "EcoParts Ltda", Categoria = "Selo Ouro - Emissão Zero", PontuacaoESG = 98, CorDestaque = "#F59E0B" },
-                new FornecedorSustentavel { Posicao = 2, Nome = "BOSCH Sistemas", Categoria = "Selo Prata - Circular", PontuacaoESG = 92, CorDestaque = "#9CA3AF" },
-                new FornecedorSustentavel { Posicao = 3, Nome = "TechGreen", Categoria = "Selo Bronze - Limpa", PontuacaoESG = 88, CorDestaque = "#B45309" },
-                new FornecedorSustentavel { Posicao = 4, Nome = "Pirelli Pneus", Categoria = "Certificado ISO 14001", PontuacaoESG = 82, CorDestaque = "#10B981" },
-                new FornecedorSustentavel { Posicao = 5, Nome = "Alumínios Sustentáveis", Categoria = "Certificado ISO 14001", PontuacaoESG = 79, CorDestaque = "#10B981" }
-            };
+                EconomiaGerada = "Indisponível";
+            }
         }
 
-        // ==========================================
-        // IMPLEMENTAÇÃO DO INOTIFYPROPERTYCHANGED
-        // ==========================================
+        /// ==========================================
+        /// NOTIFICAÇÃO DE ALTERAÇÃO DE PROPRIEDADES
+        /// ==========================================
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-
 
    
 }

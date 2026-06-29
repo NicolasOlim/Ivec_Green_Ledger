@@ -20,9 +20,9 @@ namespace WpfIveco.ViewModels
     {
         private readonly HttpClient _httpClient;
 
-        // ============================================================
-        // PROPRIEDADES
-        // ============================================================
+        /// ============================================================
+        /// PROPRIEDADES
+        /// ============================================================
 
         private string _cnpjBusca = "";
         /// <summary>CNPJ digitado pelo usuário para consulta.</summary>
@@ -67,9 +67,9 @@ namespace WpfIveco.ViewModels
         /// <summary>Total de fornecedores cadastrados.</summary>
         public int TotalFornecedores => ListaFornecedores?.Count ?? 0;
 
-        // ============================================================
-        // COMANDOS
-        // ============================================================
+        /// ============================================================
+        /// COMANDOS
+        /// ============================================================
 
         /// <summary>Comando para consultar CNPJ na BrasilAPI.</summary>
         public ICommand ConsultarCnpjCommand { get; }
@@ -77,9 +77,9 @@ namespace WpfIveco.ViewModels
         /// <summary>Comando para salvar fornecedor no Firestore.</summary>
         public ICommand SalvarFornecedorCommand { get; }
 
-        // ============================================================
-        // CONSTRUTOR
-        // ============================================================
+        /// ============================================================
+        /// CONSTRUTOR
+        /// ============================================================
 
         /// <summary>Inicializa o ViewModel com o HttpClient.</summary>
         public FornecedorViewModel(HttpClient httpClient)
@@ -90,9 +90,9 @@ namespace WpfIveco.ViewModels
             SalvarFornecedorCommand = new RelayCommand(async p => await SalvarFornecedorAsync());
         }
 
-        // ============================================================
-        // MÉTODOS PÚBLICOS
-        // ============================================================
+        /// ============================================================
+        /// MÉTODOS PÚBLICOS
+        /// ============================================================
 
         /// <summary>Carrega a lista de fornecedores da API.</summary>
         public async Task CarregarFornecedoresAsync()
@@ -121,9 +121,9 @@ namespace WpfIveco.ViewModels
             }
         }
 
-        // ============================================================
-        // MÉTODOS PRIVADOS
-        // ============================================================
+        /// ============================================================
+        /// MÉTODOS PRIVADOS
+        /// ============================================================
 
         /// <summary>Consulta um CNPJ na BrasilAPI e preenche os campos do fornecedor.</summary>
         private async Task ConsultarCnpjAsync()
