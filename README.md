@@ -125,11 +125,9 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 
 ### **Entidades e Atributos:**
 
-### **Tabela: Usuário**
-
 <div align="center">
 
-#### Tabela - USUARIO
+#### Usuario
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **id** | PK | Identificador único do usuário |
@@ -141,10 +139,10 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 </div>
 
 ---
-#### Tabela - FORNECEDOR
 
 <div align="center">
 
+#### Fornecedor
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **id** | PK | Identificador único do fornecedor |
@@ -156,10 +154,9 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 
 ---
 
-#### Tabela - LOTE_MATERIA_PRIMA
-
 <div align="center">
 
+#### Lote_materia_prima
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **id** | PK | Identificador único do lote |
@@ -173,10 +170,9 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 
 ---
 
-#### Tabela - Veiculo
-
 <div align="center">
 
+#### Veiculo
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **vin** | PK | Identificação do veículo |
@@ -188,10 +184,9 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 
 ---
 
-#### Tabela - Veiculo_Componente
-
 <div align="center">
 
+#### Veiculo_Componente
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **id** | PK | Identificação do veículo do componente |
@@ -225,10 +220,9 @@ Os relacionamentos entre as entidades do sistema são definidos a seguir:
 
 O modelo lógico do ecossistema converte as entidades conceituais em estruturas relacionais normatizadas, definindo as chaves primárias (PK), chaves estrangeiras (FK) e restrições de integridade de cada atributo. A tipagem de identificação foi padronizada como TEXT de forma unificada entre os campos de amarração (id, fk_fornedor, vin, fk_veiculo_vin, fk_loteMateriaPrima_id).
 
-### **Tabela: Usuário**
-
 <div align="center">
 
+#### Veiculo
 | Coluna | Chave/Relacionamento | Tipo | Descrição |
 | :---: | :---: | :---: | :--- |
 | **id** | PK | TEXT | Identificador único do usuário |
@@ -241,10 +235,9 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 
 ---
 
-#### Tabela - Fornecedor
-
 <div align="center">
 
+#### Fornecedor
 | Coluna | Chave/relacionamento | Tipo | Descrição |
 | :--- | :--- | :--- |  :--- |
 | **id** | PK | TEXT | Identificador único do fornecedor |
@@ -257,10 +250,9 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 
 ---
 
-#### Tabela - Lote Materia Prima
-
 <div align="center">
 
+#### Lote Materia Prima
 | Coluna | Chave/relacionamento | Tipo | Descrição |
 | :--- | :--- | :--- | :--- |
 | **vin** | PK | TEXT | Número de identificação do chassi (17 caracteres) |
@@ -272,10 +264,9 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 
 ---
 
-#### Tabela - Veiculo_componente
-
 <div align="center">
 
+#### Veiculo_componente
 | Coluna | Chave/relacionamento | Tipo | Descrição |
 | :--- | :--- | :---  | :--- |
 | **id** | PK | TEXT | Identificador único do veículo |
@@ -407,6 +398,7 @@ A análise de viabilidade técnica avalia se o sistema Iveco Green Ledger pode s
 
 <div align="center">
 
+### Infraestruturas e Tecnologias:
 | Componente | Licença | Maturidade | Observação |
 | :--- | :--- | :--- | :--- | 
 | **C# / .NET 8** | MIT(open-source) | Alta | Plataforma Microsoft estável, unificada e com suporte LTS (Long-Term Support) garantido. |
@@ -441,10 +433,10 @@ Para execução do sistema em ambiente de produção, os  requisitos mínimos re
 - **Sistema Operacional:** Windows 10 ou Windows 11(64 - bits);
 - **Conexão com a internet:** Para o funcionamento das integrações em nuvem.
 
-### **Riscos Técnicos e Mistigações:**
 
 <div align="center">
 
+### Riscos Técnicos e Mistigações:
 | Risco | Probabilidade | Impacto | Mistigação |
 | :--- | :--- | :--- | :--- | 
 | Cota gratuita do Firebase excedida com alto volume de dados | Média | Alta | Migrar para o plano Blaze (pay-as-you-go) do Firebase para suportar a escala industrial ou migrar a persistência de longo prazo para uma instância dedicada de banco de dados relacional próprio |
@@ -502,9 +494,6 @@ O Firebase Firestore constitui a camada principal de persistência global e cons
 
 O padrão arquitetural MVVM (Model-View-ViewModel) foi adotado no desenvolvimento do cliente desktop para garantir o completo desacoplamento entre a interface gráfica com o usuário e as regras de apresentação da aplicação de pátio. Abaixo está o fluxo de comunicação entre as camadas da nossa aplicação.
 
-<div class="logo-container">
-    <img src="imagens/arquitetura MVVM" alt="Logo Iveco Green Ledger" class="logo-img">
-</div>
 
 ---
 ## Módulos do Sistema:
@@ -543,10 +532,6 @@ Este é o módulo principal de controle de acesso e conformidade do pátio indus
 
 Este módulo atua de forma invisível nos bastidores como o motor de persistência global da solução. Ele gerencia as chamadas feitas pela ApiIveco ao Firebase Firestore, garantindo que as coleções NoSQL de documentos estruturados sejam atualizadas de forma escalável e com alta disponibilidade. Ele consolida de maneira definitiva o histórico de auditorias e relatórios ambientais, servindo como a fonte centralizada da verdade de todo o ecossistema.
 
-### **Módulo: Contigência Offline**
-
-Este módulo atua de forma invisível nos bastidores como o motor de persistência global da solução. Ele gerencia as chamadas feitas pela ApiIveco ao Firebase Firestore, garantindo que as coleções NoSQL de documentos estruturados sejam atualizadas de forma escalável e com alta disponibilidade. Ele consolida de maneira definitiva o histórico de auditorias e relatórios ambientais, servindo como a fonte centralizada da verdade de todo o ecossistema.
-
 ### **Módulo: Relatórios**
 
 Este módulo consolida de forma analítica todos os dados históricos processados pelo sistema. Ele permite aos gestores e auditores extrair relatórios ambientais completos e balanços consolidados das emissões de carbono geradas pela frota e pela cadeia de suprimentos. As informações, estruturadas sob os parâmetros do GHG Protocol, são recuperadas diretamente do Firebase Firestore através da ApiIveco e apresentadas prontas para exportação corporativa, garantindo transparência e conformidade jurídica para fins de auditoria interna e externa.
@@ -557,10 +542,9 @@ Projetado como uma evolução estratégica para as próximas etapas do sistema, 
 
 ---
 
-### **Processo de Desenvolvimento**
-
 <div align="center">
 
+### **Processo de Desenvolvimento**
 | Fase | Status |
 | :--- | :--- | 
 | Fase 1 - Setup e Infraestrutura | Concluído ✅ | 
@@ -602,31 +586,13 @@ Por tratar-se de um projeto acadêmico focado em inovação industrial, os custo
 
 | Item | Hora estimada | Valor por Hora | Custo Total |
 | :--- | :--- | :--- | :--- | 
-| Levantamento de Requisitos | 30h |  R$ 60,00 |  R$ 1.800,00 | 
-| Modelagem do banco e Estrutura Relacional | 25h |  R$ 65,00 |  R$ 1.625,00 | 
-| Desenvolvimento da API | 70h |  R$ 90,00 |  R$ 6.300,00 | 
-| Desenvolvimento da WPF | 80h |  R$ 85,00 |  R$ 6.800,00 | 
-| Integração e consumo das API’s | 40h |  R$ 85,00 |  R$ 3.200,00 |
-| Implementação de Lógica e Sincronização | 35h |  R$ 90,00 |  R$ 3.150,00 | 
-| Testes e Validações de Dados | 25h |  R$ 70,00 |  R$ 1.750,00 | 
-| Documentaçãos | 35h |  R$ 50,00 |  R$ 1.750,00 | 
-| Total | 340h |  - |  R$ 2.640,00 | 
-
-</div>
-
----
-Os custos mensais de operação do sistema em produção são estimados abaixo, considerando a volumetria de requisições e processamento de dados para o gerenciamento de pátio, triagem de veículos e monitoramento de emissões da Iveco:
-
-<div align="center">
-
-| Serviço | Custo no Desenvolvimento | Projeção em Produção | Observação |
-| :--- | :--- | :--- | :--- | 
-| Levantamento de Requisitos | R$ 0,00 |  R$ 0,00 |  Gratuito até 1 GiB de armazenamento, 50k leituras e 20k escritas diárias. Atende perfeitamente o escopo atual | 
-| API de rastreio e Logistica | R$ 0,00 |  R$ 0,00 |  Serviços de dados públicos ou acessados via chaves gratuitas de desenvolvedor | 
-| Hospedagem da API | R$ 0,00 |  R$ 0,00 - 120,00 |  Atualmente rodando em servidores locais e nuvem gratuita. Em produção, pode migrar para planos com maior disponibilidade | 
-| SQLite | R$ 0,00 |  R$ 0,00 |  Banco embutido no cliente desktop WPF, sem dependência de nuvem ou servidor externo | 
-| Domínio e Certificado SSL | R$ 0,00 |  R$ 5,00 - 40,00 |  Comunicação segura via criptografia e SSL gratuito |
-| Total Mensal Atual | R$ 0,00 | - |  Custo zero durante todo o ciclo de desenvolvimento | 
+| Levantamento de Requisitos | 35h |  R$ 40,00 |  R$ 1.400,00 | 
+| Modelagem do banco e Estrutura Relacional | 15h |  R$ 40,00 |  R$ 600,00 | 
+| Desenvolvimento da API | 50h |  R$ 50,00 |  R$ 2.500,00 | 
+| Desenvolvimento da WPF | 60h |  R$ 50,00 |  R$ 3.000,00 | 
+| Integração API’s e Regras de Negócio | 35h |  R$ 50,00 |  R$ 1.750,00 |
+| Testes, Validações e Homologação | 25h |  R$ 45,00 |  R$ 1.125,00 | 
+| Total | 220h |  - |  R$ 10.375,00 | 
 
 </div>
 
@@ -651,29 +617,6 @@ A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na
 | Economia mensal de CO2 | - | 900 kg - 1,100 kg de CO2 por dia |  
 | Economia anual estimada de CO2 | - | 10,8 t - 13,2 t de CO2 por ano |  
 | Domínio e Certificado SSL | R$ 0,00 | R$ 5,00 - R$ 40,00 |  
-
-</div>
-
----
-### **Receitas e Materiais**
-
-Para a implantação física do ecossistema Iveco Green Ledger, o consumo de materiais é voltado exclusivamente para a infraestrutura de tecnologia e conectividade nas portarias e balanças do pátio logístico, englobando terminais de chão de fábrica instalados para a execução contínua da interface de usuário (WpfIveco), leitores de código de barras ou QR Code USB para agilizar a entrada de dados operacionais sem digitação manual, além da infraestrutura de rede local existente para garantir a comunicação de dados e a sincronização com a nuvem, operando com custo zero de licenciamento de software por utilizar o framework .NET 8, SQLite e APIs integradas de código aberto. Por tratar-se de um sistema focado em suporte logístico interno e governança ambiental (ESG), o projeto não gera faturamento direto por vendas, mas consolida seu retorno financeiro na forma de receitas indiretas através de uma drástica redução de custos operacionais. 
-
-### **Análise Custo - Benefício**
-
-<div align="center">
-
-| Categoria | Tipo | Valor Anual Estimado | 
-| :--- | :--- | :--- |
-| Desenvolvimento | Custo |  R$ 8.800,00 |  
-| Operação / Infraestrutura | Custo |  R$ 0,00 - 1.440,00 |  
-| Manutenção, suporte técnico e suporte offline | Custo | R$ 1.200,00 - 2.400,00 |  
-| Redução de custos | Benefício | R$ 18.000,00 |  
-| Economia operacional com eliminação de erros e retrabalhos administrativos | Benefício | R$ 6.600,00 |  
-| Economia de combustível | Benefício | R$ 7.800,00 |  
-| Economia de combustível | Benefício | R$ 7.800,00 |  
-| Automação | Benefício | R$ 12.000,00 |  
-| Saldo Líquido Estimado | Lucro | R$ 31.600,00 - 34.160,00 |  
 
 </div>
 
@@ -744,41 +687,55 @@ O desenvolvimento das interfaces visuais do cliente desktop (WpfIveco) utilizand
 ---
 ## Regra de Negócio
 
-A camada de regras de negócio (Business Logic Layer) do ecossistema Iveco Green Ledger constitui o núcleo de inteligência da aplicação, sendo responsável por ditar o comportamento da ApiIveco e orientar as tomadas de decisão da interface cliente WpfIveco. Esta seção detalha as diretrizes operacionais, validações de pátio e o motor de cálculo ambiental que governam o projeto.
+## ESPECIFICAÇÃO DA REGRA DE NEGÓCIO: RN-01 – CÁLCULO E VALIDAÇÃO DE PEGADA DE CARBONO (ESCOPO 3)
 
-### *Fluxo de Triagem e Orquestração Logística*
+| Identificador | Nome | Módulo | Gatilho (Trigger) |
+| :--- | :--- | :--- | :--- |
+| **RN-01** | Cálculo e Rastreabilidade de Emissões de Gases de Efeito Estufa (GEE) | Motor Ambiental / Triagem Logística | Solicitação de encerramento de pesagem na balança ou confirmação de descarga na doca via interface cliente (`WpfIveco`). |
 
-O sistema opera sob o modelo de validação em barreira, o que significa que nenhum veículo de transporte de carga tem sua entrada autorizada ou concluída no pátio logístico da Iveco sem passar por uma verificação multifacetada e automatizada. As regras que regem essa barreira consistem em:
+---
 
-- **Automação do Vínculo de Ordem de Coleta:** O sistema intercepta o código identificador da viagem (via leitura de QR Code ou digitação de contingência). A aplicação dispara uma requisição assíncrona integrada ao microsserviço de rotas (baseado na API do Mercado Livre), verificando o status do trajeto. Caso a rota conste como "Cancelada" ou "Concluída", o fluxo de triagem é imediatamente interrompido por uma trava de negócio, notificando o operador de portaria.
-  
-- **Decodificação Técnica de Frota (Mecanismo VIN):** Ao capturar o chassi do caminhão, a API interna dispara uma consulta à API da NHTSA. O sistema valida se o chassi possui o padrão internacional de 17 caracteres. O retorno da API externa é processado para extrair o ano de fabricação, o modelo e a capacidade de carga do motor. Esses dados técnicos são injetados diretamente na memória do sistema e salvos no banco de dados NoSQL (Firebase Firestore), servindo de insumo indispensável para o cálculo posterior de pegada ecológica.
+### 1. Descrição e Objetivo
+Automatizar a mensuração de emissões indiretas de Dióxido de Carbono Equivalente ($CO_2e$) provenientes de veículos de transportadoras terceirizadas (Escopo 3). A regra garante que dados inconsistentes de veículos e combustíveis não poluam o inventário de sustentabilidade corporativo, aplicando penalidades baseadas na eficiência mecânica e idade da frota ativa.
 
-- **Homologação Cadastral e Fiscal:** Para mitigar riscos fiscais na cadeia de suprimentos, o CNPJ da transportadora associada à carga é submetido à BrasilAPI. Se o cadastro retornar com situação inválida ou inexistente perante os órgãos reguladores, o sistema impede a finalização do registro de entrada, exigindo intervenção ou liberação manual por parte de um supervisor de logística.
+---
 
-### *Motor de Cálculo Ambiental*
+### 2. Pré-condições
+* A rota de transporte deve estar vinculada a um código de viagem válido e com status ativo no banco de dados.
+* O veículo associado deve ter o ano de fabricação ($Ano_{Fab}$) e o modelo decodificados com sucesso a partir da checagem estrutural do VIN (Chassi).
+* O tipo de combustível utilizado pelo motor pesado deve ser informado obrigatoriamente através do conjunto de dados (`Diesel_S10`, `Diesel_S500`, `GNV`).
 
-A grande inteligência ecológica do projeto reside na automatização do inventário de emissões de Gases de Efeito Estufa (GEE), focando especificamente nas emissões indiretas da cadeia de valor (Escopo 3).
+---
 
-- **Cálculo Baseado em Distância e Combustível:**  Os fatores de emissão variam dinamicamente se o caminhão utiliza Diesel S10, Diesel S500 ou Gás Natural Veicular (GNV). O ano do modelo (extraído no fluxo da NHTSA) aplica um fator de degradação e eficiência, tornando o cálculo altamente preciso e auditável.
+### 3. Critérios de Validação e Fluxo Lógico (Algoritmo)
 
-### *Algoritmo de Monitoramento*
+#### Passo 1: Determinação do Fator de Emissão Base ($F_c$)
+O sistema avalia a propriedade de combustível enviada pela requisição e atribui a constante matemática de emissão por volume/massa, conforme a tabela estequiométrica interna da aplicação:
+* Se `combustível = Diesel_S10`, então $F_c = 2,68$ kg $CO_2$/Litro.
+* Se `combustível = Diesel_S500`, então $F_c = 2,73$ kg $CO_2$/Litro.
+* Se `combustível = GNV`, então $F_c = 2,04$ kg $CO_2$/$m^3$.
 
-A marcha lenta de veículos pesados dentro das dependências da fábrica representa um dos maiores gargalos ocultos de sustentabilidade e custo. O Iveco Green Ledger implementa uma regra de negócio severa para combater esse cenário:
+#### Passo 2: Cálculo da Depreciação por Idade da Frota ($F_d$)
+Com base no ano de fabricação extraído do chassi, o sistema calcula a idade operacional do veículo através da fórmula: 
+$$Idade = Ano_{Atual} - Ano_{Fab}$$
 
-- **Contabilização do Tempo de Pátio:** O sistema registra o timestamp (carimbo de data/hora) exato no momento em que a portaria autoriza a entrada do veículo e quando a balança/doca registra a pesagem ou descarga.
+O fator multiplicador de degradação da eficiência catalítica é determinado pelas seguintes faixas:
+* Para $Idade \le 3$ anos: $F_d = 1,00$ *(Eficiência nominal)*.
+* Para $3 < Idade \le 8$ anos: $F_d = 1,02$ *(Penalização de +2% na emissão)*.
+* Para $Idade > 8$ anos: $F_d = 1,05$ *(Penalização de +5% na emissão)*.
 
-- **Métrica de Desperdício:** Com base no delta de tempo em minutos gasto pelo caminhão trafegando ou esperando em fila com o motor ligado no pátio, o algoritmo calcula o desperdício de combustível presumido (sabendo que um motor pesado consome em média de 2 a 3,5 litros de óleo diesel por hora em marcha lenta). O sistema projeta instantaneamente a quantidade de $CO_2$ liberada desnecessariamente na atmosfera naquele intervalo, gerando alertas no painel do Analista de ESG caso o tempo de pátio ultrapasse a meta operacional estipulada de 15 minutos.
+#### Passo 3: Processamento da Equação de Emissão Total ($E_{Total}$)
+O sistema resgata a distância total em quilômetros ($D$) mapeada no trajeto e calcula a massa de carbono através da equação:
 
-### *Regra de Persistência Resiliência*
+$$E_{Total} = \left( \frac{D}{\text{Consumo Médio (km/L)}} \right) \times F_c \times F_d$$
 
-- **Garantia de Operação:** Durante a execução do aplicativo desktop WpfIveco, o sistema testa periodicamente a conectividade com o backend na nuvem. Detectada qualquer oscilação ou queda na internet, o fluxo de triagem não é bloqueado. A regra de negócio instrui o sistema a persistir todos os registros de entrada, cálculos do GHG e validações em andamento no banco de dados embutido e local SQLite.
+---
 
-- **Sincronização Eventual em Lote:** Assim que os serviços de rede detectam que a conexão com o Firebase Firestore foi restabelecida, uma rotina em segundo plano (background worker) é disparada de forma assíncrona. Esse módulo realiza a varredura no banco local, extrai os dados gerados durante o período de contingência, resolve possíveis conflitos de concorrência de horários e faz o upload em lote (bulk insert) para a nuvem, atualizando os dashboards gerenciais de forma transparente para o usuário final.
+### 4. Pós-condições e Ações do Sistema
 
+* **Cenário de Sucesso (Dados Consistentes):** O valor resultante ($E_{Total}$) é persistido no documento da viagem no banco NoSQL **Cloud Firestore**, as variáveis temporárias de memória são limpas e o indicador gráfico do painel administrativo da gerência de ESG atualiza-se dinamicamente sem necessidade de recarregamento manual da tela (*Hot Reload*).
+* **Cenário de Exceção (Dados Incompletos ou Nulos):** Caso o consumo médio do veículo retorne zerado do banco de dados (o que causaria um erro de divisão por zero na equação), o sistema aborta o cálculo, atribui o valor de consumo padrão de mercado para frotas pesadas ($3,5$ km/L) para fins de contingência, grava um log de aviso estruturado de nível *Warning* via **Serilog** e permite a conclusão do fluxo operacional emitindo uma notificação visual amarela para auditoria posterior.
 
-
-Visando a alta disponibilidade do chão de fábrica, a lógica de armazenamento foi arquitetada para ser tolerante a falhas completas de infraestrutura de rede:
 
 ---
 ## Considerações Finais:
@@ -808,8 +765,11 @@ Conclui-se, portanto, que o Iveco Green Ledger se consolida não apenas como um 
 ## Referências Bibliográficas:
 
 - https://firebase.google.com/?hl=pt-br;
+- (Esta referência fundamenta a escolha e a modelagem do banco de dados não-relacional (NoSQL) utilizado na nuvem)
 - https://learn.microsoft.com/en-us/dotnet/desktop/wpf/
+- (Serviu de diretriz para a construção da interface gráfica rica de usuário (GUI) voltada ao ambiente de desktop)
 - https://livecharts.dev/
+- (Documenta o ecossistema de componentes visuais adotado para a camada analítica do projeto)
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
 *Última atualização: 26 de junho de 2026.*
