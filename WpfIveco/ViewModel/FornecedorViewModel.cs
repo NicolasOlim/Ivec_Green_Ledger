@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -9,12 +10,14 @@ using System.Windows;
 using System.Windows.Input;
 using WpfIveco.Models;
 using WpfIveco.ViewModels;
+using WpfIveco.DTO;
 
 namespace WpfIveco.ViewModels
 {
     /// <summary>
     /// ViewModel para a gestão de fornecedores.
     /// Gerencia consulta de CNPJ, cadastro e listagem de fornecedores.
+    /// A categoria ESG é persistida diretamente na API (Firestore).
     /// </summary>
     public class FornecedorViewModel : ViewModelBase
     {
@@ -25,7 +28,6 @@ namespace WpfIveco.ViewModels
         /// ============================================================
 
         private string _cnpjBusca = "";
-        /// <summary>CNPJ digitado pelo usuário para consulta.</summary>
         public string CnpjBusca
         {
             get => _cnpjBusca;
@@ -33,7 +35,6 @@ namespace WpfIveco.ViewModels
         }
 
         private string _nomeFornecedorEncontrado = "";
-        /// <summary>Nome do fornecedor retornado pela consulta.</summary>
         public string NomeFornecedorEncontrado
         {
             get => _nomeFornecedorEncontrado;
@@ -41,7 +42,6 @@ namespace WpfIveco.ViewModels
         }
 
         private string _localizacaoFornecedorEncontrado = "";
-        /// <summary>Localização do fornecedor retornada pela consulta.</summary>
         public string LocalizacaoFornecedorEncontrado
         {
             get => _localizacaoFornecedorEncontrado;
@@ -49,39 +49,53 @@ namespace WpfIveco.ViewModels
         }
 
         private string _mensagemCadastro = "";
-        /// <summary>Mensagem de feedback para o usuário (sucesso/erro).</summary>
         public string MensagemCadastro
         {
             get => _mensagemCadastro;
             set { _mensagemCadastro = value; OnPropertyChanged(); }
         }
 
+        private bool _isErro = false;
+        public bool IsErro
+        {
+            get => _isErro;
+            set { _isErro = value; OnPropertyChanged(); }
+        }
+
         private ObservableCollection<FornecedorModel> _listaFornecedores = new();
-        /// <summary>Lista de fornecedores cadastrados.</summary>
         public ObservableCollection<FornecedorModel> ListaFornecedores
         {
             get => _listaFornecedores;
             set { _listaFornecedores = value; OnPropertyChanged(); }
         }
 
-        /// <summary>Total de fornecedores cadastrados.</summary>
         public int TotalFornecedores => ListaFornecedores?.Count ?? 0;
+
+        private string _statusRfb = "Aguardando consulta";
+        public string StatusRfb
+        {
+            get => _statusRfb;
+            set { _statusRfb = value; OnPropertyChanged(); }
+        }
+
+        private string _categoriaEsg = "Não avaliado";
+        public string CategoriaEsg
+        {
+            get => _categoriaEsg;
+            set { _categoriaEsg = value; OnPropertyChanged(); }
+        }
 
         /// ============================================================
         /// COMANDOS
         /// ============================================================
 
-        /// <summary>Comando para consultar CNPJ na BrasilAPI.</summary>
         public ICommand ConsultarCnpjCommand { get; }
-
-        /// <summary>Comando para salvar fornecedor no Firestore.</summary>
         public ICommand SalvarFornecedorCommand { get; }
 
         /// ============================================================
         /// CONSTRUTOR
         /// ============================================================
 
-        /// <summary>Inicializa o ViewModel com o HttpClient.</summary>
         public FornecedorViewModel(HttpClient httpClient)
         {
             App.LogInfo("Construtor", "FORNEC");
@@ -94,7 +108,6 @@ namespace WpfIveco.ViewModels
         /// MÉTODOS PÚBLICOS
         /// ============================================================
 
-        /// <summary>Carrega a lista de fornecedores da API.</summary>
         public async Task CarregarFornecedoresAsync()
         {
             App.LogInfo("CarregarFornecedoresAsync iniciado", "FORNEC");
@@ -114,9 +127,9 @@ namespace WpfIveco.ViewModels
                     App.LogInfo($"{fornecedores.Count} fornecedores carregados", "FORNEC");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                App.LogError("Erro ao carregar fornecedores – lista vazia", "FORNEC");
+                App.LogError($"Erro ao carregar fornecedores: {ex.Message}", "FORNEC");
                 ListaFornecedores = new ObservableCollection<FornecedorModel>();
             }
         }
@@ -125,10 +138,12 @@ namespace WpfIveco.ViewModels
         /// MÉTODOS PRIVADOS
         /// ============================================================
 
-        /// <summary>Consulta um CNPJ na BrasilAPI e preenche os campos do fornecedor.</summary>
         private async Task ConsultarCnpjAsync()
         {
             App.LogInfo($"Consultando CNPJ: {CnpjBusca}", "FORNEC");
+            IsErro = false;
+            MensagemCadastro = "";
+
             if (string.IsNullOrWhiteSpace(CnpjBusca))
             {
                 App.LogWarning("CNPJ vazio", "FORNEC");
@@ -150,31 +165,60 @@ namespace WpfIveco.ViewModels
 
                     NomeFornecedorEncontrado = fornecedor.GetProperty("nome").GetString();
                     LocalizacaoFornecedorEncontrado = fornecedor.GetProperty("localizacao").GetString();
-                    MensagemCadastro = "Fornecedor encontrado! Clique em 'Registrar no Ledger' para salvar.";
-                    App.LogInfo($"Fornecedor encontrado: {NomeFornecedorEncontrado}", "FORNEC");
+
+                    // Status RFB
+                    var situacao = fornecedor.TryGetProperty("situacao", out var sit)
+                        ? sit.GetString()
+                        : "ATIVA (assumido)";
+                    StatusRfb = situacao;
+
+                    // Verifica se o fornecedor já está cadastrado na lista
+                    var fornecedorExistente = ListaFornecedores.FirstOrDefault(f => f.Cnpj == cnpjLimpo);
+                    if (fornecedorExistente != null)
+                    {
+                        // Carrega a categoria ESG salva na API
+                        CategoriaEsg = fornecedorExistente.CategoriaEsg ?? "Não avaliado";
+                        MensagemCadastro = $"Fornecedor já cadastrado. Categoria ESG: {CategoriaEsg}";
+                        App.LogInfo($"Fornecedor encontrado. Categoria: {CategoriaEsg}", "FORNEC");
+                    }
+                    else
+                    {
+                        CategoriaEsg = "Não avaliado";
+                        MensagemCadastro = "Fornecedor novo! Clique em 'Registrar no Ledger' para salvar.";
+                        App.LogInfo("Fornecedor novo – categoria definida como 'Não avaliado'", "FORNEC");
+                    }
+
+                    IsErro = false;
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     App.LogWarning("CNPJ não encontrado", "FORNEC");
                     MensagemCadastro = "CNPJ não encontrado na Receita Federal.";
+                    IsErro = true;
                     NomeFornecedorEncontrado = "";
                     LocalizacaoFornecedorEncontrado = "";
+                    StatusRfb = "Não encontrado";
+                    CategoriaEsg = "N/A";
                 }
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
                     App.LogError($"Erro na consulta: {erro}", "FORNEC");
                     MensagemCadastro = "Erro ao consultar CNPJ. Tente novamente.";
+                    IsErro = true;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                App.LogError("Erro de conexão na consulta CNPJ", "FORNEC");
+                App.LogError($"Erro de conexão na consulta CNPJ: {ex.Message}", "FORNEC");
                 MensagemCadastro = "Erro de conexão. Verifique sua internet.";
+                IsErro = true;
             }
         }
 
-        /// <summary>Salva o fornecedor encontrado no Firestore via API.</summary>
+        /// <summary>
+        /// Salva o fornecedor no Firestore via API, incluindo a categoria ESG selecionada.
+        /// </summary>
         private async Task SalvarFornecedorAsync()
         {
             App.LogInfo($"Salvando fornecedor: {NomeFornecedorEncontrado}", "FORNEC");
@@ -182,17 +226,20 @@ namespace WpfIveco.ViewModels
             {
                 App.LogWarning("Nome vazio – abortando", "FORNEC");
                 MensagemCadastro = "Consulte um CNPJ válido primeiro.";
+                IsErro = true;
                 return;
             }
 
             try
             {
+                var cnpjLimpo = CnpjBusca.Replace(".", "").Replace("/", "").Replace("-", "");
                 var fornecedor = new
                 {
                     Id = "",
                     Nome = NomeFornecedorEncontrado,
                     Localizacao = LocalizacaoFornecedorEncontrado,
-                    Cnpj = CnpjBusca.Replace(".", "").Replace("/", "").Replace("-", "")
+                    Cnpj = cnpjLimpo,
+                    CategoriaEsg = CategoriaEsg // Agora enviando a categoria
                 };
 
                 var response = await _httpClient.PostAsJsonAsync("api/dados/fornecedores", fornecedor);
@@ -200,24 +247,32 @@ namespace WpfIveco.ViewModels
 
                 if (response.IsSuccessStatusCode)
                 {
-                    App.LogInfo("Fornecedor registrado com sucesso!", "FORNEC");
+                    App.LogInfo($"Fornecedor registrado com sucesso! Categoria: {CategoriaEsg}", "FORNEC");
                     MensagemCadastro = "Fornecedor registrado com sucesso!";
+                    IsErro = false;
+
+                    // Limpa os campos
                     CnpjBusca = "";
                     NomeFornecedorEncontrado = "";
                     LocalizacaoFornecedorEncontrado = "";
-                    await CarregarFornecedoresAsync();
+                    StatusRfb = "Aguardando consulta";
+                    CategoriaEsg = "Não avaliado";
+
+                    await CarregarFornecedoresAsync(); // Recarrega a lista
                 }
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
                     App.LogError($"Falha ao salvar: {erro}", "FORNEC");
                     MensagemCadastro = $"Erro ao salvar: {erro}";
+                    IsErro = true;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                App.LogError("Erro de conexão ao salvar fornecedor", "FORNEC");
+                App.LogError($"Erro de conexão ao salvar fornecedor: {ex.Message}", "FORNEC");
                 MensagemCadastro = "Erro de conexão. Verifique sua rede.";
+                IsErro = true;
             }
         }
     }

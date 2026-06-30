@@ -12,6 +12,8 @@ namespace ApiIveco.Models
         public string Localizacao { get; set; }
         [FirestoreProperty]
         public string Cnpj { get; set; }
-        
+        [FirestoreProperty]
+        public string CategoriaEsg { get; set; }
+
     }
 }

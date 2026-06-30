@@ -112,7 +112,8 @@ namespace ApiIveco.Service
                             Id = string.Empty, // Será gerado pelo Firestore
                             Nome = nomeEmpresa,
                             Localizacao = moradaCompleta,
-                            Cnpj = cnpjLimpo
+                            Cnpj = cnpjLimpo,
+                            CategoriaEsg = "Não avaliado" // Valor padrão
                         };
                     }
                 }
@@ -206,16 +207,14 @@ namespace ApiIveco.Service
             {
                 if (document.Exists)
                 {
-                    // CORRECAO: Leitura manual campo a campo para evitar conflito com o campo
-                    // "Id" gravado dentro do documento (herança de [FirestoreProperty] no modelo).
-                    // ConvertTo<>() falhava silenciosamente quando o campo "Id" interno
-                    // nao correspondia ao tipo esperado, retornando lista vazia [].
+                    // Leitura manual campo a campo para compatibilidade
                     var fornecedor = new Fornecedor
                     {
                         Id = document.Id,
                         Nome = document.TryGetValue("Nome", out string nome) ? nome : null,
                         Localizacao = document.TryGetValue("Localizacao", out string localizacao) ? localizacao : null,
                         Cnpj = document.TryGetValue("Cnpj", out string cnpj) ? cnpj : null,
+                        CategoriaEsg = document.TryGetValue("CategoriaEsg", out string cat) ? cat : "Não avaliado"
                     };
                     fornecedores.Add(fornecedor);
                 }
@@ -233,14 +232,16 @@ namespace ApiIveco.Service
             int novoId = await GerarProximoId("contador_fornecedor");
             fornecedor.Id = novoId.ToString();
 
-            // CORRECAO: Grava apenas os campos de dados via dicionario explicito,
-            // sem incluir o campo "Id" dentro do documento. O document.Id ja e a
-            // chave primaria — gravar "Id" internamente e redundante e causava o bug.
+            // Garante que a categoria tenha um valor padrão se não for fornecida
+            if (string.IsNullOrWhiteSpace(fornecedor.CategoriaEsg))
+                fornecedor.CategoriaEsg = "Não avaliado";
+
             var dados = new Dictionary<string, object>
             {
-                { "Nome",        fornecedor.Nome        ?? "" },
-                { "Localizacao", fornecedor.Localizacao ?? "" },
-                { "Cnpj",        fornecedor.Cnpj        ?? "" },
+                { "Nome",           fornecedor.Nome          ?? "" },
+                { "Localizacao",    fornecedor.Localizacao   ?? "" },
+                { "Cnpj",           fornecedor.Cnpj          ?? "" },
+                { "CategoriaEsg",   fornecedor.CategoriaEsg  ?? "Não avaliado" }
             };
 
             DocumentReference docRef = _firestoreDb.Db.Collection(_collectionFornecedor).Document(fornecedor.Id);
@@ -268,7 +269,6 @@ namespace ApiIveco.Service
 
             if (possuiLotes)
             {
-                // Vai gerar um HTTP 422 (Unprocessable Entity) ou 400
                 throw new InvalidOperationException("Operação Bloqueada: Este fornecedor possui lotes de matéria-prima associados. A exclusão comprometeria a rastreabilidade do Escopo 3.");
             }
 
@@ -294,8 +294,6 @@ namespace ApiIveco.Service
             {
                 if (document.Exists)
                 {
-                    // CORRECAO: Leitura manual para compatibilidade com documentos
-                    // que tenham o campo "Id" gravado internamente.
                     document.TryGetValue("QuantidadeKg", out double qtd);
                     document.TryGetValue("PegadaCarbonoPorKg", out double pegada);
                     DateTime? dataProducao = null;
@@ -341,7 +339,6 @@ namespace ApiIveco.Service
             int novoId = await GerarProximoId("contador_lote");
             lote.Id = novoId.ToString();
 
-            // CORRECAO: Grava via dicionario para nao incluir campo "Id" interno
             var dadosLote = new Dictionary<string, object>
             {
                 { "TipoMaterial",       lote.TipoMaterial       ?? "" },
@@ -393,8 +390,6 @@ namespace ApiIveco.Service
             {
                 if (document.Exists)
                 {
-                    // CORRECAO: Leitura manual para compatibilidade com documentos
-                    // que tenham o campo "Id" gravado internamente.
                     document.TryGetValue("PesoKg", out double peso);
                     var componente = new VeiculoComponente
                     {
@@ -450,7 +445,6 @@ namespace ApiIveco.Service
             int novoId = await GerarProximoId("contador_componente");
             componente.Id = novoId.ToString();
 
-            // CORRECAO: Grava via dicionario para nao incluir campo "Id" interno
             var dadosComp = new Dictionary<string, object>
             {
                 { "fk_Veiculo_Vin",         componente.fk_Veiculo_Vin         ?? "" },

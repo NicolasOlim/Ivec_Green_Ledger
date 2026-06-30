@@ -15,6 +15,7 @@ namespace WpfIveco.Models
         public string Cnpj { get; set; }
         public string Nome { get; set; }
         public string Localizacao { get; set; }
+        public string CategoriaEsg { get; set; }
     }
 
     public class PecaModel

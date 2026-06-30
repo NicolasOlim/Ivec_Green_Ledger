@@ -43,6 +43,94 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="PremiumComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#111827"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="14,12"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="Border" Background="{TemplateBinding Background}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ContentPresenter x:Name="ContentPresenter" Grid.Column="0" 
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                      Margin="12,0,12,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                                    <ToggleButton x:Name="PART_DropDownToggle" Grid.Column="1" Focusable="False" ClickMode="Press"
+                                                  Background="Transparent" BorderThickness="0" HorizontalAlignment="Right" Margin="0,0,14,0"
+                                                  VerticalAlignment="Center" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                        <Path Fill="#6B7280" Data="M0,0 L5,5 L10,0 Z" Width="12" Height="7" Stretch="Fill"/>
+                                    </ToggleButton>
+                                </Grid>
+                            </Border>
+                            <Popup x:Name="PART_Popup" Placement="Bottom" IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                   MaxHeight="250" AllowsTransparency="True" StaysOpen="False">
+                                <Border Background="White" CornerRadius="8" BorderBrush="#E5E5EA" BorderThickness="1"
+                                        Margin="0,6,0,0" Padding="6" Effect="{StaticResource DropShadowEffect}">
+                                    <ScrollViewer>
+                                        <ItemsPresenter/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#0A5B43"/>
+                                <Setter TargetName="Border" Property="Background" Value="#F0FDF4"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#0A5B43"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="#F3F4F6"/>
+                                <Setter Property="Foreground" Value="#9CA3AF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Padding" Value="14,10"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Foreground" Value="#111827"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="FontSize" Value="13"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ComboBoxItem">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsHighlighted" Value="True">
+                                            <Setter Property="Background" Value="#F3F4F6"/>
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#ECFDF5"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -155,9 +243,27 @@
                                      Text="{Binding Fornecedor.NomeFornecedorEncontrado}" 
                                      IsReadOnly="True" FontWeight="SemiBold"/>
 
+                            <!-- Status RFB – CORRIGIDO: removido o atributo Style duplicado -->
                             <TextBlock Text="Status RFB" Foreground="#4B5563" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
-                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="ATIVA" 
-                                     IsReadOnly="True" Foreground="#059669" FontWeight="Bold"/>
+                            <TextBox Text="{Binding Fornecedor.StatusRfb}" 
+                                     IsReadOnly="True" FontWeight="Bold">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox" BasedOn="{StaticResource PremiumTextBoxStyle}">
+                                        <Setter Property="Foreground" Value="#059669"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Fornecedor.StatusRfb}" Value="SUSPENSA">
+                                                <Setter Property="Foreground" Value="#D97706"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Fornecedor.StatusRfb}" Value="INATIVA">
+                                                <Setter Property="Foreground" Value="#EF4444"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Fornecedor.StatusRfb}" Value="Não encontrado">
+                                                <Setter Property="Foreground" Value="#EF4444"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
@@ -169,9 +275,19 @@
                                            TextWrapping="Wrap" VerticalAlignment="Center"/>
                             </Border>
 
+                            <!-- Categoria ESG – ComboBox corrigido -->
                             <TextBlock Text="Categoria ESG (Atribuída)" Foreground="#4B5563" FontSize="13" FontWeight="SemiBold" Margin="0,20,0,8"/>
-                            <TextBox Style="{StaticResource PremiumTextBoxStyle}" Text="Pendente de Auditoria" 
-                                     IsReadOnly="True" Foreground="#D97706" FontWeight="Bold"/>
+                            <ComboBox Style="{StaticResource PremiumComboBoxStyle}" 
+          SelectedValue="{Binding Fornecedor.CategoriaEsg, Mode=TwoWay}"
+          SelectedValuePath="Content"
+          IsEditable="False" IsReadOnly="False">
+                                <ComboBoxItem>Ouro</ComboBoxItem>
+                                <ComboBoxItem>Prata</ComboBoxItem>
+                                <ComboBoxItem>Bronze</ComboBoxItem>
+                                <ComboBoxItem>Pendente</ComboBoxItem>
+                                <ComboBoxItem>Não avaliado</ComboBoxItem>
+                                <ComboBoxItem>Sem dados</ComboBoxItem>
+                            </ComboBox>
                         </StackPanel>
                     </Grid>
 
