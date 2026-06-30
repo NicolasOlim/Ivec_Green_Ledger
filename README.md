@@ -125,6 +125,10 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 
 ### **Entidades e Atributos:**
 
+### **Tabela: Usuário**
+
+<div align="center">
+
 #### Tabela - USUARIO
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
@@ -134,9 +138,13 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 | **senhaHash** | Atributo | Senha criptografada para acesso |
 | **perfil** | Atributo | Permissão para acesso ao sistema |
 
----
+</div>
 
+---
 #### Tabela - FORNECEDOR
+
+<div align="center">
+
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **id** | PK | Identificador único do fornecedor |
@@ -144,9 +152,14 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 | **razaoSocial** | Atributo | Razão Social ou nome empresarial |
 | **status** | Atributo | Estado lógico do fornecedor no sistema |
 
+</div>
+
 ---
 
 #### Tabela - LOTE_MATERIA_PRIMA
+
+<div align="center">
+
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **id** | PK | Identificador único do lote |
@@ -156,9 +169,14 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 | **pegadaCarbonoPorKg** | Atributo | Fator de emissão de carbono po Kg |
 | **dataProducao** | Atributo | Data e hora em que o lote foi produzido |
 
+</div>
+
 ---
 
 #### Tabela - Veiculo
+
+<div align="center">
+
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **vin** | PK | Identificação do veículo |
@@ -166,7 +184,14 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 | **marca** | Atributo | Fabricante do Veículo |
 | **dataMontagem** | Atributo | Data e Hora que o veículo entrou na linha de montagem |
 
+</div>
+
+---
+
 #### Tabela - Veiculo_Componente
+
+<div align="center">
+
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **id** | PK | Identificação do veículo do componente |
@@ -176,11 +201,15 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 | **pesoKg** | Atributo | Peso Físico da peça e componente |
 | **totalCO2eCalculado** | Atributo | Total de carbono calculado para essa peça |
 
+</div>
+
 ---
 
 ### **Relacionamentos:**
 
 Os relacionamentos entre as entidades do sistema são definidos a seguir: 
+
+<div align="center">
 
 | Atributo | Tipo/papel | Semântica |
 | :--- | :--- | :--- |
@@ -189,6 +218,7 @@ Os relacionamentos entre as entidades do sistema são definidos a seguir:
 | **LOTE_MATERIA_PRIMA — VEICULO_COMPONENTE** | 1 : N | Um lote de matéria-prima pode dar origem ou fornecer insumos para vários registros de componentes aplicados. |
 | **VEICULO — LOTE_MATERIA_PRIMA** | N:M | Um veículo consome insumos de vários lotes de matéria-prima, e um lote de matéria-prima pode ser distribuído entre múltiplos veículos. |
 
+</div>
 ---
 
 ## Modelo Lógico:
@@ -196,17 +226,25 @@ Os relacionamentos entre as entidades do sistema são definidos a seguir:
 O modelo lógico do ecossistema converte as entidades conceituais em estruturas relacionais normatizadas, definindo as chaves primárias (PK), chaves estrangeiras (FK) e restrições de integridade de cada atributo. A tipagem de identificação foi padronizada como TEXT de forma unificada entre os campos de amarração (id, fk_fornedor, vin, fk_veiculo_vin, fk_loteMateriaPrima_id).
 
 ### **Tabela: Usuário**
+
+<div align="center">
+
 | Coluna | Chave/Relacionamento | Tipo | Descrição |
-| :--- | :--- | :--- | :--- |
+| :---: | :---: | :---: | :--- |
 | **id** | PK | TEXT | Identificador único do usuário |
 | **nome** | - | TEXT | Nome do usuário |
 | **email** | - | TEXT | Email de contato corporativo |
 | **senhaHash** | - | TEXT | Senha para a autenticação |
 | **perfil** | - | TEXT | Nível de permissão |
 
+</div>
+
 ---
 
 #### Tabela - Fornecedor
+
+<div align="center">
+
 | Coluna | Chave/relacionamento | Tipo | Descrição |
 | :--- | :--- | :--- |  :--- |
 | **id** | PK | TEXT | Identificador único do fornecedor |
@@ -215,9 +253,14 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 | **status** | - | TEXT | Estado do cadastro |
 | **perfil** | - | TEXT | Nivel de permissão |
 
+</div>
+
 ---
 
 #### Tabela - Lote Materia Prima
+
+<div align="center">
+
 | Coluna | Chave/relacionamento | Tipo | Descrição |
 | :--- | :--- | :--- | :--- |
 | **vin** | PK | TEXT | Número de identificação do chassi (17 caracteres) |
@@ -225,9 +268,14 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 | **marca** | - | TEXT | Fabricante do automóvel |
 | **dataMontagem** | - | DATETIME | Data e hora de entrada para a montagem |
 
+</div>
+
 ---
 
 #### Tabela - Veiculo_componente
+
+<div align="center">
+
 | Coluna | Chave/relacionamento | Tipo | Descrição |
 | :--- | :--- | :---  | :--- |
 | **id** | PK | TEXT | Identificador único do veículo |
@@ -236,6 +284,8 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 | **nomeComponente** | - | REAL | Nome da peça em quilogramas |
 | **pesoKg** | - | REAL | Peso de peça em quilogramas |
 | **totalCO2Calculado** | - | - | Total de carbono calculado para essa peça |
+
+</div>
 
 ---
 
@@ -313,6 +363,8 @@ Ivec_Green_Ledger/
 
 A API REST da ApiIveco é desenvolvida em ASP.NET e exposta no domínio corporativo do ecossistema. Ela é responsável por receber as requisições assíncronas do cliente desktop WPF, processar as regras de negócio automotivas, como os cálculos de emissões e validações integradas à BrasilAPI e NHTSA, e persistir os dados consolidados no banco de dados em nuvem Firebase Firestore. Sendo implementados os seguintes endpoits:
 
+<div align="center">
+
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- | 
 | **POST** | /api/usuario/login | Realiza a autenticação do usuário e retorna as permissões de perfil (Operador/Admin) | 
@@ -324,6 +376,8 @@ A API REST da ApiIveco é desenvolvida em ASP.NET e exposta no domínio corporat
 | **GET** | /api/veiculo/{vin} | Consulta os dados técnicos de um veículo específico pelo chassi | 
 | **POST** | /api/veiculo | Registra a entrada de um novo chassi — consome a API da NHTSA para decodificação internacional do VIN | 
 | **POST** | /api/veiculo-componente | Associa componentes/lotes a um veículo, processa o cálculo final do GHG Protocol e consolida o registro no Firebase | 
+
+</div>
 
 ### **Fluxo Detalhado:**
 
@@ -351,6 +405,8 @@ A análise de viabilidade técnica avalia se o sistema Iveco Green Ledger pode s
 
 ### **Infraestruturas e Tecnologias:**
 
+<div align="center">
+
 | Componente | Licença | Maturidade | Observação |
 | :--- | :--- | :--- | :--- | 
 | **C# / .NET 8** | MIT(open-source) | Alta | Plataforma Microsoft estável, unificada e com suporte LTS (Long-Term Support) garantido. |
@@ -362,6 +418,8 @@ A análise de viabilidade técnica avalia se o sistema Iveco Green Ledger pode s
 | **API da NHTSA** | Domínio Público | Alta | Base governamental norte-americana padrão global para decodificação técnica e validação de VIN (Chassi) |
 | **Swagger / Open API** | Apache 2.0 | Alta | Padrão internacional de mercado adotado na ApiIveco para documentação e testes de endpoints REST |
 | **Github** | Gratuito | Alta | Plataforme de controle de versão do mercado |
+
+</div>
 
 ### **Requisitos Mínimos de Hardware:**
 
@@ -385,6 +443,8 @@ Para execução do sistema em ambiente de produção, os  requisitos mínimos re
 
 ### **Riscos Técnicos e Mistigações:**
 
+<div align="center">
+
 | Risco | Probabilidade | Impacto | Mistigação |
 | :--- | :--- | :--- | :--- | 
 | Cota gratuita do Firebase excedida com alto volume de dados | Média | Alta | Migrar para o plano Blaze (pay-as-you-go) do Firebase para suportar a escala industrial ou migrar a persistência de longo prazo para uma instância dedicada de banco de dados relacional próprio |
@@ -392,10 +452,14 @@ Para execução do sistema em ambiente de produção, os  requisitos mínimos re
 | Interrupção de conectividade | Alta | Médio | Utilização automática da camada de persistência em borda com SQLite. O cliente desktop armazena os registros localmente |
 | Incompatibilidade ou quebra de contrato em atualizações das API’s | Baixa | Médio | Criação de contratos de integração isolados por meio de interfaces (Services/Interface/) na ApiIveco, permitindo a substituição do provedor de dados de chassi ou CNPJ com impacto zero no cliente WPF |
 
+</div>
+
 ---
 ## Escabilidade:
 
 A arquitetura adotada para o Iveco Green Ledger foi projetada estrategicamente para suportar o crescimento gradual do volume de dados e de acessos no pátio logístico sem a necessidade de refatorações estruturais complexas. Os principais aspectos de escalabilidade são:
+
+<div align="center">
 
 | Componente | Tipo | Mecanismo de Expansão | Impacto no crescimento de sistema |
 | :--- | :--- | :--- | :--- | 
@@ -404,6 +468,8 @@ A arquitetura adotada para o Iveco Green Ledger foi projetada estrategicamente p
 | Interface Desktop | Funcional (Padrão MVVM) | Desacoplamento | Permite a acoplagem de novos módulos operacionais |
 | Integração com Api’s Externas | Arquitetura | Interfaces abstratas | Facilita a substituição ou adição de novos provedores de dados com impacto zero no cliente desktop |
 | Persistência em Borda (SQLite) | Descentralizada | Distribuição da carga| Evita gargalos de escrita e sobrecarga no servidor principal |
+
+</div>
 
 ---
 
@@ -445,6 +511,8 @@ O padrão arquitetural MVVM (Model-View-ViewModel) foi adotado no desenvolviment
 
 Iveco Green Ledger é organizado em módulos funcionais isolados através do padrão MVVM, cada um com escopo operacional e status de desenvolvimento bem definidos. A tabela abaixo apresenta o panorama atual da solução:
 
+<div align="center">
+
 | Módulo | Descrição | Status |
 | :--- | :--- | :--- | 
 | Mapa | Integração com a API do Mercado Livre para localização geográfica e monitoramento em tempo real dos caminhões de suprimentos | Disponível |
@@ -454,6 +522,8 @@ Iveco Green Ledger é organizado em módulos funcionais isolados através do pad
 | Contigência Offline | Mecanismo de persistência descentralizada em banco SQLite para garantir a operação contínua do pátio em caso de queda de internet | Implementação Futura |
 | Relatórios | Exportação de históricos operacionais, balanço de emissões de carbono e dados consolidados para auditoria corporativa | Disponível |
 | Central de Notificações | Alertas automáticos na interface WPF sobre inconformidades em chassis, atrasos de cargas ou desvios de rotas logísticas | Implementação Futura |
+
+</div>
 
 ---
 
@@ -489,6 +559,8 @@ Projetado como uma evolução estratégica para as próximas etapas do sistema, 
 
 ### **Processo de Desenvolvimento**
 
+<div align="center">
+
 | Fase | Status |
 | :--- | :--- | 
 | Fase 1 - Setup e Infraestrutura | Concluído ✅ | 
@@ -498,6 +570,8 @@ Projetado como uma evolução estratégica para as próximas etapas do sistema, 
 | Fase 5 - Persistência na nuvem | Concluído ✅ | 
 | Fase 6 - Expansão Futura | Em Progresso ⚙️| 
 | Central de Notificações |Implementação Futura 💡| 
+
+</div>
 
 ### **Ambiente de Desenvolvimento**
 
@@ -510,12 +584,11 @@ Projetado como uma evolução estratégica para as próximas etapas do sistema, 
 ---
 ## Business Model Canvas:
 
-<div class="logo-container">
+<div class="logo-container" align="center">
     <img src="imagens/bussiness model canvas.png" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 ---
 
----
 
 ## Viabilidade Econômica:
 
@@ -524,6 +597,8 @@ A viabilidade econômica do projeto se consolida pela expressiva redução de cu
 ### **Custos de Desenvolvimento**
 
 Por tratar-se de um projeto acadêmico focado em inovação industrial, os custos de engenharia e desenvolvimento foram essencialmente de tempo, pesquisa e capacitação da equipe. A tabela abaixo projeta esses custos em valores reais de mercado, considerando as horas técnicas investidas e a remuneração média de desenvolvedores Júnior/Pleno no Brasil em 2026 para o desenvolvimento do ecossistema.
+
+<div align="center">
 
 | Item | Hora estimada | Valor por Hora | Custo Total |
 | :--- | :--- | :--- | :--- | 
@@ -537,9 +612,12 @@ Por tratar-se de um projeto acadêmico focado em inovação industrial, os custo
 | Documentaçãos | 35h |  R$ 50,00 |  R$ 1.750,00 | 
 | Total | 340h |  - |  R$ 2.640,00 | 
 
+</div>
+
 ---
 Os custos mensais de operação do sistema em produção são estimados abaixo, considerando a volumetria de requisições e processamento de dados para o gerenciamento de pátio, triagem de veículos e monitoramento de emissões da Iveco:
 
+<div align="center">
 
 | Serviço | Custo no Desenvolvimento | Projeção em Produção | Observação |
 | :--- | :--- | :--- | :--- | 
@@ -549,6 +627,8 @@ Os custos mensais de operação do sistema em produção são estimados abaixo, 
 | SQLite | R$ 0,00 |  R$ 0,00 |  Banco embutido no cliente desktop WPF, sem dependência de nuvem ou servidor externo | 
 | Domínio e Certificado SSL | R$ 0,00 |  R$ 5,00 - 40,00 |  Comunicação segura via criptografia e SSL gratuito |
 | Total Mensal Atual | R$ 0,00 | - |  Custo zero durante todo o ciclo de desenvolvimento | 
+
+</div>
 
 ---
 ### **Beneficios e Retorno Esperado**
@@ -562,6 +642,8 @@ A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na
 - Otimização de Rotas;
 - Auditoria Confiável.
 
+<div align="center">
+
 | Indicador | Sem Green Ledger | Com Green Ledger | 
 | :--- | :--- | :--- |
 | Tempo médio de triagem | 15 min por veículo |  2 minutos por veículo |  
@@ -570,12 +652,16 @@ A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na
 | Economia anual estimada de CO2 | - | 10,8 t - 13,2 t de CO2 por ano |  
 | Domínio e Certificado SSL | R$ 0,00 | R$ 5,00 - R$ 40,00 |  
 
+</div>
+
 ---
 ### **Receitas e Materiais**
 
 Para a implantação física do ecossistema Iveco Green Ledger, o consumo de materiais é voltado exclusivamente para a infraestrutura de tecnologia e conectividade nas portarias e balanças do pátio logístico, englobando terminais de chão de fábrica instalados para a execução contínua da interface de usuário (WpfIveco), leitores de código de barras ou QR Code USB para agilizar a entrada de dados operacionais sem digitação manual, além da infraestrutura de rede local existente para garantir a comunicação de dados e a sincronização com a nuvem, operando com custo zero de licenciamento de software por utilizar o framework .NET 8, SQLite e APIs integradas de código aberto. Por tratar-se de um sistema focado em suporte logístico interno e governança ambiental (ESG), o projeto não gera faturamento direto por vendas, mas consolida seu retorno financeiro na forma de receitas indiretas através de uma drástica redução de custos operacionais. 
 
 ### **Análise Custo - Benefício**
+
+<div align="center">
 
 | Categoria | Tipo | Valor Anual Estimado | 
 | :--- | :--- | :--- |
@@ -589,11 +675,15 @@ Para a implantação física do ecossistema Iveco Green Ledger, o consumo de mat
 | Automação | Benefício | R$ 12.000,00 |  
 | Saldo Líquido Estimado | Lucro | R$ 31.600,00 - 34.160,00 |  
 
+</div>
+
 ---
 
 ## Artefatos Técnicos Entregues
 
 Esta seção consolida os artefatos técnicos produzidos e entregues como parte do TCC, conforme os requisitos definidos pelo curso. 
+
+<div align="center">
 
 | Artefato | Descrição | Status | 
 | :--- | :--- | :--- |
@@ -603,6 +693,8 @@ Esta seção consolida os artefatos técnicos produzidos e entregues como parte 
 | Swagger | Código-fonte completo com histórico | Entregue |  
 | MVVM | Separação de responsabilidades da interface gráfica WPF | Entregue |  
 | Documentação | Documentação técnica completa contendo levantamento de requisitos | Entregue |  
+
+</div>
 
 ---
 ## Requisitos
