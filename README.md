@@ -586,31 +586,13 @@ Por tratar-se de um projeto acadêmico focado em inovação industrial, os custo
 
 | Item | Hora estimada | Valor por Hora | Custo Total |
 | :--- | :--- | :--- | :--- | 
-| Levantamento de Requisitos | 30h |  R$ 60,00 |  R$ 1.800,00 | 
-| Modelagem do banco e Estrutura Relacional | 25h |  R$ 65,00 |  R$ 1.625,00 | 
-| Desenvolvimento da API | 70h |  R$ 90,00 |  R$ 6.300,00 | 
-| Desenvolvimento da WPF | 80h |  R$ 85,00 |  R$ 6.800,00 | 
-| Integração e consumo das API’s | 40h |  R$ 85,00 |  R$ 3.200,00 |
-| Implementação de Lógica e Sincronização | 35h |  R$ 90,00 |  R$ 3.150,00 | 
-| Testes e Validações de Dados | 25h |  R$ 70,00 |  R$ 1.750,00 | 
-| Documentaçãos | 35h |  R$ 50,00 |  R$ 1.750,00 | 
-| Total | 340h |  - |  R$ 2.640,00 | 
-
-</div>
-
----
-Os custos mensais de operação do sistema em produção são estimados abaixo, considerando a volumetria de requisições e processamento de dados para o gerenciamento de pátio, triagem de veículos e monitoramento de emissões da Iveco:
-
-<div align="center">
-
-| Serviço | Custo no Desenvolvimento | Projeção em Produção | Observação |
-| :--- | :--- | :--- | :--- | 
-| Levantamento de Requisitos | R$ 0,00 |  R$ 0,00 |  Gratuito até 1 GiB de armazenamento, 50k leituras e 20k escritas diárias. Atende perfeitamente o escopo atual | 
-| API de rastreio e Logistica | R$ 0,00 |  R$ 0,00 |  Serviços de dados públicos ou acessados via chaves gratuitas de desenvolvedor | 
-| Hospedagem da API | R$ 0,00 |  R$ 0,00 - 120,00 |  Atualmente rodando em servidores locais e nuvem gratuita. Em produção, pode migrar para planos com maior disponibilidade | 
-| SQLite | R$ 0,00 |  R$ 0,00 |  Banco embutido no cliente desktop WPF, sem dependência de nuvem ou servidor externo | 
-| Domínio e Certificado SSL | R$ 0,00 |  R$ 5,00 - 40,00 |  Comunicação segura via criptografia e SSL gratuito |
-| Total Mensal Atual | R$ 0,00 | - |  Custo zero durante todo o ciclo de desenvolvimento | 
+| Levantamento de Requisitos | 35h |  R$ 40,00 |  R$ 1.400,00 | 
+| Modelagem do banco e Estrutura Relacional | 15h |  R$ 40,00 |  R$ 600,00 | 
+| Desenvolvimento da API | 50h |  R$ 50,00 |  R$ 2.500,00 | 
+| Desenvolvimento da WPF | 60h |  R$ 50,00 |  R$ 3.000,00 | 
+| Integração API’s e Regras de Negócio | 35h |  R$ 50,00 |  R$ 1.750,00 |
+| Testes, Validações e Homologação | 25h |  R$ 45,00 |  R$ 1.125,00 | 
+| Total | 220h |  - |  R$ 10.375,00 | 
 
 </div>
 
@@ -635,28 +617,6 @@ A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na
 | Economia mensal de CO2 | - | 900 kg - 1,100 kg de CO2 por dia |  
 | Economia anual estimada de CO2 | - | 10,8 t - 13,2 t de CO2 por ano |  
 | Domínio e Certificado SSL | R$ 0,00 | R$ 5,00 - R$ 40,00 |  
-
-</div>
-
----
-### **Receitas e Materiais**
-
-Para a implantação física do ecossistema Iveco Green Ledger, o consumo de materiais é voltado exclusivamente para a infraestrutura de tecnologia e conectividade nas portarias e balanças do pátio logístico, englobando terminais de chão de fábrica instalados para a execução contínua da interface de usuário (WpfIveco), leitores de código de barras ou QR Code USB para agilizar a entrada de dados operacionais sem digitação manual, além da infraestrutura de rede local existente para garantir a comunicação de dados e a sincronização com a nuvem, operando com custo zero de licenciamento de software por utilizar o framework .NET 8, SQLite e APIs integradas de código aberto. Por tratar-se de um sistema focado em suporte logístico interno e governança ambiental (ESG), o projeto não gera faturamento direto por vendas, mas consolida seu retorno financeiro na forma de receitas indiretas através de uma drástica redução de custos operacionais. 
-
-<div align="center">
-
-### **Análise Custo - Benefício**
-| Categoria | Tipo | Valor Anual Estimado | 
-| :--- | :--- | :--- |
-| Desenvolvimento | Custo |  R$ 8.800,00 |  
-| Operação / Infraestrutura | Custo |  R$ 0,00 - 1.440,00 |  
-| Manutenção, suporte técnico e suporte offline | Custo | R$ 1.200,00 - 2.400,00 |  
-| Redução de custos | Benefício | R$ 18.000,00 |  
-| Economia operacional com eliminação de erros e retrabalhos administrativos | Benefício | R$ 6.600,00 |  
-| Economia de combustível | Benefício | R$ 7.800,00 |  
-| Economia de combustível | Benefício | R$ 7.800,00 |  
-| Automação | Benefício | R$ 12.000,00 |  
-| Saldo Líquido Estimado | Lucro | R$ 31.600,00 - 34.160,00 |  
 
 </div>
 
