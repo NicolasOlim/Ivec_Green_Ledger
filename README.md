@@ -494,9 +494,6 @@ O Firebase Firestore constitui a camada principal de persistência global e cons
 
 O padrão arquitetural MVVM (Model-View-ViewModel) foi adotado no desenvolvimento do cliente desktop para garantir o completo desacoplamento entre a interface gráfica com o usuário e as regras de apresentação da aplicação de pátio. Abaixo está o fluxo de comunicação entre as camadas da nossa aplicação.
 
-<div class="logo-container">
-    <img src="imagens/arquitetura MVVM" alt="Logo Iveco Green Ledger" class="logo-img">
-</div>
 
 ---
 ## Módulos do Sistema:
