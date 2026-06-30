@@ -805,8 +805,11 @@ Conclui-se, portanto, que o Iveco Green Ledger se consolida não apenas como um 
 ## Referências Bibliográficas:
 
 - https://firebase.google.com/?hl=pt-br;
+- (Esta referência fundamenta a escolha e a modelagem do banco de dados não-relacional (NoSQL) utilizado na nuvem)
 - https://learn.microsoft.com/en-us/dotnet/desktop/wpf/
+- (Serviu de diretriz para a construção da interface gráfica rica de usuário (GUI) voltada ao ambiente de desktop)
 - https://livecharts.dev/
+- (Documenta o ecossistema de componentes visuais adotado para a camada analítica do projeto)
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
 *Última atualização: 26 de junho de 2026.*
