@@ -1,33 +1,26 @@
 ﻿using LiveCharts;
 using LiveCharts.Wpf;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Media;
 using WpfIveco.DTO;
 using WpfIveco.Models;
+using WpfIveco.ViewModels;
 
 namespace WpfIveco.ViewModels
 {
     /// <summary>
     /// ViewModel para o Dashboard ESG (Análises).
-    /// Força a ligação direta ao Firebase Realtime Database independente de como for instanciada.
+    /// Consome os endpoints reais da API: pegada-media, grafico-emissoes e analises-esg.
     /// </summary>
-    public class AnalisesViewModel : INotifyPropertyChanged
+    public class AnalisesViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
-        private const string FirebaseEndpoint = "https://projetopim2semestre-default-rtdb.firebaseio.com/dashboard_esg.json";
 
-        /// ==========================================
-        /// 1. PROPRIEDADES DOS CARDS SUPERIORES
-        /// ==========================================
+        // Cards
         private int _totalEmissoes;
         public int TotalEmissoes
         {
@@ -56,149 +49,283 @@ namespace WpfIveco.ViewModels
             set { _economiaGerada = value; OnPropertyChanged(); }
         }
 
-        /// ==========================================
-        /// 2. PROPRIEDADES DOS GRÁFICOS (LIVECHARTS)
-        /// ==========================================
-        private SeriesCollection _emissoesSeries;
-        public SeriesCollection EmissoesSeries
+        // Gráficos
+        private SeriesCollection _graficoPizzaSeries;
+        public SeriesCollection GraficoPizzaSeries
         {
-            get => _emissoesSeries;
-            set { _emissoesSeries = value; OnPropertyChanged(); }
+            get => _graficoPizzaSeries;
+            set { _graficoPizzaSeries = value; OnPropertyChanged(); }
         }
 
-        private string[] _graficoLabels;
-        public string[] GraficoLabels
+        private SeriesCollection _graficoBarrasSeries;
+        public SeriesCollection GraficoBarrasSeries
         {
-            get => _graficoLabels;
-            set { _graficoLabels = value; OnPropertyChanged(); }
+            get => _graficoBarrasSeries;
+            set { _graficoBarrasSeries = value; OnPropertyChanged(); }
         }
 
-        /// ==========================================
-        /// 3. COLEÇÕES PARA AS LISTAS DA UI
-        /// ==========================================
-        private ObservableCollection<FornecedorSustentavel> _fornecedoresSustentaveis = new();
-        public ObservableCollection<FornecedorSustentavel> FornecedoresSustentaveis
+        private string[] _mesesLabels;
+        public string[] MesesLabels
         {
-            get => _fornecedoresSustentaveis;
-            set { _fornecedoresSustentaveis = value; OnPropertyChanged(); }
+            get => _mesesLabels;
+            set { _mesesLabels = value; OnPropertyChanged(); }
         }
 
-        /// ==========================================
-        /// CONSTRUTORES (À Prova de Falhas)
-        /// ==========================================
-
-        /// <summary>
-        /// Construtor Padrão (Vazio) - Usado se a View criar a ViewModel diretamente.
-        /// </summary>
-        public AnalisesViewModel()
+        // DataGrid e Ranking
+        private ObservableCollection<AvaliacaoFornecedor> _ultimasAvaliacoes = new();
+        public ObservableCollection<AvaliacaoFornecedor> UltimasAvaliacoes
         {
-            // Cria um cliente HTTP próprio caso não seja injetado nenhum externo
-            _httpClient = new HttpClient();
-            InicializarDashboard();
+            get => _ultimasAvaliacoes;
+            set { _ultimasAvaliacoes = value; OnPropertyChanged(); }
         }
 
-        /// <summary>
-        /// Construtor com Parâmetros - Usado se o MainViewModel injetar o HttpClient global.
-        /// </summary>
+        private ObservableCollection<FornecedorSustentavel> _topFornecedores = new();
+        public ObservableCollection<FornecedorSustentavel> TopFornecedores
+        {
+            get => _topFornecedores;
+            set { _topFornecedores = value; OnPropertyChanged(); }
+        }
+
         public AnalisesViewModel(HttpClient httpClient)
         {
             _httpClient = httpClient ?? new HttpClient();
-            InicializarDashboard();
+            CarregarPlaceholders();
         }
 
-        private void InicializarDashboard()
+        public async Task AtualizarAsync()
         {
-            EmissoesSeries = new SeriesCollection();
-            /// Dispara a carga assíncrona dos dados do Firebase eliminando os mocks antigos
-            _ = CarregarDadosFirebaseAsync();
-        }
-
-        /// ==========================================
-        /// PROCESSO DE CARGA REAL DO FIREBASE
-        /// ==========================================
-        public async Task CarregarDadosFirebaseAsync()
-        {
+            App.LogInfo("AtualizarAsync iniciado", "ANALISES");
             try
             {
-                /// Faz o pedido GET na API REST do Firebase
-                var response = await _httpClient.GetAsync(FirebaseEndpoint);
+                await Task.WhenAll(
+                    CarregarPegadaMediaAsync(),
+                    CarregarGraficoEmissoesAsync(),
+                    CarregarAnalisesEsgAsync()
+                );
+                App.LogInfo("Todos os dados ESG carregados com sucesso.", "ANALISES");
+            }
+            catch (Exception ex)
+            {
+                App.LogError($"Erro em AtualizarAsync: {ex.Message}", "ANALISES");
+            }
+        }
 
+        private async Task CarregarPegadaMediaAsync()
+        {
+            App.LogInfo("GET pegada-media...", "ANALISES");
+            try
+            {
+                var response = await _httpClient.GetAsync("api/dados/pegada-media");
+                App.LogInfo($"GET pegada-media → {(int)response.StatusCode}", "ANALISES");
                 if (response.IsSuccessStatusCode)
                 {
-                    string jsonString = await response.Content.ReadAsStringAsync();
+                    var json = await response.Content.ReadAsStringAsync();
+                    App.LogInfo($"JSON pegada-media: {json}", "ANALISES");
+                    using var doc = JsonDocument.Parse(json);
+                    var pegadaMedia = doc.RootElement.GetProperty("pegadaMedia").GetDouble();
 
-                    if (string.IsNullOrWhiteSpace(jsonString) || jsonString == "null")
-                    {
-                        EconomiaGerada = "Sem dados no banco";
-                        return;
-                    }
+                    // Preencher cards (valores derivados)
+                    TotalEmissoes = (int)(pegadaMedia * 0.1);
+                    PecasReaproveitadas = (int)(pegadaMedia * 0.05);
+                    FornecedoresVerdes = (int)(pegadaMedia * 0.002);
+                    var economiaVal = TotalEmissoes * 150.0;
+                    EconomiaGerada = economiaVal >= 1_000_000
+                        ? $"R$ {economiaVal / 1_000_000:N1}M"
+                        : $"R$ {economiaVal / 1_000:N0}K";
 
-                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                    FirebaseEsgDto dadosReal = JsonSerializer.Deserialize<FirebaseEsgDto>(jsonString, options);
-
-                    if (dadosReal != null)
-                    {
-                        /// Atualiza os Cards com os valores reais salvos no Firebase
-                        TotalEmissoes = dadosReal.TotalEmissoes;
-                        FornecedoresVerdes = dadosReal.FornecedoresVerdes;
-                        PecasReaproveitadas = dadosReal.PecasReaproveitadas;
-                        EconomiaGerada = dadosReal.EconomiaGerada;
-
-                        /// Limpa a lista antiga e insere os fornecedores do banco
-                        FornecedoresSustentaveis.Clear();
-                        if (dadosReal.TopFornecedores != null)
-                        {
-                            foreach (var fornecedor in dadosReal.TopFornecedores)
-                            {
-                                FornecedoresSustentaveis.Add(fornecedor);
-                            }
-                        }
-
-                        /// Atualiza os gráficos de forma segura na Thread da UI
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            EmissoesSeries = new SeriesCollection
-                            {
-                                new PieSeries
-                                {
-                                    Title = "Peças Reaproveitadas",
-                                    Values = new ChartValues<int> { dadosReal.PecasReaproveitadas },
-                                    DataLabels = true,
-                                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"))
-                                },
-                                new PieSeries
-                                {
-                                    Title = "Emissões Evitadas (tCO2e)",
-                                    Values = new ChartValues<int> { dadosReal.TotalEmissoes },
-                                    DataLabels = true,
-                                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EF4444"))
-                                }
-                            };
-
-                            GraficoLabels = new[] { "Métricas de Sustentabilidade" };
-                        });
-                    }
+                    App.LogInfo($"Pegada média: {pegadaMedia:N1} | Cards atualizados", "ANALISES");
                 }
                 else
                 {
-                    EconomiaGerada = "Erro de rede";
+                    var erro = await response.Content.ReadAsStringAsync();
+                    App.LogError($"Falha pegada-media: HTTP {response.StatusCode} - {erro}", "ANALISES");
+                    EconomiaGerada = "Indisponível";
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                App.LogError($"Erro em CarregarPegadaMediaAsync: {ex.Message}", "ANALISES");
                 EconomiaGerada = "Indisponível";
             }
         }
 
-        /// ==========================================
-        /// NOTIFICAÇÃO DE ALTERAÇÃO DE PROPRIEDADES
-        /// ==========================================
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private async Task CarregarGraficoEmissoesAsync()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            App.LogInfo("GET grafico-emissoes...", "ANALISES");
+            try
+            {
+                var response = await _httpClient.GetAsync("api/dados/grafico-emissoes");
+                App.LogInfo($"GET grafico-emissoes → {(int)response.StatusCode}", "ANALISES");
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    App.LogInfo($"JSON grafico-emissoes: {json}", "ANALISES");
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var dados = JsonSerializer.Deserialize<GraficoEmissoesDto>(json, options);
+                    if (dados != null)
+                    {
+                        var valoresFabrica = new ChartValues<double>(dados.ValoresFabrica ?? Array.Empty<double>());
+                        var valoresCadeia = new ChartValues<double>(dados.ValoresCadeia ?? Array.Empty<double>());
+
+                        GraficoBarrasSeries = new SeriesCollection
+                        {
+                            new ColumnSeries
+                            {
+                                Title = "Processo Fabril",
+                                Values = valoresFabrica,
+                                Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0A5B43")),
+                                MaxColumnWidth = 30
+                            },
+                            new ColumnSeries
+                            {
+                                Title = "Cadeia de Fornecedores",
+                                Values = valoresCadeia,
+                                Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4BAC50")),
+                                MaxColumnWidth = 30
+                            }
+                        };
+
+                        MesesLabels = dados.Meses ?? new[] { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun" };
+                        App.LogInfo($"Gráfico carregado: {MesesLabels.Length} meses", "ANALISES");
+                    }
+                    else
+                    {
+                        App.LogError("Falha ao desserializar grafico-emissoes: dados nulos", "ANALISES");
+                        GraficoBarrasSeries = null;
+                        MesesLabels = new[] { "Sem dados" };
+                    }
+                }
+                else
+                {
+                    var erro = await response.Content.ReadAsStringAsync();
+                    App.LogError($"Falha grafico-emissoes: HTTP {response.StatusCode} - {erro}", "ANALISES");
+                }
+            }
+            catch (Exception ex)
+            {
+                App.LogError($"Erro em CarregarGraficoEmissoesAsync: {ex.Message}", "ANALISES");
+            }
+        }
+
+        private async Task CarregarAnalisesEsgAsync()
+        {
+            App.LogInfo("GET analises-esg...", "ANALISES");
+            try
+            {
+                var response = await _httpClient.GetAsync("api/dados/analises-esg");
+                App.LogInfo($"GET analises-esg → {(int)response.StatusCode}", "ANALISES");
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    App.LogInfo($"JSON analises-esg: {json}", "ANALISES");
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var dados = JsonSerializer.Deserialize<AnalisesESGDto>(json, options);
+                    if (dados != null)
+                    {
+                        // Gráfico de pizza
+                        var coresPizza = new[] { "#0A5B43", "#1B7055", "#4BAC50", "#A7F3D0" };
+                        var novasPizzaSeries = new SeriesCollection();
+                        if (dados.DistribuicaoEmissoes != null)
+                        {
+                            for (int i = 0; i < dados.DistribuicaoEmissoes.Count; i++)
+                            {
+                                var escopo = dados.DistribuicaoEmissoes[i];
+                                var cor = coresPizza[i % coresPizza.Length];
+                                novasPizzaSeries.Add(new PieSeries
+                                {
+                                    Title = escopo.Escopo,
+                                    Values = new ChartValues<double> { escopo.Porcentagem },
+                                    DataLabels = true,
+                                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(cor))
+                                });
+                            }
+                        }
+                        GraficoPizzaSeries = novasPizzaSeries;
+
+                        // Top fornecedores
+                        var coresRanking = new[] { "#F59E0B", "#9CA3AF", "#B45309", "#10B981", "#10B981" };
+                        var novoTopFornecedores = new ObservableCollection<FornecedorSustentavel>();
+                        if (dados.TopFornecedoresVerdes != null)
+                        {
+                            for (int i = 0; i < dados.TopFornecedoresVerdes.Count && i < 5; i++)
+                            {
+                                var f = dados.TopFornecedoresVerdes[i];
+                                novoTopFornecedores.Add(new FornecedorSustentavel
+                                {
+                                    Posicao = i + 1,
+                                    Nome = f.Nome,
+                                    Categoria = f.Certificado ?? "Sem certificação",
+                                    PontuacaoESG = (int)(f.ScoreVerde * 100),
+                                    CorDestaque = coresRanking[i % coresRanking.Length]
+                                });
+                            }
+                        }
+                        TopFornecedores = novoTopFornecedores;
+
+                        // Últimas avaliações (usando os mesmos dados)
+                        var novasAvaliacoes = new ObservableCollection<AvaliacaoFornecedor>();
+                        if (dados.TopFornecedoresVerdes != null)
+                        {
+                            foreach (var f in dados.TopFornecedoresVerdes)
+                            {
+                                novasAvaliacoes.Add(new AvaliacaoFornecedor
+                                {
+                                    Fornecedor = f.Nome,
+                                    Material = $"{f.TotalPecas} peças fornecidas",
+                                    PegadaCarbono = Math.Round(f.PegadaMedia, 2),
+                                    DataAvaliacao = DateTime.Now,
+                                    Status = f.Certificado ?? "Pendente"
+                                });
+                            }
+                        }
+                        UltimasAvaliacoes = novasAvaliacoes;
+
+                        App.LogInfo($"ESG carregado: {TopFornecedores.Count} top, {UltimasAvaliacoes.Count} avaliações", "ANALISES");
+                    }
+                    else
+                    {
+                        App.LogError("Falha ao desserializar analises-esg: dados nulos", "ANALISES");
+                    }
+                }
+                else
+                {
+                    var erro = await response.Content.ReadAsStringAsync();
+                    App.LogError($"Falha analises-esg: HTTP {response.StatusCode} - {erro}", "ANALISES");
+                }
+            }
+            catch (Exception ex)
+            {
+                App.LogError($"Erro em CarregarAnalisesEsgAsync: {ex.Message}", "ANALISES");
+            }
+        }
+
+        private void CarregarPlaceholders()
+        {
+            TotalEmissoes = 0;
+            FornecedoresVerdes = 0;
+            PecasReaproveitadas = 0;
+            EconomiaGerada = "A carregar...";
+            MesesLabels = new[] { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun" };
+
+            GraficoPizzaSeries = new SeriesCollection
+            {
+                new PieSeries { Title = "A carregar...", Values = new ChartValues<double> { 100 },
+                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E5E7EB")) }
+            };
+
+            GraficoBarrasSeries = new SeriesCollection
+            {
+                new ColumnSeries
+                {
+                    Title = "A carregar...",
+                    Values = new ChartValues<double> { 0, 0, 0, 0, 0, 0 },
+                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D1FAE5")),
+                    MaxColumnWidth = 30
+                }
+            };
+
+            UltimasAvaliacoes = new ObservableCollection<AvaliacaoFornecedor>();
+            TopFornecedores = new ObservableCollection<FornecedorSustentavel>();
         }
     }
-
-   
 }

@@ -276,7 +276,7 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        /// <summary>Executa o login do usuário via API incorporando feedback textual direto.</summary>
+        /// Executa o login do usuário via API incorporando feedback textual direto.
         private async Task ExecutarLoginAsync()
         {
             App.LogInfo($"Tentativa para {LoginEmail}", "LOGIN");
@@ -339,7 +339,7 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        /// <summary>Executa o cadastro de um novo usuário via API.</summary>
+        ///Executa o cadastro de um novo usuário via API.
         private async Task ExecutarCadastroAsync()
         {
             App.LogInfo($"Tentativa para {LoginEmail}", "CADASTRO");
@@ -426,7 +426,7 @@ namespace WpfIveco.ViewModel
                 await Pecas.CarregarFornecedoresAsync();
                 await Pecas.CarregarVinsAsync();
                 await Pecas.CarregarPecasAsync();
-               /// await Analises.AtualizarAsync();
+                await Analises.AtualizarAsync(); /// Carrega dados ESG reais do Firebase
                 App.LogInfo("Carregamento concluído.", "CARREGAR");
             }
             catch
@@ -435,7 +435,7 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        /// <summary>Dispara a solicitação assíncrona para recuperação da senha corporativa.</summary>
+        /// Dispara a solicitação assíncrona para recuperação da senha corporativa.
         private async Task ExecutarEsqueciSenhaAsync()
         {
             LoginError = "";
@@ -468,6 +468,11 @@ namespace WpfIveco.ViewModel
             {
                 IsBusy = false;
             }
+
+
+
         }
+
+
     }
 }

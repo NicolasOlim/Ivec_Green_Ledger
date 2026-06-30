@@ -132,19 +132,20 @@
             </StackPanel>
         </Grid>
 
+        <!-- Cards com bindings dinâmicos -->
         <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,32">
             <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,16,0">
                 <StackPanel>
                     <TextBlock Text="Consultas Hoje" FontSize="13" Foreground="{StaticResource TextSecondary}" FontWeight="Medium" Margin="0,0,0,8"/>
-                    <TextBlock Text="1.248" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                    <TextBlock Text="↑ 12% vs. ontem" FontSize="12" Foreground="#10B981" Margin="0,8,0,0" FontWeight="Medium"/>
+                    <TextBlock Text="{Binding Dashboard.ConsultasHoje}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                    <TextBlock Text="{Binding Dashboard.VariacaoConsultas, StringFormat='↑ {0} vs. ontem'}" FontSize="12" Foreground="#10B981" Margin="0,8,0,0" FontWeight="Medium"/>
                 </StackPanel>
             </Border>
 
             <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,16,0">
                 <StackPanel>
                     <TextBlock Text="Falhas de Integração" FontSize="13" Foreground="{StaticResource TextSecondary}" FontWeight="Medium" Margin="0,0,0,8"/>
-                    <TextBlock Text="0,3%" FontSize="28" FontWeight="Bold" Foreground="#EF4444"/>
+                    <TextBlock Text="{Binding Dashboard.FalhasIntegracao, StringFormat={}{0:N1}%}" FontSize="28" FontWeight="Bold" Foreground="#EF4444"/>
                     <TextBlock Text="2 instabilidades nas últimas 24h" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,8,0,0"/>
                 </StackPanel>
             </Border>
@@ -152,7 +153,7 @@
             <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,16,0">
                 <StackPanel>
                     <TextBlock Text="Tempo de Resposta (API)" FontSize="13" Foreground="{StaticResource TextSecondary}" FontWeight="Medium" Margin="0,0,0,8"/>
-                    <TextBlock Text="120 ms" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                    <TextBlock Text="{Binding Dashboard.TempoRespostaMs, StringFormat={}{0} ms}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                     <TextBlock Text="Média ideal atingida" FontSize="12" Foreground="#10B981" Margin="0,8,0,0" FontWeight="Medium"/>
                 </StackPanel>
             </Border>
@@ -160,7 +161,7 @@
             <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,0,0">
                 <StackPanel>
                     <TextBlock Text="Uso do Servidor" FontSize="13" Foreground="{StaticResource TextSecondary}" FontWeight="Medium" Margin="0,0,0,8"/>
-                    <TextBlock Text="42%" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                    <TextBlock Text="{Binding Dashboard.UsoServidor, StringFormat={}{0}%}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                     <TextBlock Text="Estável" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,8,0,0"/>
                 </StackPanel>
             </Border>
