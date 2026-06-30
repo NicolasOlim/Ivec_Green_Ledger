@@ -125,11 +125,9 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 
 ### **Entidades e Atributos:**
 
-### **Tabela: Usuário**
-
 <div align="center">
 
-#### Tabela - USUARIO
+#### Usuario
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **id** | PK | Identificador único do usuário |
@@ -141,10 +139,10 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 </div>
 
 ---
-#### Tabela - FORNECEDOR
 
 <div align="center">
 
+#### Fornecedor
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **id** | PK | Identificador único do fornecedor |
@@ -156,10 +154,9 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 
 ---
 
-#### Tabela - LOTE_MATERIA_PRIMA
-
 <div align="center">
 
+#### Lote_materia_prima
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **id** | PK | Identificador único do lote |
@@ -173,10 +170,9 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 
 ---
 
-#### Tabela - Veiculo
-
 <div align="center">
 
+#### Veiculo
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **vin** | PK | Identificação do veículo |
@@ -188,10 +184,9 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 
 ---
 
-#### Tabela - Veiculo_Componente
-
 <div align="center">
 
+#### Veiculo_Componente
 | Atributo | Tipo/papel | Observação |
 | :--- | :--- | :--- |
 | **id** | PK | Identificação do veículo do componente |
@@ -225,10 +220,9 @@ Os relacionamentos entre as entidades do sistema são definidos a seguir:
 
 O modelo lógico do ecossistema converte as entidades conceituais em estruturas relacionais normatizadas, definindo as chaves primárias (PK), chaves estrangeiras (FK) e restrições de integridade de cada atributo. A tipagem de identificação foi padronizada como TEXT de forma unificada entre os campos de amarração (id, fk_fornedor, vin, fk_veiculo_vin, fk_loteMateriaPrima_id).
 
-### **Tabela: Usuário**
-
 <div align="center">
 
+#### Veiculo
 | Coluna | Chave/Relacionamento | Tipo | Descrição |
 | :---: | :---: | :---: | :--- |
 | **id** | PK | TEXT | Identificador único do usuário |
@@ -241,10 +235,9 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 
 ---
 
-#### Tabela - Fornecedor
-
 <div align="center">
 
+#### Fornecedor
 | Coluna | Chave/relacionamento | Tipo | Descrição |
 | :--- | :--- | :--- |  :--- |
 | **id** | PK | TEXT | Identificador único do fornecedor |
@@ -257,10 +250,9 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 
 ---
 
-#### Tabela - Lote Materia Prima
-
 <div align="center">
 
+#### Lote Materia Prima
 | Coluna | Chave/relacionamento | Tipo | Descrição |
 | :--- | :--- | :--- | :--- |
 | **vin** | PK | TEXT | Número de identificação do chassi (17 caracteres) |
@@ -272,10 +264,9 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 
 ---
 
-#### Tabela - Veiculo_componente
-
 <div align="center">
 
+#### Veiculo_componente
 | Coluna | Chave/relacionamento | Tipo | Descrição |
 | :--- | :--- | :---  | :--- |
 | **id** | PK | TEXT | Identificador único do veículo |
@@ -407,6 +398,7 @@ A análise de viabilidade técnica avalia se o sistema Iveco Green Ledger pode s
 
 <div align="center">
 
+### Infraestruturas e Tecnologias:
 | Componente | Licença | Maturidade | Observação |
 | :--- | :--- | :--- | :--- | 
 | **C# / .NET 8** | MIT(open-source) | Alta | Plataforma Microsoft estável, unificada e com suporte LTS (Long-Term Support) garantido. |
@@ -441,10 +433,10 @@ Para execução do sistema em ambiente de produção, os  requisitos mínimos re
 - **Sistema Operacional:** Windows 10 ou Windows 11(64 - bits);
 - **Conexão com a internet:** Para o funcionamento das integrações em nuvem.
 
-### **Riscos Técnicos e Mistigações:**
 
 <div align="center">
 
+### Riscos Técnicos e Mistigações:
 | Risco | Probabilidade | Impacto | Mistigação |
 | :--- | :--- | :--- | :--- | 
 | Cota gratuita do Firebase excedida com alto volume de dados | Média | Alta | Migrar para o plano Blaze (pay-as-you-go) do Firebase para suportar a escala industrial ou migrar a persistência de longo prazo para uma instância dedicada de banco de dados relacional próprio |
@@ -557,10 +549,9 @@ Projetado como uma evolução estratégica para as próximas etapas do sistema, 
 
 ---
 
-### **Processo de Desenvolvimento**
-
 <div align="center">
 
+### **Processo de Desenvolvimento**
 | Fase | Status |
 | :--- | :--- | 
 | Fase 1 - Setup e Infraestrutura | Concluído ✅ | 
@@ -659,10 +650,9 @@ A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na
 
 Para a implantação física do ecossistema Iveco Green Ledger, o consumo de materiais é voltado exclusivamente para a infraestrutura de tecnologia e conectividade nas portarias e balanças do pátio logístico, englobando terminais de chão de fábrica instalados para a execução contínua da interface de usuário (WpfIveco), leitores de código de barras ou QR Code USB para agilizar a entrada de dados operacionais sem digitação manual, além da infraestrutura de rede local existente para garantir a comunicação de dados e a sincronização com a nuvem, operando com custo zero de licenciamento de software por utilizar o framework .NET 8, SQLite e APIs integradas de código aberto. Por tratar-se de um sistema focado em suporte logístico interno e governança ambiental (ESG), o projeto não gera faturamento direto por vendas, mas consolida seu retorno financeiro na forma de receitas indiretas através de uma drástica redução de custos operacionais. 
 
-### **Análise Custo - Benefício**
-
 <div align="center">
 
+### **Análise Custo - Benefício**
 | Categoria | Tipo | Valor Anual Estimado | 
 | :--- | :--- | :--- |
 | Desenvolvimento | Custo |  R$ 8.800,00 |  
