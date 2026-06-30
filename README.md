@@ -727,41 +727,55 @@ O desenvolvimento das interfaces visuais do cliente desktop (WpfIveco) utilizand
 ---
 ## Regra de Negócio
 
-A camada de regras de negócio (Business Logic Layer) do ecossistema Iveco Green Ledger constitui o núcleo de inteligência da aplicação, sendo responsável por ditar o comportamento da ApiIveco e orientar as tomadas de decisão da interface cliente WpfIveco. Esta seção detalha as diretrizes operacionais, validações de pátio e o motor de cálculo ambiental que governam o projeto.
+## ESPECIFICAÇÃO DA REGRA DE NEGÓCIO: RN-01 – CÁLCULO E VALIDAÇÃO DE PEGADA DE CARBONO (ESCOPO 3)
 
-### *Fluxo de Triagem e Orquestração Logística*
+| Identificador | Nome | Módulo | Gatilho (Trigger) |
+| :--- | :--- | :--- | :--- |
+| **RN-01** | Cálculo e Rastreabilidade de Emissões de Gases de Efeito Estufa (GEE) | Motor Ambiental / Triagem Logística | Solicitação de encerramento de pesagem na balança ou confirmação de descarga na doca via interface cliente (`WpfIveco`). |
 
-O sistema opera sob o modelo de validação em barreira, o que significa que nenhum veículo de transporte de carga tem sua entrada autorizada ou concluída no pátio logístico da Iveco sem passar por uma verificação multifacetada e automatizada. As regras que regem essa barreira consistem em:
+---
 
-- **Automação do Vínculo de Ordem de Coleta:** O sistema intercepta o código identificador da viagem (via leitura de QR Code ou digitação de contingência). A aplicação dispara uma requisição assíncrona integrada ao microsserviço de rotas (baseado na API do Mercado Livre), verificando o status do trajeto. Caso a rota conste como "Cancelada" ou "Concluída", o fluxo de triagem é imediatamente interrompido por uma trava de negócio, notificando o operador de portaria.
-  
-- **Decodificação Técnica de Frota (Mecanismo VIN):** Ao capturar o chassi do caminhão, a API interna dispara uma consulta à API da NHTSA. O sistema valida se o chassi possui o padrão internacional de 17 caracteres. O retorno da API externa é processado para extrair o ano de fabricação, o modelo e a capacidade de carga do motor. Esses dados técnicos são injetados diretamente na memória do sistema e salvos no banco de dados NoSQL (Firebase Firestore), servindo de insumo indispensável para o cálculo posterior de pegada ecológica.
+### 1. Descrição e Objetivo
+Automatizar a mensuração de emissões indiretas de Dióxido de Carbono Equivalente ($CO_2e$) provenientes de veículos de transportadoras terceirizadas (Escopo 3). A regra garante que dados inconsistentes de veículos e combustíveis não poluam o inventário de sustentabilidade corporativo, aplicando penalidades baseadas na eficiência mecânica e idade da frota ativa.
 
-- **Homologação Cadastral e Fiscal:** Para mitigar riscos fiscais na cadeia de suprimentos, o CNPJ da transportadora associada à carga é submetido à BrasilAPI. Se o cadastro retornar com situação inválida ou inexistente perante os órgãos reguladores, o sistema impede a finalização do registro de entrada, exigindo intervenção ou liberação manual por parte de um supervisor de logística.
+---
 
-### *Motor de Cálculo Ambiental*
+### 2. Pré-condições
+* A rota de transporte deve estar vinculada a um código de viagem válido e com status ativo no banco de dados.
+* O veículo associado deve ter o ano de fabricação ($Ano_{Fab}$) e o modelo decodificados com sucesso a partir da checagem estrutural do VIN (Chassi).
+* O tipo de combustível utilizado pelo motor pesado deve ser informado obrigatoriamente através do conjunto de dados (`Diesel_S10`, `Diesel_S500`, `GNV`).
 
-A grande inteligência ecológica do projeto reside na automatização do inventário de emissões de Gases de Efeito Estufa (GEE), focando especificamente nas emissões indiretas da cadeia de valor (Escopo 3).
+---
 
-- **Cálculo Baseado em Distância e Combustível:**  Os fatores de emissão variam dinamicamente se o caminhão utiliza Diesel S10, Diesel S500 ou Gás Natural Veicular (GNV). O ano do modelo (extraído no fluxo da NHTSA) aplica um fator de degradação e eficiência, tornando o cálculo altamente preciso e auditável.
+### 3. Critérios de Validação e Fluxo Lógico (Algoritmo)
 
-### *Algoritmo de Monitoramento*
+#### Passo 1: Determinação do Fator de Emissão Base ($F_c$)
+O sistema avalia a propriedade de combustível enviada pela requisição e atribui a constante matemática de emissão por volume/massa, conforme a tabela estequiométrica interna da aplicação:
+* Se `combustível = Diesel_S10`, então $F_c = 2,68$ kg $CO_2$/Litro.
+* Se `combustível = Diesel_S500`, então $F_c = 2,73$ kg $CO_2$/Litro.
+* Se `combustível = GNV`, então $F_c = 2,04$ kg $CO_2$/$m^3$.
 
-A marcha lenta de veículos pesados dentro das dependências da fábrica representa um dos maiores gargalos ocultos de sustentabilidade e custo. O Iveco Green Ledger implementa uma regra de negócio severa para combater esse cenário:
+#### Passo 2: Cálculo da Depreciação por Idade da Frota ($F_d$)
+Com base no ano de fabricação extraído do chassi, o sistema calcula a idade operacional do veículo através da fórmula: 
+$$Idade = Ano_{Atual} - Ano_{Fab}$$
 
-- **Contabilização do Tempo de Pátio:** O sistema registra o timestamp (carimbo de data/hora) exato no momento em que a portaria autoriza a entrada do veículo e quando a balança/doca registra a pesagem ou descarga.
+O fator multiplicador de degradação da eficiência catalítica é determinado pelas seguintes faixas:
+* Para $Idade \le 3$ anos: $F_d = 1,00$ *(Eficiência nominal)*.
+* Para $3 < Idade \le 8$ anos: $F_d = 1,02$ *(Penalização de +2% na emissão)*.
+* Para $Idade > 8$ anos: $F_d = 1,05$ *(Penalização de +5% na emissão)*.
 
-- **Métrica de Desperdício:** Com base no delta de tempo em minutos gasto pelo caminhão trafegando ou esperando em fila com o motor ligado no pátio, o algoritmo calcula o desperdício de combustível presumido (sabendo que um motor pesado consome em média de 2 a 3,5 litros de óleo diesel por hora em marcha lenta). O sistema projeta instantaneamente a quantidade de $CO_2$ liberada desnecessariamente na atmosfera naquele intervalo, gerando alertas no painel do Analista de ESG caso o tempo de pátio ultrapasse a meta operacional estipulada de 15 minutos.
+#### Passo 3: Processamento da Equação de Emissão Total ($E_{Total}$)
+O sistema resgata a distância total em quilômetros ($D$) mapeada no trajeto e calcula a massa de carbono através da equação:
 
-### *Regra de Persistência Resiliência*
+$$E_{Total} = \left( \frac{D}{\text{Consumo Médio (km/L)}} \right) \times F_c \times F_d$$
 
-- **Garantia de Operação:** Durante a execução do aplicativo desktop WpfIveco, o sistema testa periodicamente a conectividade com o backend na nuvem. Detectada qualquer oscilação ou queda na internet, o fluxo de triagem não é bloqueado. A regra de negócio instrui o sistema a persistir todos os registros de entrada, cálculos do GHG e validações em andamento no banco de dados embutido e local SQLite.
+---
 
-- **Sincronização Eventual em Lote:** Assim que os serviços de rede detectam que a conexão com o Firebase Firestore foi restabelecida, uma rotina em segundo plano (background worker) é disparada de forma assíncrona. Esse módulo realiza a varredura no banco local, extrai os dados gerados durante o período de contingência, resolve possíveis conflitos de concorrência de horários e faz o upload em lote (bulk insert) para a nuvem, atualizando os dashboards gerenciais de forma transparente para o usuário final.
+### 4. Pós-condições e Ações do Sistema
 
+* **Cenário de Sucesso (Dados Consistentes):** O valor resultante ($E_{Total}$) é persistido no documento da viagem no banco NoSQL **Cloud Firestore**, as variáveis temporárias de memória são limpas e o indicador gráfico do painel administrativo da gerência de ESG atualiza-se dinamicamente sem necessidade de recarregamento manual da tela (*Hot Reload*).
+* **Cenário de Exceção (Dados Incompletos ou Nulos):** Caso o consumo médio do veículo retorne zerado do banco de dados (o que causaria um erro de divisão por zero na equação), o sistema aborta o cálculo, atribui o valor de consumo padrão de mercado para frotas pesadas ($3,5$ km/L) para fins de contingência, grava um log de aviso estruturado de nível *Warning* via **Serilog** e permite a conclusão do fluxo operacional emitindo uma notificação visual amarela para auditoria posterior.
 
-
-Visando a alta disponibilidade do chão de fábrica, a lógica de armazenamento foi arquitetada para ser tolerante a falhas completas de infraestrutura de rede:
 
 ---
 ## Considerações Finais:
