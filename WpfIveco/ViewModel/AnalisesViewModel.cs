@@ -2,9 +2,11 @@
 using LiveCharts.Wpf;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using WpfIveco.DTO;
 using WpfIveco.Models;
@@ -49,15 +51,15 @@ namespace WpfIveco.ViewModels
             set { _economiaGerada = value; OnPropertyChanged(); }
         }
 
-        // Gráficos
-        private SeriesCollection _graficoPizzaSeries;
+        // Gráficos – as coleções são inicializadas uma vez e reutilizadas
+        private SeriesCollection _graficoPizzaSeries = new SeriesCollection();
         public SeriesCollection GraficoPizzaSeries
         {
             get => _graficoPizzaSeries;
             set { _graficoPizzaSeries = value; OnPropertyChanged(); }
         }
 
-        private SeriesCollection _graficoBarrasSeries;
+        private SeriesCollection _graficoBarrasSeries = new SeriesCollection();
         public SeriesCollection GraficoBarrasSeries
         {
             get => _graficoBarrasSeries;
@@ -71,7 +73,7 @@ namespace WpfIveco.ViewModels
             set { _mesesLabels = value; OnPropertyChanged(); }
         }
 
-        // DataGrid e Ranking
+        // DataGrid e Ranking – coleções reutilizadas
         private ObservableCollection<AvaliacaoFornecedor> _ultimasAvaliacoes = new();
         public ObservableCollection<AvaliacaoFornecedor> UltimasAvaliacoes
         {
@@ -125,7 +127,6 @@ namespace WpfIveco.ViewModels
 
                     TotalEmissoes = (int)(pegadaMedia * 0.1);
                     PecasReaproveitadas = (int)(pegadaMedia * 0.05);
-                    FornecedoresVerdes = (int)(pegadaMedia * 0.002);
                     var economiaVal = TotalEmissoes * 150.0;
                     EconomiaGerada = economiaVal >= 1_000_000
                         ? $"R$ {economiaVal / 1_000_000:N1}M"
@@ -160,28 +161,38 @@ namespace WpfIveco.ViewModels
                     var dados = JsonSerializer.Deserialize<GraficoEmissoesDto>(json, options);
                     if (dados != null)
                     {
-                        var valoresFabrica = new ChartValues<double>(dados.ValoresFabrica ?? Array.Empty<double>());
-                        var valoresCadeia = new ChartValues<double>(dados.ValoresCadeia ?? Array.Empty<double>());
-
-                        GraficoBarrasSeries = new SeriesCollection
+                        await Application.Current.Dispatcher.InvokeAsync(() =>
                         {
-                            new ColumnSeries
+                            // Limpa a coleção existente
+                            GraficoBarrasSeries.Clear();
+
+                            var valoresFabrica = dados.ValoresFabrica ?? Array.Empty<double>();
+                            var valoresCadeia = dados.ValoresCadeia ?? Array.Empty<double>();
+                            MesesLabels = dados.Meses ?? new[] { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun" };
+
+                            // Adiciona as duas séries
+                            GraficoBarrasSeries.Add(new ColumnSeries
                             {
                                 Title = "Processo Fabril",
-                                Values = valoresFabrica,
+                                Values = new ChartValues<double>(valoresFabrica),
                                 Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0A5B43")),
                                 MaxColumnWidth = 30
-                            },
-                            new ColumnSeries
+                            });
+
+                            GraficoBarrasSeries.Add(new ColumnSeries
                             {
                                 Title = "Cadeia de Fornecedores",
-                                Values = valoresCadeia,
+                                Values = new ChartValues<double>(valoresCadeia),
                                 Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4BAC50")),
                                 MaxColumnWidth = 30
-                            }
-                        };
-                        MesesLabels = dados.Meses ?? new[] { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun" };
-                        App.LogInfo($"Gráfico carregado: {MesesLabels.Length} meses", "ANALISES");
+                            });
+
+                            // Força notificação
+                            OnPropertyChanged(nameof(GraficoBarrasSeries));
+                            OnPropertyChanged(nameof(MesesLabels));
+
+                            App.LogInfo($"Gráfico de barras atualizado com {MesesLabels.Length} meses", "ANALISES");
+                        });
                     }
                 }
                 else
@@ -209,82 +220,89 @@ namespace WpfIveco.ViewModels
                     var dados = JsonSerializer.Deserialize<AnalisesESGDto>(json, options);
                     if (dados != null)
                     {
-                        // --- Gráfico de Pizza ---
-                        var coresPizza = new[] { "#0A5B43", "#1B7055", "#4BAC50", "#A7F3D0" };
-                        var novasPizzaSeries = new SeriesCollection();
-                        if (dados.DistribuicaoEmissoes != null)
+                        await Application.Current.Dispatcher.InvokeAsync(() =>
                         {
-                            for (int i = 0; i < dados.DistribuicaoEmissoes.Count; i++)
+                            // --- GRÁFICO DE PIZZA ---
+                            GraficoPizzaSeries.Clear();
+                            if (dados.DistribuicaoEmissoes != null && dados.DistribuicaoEmissoes.Count > 0)
                             {
-                                var escopo = dados.DistribuicaoEmissoes[i];
-                                var cor = coresPizza[i % coresPizza.Length];
-                                novasPizzaSeries.Add(new PieSeries
+                                var coresPizza = new[] { "#0A5B43", "#1B7055", "#4BAC50", "#A7F3D0" };
+                                for (int i = 0; i < dados.DistribuicaoEmissoes.Count; i++)
                                 {
-                                    Title = escopo.Escopo,
-                                    Values = new ChartValues<double> { escopo.Porcentagem },
+                                    var escopo = dados.DistribuicaoEmissoes[i];
+                                    var cor = coresPizza[i % coresPizza.Length];
+                                    GraficoPizzaSeries.Add(new PieSeries
+                                    {
+                                        Title = escopo.Escopo,
+                                        Values = new ChartValues<double> { escopo.Porcentagem },
+                                        DataLabels = true,
+                                        Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(cor))
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                GraficoPizzaSeries.Add(new PieSeries
+                                {
+                                    Title = "Sem dados",
+                                    Values = new ChartValues<double> { 100 },
                                     DataLabels = true,
-                                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(cor))
+                                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E5E7EB"))
                                 });
                             }
-                        }
-                        GraficoPizzaSeries = novasPizzaSeries;
+                            OnPropertyChanged(nameof(GraficoPizzaSeries));
 
-                        // --- CONTAGEM REAL DE FORNECEDORES CERTIFICADOS ---
-                        // Critério: pontuação ESG > 50 (scoreVerde * 100 > 50)
-                        // Isso corresponde a scoreVerde > 0.5
-                        int certificados = 0;
-                        if (dados.TopFornecedoresVerdes != null)
-                        {
-                            certificados = dados.TopFornecedoresVerdes
-                                .Count(f => (f.ScoreVerde * 100) > 50);
-                        }
-                        FornecedoresVerdes = certificados;
-                        App.LogInfo($"Fornecedores certificados (pontuação > 50): {certificados}", "ANALISES");
-
-                        // --- FILTRA fornecedores com dados (TotalPecas > 0) para tabela e ranking ---
-                        var fornecedoresComDados = dados.TopFornecedoresVerdes?
-                            .Where(f => f.TotalPecas > 0)
-                            .OrderByDescending(f => f.ScoreVerde)
-                            .ToList() ?? new List<FornecedorVerdeDto>();
-
-                        // --- Ranking: TOP FORNECEDORES (apenas com dados) ---
-                        var coresRanking = new[] { "#F59E0B", "#9CA3AF", "#B45309", "#10B981", "#10B981", "#3B82F6", "#8B5CF6", "#EC4899", "#F97316", "#14B8A6" };
-                        var novoTopFornecedores = new ObservableCollection<FornecedorSustentavel>();
-                        for (int i = 0; i < fornecedoresComDados.Count && i < 10; i++)
-                        {
-                            var f = fornecedoresComDados[i];
-                            // Categoria exibida: se a pontuação > 50, considera certificado, senão mantém o que veio da API
-                            string categoriaExibida = (f.ScoreVerde * 100) > 50 ? "Certificado" : (f.Certificado ?? "Pendente");
-                            novoTopFornecedores.Add(new FornecedorSustentavel
+                            // --- CONTAGEM DE CERTIFICADOS ---
+                            int certificados = 0;
+                            if (dados.TopFornecedoresVerdes != null)
                             {
-                                Posicao = i + 1,
-                                Nome = f.Nome,
-                                Categoria = categoriaExibida,
-                                PontuacaoESG = (int)(f.ScoreVerde * 100),
-                                CorDestaque = coresRanking[i % coresRanking.Length]
-                            });
-                        }
-                        TopFornecedores = novoTopFornecedores;
-                        App.LogInfo($"TopFornecedores carregados: {TopFornecedores.Count} itens (com dados)", "ANALISES");
+                                certificados = dados.TopFornecedoresVerdes
+                                    .Count(f => (f.ScoreVerde * 100) > 50);
+                            }
+                            FornecedoresVerdes = certificados;
 
-                        // --- Últimas Avaliações (apenas com dados) ---
-                        var novasAvaliacoes = new ObservableCollection<AvaliacaoFornecedor>();
-                        foreach (var f in fornecedoresComDados)
-                        {
-                            string statusExibido = (f.ScoreVerde * 100) > 50 ? "Certificado" : (f.Certificado ?? "Pendente");
-                            novasAvaliacoes.Add(new AvaliacaoFornecedor
+                            // --- FORNECEDORES COM DADOS ---
+                            var fornecedoresComDados = dados.TopFornecedoresVerdes?
+                                .Where(f => f.TotalPecas > 0)
+                                .OrderByDescending(f => f.ScoreVerde)
+                                .ToList() ?? new List<FornecedorVerdeDto>();
+
+                            // --- RANKING ---
+                            TopFornecedores.Clear();
+                            var coresRanking = new[] { "#F59E0B", "#9CA3AF", "#B45309", "#10B981", "#10B981", "#3B82F6", "#8B5CF6", "#EC4899", "#F97316", "#14B8A6" };
+                            for (int i = 0; i < fornecedoresComDados.Count && i < 10; i++)
                             {
-                                Fornecedor = f.Nome,
-                                Material = $"{f.TotalPecas} peças fornecidas",
-                                PegadaCarbono = Math.Round(f.PegadaMedia, 2),
-                                DataAvaliacao = DateTime.Now,
-                                Status = statusExibido
-                            });
-                        }
-                        UltimasAvaliacoes = novasAvaliacoes;
-                        App.LogInfo($"UltimasAvaliacoes carregadas: {UltimasAvaliacoes.Count} itens (com dados)", "ANALISES");
+                                var f = fornecedoresComDados[i];
+                                string categoriaExibida = (f.ScoreVerde * 100) > 50 ? "Certificado" : (f.Certificado ?? "Pendente");
+                                TopFornecedores.Add(new FornecedorSustentavel
+                                {
+                                    Posicao = i + 1,
+                                    Nome = f.Nome,
+                                    Categoria = categoriaExibida,
+                                    PontuacaoESG = (int)(f.ScoreVerde * 100),
+                                    CorDestaque = coresRanking[i % coresRanking.Length]
+                                });
+                            }
+                            OnPropertyChanged(nameof(TopFornecedores));
 
-                        App.LogInfo($"ESG carregado: {TopFornecedores.Count} top, {UltimasAvaliacoes.Count} avaliações", "ANALISES");
+                            // --- TABELA ---
+                            UltimasAvaliacoes.Clear();
+                            foreach (var f in fornecedoresComDados)
+                            {
+                                string statusExibido = (f.ScoreVerde * 100) > 50 ? "Certificado" : (f.Certificado ?? "Pendente");
+                                UltimasAvaliacoes.Add(new AvaliacaoFornecedor
+                                {
+                                    Fornecedor = f.Nome,
+                                    Material = $"{f.TotalPecas} peças fornecidas",
+                                    PegadaCarbono = Math.Round(f.PegadaMedia, 2),
+                                    DataAvaliacao = DateTime.Now,
+                                    Status = statusExibido
+                                });
+                            }
+                            OnPropertyChanged(nameof(UltimasAvaliacoes));
+
+                            App.LogInfo($"ESG atualizado: pizza={GraficoPizzaSeries.Count}, top={TopFornecedores.Count}, tabela={UltimasAvaliacoes.Count}", "ANALISES");
+                        });
                     }
                     else
                     {
@@ -300,9 +318,8 @@ namespace WpfIveco.ViewModels
             {
                 App.LogError($"Erro em CarregarAnalisesEsgAsync: {ex.Message}", "ANALISES");
             }
-
-
         }
+
         private void CarregarPlaceholders()
         {
             TotalEmissoes = 0;
@@ -311,25 +328,27 @@ namespace WpfIveco.ViewModels
             EconomiaGerada = "A carregar...";
             MesesLabels = new[] { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun" };
 
-            GraficoPizzaSeries = new SeriesCollection
+            // Placeholder do gráfico de pizza
+            GraficoPizzaSeries.Clear();
+            GraficoPizzaSeries.Add(new PieSeries
             {
-                new PieSeries { Title = "A carregar...", Values = new ChartValues<double> { 100 },
-                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E5E7EB")) }
-            };
+                Title = "A carregar...",
+                Values = new ChartValues<double> { 100 },
+                Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E5E7EB"))
+            });
 
-            GraficoBarrasSeries = new SeriesCollection
+            // Placeholder do gráfico de barras
+            GraficoBarrasSeries.Clear();
+            GraficoBarrasSeries.Add(new ColumnSeries
             {
-                new ColumnSeries
-                {
-                    Title = "A carregar...",
-                    Values = new ChartValues<double> { 0, 0, 0, 0, 0, 0 },
-                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D1FAE5")),
-                    MaxColumnWidth = 30
-                }
-            };
+                Title = "A carregar...",
+                Values = new ChartValues<double> { 0, 0, 0, 0, 0, 0 },
+                Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D1FAE5")),
+                MaxColumnWidth = 30
+            });
 
-            UltimasAvaliacoes = new ObservableCollection<AvaliacaoFornecedor>();
-            TopFornecedores = new ObservableCollection<FornecedorSustentavel>();
+            UltimasAvaliacoes.Clear();
+            TopFornecedores.Clear();
         }
     }
 }

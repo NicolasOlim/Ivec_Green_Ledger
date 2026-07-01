@@ -6,7 +6,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 using WpfIveco.ViewModels;
 
 namespace WpfIveco.ViewModel
@@ -18,7 +17,6 @@ namespace WpfIveco.ViewModel
     public class MainViewModel : ViewModelBase
     {
         private HttpClient _httpClient;
-        private readonly DispatcherTimer _timer;
 
         /// ============================================================
         /// SUB-VIEWMODELS
@@ -51,7 +49,6 @@ namespace WpfIveco.ViewModel
         /// CAMPOS DE LOGIN E CADASTRO
         /// ============================================================
 
-        /// Armazena mensagens de erro vindas de falhas gerais de autenticação na API
         private string _loginError = "";
         public string LoginError
         {
@@ -67,13 +64,11 @@ namespace WpfIveco.ViewModel
             {
                 _loginEmail = value;
                 OnPropertyChanged();
-                /// Limpa mensagem de erro de e-mail ao digitar
                 if (!string.IsNullOrEmpty(EmailError))
                 {
                     EmailError = "";
                     EmailValido = false;
                 }
-                /// Limpa mensagem de erro de login ao alterar o e-mail
                 if (!string.IsNullOrEmpty(LoginError))
                 {
                     LoginError = "";
@@ -89,7 +84,6 @@ namespace WpfIveco.ViewModel
             {
                 _loginSenha = value;
                 OnPropertyChanged();
-                /// Limpa mensagem de erro de login geral ao alterar a senha
                 if (!string.IsNullOrEmpty(LoginError))
                 {
                     LoginError = "";
@@ -139,7 +133,24 @@ namespace WpfIveco.ViewModel
         /// ============================================================
 
         private string _abaAtiva = "Dashboard";
-        public string AbaAtiva { get => _abaAtiva; set { _abaAtiva = value; OnPropertyChanged(); } }
+        public string AbaAtiva
+        {
+            get => _abaAtiva;
+            set
+            {
+                if (_abaAtiva != value)
+                {
+                    _abaAtiva = value;
+                    OnPropertyChanged();
+
+                    // Atualiza os dados ESG sempre que a aba "Analises" for aberta
+                    if (_abaAtiva == "Analises" && IsLoggedIn)
+                    {
+                        _ = AtualizarAnalisesAsync();
+                    }
+                }
+            }
+        }
 
         private string _apiUrlConfig = "https://apiivecogreenledger.runasp.net/";
         public string ApiUrlConfig
@@ -166,8 +177,6 @@ namespace WpfIveco.ViewModel
         public ICommand AlternarModoAuthCommand { get; }
         public ICommand MudarAbaCommand { get; }
         public ICommand LigarDesligarSimuladorCommand { get; }
-
-        /// Comando para processar a recuperação de credenciais de acesso
         public ICommand EsqueciMinhaSenhaCommand { get; }
 
         /// ============================================================
@@ -194,12 +203,7 @@ namespace WpfIveco.ViewModel
             FazerLoginCommand = new RelayCommand(async p => await ExecutarLoginAsync());
             FazerCadastroCommand = new RelayCommand(async p => await ExecutarCadastroAsync());
             FazerLogoutCommand = new RelayCommand(p => ExecutarLogout());
-
-            /// Inicialização segura do comando de recuperação de senha corporativa
             EsqueciMinhaSenhaCommand = new RelayCommand(async p => await ExecutarEsqueciSenhaAsync());
-
-            _timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(2) };
-            _timer.Tick += async (s, e) => await CarregarTudoAsync();
 
             App.LogInfo("Construtor finalizado", "MAIN");
         }
@@ -276,13 +280,14 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        /// Executa o login do usuário via API incorporando feedback textual direto.
+        /// <summary>
+        /// Executa o login do usuário via API.
+        /// </summary>
         private async Task ExecutarLoginAsync()
         {
             App.LogInfo($"Tentativa para {LoginEmail}", "LOGIN");
             LoginError = "";
 
-            /// 1. Realiza chamada de validação remota de e-mail corporativo
             if (!await ValidarEmailAsync(LoginEmail))
             {
                 LoginError = EmailError;
@@ -317,14 +322,12 @@ namespace WpfIveco.ViewModel
                     LoginSenha = "";
 
                     App.LogInfo($"Sucesso – Usuário: {NomeUsuario}, Perfil: {PerfilUsuario}", "LOGIN");
-                    await CarregarTudoAsync();
-                    _timer.Start();
+                    await CarregarTudoAsync(); // Carregamento inicial
                 }
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
                     App.LogError($"Falha: {erro}", "LOGIN");
-                    /// Atualiza a propriedade visual vinculada na UI em vez de travar a thread com MessageBox
                     LoginError = "Credenciais inválidas ou acesso negado à plataforma.";
                 }
             }
@@ -339,12 +342,13 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        ///Executa o cadastro de um novo usuário via API.
+        /// <summary>
+        /// Executa o cadastro de um novo usuário via API.
+        /// </summary>
         private async Task ExecutarCadastroAsync()
         {
             App.LogInfo($"Tentativa para {LoginEmail}", "CADASTRO");
 
-            /// 1. Valida o e-mail
             if (!await ValidarEmailAsync(LoginEmail))
             {
                 MessageBox.Show(EmailError, "E-mail inválido", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -412,12 +416,15 @@ namespace WpfIveco.ViewModel
             LoginError = "";
             EmailValido = false;
             AbaAtiva = "Dashboard";
-            _timer.Stop();
         }
 
+        /// <summary>
+        /// Carrega todos os dados do sistema (chamado após o login).
+        /// </summary>
         private async Task CarregarTudoAsync()
         {
             App.LogInfo("Carregando todos os dados...", "CARREGAR");
+
             try
             {
                 await Dashboard.AtualizarPegadaMediaAsync();
@@ -426,16 +433,28 @@ namespace WpfIveco.ViewModel
                 await Pecas.CarregarFornecedoresAsync();
                 await Pecas.CarregarVinsAsync();
                 await Pecas.CarregarPecasAsync();
-                await Analises.AtualizarAsync(); /// Carrega dados ESG reais do Firebase
+                await Analises.AtualizarAsync(); // Carrega os dados ESG inicialmente
+
                 App.LogInfo("Carregamento concluído.", "CARREGAR");
             }
-            catch
+            catch (Exception ex)
             {
-                App.LogError("Falha ao carregar alguns dados – verifique a API", "CARREGAR");
+                App.LogError($"Falha ao carregar alguns dados: {ex.Message}", "CARREGAR");
             }
         }
 
+        /// <summary>
+        /// Atualiza apenas os dados da aba "Análises ESG" (chamado ao abrir a aba).
+        /// </summary>
+        private async Task AtualizarAnalisesAsync()
+        {
+            App.LogInfo("Atualizando dados ESG (aba aberta)", "MAIN");
+            await Analises.AtualizarAsync();
+        }
+
+        /// <summary>
         /// Dispara a solicitação assíncrona para recuperação da senha corporativa.
+        /// </summary>
         private async Task ExecutarEsqueciSenhaAsync()
         {
             LoginError = "";
@@ -468,11 +487,6 @@ namespace WpfIveco.ViewModel
             {
                 IsBusy = false;
             }
-
-
-
         }
-
-
     }
 }
