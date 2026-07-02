@@ -103,13 +103,17 @@ namespace WpfIveco.ViewModels
             App.LogInfo("AtualizarAsync iniciado", "ANALISES");
             try
             {
-                // Executa tudo em paralelo – CarregarTotalEmissoesAsync já calcula a economia
+                // Carrega TotalEmissoes primeiro
+                await CarregarTotalEmissoesAsync();
+
+                // Agora carrega os demais (incluindo economia)
                 await Task.WhenAll(
                     CarregarPegadaMediaAsync(),
                     CarregarGraficoEmissoesAsync(),
                     CarregarAnalisesEsgAsync(),
-                    CarregarTotalEmissoesAsync()
+                    CarregarEconomiaAsync() // Agora TotalEmissoes já está atualizado
                 );
+
                 App.LogInfo("Todos os dados ESG carregados com sucesso.", "ANALISES");
             }
             catch (Exception ex)
@@ -162,20 +166,24 @@ namespace WpfIveco.ViewModels
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
+                    App.LogInfo($"JSON grafico-emissoes: {json}", "ANALISES");
+
                     var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                     var dados = JsonSerializer.Deserialize<GraficoEmissoesDto>(json, options);
+
                     if (dados != null)
                     {
+                        // Garantir que os arrays não sejam nulos
+                        var valoresFabrica = dados.ValoresFabrica ?? Array.Empty<double>();
+                        var valoresCadeia = dados.ValoresCadeia ?? Array.Empty<double>();
+                        var meses = dados.Meses ?? new[] { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun" };
+
                         await Application.Current.Dispatcher.InvokeAsync(() =>
                         {
-                            // Limpa a coleção existente
+                            // Limpa a coleção existente (use o nome correto da propriedade)
                             GraficoBarrasSeries.Clear();
 
-                            var valoresFabrica = dados.ValoresFabrica ?? Array.Empty<double>();
-                            var valoresCadeia = dados.ValoresCadeia ?? Array.Empty<double>();
-                            MesesLabels = dados.Meses ?? new[] { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun" };
-
-                            // Adiciona as duas séries
+                            // Adiciona a série do Processo Fabril
                             GraficoBarrasSeries.Add(new ColumnSeries
                             {
                                 Title = "Processo Fabril",
@@ -184,6 +192,7 @@ namespace WpfIveco.ViewModels
                                 MaxColumnWidth = 30
                             });
 
+                            // Adiciona a série da Cadeia de Fornecedores
                             GraficoBarrasSeries.Add(new ColumnSeries
                             {
                                 Title = "Cadeia de Fornecedores",
@@ -192,22 +201,31 @@ namespace WpfIveco.ViewModels
                                 MaxColumnWidth = 30
                             });
 
-                            // Força notificação
+                            // Atualiza os labels do eixo X
+                            MesesLabels = meses;
+
+                            // Força notificação de mudança
                             OnPropertyChanged(nameof(GraficoBarrasSeries));
                             OnPropertyChanged(nameof(MesesLabels));
 
                             App.LogInfo($"Gráfico de barras atualizado com {MesesLabels.Length} meses", "ANALISES");
                         });
                     }
+                    else
+                    {
+                        App.LogError("Falha ao desserializar grafico-emissoes: dados nulos", "ANALISES");
+                    }
                 }
                 else
                 {
-                    App.LogError($"Falha grafico-emissoes: HTTP {response.StatusCode}", "ANALISES");
+                    var erro = await response.Content.ReadAsStringAsync();
+                    App.LogError($"Falha grafico-emissoes: HTTP {response.StatusCode} - {erro}", "ANALISES");
                 }
             }
             catch (Exception ex)
             {
                 App.LogError($"Erro em CarregarGraficoEmissoesAsync: {ex.Message}", "ANALISES");
+                // Mantém os placeholders em caso de erro
             }
         }
 
