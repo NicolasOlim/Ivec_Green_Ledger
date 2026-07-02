@@ -1,74 +1,52 @@
 # 📦🍃 Iveco Green Ledger – Sistema de Rastreamento Inteligente  
-**Trabalho de Conclusão de Curso**  
-**Unidade SENAI: Nova Lima**
 
-**Instrutor: Frederico Martins Aguiar**
-
-**Equipe de Desenvolvimento**  
-
-[🧑‍💻 Alice Andrade](https://github.com/aliceandradee)  |  [🧑‍💻 Erick Silva](https://github.com/erick190813)  | [🧑‍💻 Nicolas Oliveira Lima](https://github.com/NicolasOlim) | [🧑‍💻 Vinicius Augusto](https://github.com/vnxtry)  
-
----
-
-<div class="logo-container">
+ <div class="logo-container" align="center">
     <img src="imagens/Iveco_greenLogo.png" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 
----
+**Trabalho de Conclusão de Curso (TCC) | SENAI - Unidade Nova Lima | Orientador: Fred Aguiar**
 
-## Quem somos:
+<div align="center">
 
-O projeto Iveco Green Ledger foi idealizado, modelado e implementado por um grupo de estudantes do Curso Técnico em Desenvolvimento de Sistemas da Escola de Programação e Robótica – SENAI, atuando sob a orientação do educador Fred Aguiar. Diante do cenário de transformação digital e das crescentes pressões globais por transparência climática, o grupo uniu competências complementares nas áreas de arquitetura de software distribuída, engenharia de dados avançada e análise de balanços de sustentabilidade corporativa (ESG).
+### Equipe de Desenvolvimento
+</div>
 
-Essa sinergia técnica e o aprofundamento nos critérios metodológicos do GHG Protocol permitiram que a equipe projetasse, validasse e construísse uma solução computacional de alto nível. O ecossistema foi desenhado especificamente para mitigar e solucionar gargalos reais e complexos de rastreabilidade logística, controle de insumos industriais e auditoria ambiental, preenchendo uma lacuna crítica no monitoramento do Escopo 3 dentro da cadeia de suprimentos automotiva de carga pesada.
+[🧑‍💻 Alice Andrade](https://github.com/aliceandradee)  |  [🧑‍💻 Erick Silva](https://github.com/erick190813)  | [🧑‍💻 Nicolas Oliveira Lima](https://github.com/NicolasOlim) | [🧑‍💻 Vinicius Augusto](https://github.com/vnxtry)  
 
----
-
-## Problema encontrado:
-O cenário industrial automobilístico de grande porte é marcado por movimentações logísticas massivas de materiais em suas linhas de montagem, englobando desde ligas metálicas brutas até componentes complexos fornecidos por uma extensa rede parceira. Na maioria das organizações desse setor, o ciclo de vida e o real impacto ecológico desses insumos não são monitorados de maneira integrada desde a sua origem, sendo a pegada de carbono tratada de forma genérica ou totalmente dissociada de cada veículo produzido.
-
-A ausência de sistemas organizados de rastreabilidade e gerenciamento inteligente desses fluxos materiais gera impactos consideráveis em duas dimensões principais. Sob a ótica econômica e operacional, as montadoras enfrentam ineficiências decorrentes de inventários imprecisos e erros em inputs manuais de recebimento, tornando o fluxo sequencial da linha de montagem vulnerável a oscilações de rede e paralisações onerosas no chão de fábrica caso não possuam mecanismos locais estáveis de contingência de dados.
-
-No âmbito ambiental e de governança (ESG), a falta de um rastreamento preciso impede que as empresas calculem com exatidão matemática as suas emissões de Escopo 3 do GHG Protocol, referentes ao impacto indireto da cadeia de suprimentos. Embora a transição para uma economia de baixo carbono seja amplamente discutida, sua aplicação real na indústria pesada é limitada pela escassez de ferramentas tecnológicas acessíveis e integradas de forma direta ao cotidiano operacional das fábricas para transformar a coleta de dados físicos em ativos de conformidade climática.
-
-É nesse cenário desafiador que se insere a proposta do Iveco Green Ledger, uma plataforma tecnológica voltada para a gestão inteligente, rastreabilidade volumétrica e direcionamento de metadados ambientais na linha de produção de veículos comerciais. A solução se justifica por estruturar um modelo operacional híbrido capaz de garantir a resiliência offline no recebimento de materiais por meio de armazenamento relacional local (SQLite) e centralizar a inteligência analítica na nuvem (Firebase Firestore), integrando eficiência de software e sustentabilidade aplicada de acordo com as demandas ecológicas contemporâneas.
+O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclusão do nosso curso técnico em Desenvolvimento de Sistemas da Escola de Programação e Robótica – SENAI, atuando sob a orientação do educador Fred Aguiar. Diante do cenário de transformação digital e das crescentes pressões globais por transparência climática, unimso competências complementares nas áreas de arquitetura de software distribuída, engenharia de dados avançada e análise de balanços de sustentabilidade corporativa (ESG).
 
 ---
 
-## Solução a ser trabalhada:
+<div align="center">
 
-A solução apresentada para linha de montagem é o **Iveco Green Ledger**. Trata-se de um ecossistema de software  projetado especificamente para atuar na intersecção entre o chão de fábrica e a gestão de governança climática (ESG). O sistema automatiza a coleta de metadados logísticos e de cubagem volumétrica, vinculando de forma direta e imutável o impacto ecológico de cada insumo recebido ao número de chassi correspondente (VIN) do veículo comercial em produção.
+## Problema encontrado
+</div>
 
-O grande diferencial técnico do ecossistema reside na sua arquitetura de dados híbrida e resiliente, estruturada para neutralizar as vulnerabilidades típicas do ambiente industrial pesado. A operação de recepção e validação de materiais no galpão é gerenciada por um cliente desktop desenvolvido em WPF sob o padrão de projeto MVVM. Esta interface consome uma camada de persistência local baseada no banco de dados embutido SQLite, garantindo que o sistema opere em regime de total autonomia mesmo diante de oscilações ou quedas na infraestrutura de rede da fábrica, evitando paralisações onerosas na linha de montagem.
+A rotina de uma grande fábrica de veículos envolve uma movimentação enorme de materiais o tempo todo, desde matéria-prima bruta até peças prontas que chegam dos fornecedores. O grande desafio é que a maioria das empresas não consegue acompanhar de perto a jornada dessas peças e nem o impacto real que elas causam no meio ambiente.
 
-Assim que a conectividade com a internet é estabelecida ou normalizada, os dados locais são sincronizados de forma assíncrona com o back-end, cuja inteligência é centralizada na nuvem por meio do Firebase. Essa API RESTful, construída sobre a robustez do framework ASP.NET Core 8, é responsável por orquestrar a comunicação com serviços externos regulatórios (como BrasilAPI e NHTSA response) e rodar o motor algorítmico que calcula a pegada de carbono de Escopo 3 com base nas diretrizes internacionais do GHG Protocol.
+Isso gera três problemas principais:
+* **Cálculos aproximados:** Como não há um controle detalhado, a estimativa de poluição de cada veículo produzido acaba sendo feita de forma muito genérica.
+* **Erros em papéis e fichas:** O controle de entrada de materiais na portaria ainda depende muito de preenchimento manual, o que causa erros de digitação e perda de tempo.
+* **Dependência da internet:** Se a internet da fábrica cai, o sistema para de funcionar. Isso gera filas de caminhões e atrasos caros na produção.
 
-Por fim, a solução consolida essas informações complexas em dashboards analíticos de alta performance renderizados em tempo real. Essa camada visual permite que os gestores de logística e os auditores ambientais da Iveco acessem relatórios dinâmicos e transparentes sobre o balanço de carbono da cadeia de suprimentos. Dessa forma, o Iveco Green Ledger converte dados operacionais brutos de manufatura em ativos estratégicos de conformidade socioambiental, unindo de ponta a ponta a eficiência de software à sustentabilidade industrial aplicada.
+Pensando nisso criamos uma plataforma para facilitar o recebimento dessas peças e calcular automaticamente o impacto ambiental na linha de produção. 
 
----
-
-## Objetivos do Projeto:
-
-### Objetivo Geral:
-
-Desenvolver uma plataforma tecnológica para a gestão inteligente, cubagem volumétrica e rastreabilidade ambiental de insumos automotivos, composta por uma API, um simulador de sensores IoT industriais e um cliente em WPF estruturado no padrão MVVM, com integração a serviços externos de validação regulatória e persistência em nuvem.
-
-### Objetivos específicos:
-
- - **Projetar e construir a interface de chão de fábrica:** Desenvolver o cliente desktop utilizando o framework WPF sob o padrão arquitetural MVVM (Model-View-ViewModel), garantindo uma experiência de usuário fluida, intuitiva e adaptada à rotina operacional dos operadores de recebimento logístico.
-
- - **Automatizar as validações regulatórias e fiscais:** Integrar o back-end a APIs públicas (como BrasilAPI para dados cadastrais e fiscais de fornecedores e NHTSA para a decodificação técnica do código VIN), eliminando a necessidade de inputs manuais suscetíveis a falhas humanas.
-
-- **Centralizar a inteligência analítica na nuvem:** Estruturar a persistência não relacional (NoSQL) no Firebase Firestore e desenvolver um back-end em ASP.NET Core 8 responsável pelo processamento assíncrono, sincronização dos dados locais e orquestração do ecossistema.
-
-- **Prover transparência analítica para governança ESG:** Implementar dashboards dinâmicos em tempo real utilizando a biblioteca LiveCharts2, permitindo a geração de relatórios de conformidade ambiental auditáveis para a tomada de decisões gerenciais e estratégicas.
-
+O grande diferencial do nosso sistema é que ele **funciona mesmo sem internet**. Assim, o trabalho no pátio da fábrica nunca precisa parar por falta de conexão, os erros manuais são eliminados e a empresa passa a ter relatórios automáticos, rápidos e confiáveis sobre suas metas de sustentabilidade.
 
 ---
+
 
 ## Metodologia:
 
-O desenvolvimento do ecossistema foi estruturado de forma interativa, sendo dividido em três fases principais: o levantamento de requisitos e modelagem (Fase 1), focado nas regras de negócio. O desenvolvimento da interface e persistência (Fase 2), voltado à construção do cliente WPF, tabelas pelo SQLite e dashboards analíticos. E a construção da API REST com integridade na nuvem (Fase 3), englobando o motor do GHG Protocol, as logs e as integrações assíncronas com as API's. O controle de versão e o gerenciamento do código-fonte foram centralizados na plataforma GitHub, garantindo um histórico de desenvolvimento consistente, seguro e colaborativo entre a equipe.
+O desenvolvimento do sistema foi realizado em etapas bem organizadas, divididas em três fases principais para garantir que o programa atendesse perfeitamente às necessidades reais da fábrica:
+
+<p align="center">
+  <img src="imagens/organização - trello.png" alt="Logo Iveco Green Ledger" width="450">
+</p>
+
+* **Fase 1 (Levantamento e Planejamento):** Focada na definição das regras de negócio, validações de segurança e estruturação inicial do projeto.
+* **Fase 2 (Raciocínio e Interface):** Voltada para a construção da interface visual em WPF, criação das tabelas do banco de dados local para funcionamento offline e montagem dos painéis de gráficos analíticos.
+* **Fase 3 (Integração e Nuvem):** Conclusão da API principal, desenvolvimento do motor de cálculo da pegada de carbono, configuração das notificações e a sincronização automática dos dados com a nuvem.
 
 ---
 
@@ -78,7 +56,9 @@ Este capítulo descreve o contexto organizacional que motivou o desenvolvimento 
 
 ### Contexto Organizacional:
 
-Para sanar os gargalos operacionais e ambientais identificados da empresa Iveco, sendo assim foi padronizado uma arquitetura de serviços desacoplados e persistência balanceada. O ciclo de vida do dado inicia-se com o mapeamento físico de insumos e a validação do chassi no fluxo de montagem, onde o administrador pré-configura os índices de emissão do GHG Protocol e homologa os fornecedores na nuvem. Quando o operador executa o recebimento logístico de um material, o sistema captura suas credenciais a partir da camada de autenticação e cria um registro de telemetria local, realizando o cruzamento de cardinalidade entre os dados de cubagem e a árvore de peças vinculadas ao veículo por meio da tabela associativa.
+O sistema foi criado para resolver de forma simples os problemas de controle de estoque e de impacto ambiental na fábrica da Iveco. Para que a produção nunca pare, o programa funciona dividindo as tarefas de forma inteligente: os dados mais importantes ficam salvos na internet (nuvem) e uma cópia de segurança é mantida nos próprios computadores da fábrica.
+
+O trabalho do sistema começa bem antes dos materiais chegarem, quando um responsável pela área ambiental cadastra os índices de poluição permitidos e a lista de fornecedores autorizados. No dia a dia, assim que um caminhão de suprimentos chega para descarregar, o operador usa o sistema para checar as informações do veículo e registrar o tamanho e o peso da carga. Com isso, o programa junta tudo automaticamente e calcula o impacto ecológico daquela entrega, gerando relatórios rápidos para a gerência sem complicar a rotina do chão de fábrica.
 
 
 ### **Usuário do Sistema**:
