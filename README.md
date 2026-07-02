@@ -1,63 +1,52 @@
 # 📦🍃 Iveco Green Ledger – Sistema de Rastreamento Inteligente  
-**Trabalho de Conclusão de Curso**  
-**Unidade SENAI: Nova Lima**
 
-**Instrutor: Frederico Martins Aguiar**
-
-**Equipe de Desenvolvimento**  
-
-[🧑‍💻 Alice Andrade](https://github.com/aliceandradee)  |  [🧑‍💻 Erick Silva](https://github.com/erick190813)  | [🧑‍💻 Nicolas Oliveira Lima](https://github.com/NicolasOlim) | [🧑‍💻 Vinicius Augusto](https://github.com/vnxtry)  
-
----
-
-<div class="logo-container">
+ <div class="logo-container" align="center">
     <img src="imagens/Iveco_greenLogo.png" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 
----
+**Trabalho de Conclusão de Curso (TCC) | SENAI - Unidade Nova Lima | Orientador: Fred Aguiar**
 
-## Quem somos:
+<div align="center">
+
+### Equipe de Desenvolvimento
+</div>
+
+[🧑‍💻 Alice Andrade](https://github.com/aliceandradee)  |  [🧑‍💻 Erick Silva](https://github.com/erick190813)  | [🧑‍💻 Nicolas Oliveira Lima](https://github.com/NicolasOlim) | [🧑‍💻 Vinicius Augusto](https://github.com/vnxtry)  
 
 O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclusão do nosso curso técnico em Desenvolvimento de Sistemas da Escola de Programação e Robótica – SENAI, atuando sob a orientação do educador Fred Aguiar. Diante do cenário de transformação digital e das crescentes pressões globais por transparência climática, unimso competências complementares nas áreas de arquitetura de software distribuída, engenharia de dados avançada e análise de balanços de sustentabilidade corporativa (ESG).
 
 ---
 
-## Problema encontrado:
+<div align="center">
 
-O dia a dia de uma grande fábrica de veículos envolve a entrada e saída constante de uma quantidade enorme de materiais, que vão desde metais brutos até peças prontas trazidas por fornecedores parceiros. O problema é que a maioria das empresas não consegue acompanhar de perto o ciclo de vida dessas peças e nem o impacto real que elas causam no meio ambiente. Isso faz com que a contagem da poluição gerada na fabricação seja calculada de forma muito genérica, sem que a montadora saiba a pegada de carbono real de cada veículo produzido. Além disso, o preenchimento manual de fichas na portaria gera muitos erros de digitação e perda de tempo, deixando o trabalho vulnerável a atrasos caros e filas se a internet da fábrica cair e o sistema parar por falta de um modo de funcionamento local.
+## Problema encontrado
+</div>
 
-Sendo assim, nós da Iveco Green Ledger tivemos a ideia de criar uma plataforma para ajudar no recebimento de materiais e no cálculo ambiental na linha de produção. Nosso modelo garante que o trabalho no pátio nunca precise parar por falta de conexão, acabando com os erros manuais e gerando relatórios de poluição automáticos e confiáveis para a empresa, unindo a agilidade do software com a sustentabilidade necessária para o negócio.
+A rotina de uma grande fábrica de veículos envolve uma movimentação enorme de materiais o tempo todo, desde matéria-prima bruta até peças prontas que chegam dos fornecedores. O grande desafio é que a maioria das empresas não consegue acompanhar de perto a jornada dessas peças e nem o impacto real que elas causam no meio ambiente.
 
----
+Isso gera três problemas principais:
+* **Cálculos aproximados:** Como não há um controle detalhado, a estimativa de poluição de cada veículo produzido acaba sendo feita de forma muito genérica.
+* **Erros em papéis e fichas:** O controle de entrada de materiais na portaria ainda depende muito de preenchimento manual, o que causa erros de digitação e perda de tempo.
+* **Dependência da internet:** Se a internet da fábrica cai, o sistema para de funcionar. Isso gera filas de caminhões e atrasos caros na produção.
 
-## Solução a ser trabalhada:
+Pensando nisso criamos uma plataforma para facilitar o recebimento dessas peças e calcular automaticamente o impacto ambiental na linha de produção. 
 
-Desenvolvemos uma solução com a intuição de modernizar a portaria e o pátio de recebimento da fábrica. O sistema funciona de forma muito simples: assim que um caminhão chega, o operador digita os dados do veículo e o programa consulta automaticamente as informações e eliminando a necessidade de papéis, pranchetas e digitação manual de fichas compridas, o que zera os erros humanos e faz o tempo de conferência de cada veículo ser mais ágil. Evitando a formação de filas de carretas na entrada e cortando os prejuízos com multas por atraso na liberação dos motoristas.
-
----
-
-## Objetivos do projeto:
-
-### Objetivo geral:
-
-Nosso objetivo foi desenvolver uma plataforma digital para o controle inteligente, cálculo de volume e rastreamento ambiental de peças de veículos, composta por um sistema central, um simulador de sensores de fábrica e telas práticas para o usuário, com consultas automáticas e salvamento de dados em nuvem (Firebase).
-
-### Objetivos específicos:
-
- - **Criação de telas/interfaces práticas:** Garantimos um programa rápido, visualmente limpo e totalmente adaptado à rotina de trabalho dos operadores.
-
- - **Automatizar a checagem de dados:** Nosso programa busca informações automaticamente na base de dados para eliminar de vez os erros de digitação e a papelada.
-
-- **Centralizar a inteligência do sistema na nuvem:** Essa parte é responsável por processar todas as informações, atualizar o estoque e garantir que tudo funcione junto.
-
-- **Oferecer gráficos e relatórios claros:** Criação de relatórios confiáveis em PDF e a análise feita e representada através dos gráficos.
+O grande diferencial do nosso sistema é que ele **funciona mesmo sem internet**. Assim, o trabalho no pátio da fábrica nunca precisa parar por falta de conexão, os erros manuais são eliminados e a empresa passa a ter relatórios automáticos, rápidos e confiáveis sobre suas metas de sustentabilidade.
 
 ---
+
 
 ## Metodologia:
 
 O desenvolvimento do sistema foi realizado em etapas bem organizadas, divididas em três fases principais para garantir que o programa atendesse perfeitamente às necessidades reais da fábrica:
 
+<p align="center">
+  <img src="imagens/organização - trello.png" alt="Logo Iveco Green Ledger" width="450">
+</p>
+
+* **Fase 1 (Levantamento e Planejamento):** Focada na definição das regras de negócio, validações de segurança e estruturação inicial do projeto.
+* **Fase 2 (Raciocínio e Interface):** Voltada para a construção da interface visual em WPF, criação das tabelas do banco de dados local para funcionamento offline e montagem dos painéis de gráficos analíticos.
+* **Fase 3 (Integração e Nuvem):** Conclusão da API principal, desenvolvimento do motor de cálculo da pegada de carbono, configuração das notificações e a sincronização automática dos dados com a nuvem.
 
 ---
 
@@ -67,7 +56,9 @@ Este capítulo descreve o contexto organizacional que motivou o desenvolvimento 
 
 ### Contexto Organizacional:
 
-Para sanar os gargalos operacionais e ambientais identificados da empresa Iveco, sendo assim foi padronizado uma arquitetura de serviços desacoplados e persistência balanceada. O ciclo de vida do dado inicia-se com o mapeamento físico de insumos e a validação do chassi no fluxo de montagem, onde o administrador pré-configura os índices de emissão do GHG Protocol e homologa os fornecedores na nuvem. Quando o operador executa o recebimento logístico de um material, o sistema captura suas credenciais a partir da camada de autenticação e cria um registro de telemetria local, realizando o cruzamento de cardinalidade entre os dados de cubagem e a árvore de peças vinculadas ao veículo por meio da tabela associativa.
+O sistema foi criado para resolver de forma simples os problemas de controle de estoque e de impacto ambiental na fábrica da Iveco. Para que a produção nunca pare, o programa funciona dividindo as tarefas de forma inteligente: os dados mais importantes ficam salvos na internet (nuvem) e uma cópia de segurança é mantida nos próprios computadores da fábrica.
+
+O trabalho do sistema começa bem antes dos materiais chegarem, quando um responsável pela área ambiental cadastra os índices de poluição permitidos e a lista de fornecedores autorizados. No dia a dia, assim que um caminhão de suprimentos chega para descarregar, o operador usa o sistema para checar as informações do veículo e registrar o tamanho e o peso da carga. Com isso, o programa junta tudo automaticamente e calcula o impacto ecológico daquela entrega, gerando relatórios rápidos para a gerência sem complicar a rotina do chão de fábrica.
 
 
 ### **Usuário do Sistema**:
