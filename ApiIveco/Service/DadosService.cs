@@ -1056,5 +1056,42 @@ namespace ApiIveco.Service
 
             return resultado;
         }
+
+
+        /// <summary>
+        /// Calcula o total de emissões de CO2 reais, somando as emissões de todos os veículos (com base em seus componentes)
+        /// e de todos os lotes de matéria-prima.
+        /// </summary>
+        /// <returns>Total de emissões em kg CO₂.</returns>
+        public async Task<double> CalcularTotalEmissoesAsync()
+        {
+            double total = 0;
+            const double fatorEmissaoPadrao = 2.5; // kg CO2/kg
+
+            // 1. Emissões dos veículos (através dos componentes)
+            var componentes = await ListarVeiculoComponente();
+            if (componentes != null)
+            {
+                foreach (var comp in componentes)
+                {
+                    total += comp.PesoKg * fatorEmissaoPadrao;
+                }
+                _logger.LogInformation($"Total de emissões dos veículos: {total} kg CO₂", "DadosService");
+            }
+
+            // 2. Emissões dos lotes
+            var lotes = await ListarLoteMateriaPrima();
+            if (lotes != null)
+            {
+                foreach (var lote in lotes)
+                {
+                    total += lote.QuantidadeKg * lote.PegadaCarbonoPorKg;
+                }
+                _logger.LogInformation($"Total de emissões dos lotes: {lotes.Sum(l => l.QuantidadeKg * l.PegadaCarbonoPorKg)} kg CO₂", "DadosService");
+            }
+
+            _logger.LogInformation($"Total geral de emissões: {total} kg CO₂ ({total / 1000:F2} ton)", "DadosService");
+            return total;
+        }
     }
 }

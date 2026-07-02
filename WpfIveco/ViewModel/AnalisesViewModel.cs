@@ -102,7 +102,8 @@ namespace WpfIveco.ViewModels
                 await Task.WhenAll(
                     CarregarPegadaMediaAsync(),
                     CarregarGraficoEmissoesAsync(),
-                    CarregarAnalisesEsgAsync()
+                    CarregarAnalisesEsgAsync(),
+                    CarregarTotalEmissoesAsync() 
                 );
                 App.LogInfo("Todos os dados ESG carregados com sucesso.", "ANALISES");
             }
@@ -125,7 +126,6 @@ namespace WpfIveco.ViewModels
                     using var doc = JsonDocument.Parse(json);
                     var pegadaMedia = doc.RootElement.GetProperty("pegadaMedia").GetDouble();
 
-                    TotalEmissoes = (int)(pegadaMedia * 0.1);
                     PecasReaproveitadas = (int)(pegadaMedia * 0.05);
                     var economiaVal = TotalEmissoes * 150.0;
                     EconomiaGerada = economiaVal >= 1_000_000
@@ -350,5 +350,38 @@ namespace WpfIveco.ViewModels
             UltimasAvaliacoes.Clear();
             TopFornecedores.Clear();
         }
+
+        /// <summary>
+        /// Busca o total real de emissões (soma de veículos e lotes) do endpoint /total-emissoes.
+        /// </summary>
+        private async Task CarregarTotalEmissoesAsync()
+        {
+            App.LogInfo("GET total-emissoes...", "ANALISES");
+            try
+            {
+                var response = await _httpClient.GetAsync("api/dados/total-emissoes");
+                App.LogInfo($"GET total-emissoes → {(int)response.StatusCode}", "ANALISES");
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    using var doc = JsonDocument.Parse(json);
+                    var total = doc.RootElement.GetProperty("totalEmissoes").GetDouble();
+
+                    // Converte kg para toneladas e arredonda para inteiro
+                    TotalEmissoes = (int)Math.Round(total / 1000);
+                    App.LogInfo($"Total de emissões reais: {TotalEmissoes} ton ({total} kg)", "ANALISES");
+                }
+                else
+                {
+                    var erro = await response.Content.ReadAsStringAsync();
+                    App.LogError($"Falha total-emissoes: HTTP {response.StatusCode} - {erro}", "ANALISES");
+                }
+            }
+            catch (Exception ex)
+            {
+                App.LogError($"Erro em CarregarTotalEmissoesAsync: {ex.Message}", "ANALISES");
+            }
+        }
+
     }
 }

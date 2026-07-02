@@ -741,6 +741,33 @@ namespace ApiIveco.Controllers
             return Ok(dados);
         }
 
-       
+        /// <summary>
+        /// Retorna o total de emissões de CO2 reais, somando veículos e lotes.
+        /// </summary>
+        /// <remarks>
+        /// O cálculo considera:
+        /// - Para veículos: soma do peso de todos os componentes multiplicado por 2.5 kg CO₂/kg.
+        /// - Para lotes: soma de QuantidadeKg * PegadaCarbonoPorKg.
+        /// O resultado é retornado em kg.
+        /// </remarks>
+        [Tags("Dashboard")]
+        [HttpGet("total-emissoes")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetTotalEmissoes()
+        {
+            _logger.LogInformation("[GET] Calculando total de emissões.");
+            try
+            {
+                var total = await _dadosService.CalcularTotalEmissoesAsync();
+                return Ok(new { totalEmissoes = total });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Erro ao calcular total de emissões: {ex.Message}");
+                return StatusCode(500, new { Mensagem = "Erro ao calcular total de emissões." });
+            }
+        }
+
     }
 }
