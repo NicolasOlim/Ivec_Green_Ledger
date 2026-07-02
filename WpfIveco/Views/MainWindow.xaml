@@ -503,8 +503,6 @@
                                 </ControlTemplate>
                             </Button.Template>
                         </Button>
-
-                        <TextBlock Text="Esqueci minha Senha" Foreground="#0A5B43" FontSize="14" FontWeight="SemiBold" TextDecorations="Underline" Cursor="Hand" Margin="0,24,0,0" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
             </Grid>

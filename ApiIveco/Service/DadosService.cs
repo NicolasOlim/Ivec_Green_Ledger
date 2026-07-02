@@ -1093,5 +1093,53 @@ namespace ApiIveco.Service
             _logger.LogInformation($"Total geral de emissões: {total} kg CO₂ ({total / 1000:F2} ton)", "DadosService");
             return total;
         }
+
+        /// <summary>
+        /// Obtém o preço atual do carbono (R$ por tonelada) da API pública do World Bank.
+        /// Se falhar, retorna um valor fixo de fallback (R$ 150,00).
+        /// </summary>
+        public async Task<double> ObterPrecoCarbonoAsync()
+        {
+            try
+            {
+                using var client = new HttpClient();
+                client.Timeout = TimeSpan.FromSeconds(10);
+                client.DefaultRequestHeaders.Add("User-Agent", "IvecoGreenLedger/1.0");
+
+                // Endpoint público do World Bank para preço do carbono (EU ETS)
+                // Retorna o preço em USD/ton
+                var url = "https://api.worldbank.org/v2/country/all/indicator/EN.CLC.CRBT.ZS?format=json";
+                var response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    using var doc = JsonDocument.Parse(json);
+
+                    // O JSON do World Bank é um array: [0] = metadados, [1] = dados
+                    // O preço está em [1][0].value
+                    var precoUSD = doc.RootElement[1][0]
+                                         .GetProperty("value")
+                                         .GetDouble();
+
+                    // Converte USD para BRL (câmbio aproximado, ajuste se necessário)
+                    var precoBRL = precoUSD * 5.5;
+                    var resultado = Math.Round(precoBRL, 2);
+
+                    _logger.LogInformation($"Preço do carbono (World Bank): USD {precoUSD} → R$ {resultado}/ton");
+                    return resultado;
+                }
+                else
+                {
+                    _logger.LogWarning($"Falha ao obter preço do World Bank. Status: {response.StatusCode}. Usando fallback.");
+                    return 150.0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning($"Erro na consulta de preço do carbono: {ex.Message}. Usando fallback.");
+                return 150.0;
+            }
+        }
     }
 }
