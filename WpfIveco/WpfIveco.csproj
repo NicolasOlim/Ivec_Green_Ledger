@@ -16,6 +16,7 @@
     <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
     <PackageReference Include="QuestPDF" Version="2026.5.0" />
     <PackageReference Include="Serilog.Sinks.Logtail" Version="0.0.1" />
+    <PackageReference Include="System.Runtime.Caching" Version="10.0.9" />
   </ItemGroup>
 
 </Project>

@@ -143,10 +143,19 @@ namespace WpfIveco.ViewModel
                     _abaAtiva = value;
                     OnPropertyChanged();
 
-                    // Atualiza os dados ESG sempre que a aba "Analises" for aberta
-                    if (_abaAtiva == "Analises" && IsLoggedIn)
+                    // Atualiza dados ao abrir a aba (somente se logado)
+                    if (IsLoggedIn)
                     {
-                        _ = AtualizarAnalisesAsync();
+                        switch (_abaAtiva)
+                        {
+                            case "Dashboard":
+                                _ = Dashboard.AtualizarPegadaMediaAsync();
+                                break;
+                            case "Analises":
+                                _ = Analises.AtualizarAsync();
+                                break;
+                                // Outras abas podem ser adicionadas conforme necessário
+                        }
                     }
                 }
             }

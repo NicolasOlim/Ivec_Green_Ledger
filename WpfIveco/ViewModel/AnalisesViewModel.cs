@@ -158,7 +158,7 @@ namespace WpfIveco.ViewModels
 
         private async Task CarregarGraficoEmissoesAsync()
         {
-            App.LogInfo("GET grafico-emissoes...", "ANALISES");
+            App.LogInfo("CarregarGraficoEmissoesAsync iniciado", "ANALISES");
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/grafico-emissoes");
@@ -173,42 +173,55 @@ namespace WpfIveco.ViewModels
 
                     if (dados != null)
                     {
-                        // Garantir que os arrays não sejam nulos
                         var valoresFabrica = dados.ValoresFabrica ?? Array.Empty<double>();
                         var valoresCadeia = dados.ValoresCadeia ?? Array.Empty<double>();
                         var meses = dados.Meses ?? new[] { "Jan", "Fev", "Mar", "Abr", "Mai", "Jun" };
 
+                        App.LogInfo($"valoresFabrica: {valoresFabrica.Length}, valoresCadeia: {valoresCadeia.Length}", "ANALISES");
+
                         await Application.Current.Dispatcher.InvokeAsync(() =>
                         {
-                            // Limpa a coleção existente (use o nome correto da propriedade)
-                            GraficoBarrasSeries.Clear();
-
-                            // Adiciona a série do Processo Fabril
-                            GraficoBarrasSeries.Add(new ColumnSeries
+                            try
                             {
-                                Title = "Processo Fabril",
-                                Values = new ChartValues<double>(valoresFabrica),
-                                Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0A5B43")),
-                                MaxColumnWidth = 30
-                            });
+                                if (GraficoBarrasSeries == null)
+                                {
+                                    App.LogWarning("GraficoBarrasSeries é nulo. Recriando...", "ANALISES");
+                                    GraficoBarrasSeries = new SeriesCollection();
+                                }
 
-                            // Adiciona a série da Cadeia de Fornecedores
-                            GraficoBarrasSeries.Add(new ColumnSeries
+                                GraficoBarrasSeries.Clear();
+
+                                // CORREÇÃO: usar ColorConverter diretamente com fallback
+                                var corFabrica = (Color)ColorConverter.ConvertFromString("#0A5B43");
+                                var corCadeia = (Color)ColorConverter.ConvertFromString("#4BAC50");
+
+                                GraficoBarrasSeries.Add(new ColumnSeries
+                                {
+                                    Title = "Processo Fabril",
+                                    Values = new ChartValues<double>(valoresFabrica),
+                                    Fill = new SolidColorBrush(corFabrica),
+                                    MaxColumnWidth = 30
+                                });
+
+                                GraficoBarrasSeries.Add(new ColumnSeries
+                                {
+                                    Title = "Cadeia de Fornecedores",
+                                    Values = new ChartValues<double>(valoresCadeia),
+                                    Fill = new SolidColorBrush(corCadeia),
+                                    MaxColumnWidth = 30
+                                });
+
+                                MesesLabels = meses;
+                                OnPropertyChanged(nameof(GraficoBarrasSeries));
+                                OnPropertyChanged(nameof(MesesLabels));
+
+                                App.LogInfo($"Gráfico de barras atualizado com {MesesLabels.Length} meses", "ANALISES");
+                            }
+                            catch (Exception ex)
                             {
-                                Title = "Cadeia de Fornecedores",
-                                Values = new ChartValues<double>(valoresCadeia),
-                                Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4BAC50")),
-                                MaxColumnWidth = 30
-                            });
-
-                            // Atualiza os labels do eixo X
-                            MesesLabels = meses;
-
-                            // Força notificação de mudança
-                            OnPropertyChanged(nameof(GraficoBarrasSeries));
-                            OnPropertyChanged(nameof(MesesLabels));
-
-                            App.LogInfo($"Gráfico de barras atualizado com {MesesLabels.Length} meses", "ANALISES");
+                                App.LogError($"Erro ao atualizar gráfico na UI: {ex.Message}", "ANALISES");
+                                App.LogError($"Stack trace: {ex.StackTrace}", "ANALISES");
+                            }
                         });
                     }
                     else
@@ -225,7 +238,7 @@ namespace WpfIveco.ViewModels
             catch (Exception ex)
             {
                 App.LogError($"Erro em CarregarGraficoEmissoesAsync: {ex.Message}", "ANALISES");
-                // Mantém os placeholders em caso de erro
+                App.LogError($"Stack trace: {ex.StackTrace}", "ANALISES");
             }
         }
 
