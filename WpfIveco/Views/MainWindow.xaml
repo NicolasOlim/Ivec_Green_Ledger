@@ -281,64 +281,92 @@
                     </Grid>
                 </Border>
 
-                <!-- Área de conteúdo -->
-                <ScrollViewer Grid.Column="1" Padding="40" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <ContentControl>
-                        <ContentControl.Style>
-                            <Style TargetType="ContentControl">
-                                <Setter Property="Content">
-                                    <Setter.Value>
-                                        <views:DashboardView/>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding AbaAtiva}" Value="Projetos">
-                                        <Setter Property="Content">
-                                            <Setter.Value>
-                                                <views:RastreabilidadeView/>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding AbaAtiva}" Value="Cadastro">
-                                        <Setter Property="Content">
-                                            <Setter.Value>
-                                                <views:FornecedoresView/>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding AbaAtiva}" Value="Analises">
-                                        <Setter Property="Content">
-                                            <Setter.Value>
-                                                <views:AnalisesView/>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding AbaAtiva}" Value="Pecas">
-                                        <Setter Property="Content">
-                                            <Setter.Value>
-                                                <views:PecasView/>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding AbaAtiva}" Value="Relatorios">
-                                        <Setter Property="Content">
-                                            <Setter.Value>
-                                                <views:RelatoriosView/>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding AbaAtiva}" Value="Ajustes">
-                                        <Setter Property="Content">
-                                            <Setter.Value>
-                                                <views:AjustesView/>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ContentControl.Style>
-                    </ContentControl>
-                </ScrollViewer>
+                <!-- Área de conteúdo principal com TopBar de Notificações -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <!-- Top Bar -->
+                        <RowDefinition Height="*"/>
+                        <!-- Conteúdo -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Top Bar / Notificações -->
+                    <Border Grid.Row="0" Background="Transparent" Padding="0,15,30,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+
+                            <!-- Sino de Notificações -->
+                            <Button x:Name="BtnNotificacoes" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,0,20,0" ToolTip="Ver notificações">
+                                <Grid>
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9F5;" FontSize="24" Foreground="#6B7280" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <!-- Badge de notificações -->
+                                    <Border Background="#EF4444" CornerRadius="10" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8,-6,0,0">
+                                        <TextBlock Text="3" Foreground="White" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </Grid>
+                            </Button>
+
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ScrollViewer / Abas -->
+                    <ScrollViewer Grid.Row="1" Padding="40" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ContentControl>
+                            <ContentControl.Style>
+                                <Style TargetType="ContentControl">
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <views:DashboardView/>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding AbaAtiva}" Value="Projetos">
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <views:RastreabilidadeView/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding AbaAtiva}" Value="Cadastro">
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <views:FornecedoresView/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding AbaAtiva}" Value="Analises">
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <views:AnalisesView/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding AbaAtiva}" Value="Pecas">
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <views:PecasView/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding AbaAtiva}" Value="Relatorios">
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <views:RelatoriosView/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding AbaAtiva}" Value="Ajustes">
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <views:AjustesView/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ContentControl.Style>
+                        </ContentControl>
+                    </ScrollViewer>
+                </Grid>
             </Grid>
         </Border>
 
@@ -501,9 +529,9 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Ícone amarelo/laranja -->
-                    <Border Grid.Row="0" Grid.Column="0" Width="64" Height="64" CornerRadius="32" Background="#FFFBEB" BorderBrush="#FEF3C7" BorderThickness="1" VerticalAlignment="Top" Margin="0,0,16,0">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xF3B1;" FontSize="28" Foreground="#F59E0B" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                    <!-- Ícone alterado para Vermelho -->
+                    <Border Grid.Row="0" Grid.Column="0" Width="64" Height="64" CornerRadius="32" Background="#FEF2F2" BorderBrush="#FECACA" BorderThickness="1" VerticalAlignment="Top" Margin="0,0,16,0">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xF3B1;" FontSize="28" Foreground="#DC2626" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,0,0,0"/>
                     </Border>
 
                     <!-- Textos -->
@@ -525,8 +553,8 @@
                             </Button.Template>
                         </Button>
 
-                        <!-- Sair -->
-                        <Button Click="BtnConfirmarSaida_Click" Background="#1D4ED8" Cursor="Hand">
+                        <!-- Sair (Alterado de Azul para Verde) -->
+                        <Button Click="BtnConfirmarSaida_Click" Background="#16A34A" Cursor="Hand">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Border x:Name="bgBorder" Background="{TemplateBinding Background}" CornerRadius="8" Padding="32,10">
@@ -534,7 +562,7 @@
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="bgBorder" Property="Background" Value="#1E40AF"/>
+                                            <Setter TargetName="bgBorder" Property="Background" Value="#15803D"/>
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
@@ -544,5 +572,55 @@
                 </Grid>
             </Border>
         </Grid>
+
+        <!-- ========================================== -->
+        <!-- NOTIFICAÇÃO TOAST (Pop-up flutuante)        -->
+        <!-- ========================================== -->
+        <Border x:Name="ToastContainer" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60" Panel.ZIndex="1000" CornerRadius="12" Padding="16,14" MaxWidth="600">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="#1E293B"/>
+                    <!-- Cinza escuro padrão -->
+                    <Style.Triggers>
+                        <!-- Muda a cor de fundo e o ícone baseado no tipo de notificação -->
+                        <DataTrigger Binding="{Binding NotificationType}" Value="Success">
+                            <Setter Property="Background" Value="#10B981"/>
+                            <!-- Verde -->
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding NotificationType}" Value="Error">
+                            <Setter Property="Background" Value="#EF4444"/>
+                            <!-- Vermelho -->
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsNotificationVisible}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="25" ShadowDepth="4" Opacity="0.25" Color="Black"/>
+            </Border.Effect>
+
+            <StackPanel Orientation="Horizontal">
+                <!-- Ícone dinâmico -->
+                <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="20" Foreground="White" Margin="0,0,12,0" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Text" Value="&#xE73E;"/>
+                            <!-- CheckMark -->
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding NotificationType}" Value="Error">
+                                    <Setter Property="Text" Value="&#xE711;"/>
+                                    <!-- Cancel/Erro -->
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- Mensagem -->
+                <TextBlock Text="{Binding NotificationMessage, FallbackValue='Operação realizada com sucesso!'}" Foreground="White" FontSize="14" FontWeight="Medium" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
