@@ -73,6 +73,8 @@ namespace WpfIveco.ViewModels
             set { _mesesLabels = value; OnPropertyChanged(); }
         }
 
+
+
         // DataGrid e Ranking – coleções reutilizadas
         private ObservableCollection<AvaliacaoFornecedor> _ultimasAvaliacoes = new();
         public ObservableCollection<AvaliacaoFornecedor> UltimasAvaliacoes
@@ -94,16 +96,19 @@ namespace WpfIveco.ViewModels
             CarregarPlaceholders();
         }
 
+
+
         public async Task AtualizarAsync()
         {
             App.LogInfo("AtualizarAsync iniciado", "ANALISES");
             try
             {
+                // Executa tudo em paralelo – CarregarTotalEmissoesAsync já calcula a economia
                 await Task.WhenAll(
                     CarregarPegadaMediaAsync(),
                     CarregarGraficoEmissoesAsync(),
                     CarregarAnalisesEsgAsync(),
-                    CarregarTotalEmissoesAsync() 
+                    CarregarTotalEmissoesAsync()
                 );
                 App.LogInfo("Todos os dados ESG carregados com sucesso.", "ANALISES");
             }
@@ -352,11 +357,11 @@ namespace WpfIveco.ViewModels
         }
 
         /// <summary>
-        /// Busca o total real de emissões (soma de veículos e lotes) do endpoint /total-emissoes.
+        /// Busca o total real de emissões (soma de veículos e lotes) e calcula a economia.
         /// </summary>
         private async Task CarregarTotalEmissoesAsync()
         {
-            App.LogInfo("GET total-emissoes...", "ANALISES");
+            App.LogInfo("CarregarTotalEmissoesAsync iniciado", "ANALISES");
             try
             {
                 var response = await _httpClient.GetAsync("api/dados/total-emissoes");
@@ -364,23 +369,194 @@ namespace WpfIveco.ViewModels
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
+                    App.LogInfo($"JSON total-emissoes: {json}", "ANALISES");
                     using var doc = JsonDocument.Parse(json);
                     var total = doc.RootElement.GetProperty("totalEmissoes").GetDouble();
 
                     // Converte kg para toneladas e arredonda para inteiro
-                    TotalEmissoes = (int)Math.Round(total / 1000);
+                    int totalTon = (int)Math.Round(total / 1000);
+                    TotalEmissoes = totalTon;
                     App.LogInfo($"Total de emissões reais: {TotalEmissoes} ton ({total} kg)", "ANALISES");
+
+                    // Calcula a economia imediatamente com os dados obtidos
+                    await CalcularEconomiaAsync(TotalEmissoes);
                 }
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
                     App.LogError($"Falha total-emissoes: HTTP {response.StatusCode} - {erro}", "ANALISES");
+                    // Fallback: estimar pela pegada média
+                    await EstimarEconomiaPorPegadaMedia();
                 }
             }
             catch (Exception ex)
             {
                 App.LogError($"Erro em CarregarTotalEmissoesAsync: {ex.Message}", "ANALISES");
+                await EstimarEconomiaPorPegadaMedia();
             }
+        }
+
+        /// <summary>
+        /// Calcula a economia estimada com base no total de emissões (ton) e no preço atual do carbono (R$/ton).
+        /// </summary>
+        private async Task CarregarEconomiaAsync()
+        {
+            App.LogInfo("CarregarEconomiaAsync iniciado", "ANALISES");
+
+            try
+            {
+                // 1. Obter preço do carbono (com fallback)
+                double precoPorTon = 150.0;
+                try
+                {
+                    var response = await _httpClient.GetAsync("api/dados/preco-carbono");
+                    App.LogInfo($"GET preco-carbono → {(int)response.StatusCode}", "ANALISES");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var json = await response.Content.ReadAsStringAsync();
+                        App.LogInfo($"JSON preco-carbono: {json}", "ANALISES");
+                        using var doc = JsonDocument.Parse(json);
+                        precoPorTon = doc.RootElement.GetProperty("preco").GetDouble();
+                        App.LogInfo($"Preço do carbono obtido: R$ {precoPorTon:F2}/ton", "ANALISES");
+                    }
+                    else
+                    {
+                        App.LogWarning($"Falha ao obter preço do carbono. Usando fallback: R$ {precoPorTon}/ton", "ANALISES");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    App.LogWarning($"Erro na consulta de preço: {ex.Message}. Usando fallback: R$ {precoPorTon}/ton", "ANALISES");
+                }
+
+                // 2. Obter TotalEmissoes (já deve estar atualizado)
+                double totalEmissoesTon = TotalEmissoes;
+                App.LogInfo($"TotalEmissoes atual: {totalEmissoesTon} ton", "ANALISES");
+
+                // 3. Se TotalEmissoes for 0 (raro, pois o card já mostra 2), tenta estimar
+                if (totalEmissoesTon <= 0)
+                {
+                    App.LogWarning("TotalEmissoes está zerado. Tentando estimar a partir da pegada média.", "ANALISES");
+                    try
+                    {
+                        var response = await _httpClient.GetAsync("api/dados/pegada-media");
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var json = await response.Content.ReadAsStringAsync();
+                            using var doc = JsonDocument.Parse(json);
+                            var pegadaMedia = doc.RootElement.GetProperty("pegadaMedia").GetDouble();
+                            totalEmissoesTon = (int)(pegadaMedia * 0.1);
+                            App.LogInfo($"Total estimado a partir da pegada média: {totalEmissoesTon} ton", "ANALISES");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        App.LogError($"Erro ao estimar TotalEmissoes: {ex.Message}", "ANALISES");
+                    }
+                }
+
+                // 4. Calcular economia
+                var economiaVal = totalEmissoesTon * precoPorTon;
+                App.LogInfo($"Economia bruta: R$ {economiaVal:F2} (ton={totalEmissoesTon}, preço={precoPorTon:F2})", "ANALISES");
+
+                // 5. Formatação inteligente (com proteção contra valores negativos)
+                string economiaFormatada;
+                if (economiaVal < 0) economiaVal = 0;
+
+                if (economiaVal >= 1_000_000)
+                {
+                    economiaFormatada = $"R$ {economiaVal / 1_000_000:N1}M";
+                }
+                else if (economiaVal >= 1_000)
+                {
+                    economiaFormatada = $"R$ {economiaVal / 1_000:N1}K";
+                }
+                else
+                {
+                    economiaFormatada = $"R$ {economiaVal:N0}";
+                }
+
+                EconomiaGerada = economiaFormatada;
+                App.LogInfo($"Economia final: {EconomiaGerada}", "ANALISES");
+            }
+            catch (Exception ex)
+            {
+                App.LogError($"Erro geral em CarregarEconomiaAsync: {ex.Message}", "ANALISES");
+                // Fallback final
+                var economiaVal = TotalEmissoes * 150.0;
+                EconomiaGerada = economiaVal >= 1_000_000
+                    ? $"R$ {economiaVal / 1_000_000:N1}M"
+                    : (economiaVal >= 1_000
+                        ? $"R$ {economiaVal / 1_000:N1}K"
+                        : $"R$ {economiaVal:N0}");
+                App.LogInfo($"Economia com fallback final: {EconomiaGerada}", "ANALISES");
+            }
+        }
+
+        /// <summary>
+        /// Estima a economia usando a pegada média como fallback.
+        /// </summary>
+        private async Task EstimarEconomiaPorPegadaMedia()
+        {
+            App.LogInfo("Estimando economia via pegada média...", "ANALISES");
+            try
+            {
+                var response = await _httpClient.GetAsync("api/dados/pegada-media");
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    using var doc = JsonDocument.Parse(json);
+                    var pegadaMedia = doc.RootElement.GetProperty("pegadaMedia").GetDouble();
+                    int estimado = (int)(pegadaMedia * 0.1);
+                    TotalEmissoes = estimado;
+                    App.LogInfo($"Total estimado: {estimado} ton", "ANALISES");
+                    await CalcularEconomiaAsync(estimado);
+                }
+                else
+                {
+                    App.LogError("Não foi possível obter pegada média para estimar.", "ANALISES");
+                    await CalcularEconomiaAsync(0);
+                }
+            }
+            catch (Exception ex)
+            {
+                App.LogError($"Erro na estimativa: {ex.Message}", "ANALISES");
+                await CalcularEconomiaAsync(0);
+            }
+        }
+
+        /// <summary>
+        /// Calcula e formata a economia estimada com base no total de emissões (ton).
+        /// </summary>
+        private async Task CalcularEconomiaAsync(double totalTon)
+        {
+            // Preço fixo do carbono (R$ por tonelada) – ajuste conforme necessário
+            const double precoPorTon = 150.0;
+
+            var economiaVal = totalTon * precoPorTon;
+            App.LogInfo($"Economia bruta: R$ {economiaVal:F2} (ton={totalTon}, preço={precoPorTon})", "ANALISES");
+
+            // Formatação
+            string economiaFormatada;
+            if (economiaVal >= 1_000_000)
+            {
+                economiaFormatada = $"R$ {economiaVal / 1_000_000:N1}M";
+            }
+            else if (economiaVal >= 1_000)
+            {
+                economiaFormatada = $"R$ {economiaVal / 1_000:N1}K";
+            }
+            else
+            {
+                economiaFormatada = $"R$ {economiaVal:N0}";
+            }
+
+            // Atualiza a UI na thread correta
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                EconomiaGerada = economiaFormatada;
+                App.LogInfo($"Economia setada para: {EconomiaGerada}", "ANALISES");
+            });
         }
 
     }

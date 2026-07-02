@@ -769,5 +769,20 @@ namespace ApiIveco.Controllers
             }
         }
 
+        /// <summary>
+        /// Retorna o preço atual do carbono (R$ por tonelada).
+        /// </summary>
+        [Tags("Dashboard")]
+        [HttpGet("preco-carbono")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetPrecoCarbono()
+        {
+            var preco = await _dadosService.ObterPrecoCarbonoAsync();
+            return Ok(new { preco = preco });
+        }
+
+
+
     }
 }
