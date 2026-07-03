@@ -35,8 +35,10 @@ O grande diferencial do nosso sistema é que ele **funciona mesmo sem internet**
 
 ---
 
+<div align="center">
 
 ## Metodologia:
+</div>
 
 O desenvolvimento do sistema foi realizado em etapas bem organizadas, divididas em três fases principais para garantir que o programa atendesse perfeitamente às necessidades reais da fábrica:
 
