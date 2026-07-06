@@ -508,13 +508,25 @@ Iveco Green Ledger é organizado em módulos funcionais isolados através do pad
 
 ### **Módulo: Mapa**
 
+<p align="center">
+  <img src="imagens/organização - trello.png" alt="Logo Iveco Green Ledger" width="450">
+</p>
+
 Este módulo é responsável por monitorar o fluxo logístico externo antes da chegada ao pátio. Permite ao sistema rastrear caminhões de suprimentos e insumos em tempo real, utilizando a API do Mercado Livre (Mercado Envios / Tracking API). Os dados geográficos, históricos de movimentação e previsões de entrega coletados de forma assíncrona são processados e salvos automaticamente no Firebase Firestore para vincular o transporte às metas de emissões de escopo 3.
 
 ### **Módulo: Dashboard**
 
+<p align="center">
+  <img src="imagens/DashboardESG.png" alt="Logo Iveco Green Ledger" width="450">
+</p>
+
 Este módulo centraliza a inteligência ecológica da aplicação através de uma interface analítica e reativa construída em WPF. Ele consome diretamente os endpoints de cálculo da ApiIveco, que processa dados operacionais com base nas diretrizes internacionais do GHG Protocol. Os gráficos e indicadores de pegada de carbono são atualizados em tempo real na tela do operador à medida que novos dados de insumos e transportes entram no sistema.
 
 ### **Módulo: Cadastro de Veículos**
+
+<p align="center">
+  <img src="imagens/rastreabilidade.png" alt="Logo Iveco Green Ledger" width="450">
+</p>
 
 Este é o módulo principal de controle de acesso e conformidade do pátio industrial. Ele permite o registro e a auditoria instantânea de veículos na recepção através de uma triagem automatizada: o CNPJ do fornecedor é validado nas bases federais pela BrasilAPI e o número de chassi (VIN) é decodificado tecnicamente via API da NHTSA. O módulo previne erros humanos de digitação e garante que apenas cadastros 100% íntegros sigam para o fluxo de pesagem e cálculo de carbono.
 
@@ -523,6 +535,10 @@ Este é o módulo principal de controle de acesso e conformidade do pátio indus
 Este módulo atua de forma invisível nos bastidores como o motor de persistência global da solução. Ele gerencia as chamadas feitas pela ApiIveco ao Firebase Firestore, garantindo que as coleções NoSQL de documentos estruturados sejam atualizadas de forma escalável e com alta disponibilidade. Ele consolida de maneira definitiva o histórico de auditorias e relatórios ambientais, servindo como a fonte centralizada da verdade de todo o ecossistema.
 
 ### **Módulo: Relatórios**
+
+<p align="center">
+  <img src="imagens/centralrelatorios.png" alt="Logo Iveco Green Ledger" width="450">
+</p>
 
 Este módulo consolida de forma analítica todos os dados históricos processados pelo sistema. Ele permite aos gestores e auditores extrair relatórios ambientais completos e balanços consolidados das emissões de carbono geradas pela frota e pela cadeia de suprimentos. As informações, estruturadas sob os parâmetros do GHG Protocol, são recuperadas diretamente do Firebase Firestore através da ApiIveco e apresentadas prontas para exportação corporativa, garantindo transparência e conformidade jurídica para fins de auditoria interna e externa.
 
