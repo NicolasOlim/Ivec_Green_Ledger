@@ -103,6 +103,10 @@ Este capítulo apresenta os três níveis de modelagem do banco de dados do sist
 
 ### **Modelo Conceitual (DER) :**
 
+<div class="logo-container">
+    <img src="Banco de Dados/MODELO CONCEITUAL DO BANCO.jpg" alt="Logo Iveco Green Ledger" class="logo-img">
+</div>
+
 O modelo conceitual representa as entidades do domínio e seus relacionamentos em nível de abstração, sem preocupação com tipos de dados ou chaves de implementação. A modelagem segue a notação do BRModelo, utilizando Diagrama Entidade- Relacionamento (DER). 
 
 ### **Entidades e Atributos:**
@@ -199,6 +203,10 @@ Os relacionamentos entre as entidades do sistema são definidos a seguir:
 ---
 
 ## Modelo Lógico:
+
+<div class="logo-container">
+    <img src="Banco de Dados/MODELO LOGICO.png" alt="Logo Iveco Green Ledger" class="logo-img">
+</div>
 
 O modelo lógico do ecossistema converte as entidades conceituais em estruturas relacionais normatizadas, definindo as chaves primárias (PK), chaves estrangeiras (FK) e restrições de integridade de cada atributo. A tipagem de identificação foi padronizada como TEXT de forma unificada entre os campos de amarração (id, fk_fornedor, vin, fk_veiculo_vin, fk_loteMateriaPrima_id).
 
