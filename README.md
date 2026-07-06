@@ -279,7 +279,7 @@ O Green Ledger adota uma arquitetura distribuída e desacoplada, separando clara
 ### **Visão Geral da Arquitetura:**
 
 <div class="logo-container">
-    <img src="imagens/diagramacasodeuso.png" alt="Logo Iveco Green Ledger" class="logo-img">
+    <img src="imagens/Visao_geral.png" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 
 ---
