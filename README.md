@@ -507,11 +507,6 @@ Iveco Green Ledger é organizado em módulos funcionais isolados através do pad
 ---
 
 ### **Módulo: Mapa**
-
-<p align="center">
-  <img src="imagens/organização - trello.png" alt="Logo Iveco Green Ledger" width="450">
-</p>
-
 Este módulo é responsável por monitorar o fluxo logístico externo antes da chegada ao pátio. Permite ao sistema rastrear caminhões de suprimentos e insumos em tempo real, utilizando a API do Mercado Livre (Mercado Envios / Tracking API). Os dados geográficos, históricos de movimentação e previsões de entrega coletados de forma assíncrona são processados e salvos automaticamente no Firebase Firestore para vincular o transporte às metas de emissões de escopo 3.
 
 ### **Módulo: Dashboard**
