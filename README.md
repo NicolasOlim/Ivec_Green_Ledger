@@ -22,36 +22,12 @@ O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclu
 - [Problema encontrado](#problema-encontrado)
 - [Metodologia](#metodologia)
 - [Mini mundo da demanda](#mini-mundo-da-demanda)
-  - [Contexto organizacional](#contexto-organizacional)
-  - [Atores do sistema](#atores-do-system)
-    - [Empresa IVECO](#empresa-iveco)
-    - [Usuário do sistema](#usuário-do-sistema)
-    - [Administrador](#administrador)
-    - [Sistema green ledger](#sistema-green-ledger)
-  - [Regras de negócio](#regra-de-negócio)
-- [🗄️ Modelagem do banco de dados](#modelagem-do-banco-de-dados)
-  - [Modelo Conceitual (DER)](#modelo-conceitual-der)
-    - [Entidades e Atributos (Tabelas)](#entidades-e-atributos)
-  - [Relacionamentos](#relacionamentos)
-  - [Modelo Lógico](#modelo-lógico)
-- [🏛️ Arquitetura e modelagem do sistema](#arquitetura-e-modelagem-do-sistema)
-  - [Visão geral da arquitetura](#visão-geral-da-arquitetura)
-  - [Casos de Uso (UC)](#visão-geral-da-arquitetura) **
-  - [Padrão MVVM no cliente WPF](#padrão-mvvm-no-cliente-wpf)
-    - [Base ViewModel e INotifyPropertyChanged](#base-viewmodel-e-inotifypropertychanged)
-    - [Relay Command](#relay-command)
-  - [Modelos e Diagramas do Sistema](#modelo-físico-do-sistema)
-- [🌐 API REST - Endpoints e integração](#api-rest---endpoints-e-integracão)
-  - [Endpoints implementados](#endpoints-implementados)
-  - [Fluxo Detalhado (Validação VIN)](#fluxo-detalhado)
-  - [Swagger](#swagger)
-  - [Configuração CORS e segurança](#configuração-cors-e-segurança)
-- [📊 Viabilidade técnica](#viabilidade-técnica)
-  - [Infraestruturas e Tecnologias](#infraestruturas-e-tecnologias)
-  - [Requisitos Mínimos de Hardware e Software](#requisitos-mínimos-de-hardware)
-  - [Riscos técnicos e mitigações](#riscos-técnicos-e-mistigações)
-  - [Escalabilidade](#escalabilidade)
-  - [Por que C# e .NET?](#c-e-net)
+- [Modelagem do banco de dados](#modelagem-do-banco-de-dados)
+- [Arquitetura e modelagem do sistema](#arquitetura-e-modelagem-do-sistema)
+- [API REST - Endpoints e integração](#api-rest---endpoints-e-integracão)
+- [Viabilidade técnica](#viabilidade-técnica)
+- [Arquitetura do projeto MVVM](#arquitetura-do-projeto-MVVM)
+
 
 ---
 
@@ -631,7 +607,10 @@ O Firebase Firestore constitui a camada principal de persistência global e cons
 
 ---
 
-## Arquitetura Do Projeto MVVM:
+<div align="center">
+
+## Arquitetura do projeto MVVM
+</div>
 
 O padrão arquitetural MVVM (Model-View-ViewModel) foi adotado no desenvolvimento do cliente desktop para garantir o completo desacoplamento entre a interface gráfica com o usuário e as regras de apresentação da aplicação de pátio. Abaixo está o fluxo de comunicação entre as camadas da nossa aplicação.
 
