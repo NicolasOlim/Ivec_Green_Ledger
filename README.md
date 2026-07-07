@@ -58,10 +58,6 @@ O grande diferencial do nosso sistema é que ele **funciona mesmo sem internet**
 
 O desenvolvimento do sistema foi realizado em etapas bem organizadas, divididas em três fases principais para garantir que o programa atendesse perfeitamente às necessidades reais da fábrica:
 
-<p align="center">
-  <img src="imagens/organização - trello.png" alt="Logo Iveco Green Ledger" width="450">
-</p>
-
 * **Fase 1 (Levantamento e Planejamento):** Focada na definição das regras de negócio, validações de segurança e estruturação inicial do projeto.
 * **Fase 2 (Raciocínio e Interface):** Voltada para a construção da interface visual em WPF, criação das tabelas do banco de dados local para funcionamento offline e montagem dos painéis de gráficos analíticos.
 * **Fase 3 (Integração e Nuvem):** Conclusão da API principal, desenvolvimento do motor de cálculo da pegada de carbono, configuração das notificações e a sincronização automática dos dados com a nuvem.
@@ -140,15 +136,12 @@ Este capítulo apresenta os três níveis de modelagem do banco de dados do sist
 
 ### **Modelo Conceitual (DER) :**
 
-<div class="logo-container">
-    <img src="Banco de Dados/MODELO CONCEITUAL DO BANCO.jpg" alt="Logo Iveco Green Ledger" class="logo-img">
-</div>
+ <img src="Banco de Dados/MODELO CONCEITUAL DO BANCO.jpg" alt="Logo Iveco Green Ledger" width="750">
+
 
 O modelo conceitual representa as entidades do domínio e seus relacionamentos em nível de abstração, sem preocupação com tipos de dados ou chaves de implementação. A modelagem segue a notação do BRModelo, utilizando Diagrama Entidade- Relacionamento (DER). 
 
 ### **Entidades e Atributos:**
-
-<div align="center">
 
 #### Usuario
 | Atributo | Tipo/papel | Observação |
@@ -159,11 +152,8 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 | **senhaHash** | Atributo | Senha criptografada para acesso |
 | **perfil** | Atributo | Permissão para acesso ao sistema |
 
-</div>
 
 ---
-
-<div align="center">
 
 #### Fornecedor
 | Atributo | Tipo/papel | Observação |
@@ -173,11 +163,8 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 | **razaoSocial** | Atributo | Razão Social ou nome empresarial |
 | **status** | Atributo | Estado lógico do fornecedor no sistema |
 
-</div>
 
 ---
-
-<div align="center">
 
 #### Lote_materia_prima
 | Atributo | Tipo/papel | Observação |
@@ -189,11 +176,8 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 | **pegadaCarbonoPorKg** | Atributo | Fator de emissão de carbono po Kg |
 | **dataProducao** | Atributo | Data e hora em que o lote foi produzido |
 
-</div>
 
 ---
-
-<div align="center">
 
 #### Veiculo
 | Atributo | Tipo/papel | Observação |
@@ -203,11 +187,7 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 | **marca** | Atributo | Fabricante do Veículo |
 | **dataMontagem** | Atributo | Data e Hora que o veículo entrou na linha de montagem |
 
-</div>
-
 ---
-
-<div align="center">
 
 #### Veiculo_Componente
 | Atributo | Tipo/papel | Observação |
@@ -219,15 +199,11 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 | **pesoKg** | Atributo | Peso Físico da peça e componente |
 | **totalCO2eCalculado** | Atributo | Total de carbono calculado para essa peça |
 
-</div>
-
 ---
 
 ### **Relacionamentos:**
 
 Os relacionamentos entre as entidades do sistema são definidos a seguir: 
-
-<div align="center">
 
 | Atributo | Tipo/papel | Semântica |
 | :--- | :--- | :--- |
@@ -236,18 +212,14 @@ Os relacionamentos entre as entidades do sistema são definidos a seguir:
 | **LOTE_MATERIA_PRIMA — VEICULO_COMPONENTE** | 1 : N | Um lote de matéria-prima pode dar origem ou fornecer insumos para vários registros de componentes aplicados. |
 | **VEICULO — LOTE_MATERIA_PRIMA** | N:M | Um veículo consome insumos de vários lotes de matéria-prima, e um lote de matéria-prima pode ser distribuído entre múltiplos veículos. |
 
-</div>
 ---
 
 ### Modelo Lógico:
 
-<div class="logo-container">
-    <img src="Banco de Dados/MODELO LOGICO.png" alt="Logo Iveco Green Ledger" class="logo-img">
-</div>
+<img src="Banco de Dados/MODELO LOGICO.png" alt="Logo Iveco Green Ledger" width="750">
 
 O modelo lógico do ecossistema converte as entidades conceituais em estruturas relacionais normatizadas, definindo as chaves primárias (PK), chaves estrangeiras (FK) e restrições de integridade de cada atributo. A tipagem de identificação foi padronizada como TEXT de forma unificada entre os campos de amarração (id, fk_fornedor, vin, fk_veiculo_vin, fk_loteMateriaPrima_id).
 
-<div align="center">
 
 #### Veiculo
 | Coluna | Chave/Relacionamento | Tipo | Descrição |
@@ -258,11 +230,9 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 | **senhaHash** | - | TEXT | Senha para a autenticação |
 | **perfil** | - | TEXT | Nível de permissão |
 
-</div>
 
 ---
 
-<div align="center">
 
 #### Fornecedor
 | Coluna | Chave/relacionamento | Tipo | Descrição |
@@ -273,11 +243,8 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 | **status** | - | TEXT | Estado do cadastro |
 | **perfil** | - | TEXT | Nivel de permissão |
 
-</div>
 
 ---
-
-<div align="center">
 
 #### Lote Materia Prima
 | Coluna | Chave/relacionamento | Tipo | Descrição |
@@ -287,11 +254,8 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 | **marca** | - | TEXT | Fabricante do automóvel |
 | **dataMontagem** | - | DATETIME | Data e hora de entrada para a montagem |
 
-</div>
 
 ---
-
-<div align="center">
 
 #### Veiculo_componente
 | Coluna | Chave/relacionamento | Tipo | Descrição |
@@ -303,7 +267,6 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 | **pesoKg** | - | REAL | Peso de peça em quilogramas |
 | **totalCO2Calculado** | - | - | Total de carbono calculado para essa peça |
 
-</div>
 
 ---
 
