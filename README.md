@@ -762,70 +762,41 @@ A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na
 
 ---
 
-
-## Histórico De Evolução e Atualização Do Projeto
-### **Fase de inicialização e infraestrutura base (setup inicial)**
-
-Estruturação da Solução Multicamadas e Infraestrutura Base: Criação da arquitetura desacoplada no Visual Studio dividindo o projeto em duas frentes de execução distintas: o backend de microsserviços (ApiIveco) desenvolvido em ASP.NET Core e o cliente rico desktop (WpfIveco). Implementação da Arquitetura MVVM Nativa: Desenvolvimento e consolidação da infraestrutura necessária para o funcionamento do padrão MVVM no ambiente WPF, com a criação da classe abstrata BaseViewModel encapsulando a interface de notificação de propriedades (INotifyPropertyChanged), além da classe genérica RelayCommand para substituição completa de manipuladores de eventos em code-behind por bindings limpos e declarativos diretamente no XAML. 
-
-### **Fase de amadurecimento do frontend**
-
-O desenvolvimento das interfaces visuais do cliente desktop (WpfIveco) utilizando XAML estruturado, com foco na criação de componentes reaproveitáveis, dicionários de recursos (Resource Dictionaries) para padronização estética e painéis de controle (Dashboards) responsivos. A interface foi otimizada para operação em chão de fábrica, traduzindo dados complexos do motor de cálculo de emissões do GHG Protocol e status de triagem em elementos visuais limpos, intuitivos e totalmente vinculados às propriedades das ViewModels.
-
----
 ## Regra de Negócio
 
-## ESPECIFICAÇÃO DA REGRA DE NEGÓCIO: RN-01 – CÁLCULO E VALIDAÇÃO DE PEGADA DE CARBONO (ESCOPO 3)
+A camada de regras de negócio do ecossistema Iveco Green Ledger constitui o núcleo de inteligência da aplicação, sendo responsável por ditar o comportamento da ApiIveco e orientar as tomadas de decisão da interface cliente WpfIveco. Esta seção detalha as diretrizes operacionais, validações de pátio e o motor de cálculo ambiental que governam o projeto.
 
-| Identificador | Nome | Módulo | Gatilho (Trigger) |
-| :--- | :--- | :--- | :--- |
-| **RN-01** | Cálculo e Rastreabilidade de Emissões de Gases de Efeito Estufa (GEE) | Motor Ambiental / Triagem Logística | Solicitação de encerramento de pesagem na balança ou confirmação de descarga na doca via interface cliente (`WpfIveco`). |
+**1-) Fluxo de Triagem e Orquestração Logística:** 
+O sistema opera sob o modelo de validação em barreira, o que significa que nenhum veículo de transporte de carga tem sua entrada autorizada ou concluída no pátio logístico da Iveco sem passar por uma verificação multifacetada e automatizada. As regras que regem essa barreira consistem em:
 
----
+- Automação do Vínculo de Ordem de Coleta: O sistema intercepta o código identificador da viagem (via leitura de QR Code ou digitação de contingência). A aplicação dispara uma requisição assíncrona integrada ao microsserviço de rotas (baseado na API do Mercado Livre), verificando o status do trajeto. Caso a rota conste como "Cancelada" ou "Concluída", o fluxo de triagem é imediatamente interrompido por uma trava de negócio, notificando o operador de portaria.
 
-### 1. Descrição e Objetivo
-Automatizar a mensuração de emissões indiretas de Dióxido de Carbono Equivalente ($CO_2e$) provenientes de veículos de transportadoras terceirizadas (Escopo 3). A regra garante que dados inconsistentes de veículos e combustíveis não poluam o inventário de sustentabilidade corporativo, aplicando penalidades baseadas na eficiência mecânica e idade da frota ativa.
+- Decodificação Técnica de Frota (Mecanismo VIN): Ao capturar o chassi do caminhão, a API interna dispara uma consulta à API da NHTSA. O sistema valida se o chassi possui o padrão internacional de 17 caracteres. O retorno da API externa é processado para extrair o ano de fabricação, o modelo e a capacidade de carga do motor. Esses dados técnicos são injetados diretamente na memória do sistema e salvos no banco de dados NoSQL (Firebase Firestore), servindo de insumo indispensável para o cálculo posterior de pegada ecológica.
 
----
+- Homologação Cadastral e Fiscal: Para mitigar riscos fiscais na cadeia de suprimentos, o CNPJ da transportadora associada à carga é submetido à BrasilAPI. Se o cadastro retornar com situação inválida ou inexistente perante os órgãos reguladores, o sistema impede a finalização do registro de entrada, exigindo intervenção ou liberação manual por parte de um supervisor de logística.
 
-### 2. Pré-condições
-* A rota de transporte deve estar vinculada a um código de viagem válido e com status ativo no banco de dados.
-* O veículo associado deve ter o ano de fabricação ($Ano_{Fab}$) e o modelo decodificados com sucesso a partir da checagem estrutural do VIN (Chassi).
-* O tipo de combustível utilizado pelo motor pesado deve ser informado obrigatoriamente através do conjunto de dados (`Diesel_S10`, `Diesel_S500`, `GNV`).
+ **2-) Motor de Cálculo Ambiental:** 
+A grande inteligência ecológica do projeto reside na automatização do inventário de emissões de Gases de Efeito Estufa (GEE), focando especificamente nas emissões indiretas da cadeia de valor (Escopo 3).
 
----
+- Cálculo Baseado em Distância e Combustível: Os fatores de emissão variam dinamicamente se o caminhão utiliza Diesel S10, Diesel S500 ou Gás Natural Veicular (GNV). O ano do modelo (extraído no fluxo da NHTSA) aplica um fator de degradação e eficiência, tornando o cálculo altamente preciso e auditável.
 
-### 3. Critérios de Validação e Fluxo Lógico (Algoritmo)
+ **3-) Algoritmo de Monitoramento:** 
+A marcha lenta de veículos pesados dentro das dependências da fábrica representa um dos maiores gargalos ocultos de sustentabilidade e custo. O Iveco Green Ledger implementa uma regra de negócio severa para combater esse cenário:
 
-#### Passo 1: Determinação do Fator de Emissão Base ($F_c$)
-O sistema avalia a propriedade de combustível enviada pela requisição e atribui a constante matemática de emissão por volume/massa, conforme a tabela estequiométrica interna da aplicação:
-* Se `combustível = Diesel_S10`, então $F_c = 2,68$ kg $CO_2$/Litro.
-* Se `combustível = Diesel_S500`, então $F_c = 2,73$ kg $CO_2$/Litro.
-* Se `combustível = GNV`, então $F_c = 2,04$ kg $CO_2$/$m^3$.
+- Contabilização do Tempo de Pátio: O sistema registra o timestamp (carimbo de data/hora) exato no momento em que a portaria autoriza a entrada do veículo e quando a balança/doca registra a pesagem ou descarga.
 
-#### Passo 2: Cálculo da Depreciação por Idade da Frota ($F_d$)
-Com base no ano de fabricação extraído do chassi, o sistema calcula a idade operacional do veículo através da fórmula: 
-$$Idade = Ano_{Atual} - Ano_{Fab}$$
+- Métrica de Desperdício: Com base no delta de tempo em minutos gasto pelo caminhão trafegando ou esperando em fila com o motor ligado no pátio, o algoritmo calcula o desperdício de combustível presumido (sabendo que um motor pesado consome em média de 2 a 3,5 litros de óleo diesel por hora em marcha lenta). O sistema projeta instantaneamente a quantidade de $CO_2$ liberada desnecessariamente na atmosfera naquele intervalo, gerando alertas no painel do Analista de ESG caso o tempo de pátio ultrapasse a meta operacional estipulada de 15 minutos.
 
-O fator multiplicador de degradação da eficiência catalítica é determinado pelas seguintes faixas:
-* Para $Idade \le 3$ anos: $F_d = 1,00$ *(Eficiência nominal)*.
-* Para $3 < Idade \le 8$ anos: $F_d = 1,02$ *(Penalização de +2% na emissão)*.
-* Para $Idade > 8$ anos: $F_d = 1,05$ *(Penalização de +5% na emissão)*.
+**4-) Regra de Persistência Resiliência:** 
+Visando a alta disponibilidade do chão de fábrica, a lógica de armazenamento foi arquitetada para ser tolerante a falhas completas de infraestrutura de rede:
 
-#### Passo 3: Processamento da Equação de Emissão Total ($E_{Total}$)
-O sistema resgata a distância total em quilômetros ($D$) mapeada no trajeto e calcula a massa de carbono através da equação:
+- Garantia de Operação: Durante a execução do aplicativo desktop WpfIveco, o sistema testa periodicamente a conectividade com o backend na nuvem. Detectada qualquer oscilação ou queda na internet, o fluxo de triagem não é bloqueado. A regra de negócio instrui o sistema a persistir todos os registros de entrada, cálculos do GHG e validações em andamento no banco de dados embutido e local SQLite.
 
-$$E_{Total} = \left( \frac{D}{\text{Consumo Médio (km/L)}} \right) \times F_c \times F_d$$
+- Sincronização Eventual em Lote: Assim que os serviços de rede detectam que a conexão com o Firebase Firestore foi restabelecida, uma rotina em segundo plano (background worker) é disparada de forma assíncrona. 
+Esse módulo realiza a varredura no banco local, extrai os dados gerados e resolve possíveis conflitos de concorrência de horários e faz o upload em lote para a nuvem, atualizando os dashboards gerenciais de forma transparente para o usuário final.
 
 ---
 
-### 4. Pós-condições e Ações do Sistema
-
-* **Cenário de Sucesso (Dados Consistentes):** O valor resultante ($E_{Total}$) é persistido no documento da viagem no banco NoSQL **Cloud Firestore**, as variáveis temporárias de memória são limpas e o indicador gráfico do painel administrativo da gerência de ESG atualiza-se dinamicamente sem necessidade de recarregamento manual da tela (*Hot Reload*).
-* **Cenário de Exceção (Dados Incompletos ou Nulos):** Caso o consumo médio do veículo retorne zerado do banco de dados (o que causaria um erro de divisão por zero na equação), o sistema aborta o cálculo, atribui o valor de consumo padrão de mercado para frotas pesadas ($3,5$ km/L) para fins de contingência, grava um log de aviso estruturado de nível *Warning* via **Serilog** e permite a conclusão do fluxo operacional emitindo uma notificação visual amarela para auditoria posterior.
-
-
----
 ## Considerações Finais:
 
 A camada de regras de negócio (Business Logic Layer) do ecossistema Iveco Green Ledger constitui o núcleo de inteligência da aplicação, sendo responsável por ditar o comportamento da ApiIveco e orientar as tomadas de decisão da interface cliente WpfIveco. Esta seção detalha as diretrizes operacionais, validações de pátio e o motor de cálculo ambiental que governam o projeto.
@@ -836,18 +807,6 @@ No aspecto comercial e de negócios, a validação de dados em barreira por meio
 
 A análise de viabilidade econômico-financeira realizada reforça o alto retorno sobre o investimento (ROI) do projeto. Ao confrontar os custos estimados de desenvolvimento e manutenção com a receita indireta projetada de R$ 44.400,00 anuais (provenientes da eliminação de retrabalhos, economia de diesel e automação de auditorias ambientais), constatou-se que o ecossistema recupera integralmente o capital investido em aproximadamente 7 meses de operação real na planta.
 
----
-## Trabalhos Futuros e Evolução do Sistema:
-
-Como horizontes de evolução e continuidade para o projeto, recomendam-se as seguintes frentes de expansão tecnológica:
-
-- **Integração com Visão Computacional (OCR):** Implementar algoritmos de inteligência artificial para leitura e reconhecimento automático de placas (LPR) e números de chassi através de câmeras na portaria, eliminando totalmente a necessidade de bipagem de QR Codes.
-
-- **Módulo de Rastreamento IoT em Tempo Real:** Integrar sensores de telemetria diretamente nos veículos da frota parceira para monitorar o consumo exato de combustível e as paradas por GPS, substituindo as médias estimadas por dados empíricos de altíssima precisão.
-
-- **Aplicativo Mobile para o Motorista** Desenvolver um módulo móvel focado no motorista terceirizado, permitindo que ele realize um pré-cadastro da carga e agende o horário de chegada (slot logístico) antes mesmo de atingir a barreira física da fábrica.
-
-Conclui-se, portanto, que o Iveco Green Ledger se consolida não apenas como um projeto acadêmico de engenharia, mas como um ativo tecnológico viável, lucrativo e sustentável, perfeitamente alinhado com as demandas de eficiência e responsabilidade climática exigidas pelo mercado global em 2026.
 
 ---
 ## Referências Bibliográficas:
