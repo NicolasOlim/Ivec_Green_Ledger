@@ -19,14 +19,14 @@ O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclu
 
 ## 📌 Sumário do Projeto
 
-- [Problema encontrado](#problema-encontrado)
+- [Problema Encontrado](#problema-encontrado)
 - [Metodologia](#metodologia)
-- [Mini mundo da demanda](#mini-mundo-da-demanda)
-- [Modelagem do banco de dados](#modelagem-do-banco-de-dados)
-- [Arquitetura e modelagem do sistema](#arquitetura-e-modelagem-do-sistema)
-- [API REST - Endpoints e integração](#api-rest---endpoints-e-integracão)
-- [Viabilidade técnica](#viabilidade-técnica)
-- [Arquitetura do projeto MVVM](#arquitetura-do-projeto-MVVM)
+- [Mini Mundo Da Demanda](#mini-mundo-da-demanda)
+- [Modelagem Do Banco De Dados](#modelagem-do-banco-de-dados)
+- [Arquitetura e Modelagem Do Sistema](#arquitetura-e-modelagem-do-sistema)
+- [API REST - Endpoints e Integração](#api-rest---endpoints-e-integracão)
+- [Viabilidade Técnica](#viabilidade-técnica)
+- [Arquitetura do Projeto MVVM](#arquitetura-do-projeto-MVVM)
 - [Processo de Desenvolvimento](#processo-de-desenvolvimento)
 - [Business Model Canvas](#business-model-canvas)
 - [Viabilidade Econômica](#viabilidade-econômica)
@@ -43,7 +43,7 @@ O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclu
 
 <div align="center">
 
-## Problema encontrado
+## Problema Encontrado
 </div>
 
 A rotina de uma grande fábrica de veículos envolve uma movimentação enorme de materiais o tempo todo, desde matéria-prima bruta até peças prontas que chegam dos fornecedores. O grande desafio é que a maioria das empresas não consegue acompanhar de perto a jornada dessas peças e nem o impacto real que elas causam no meio ambiente.
@@ -74,7 +74,7 @@ O desenvolvimento do sistema foi realizado em etapas bem organizadas, divididas 
 
 <div align="center">
 
-## Mini mundo da demanda
+## Mini Mundo Da Demanda
 </div>
 
  Este capítulo descreve o contexto organizacional que motivou o desenvolvimento da Green Ledger, os atores envolvidos e as regras de negócio que orientaram a modelagem do sistema. 
@@ -137,7 +137,7 @@ A Iveco atua como o ator institucional e gestor central da plataforma. Suas resp
 
 <div align="center">
 
-## Modelagem do banco de dados
+## Modelagem Do Banco De Dados
 </div>
 
 Este capítulo apresenta os três níveis de modelagem do banco de dados do sistema Green Ledger: conceitual, lógico e físico, conforme as metodologias de modelagem relacional adotadas no curso. 
@@ -280,12 +280,12 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 
 <div align="center">
 
-## Arquitetura e modelagem do sistema
+## Arquitetura e Modelagem Do Sistema
 </div>
 
 O Green Ledger adota uma arquitetura distribuída e desacoplada, separando claramente as responsabilidades entre o cliente desktop de pátio, a API REST corporativa e a camada de persistência híbrida. Esta seção descreve cada componente técnico, suas integrações de borda com serviços externos e os padrões de resiliência a falhas de rede.
 
-### **Visão geral da arquitetura:**
+### **Visão Geral Da Arquitetura:**
 
 O Green Ledger adota uma arquitetura distribuída e desacoplada, separando claramente as responsabilidades entre o cliente desktop de pátio, a API REST corporativa e a camada de persistência híbrida. Esta seção descreve cada componente técnico, suas integrações de borda com serviços externos e os padrões de resiliência a falhas de rede.
 O ecossistema Iveco Green Ledger foi projetado sob uma arquitetura de serviços desacoplados e distribuídos, baseada em uma infraestrutura híbrida de persistência de dados para garantir alta disponibilidade e resiliência no ambiente industrial. A solução é estruturada em quatro pilares fundamentais de tecnologia e comunicação, descritos a seguir:
@@ -379,7 +379,7 @@ Ivec_Green_Ledger/
 
 <div align="center">
 
-## API REST - Endpoints e integração
+## API REST - Endpoints e Integração
 </div>
 
 A API REST da aplicação é desenvolvida sobre a plataforma ASP.NET Core e exposta no domínio corporativo do ecossistema. Ela é a responsável por receber as requisições assíncronas originadas pelo WPF, processando de forma centralizada as regras de negócio, como os algoritmos de cálculos de emissões baseados no GHG Protocol e as validações integradas com os serviços externos da BrasilAPI e da NHTSA. Após a conclusão dessas etapas, o back-end realiza a persistência definitiva dos dados consolidados no banco de dados em nuvem Firebase Firestore.
@@ -444,7 +444,7 @@ Complementarmente, o sistema impõe o redirecionamento mandatório de HTTPS, int
 
 <div align="center">
 
-## Viabilidade técnica
+## Viabilidade Técnica
 </div>
 
 A análise de viabilidade técnica avalia se o sistema Iveco Green Ledger pode ser desenvolvido, implantado e mantido com os recursos tecnológicos selecionados, considerando o contexto de desenvolvimento da solução .NET unificada e a realidade operacional do chão de fábrica e do pátio logístico a que se destina.
@@ -489,7 +489,7 @@ Para execução do sistema em ambiente de produção, os  requisitos mínimos re
 - **Sistema Operacional:** Windows 10 ou Windows 11(64 - bits);
 - **Conexão com a internet:** Para o funcionamento das integrações em nuvem.
 
-### Riscos técnicos e mistigações:
+### Riscos Técnicos e Mistigações:
 
 <div align="center">
 
@@ -572,7 +572,7 @@ O Firebase Firestore constitui a camada principal de persistência global e cons
 
 <div align="center">
 
-## Arquitetura do projeto MVVM
+## Arquitetura Do Projeto MVVM
 </div>
 
 O padrão arquitetural MVVM foi adotado no desenvolvimento do cliente desktop para garantir o completo desacoplamento entre a interface gráfica com o usuário e as regras de apresentação da aplicação de pátio. Ao isolar a lógica de controle dos elementos visuais da tela, essa abordagem elimina a necessidade de codificação direta nos arquivos de código associados à interface. Essa separação rígida garante que as alterações estéticas no layout gráfico possam ser realizadas de forma independente, sem o risco de corromper ou afetar o comportamento das regras operacionais subjacentes que gerenciam o fluxo logístico de entrada de dados.
@@ -611,7 +611,7 @@ Este módulo centraliza a inteligência ecológica da aplicação através de um
 
 <div align="center">
 
-## Processo de desenvolvimento
+## Processo De Desenvolvimento
 </div>
 
 ### **Processo de Desenvolvimento**
@@ -651,7 +651,7 @@ Este módulo centraliza a inteligência ecológica da aplicação através de um
 
 <div align="center">
 
-## Viabilidade econômica
+## Viabilidade Econômica
 </div>
 
 A viabilidade econômica do projeto se consolida pela expressiva redução de custos operacionais e pelo ganho de eficiência logística no pátio industrial da Iveco. Ao automatizar a triagem de veículos com as APIs da NHTSA e BrasilAPI, o sistema elimina os custos decorrentes de erros humanos de digitação, fraudes cadastrais e o tempo ocioso de caminhões em filas de espera. Além disso, a adoção de uma arquitetura Open-Source baseada em .NET 8 e SQLite, combinada à infraestrutura sob demanda e altamente escalável do Firebase Firestore, minimiza o investimento inicial em servidores físicos e licenças de software proprietárias. Sob a ótica estratégica, o motor de cálculo alinhado ao GHG Protocol posiciona a companhia em estrita conformidade com as exigências globais de ESG, mitigando riscos de sanções ambientais e abrindo portas para incentivos fiscais e captação de fundos verdes, o que garante um retorno sobre o investimento.
@@ -770,7 +770,9 @@ A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na
 
 ---
 
+<div align="center">
 ## Regra de Negócio
+</div>
 
 A camada de regras de negócio do ecossistema Iveco Green Ledger constitui o núcleo de inteligência da aplicação, sendo responsável por ditar o comportamento da ApiIveco e orientar as tomadas de decisão da interface cliente WpfIveco. Esta seção detalha as diretrizes operacionais, validações de pátio e o motor de cálculo ambiental que governam o projeto.
 
@@ -817,7 +819,9 @@ A análise de viabilidade econômico-financeira realizada reforça o alto retorn
 
 
 ---
+<div align="center">
 ## Referências Bibliográficas:
+</div>
 
 - https://firebase.google.com/?hl=pt-br;
 - (Esta referência fundamenta a escolha e a modelagem do banco de dados não-relacional (NoSQL) utilizado na nuvem)
