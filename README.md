@@ -754,7 +754,7 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 
 ### **Diagrama de fluxo do Registro das Peças**
 
-<img src="imagens/Diagrama de Fluxo do Calculo da Pegada de carbono.png" alt="Logo Iveco Green Ledger" width="850">
+<img src="imagens/Diagrama de Fluxo Registro das peças.png" alt="Logo Iveco Green Ledger" width="850">
 
 ---
 
