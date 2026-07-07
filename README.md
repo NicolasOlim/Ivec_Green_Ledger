@@ -292,9 +292,7 @@ O ecossistema Iveco Green Ledger foi projetado sob uma arquitetura de serviços 
 
 ---
 
-<div class="logo-container">
-    <img src="imagens/Visao_geral.png" alt="Logo Iveco Green Ledger" class="logo-img">
-</div>
+<img src="imagens/Visao_geral.png" alt="Logo Iveco Green Ledger" width="750">
 
 ---
 
@@ -355,25 +353,19 @@ Ivec_Green_Ledger/
 
 ### **Modelo físico do sistema**
 
-<div class="logo-container">
-    <img src="" alt="Logo Iveco Green Ledger" class="logo-img">
-</div>
+<img src="imagens/Visao_geral.png" alt="Logo Iveco Green Ledger" width="750">
 
 ---
 
 ### **Modelo lógico do sistema**
 
-<div class="logo-container">
-    <img src="" alt="Logo Iveco Green Ledger" class="logo-img">
-</div>
+<img src="imagens/Visao_geral.png" alt="Logo Iveco Green Ledger" width="750">
 
 ---
 
 ### **Modelagem de domínio**
 
-<div class="logo-container">
-    <img src="" alt="Logo Iveco Green Ledger" class="logo-img">
-</div>
+<img src="imagens/Visao_geral.png" alt="Logo Iveco Green Ledger" width="750">
 
 ---
 
