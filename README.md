@@ -771,6 +771,7 @@ A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na
 ---
 
 <div align="center">
+ 
 ## Regra de Negócio
 </div>
 
@@ -806,8 +807,10 @@ Visando a alta disponibilidade do chão de fábrica, a lógica de armazenamento 
 Esse módulo realiza a varredura no banco local, extrai os dados gerados e resolve possíveis conflitos de concorrência de horários e faz o upload em lote para a nuvem, atualizando os dashboards gerenciais de forma transparente para o usuário final.
 
 ---
-
+<div align="center">
+ 
 ## Considerações Finais:
+</div>
 
 A camada de regras de negócio (Business Logic Layer) do ecossistema Iveco Green Ledger constitui o núcleo de inteligência da aplicação, sendo responsável por ditar o comportamento da ApiIveco e orientar as tomadas de decisão da interface cliente WpfIveco. Esta seção detalha as diretrizes operacionais, validações de pátio e o motor de cálculo ambiental que governam o projeto.
 
