@@ -17,6 +17,46 @@ O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclu
 
 ---
 
+## 📌 Sumário do Projeto
+
+- [Problema encontrado](#problema-encontrado)
+- [Metodologia](#metodologia)
+- [Mini mundo da demanda](#mini-mundo-da-demanda)
+  - [Contexto organizacional](#contexto-organizacional)
+  - [Atores do sistema](#atores-do-system)
+    - [Empresa IVECO](#empresa-iveco)
+    - [Usuário do sistema](#usuário-do-sistema)
+    - [Administrador](#administrador)
+    - [Sistema green ledger](#sistema-green-ledger)
+  - [Regras de negócio](#regra-de-negócio)
+- [🗄️ Modelagem do banco de dados](#modelagem-do-banco-de-dados)
+  - [Modelo Conceitual (DER)](#modelo-conceitual-der)
+    - [Entidades e Atributos (Tabelas)](#entidades-e-atributos)
+  - [Relacionamentos](#relacionamentos)
+  - [Modelo Lógico](#modelo-lógico)
+- [🏛️ Arquitetura e modelagem do sistema](#arquitetura-e-modelagem-do-sistema)
+  - [Visão geral da arquitetura](#visão-geral-da-arquitetura)
+  - [Casos de Uso (UC)](#visão-geral-da-arquitetura) **
+  - [Padrão MVVM no cliente WPF](#padrão-mvvm-no-cliente-wpf)
+    - [Base ViewModel e INotifyPropertyChanged](#base-viewmodel-e-inotifypropertychanged)
+    - [Relay Command](#relay-command)
+  - [Modelos e Diagramas do Sistema](#modelo-físico-do-sistema)
+- [🌐 API REST - Endpoints e integração](#api-rest---endpoints-e-integracão)
+  - [Endpoints implementados](#endpoints-implementados)
+  - [Fluxo Detalhado (Validação VIN)](#fluxo-detalhado)
+  - [Swagger](#swagger)
+  - [Configuração CORS e segurança](#configuração-cors-e-segurança)
+- [📊 Viabilidade técnica](#viabilidade-técnica)
+  - [Infraestruturas e Tecnologias](#infraestruturas-e-tecnologias)
+  - [Requisitos Mínimos de Hardware e Software](#requisitos-mínimos-de-hardware)
+  - [Riscos técnicos e mitigações](#riscos-técnicos-e-mistigações)
+  - [Escalabilidade](#escalabilidade)
+  - [Por que C# e .NET?](#c-e-net)
+
+---
+
+---
+
 <div align="center">
 
 ## Problema encontrado
@@ -52,52 +92,73 @@ O desenvolvimento do sistema foi realizado em etapas bem organizadas, divididas 
 
 ---
 
-## Mini Mundo Da Demanda:
+<div align="center">
 
-Este capítulo descreve o contexto organizacional que motivou o desenvolvimento da Green Ledger, os atores envolvidos e as regras de negócio que orientaram a modelagem do sistema. 
+## Mini mundo da demanda
+</div>
 
-### Contexto Organizacional:
+ Este capítulo descreve o contexto organizacional que motivou o desenvolvimento da Green Ledger, os atores envolvidos e as regras de negócio que orientaram a modelagem do sistema. 
 
-O sistema foi criado para resolver de forma simples os problemas de controle de estoque e de impacto ambiental na fábrica da Iveco. Para que a produção nunca pare, o programa funciona dividindo as tarefas de forma inteligente: os dados mais importantes ficam salvos na internet (nuvem) e uma cópia de segurança é mantida nos próprios computadores da fábrica.
+### Contexto organizacional:
+ Para sanar os gargalos operacionais e ambientais identificados na planta da Iveco, o sistema foi estruturado a partir de uma arquitetura de serviços desacoplados com armazenamento balanceado entre a rede local e a nuvem. O ciclo de vida da informação inicia-se com o mapeamento físico dos insumos que chegam à fábrica e com a validação das características técnicas dos veículos de transporte. Previamente, o analista de governança socioambiental configura no sistema os índices oficiais de emissão do GHG Protocol e homologa a lista de fornecedores autorizados na base de dados centralizada.
 
-O trabalho do sistema começa bem antes dos materiais chegarem, quando um responsável pela área ambiental cadastra os índices de poluição permitidos e a lista de fornecedores autorizados. No dia a dia, assim que um caminhão de suprimentos chega para descarregar, o operador usa o sistema para checar as informações do veículo e registrar o tamanho e o peso da carga. Com isso, o programa junta tudo automaticamente e calcula o impacto ecológico daquela entrega, gerando relatórios rápidos para a gerência sem complicar a rotina do chão de fábrica.
+### Atores do sistema: 
 
+### *Empresa IVECO*
+A Iveco atua como o ator institucional e gestor central da plataforma. Suas responsabilidades concentram-se na parametrização dos índices oficiais de emissão de gases poluentes baseados no GHG Protocol e na homologação inicial de fornecedores autorizados. A organização utiliza o ecossistema como uma ferramenta de auditoria climática automatizada, consolidando os relatórios de pegada ecológica gerados no chão de fábrica para prestar contas a órgãos reguladores e auditorias externas de governança ESG.
 
-### **Usuário do Sistema**:
+### *Usuário do sistema*
+ Este ator compreende os profissionais internos que interagem diretamente com a interface do software para gerenciar o fluxo logístico e ambiental. Suas atribuições e responsabilidades no ecossistema envolvem:
 
-- Realiza autenticação no sistema por meio de credenciais cadastradas e validadas;
-- Cadastra os lotes de matéria-prima recebidos, informando os dados de cubagem e massa em quilogramas;
-- Consulta o histórico e o status de sincronização;
-- Associa as peças e os componentes industriais ao número de chassi correspondente por meio do código identificador VIN de 17 caracteres;
-- Monitora indicadores de emissões de carbono nos painéis visuais e gera relatórios em formato PDF.
+- Controle de Acesso e Segurança
 
-### **Administrador**:
+- Entrada de Dados de Inventário
 
-- Gerencia os usuários do sistema;
-- Gerencia os fornecedores parceiros e os parâmetros de índices referente á emissão;
-- Emite relatórios ambientais e gerencia log.
+- Monitoramento de Resiliência
 
-### **Sistema Green Ledger**:
+- Vínculo Técnico e Rastreabilidade
 
-- Controla a cubagem volumétrica e o inventário de insumos automotivos;
-- Mapeia e vincula e as emissões de carbono a cada chassi de veículo produzido;
-- Sincroniza os registros de forma assíncrona com a nuvem;
-- Valida dados de fornecedores;
-- Gera relatórios em formato PDF.
+- Análise de Indicadores Ambientais
 
-### Regras de Negócio:
+### *Administrador*
+ Este ator representa o perfil de nível gerencial e de governança técnica com privilégios totais de controle sobre o ecossistema. Suas responsabilidades e ações práticas na plataforma englobam: 
 
-- 1: Um lote de matéria-prima pertence obrigatoriamente a um fornecedor;
-- 2: Exige a validação cadastral do CNPJ do fornecedor;
-- 3: Um componente ou insumo deve estar associado a uma categoria de material; 
-- 4: Um chassi de veículo deve ser validado por meio do VIN (17 caracteres);
-- 5: Um lote de matéria-prima pode ser vinculado a múltiplos chassis, assim como um chassi consome múltiplos lotes de materiais;
-- 6: O sistema registra automaticamente a data, hora exata e o usuário responsável por cada operação;
-- 7: O ecossistema controla o ciclo de vida e a integridade de cada registro;
+- Governança de Acesso e Controle de Usuários
+
+- Homologação e Parâmetros Ecológicos
+
+- Auditoria de Conformidade e Gestão de Logs
+
+### *Sistema green ledger*
+- Controle de Cubagem e Gestão de Inventário
+
+- Gerenciamento de Persistência e Sincronização Assíncrona
+
+- Validação Automatizada de Fornecedores e Chassis
+
+- Emissão de Relatórios
+
+### Regra de negócio: 
+1. Um lote de matéria-prima pertence obrigatoriamente a um fornecedor;
+
+2. Exige a validação cadastral do CNPJ do fornecedor;
+
+3. Um componente ou insumo deve estar associado a uma categoria de material; 
+
+4. Um chassi de veículo deve ser validado por meio do VIN (17 caracteres);
+
+5. Um lote de matéria-prima pode ser vinculado a múltiplos chassis, assim como um chassi consome múltiplos lotes de materiais;
+
+6. O sistema registra automaticamente a data, hora exata e o usuário responsável por cada operação;
+
+7. O ecossistema controla o ciclo de vida e a integridade de cada registro;
 
 ---
 
-## Modelagem do banco de dados:
+<div align="center">
+
+## Modelagem do banco de dados
+</div>
 
 Este capítulo apresenta os três níveis de modelagem do banco de dados do sistema Green Ledger: conceitual, lógico e físico, conforme as metodologias de modelagem relacional adotadas no curso. 
 
@@ -202,7 +263,7 @@ Os relacionamentos entre as entidades do sistema são definidos a seguir:
 </div>
 ---
 
-## Modelo Lógico:
+### Modelo Lógico:
 
 <div class="logo-container">
     <img src="Banco de Dados/MODELO LOGICO.png" alt="Logo Iveco Green Ledger" class="logo-img">
@@ -270,13 +331,27 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 
 ---
 
-## Arquitetura do Sistema:
+<div align="center">
+
+## Arquitetura e modelagem do sistema
+</div>
 
 O Green Ledger adota uma arquitetura distribuída e desacoplada, separando claramente as responsabilidades entre o cliente desktop de pátio, a API REST corporativa e a camada de persistência híbrida. Esta seção descreve cada componente técnico, suas integrações de borda com serviços externos e os padrões de resiliência a falhas de rede.
 
-**Diagrama de Caso de Uso**
+### **Visão geral da arquitetura:**
 
-### **Visão Geral da Arquitetura:**
+O Green Ledger adota uma arquitetura distribuída e desacoplada, separando claramente as responsabilidades entre o cliente desktop de pátio, a API REST corporativa e a camada de persistência híbrida. Esta seção descreve cada componente técnico, suas integrações de borda com serviços externos e os padrões de resiliência a falhas de rede.
+O ecossistema Iveco Green Ledger foi projetado sob uma arquitetura de serviços desacoplados e distribuídos, baseada em uma infraestrutura híbrida de persistência de dados para garantir alta disponibilidade e resiliência no ambiente industrial. A solução é estruturada em quatro pilares fundamentais de tecnologia e comunicação, descritos a seguir:
+
+- **Cliente WPF (Frontend Desktop):** Camada de interface com o usuário implantada nas estações de trabalho do chão de fábrica. Construída em XAML e C# sob o padrão arquitetural MVVM (Model-View-ViewModel), essa camada assegura a separação rígida entre a lógica de apresentação e os dados operacionais, garantindo uma experiência de usuário fluida e de fácil manutenção.
+
+- **API REST em ASP.NET Core (Backend):** Módulo centralizador da inteligência analítica do sistema, desenvolvido em .NET 8. Esta camada expõe endpoints HTTP seguros e processa de forma assíncrona as principais regras de negócio do ecossistema, tais como o motor de cálculo ecológico do GHG Protocol, o algoritmo de cubagem volumétrica e o consumo das APIs externas de validação cadastral e fiscal.
+
+- **Firebase Firestore (Persistência em Nuvem):** Banco de dados não relacional (NoSQL) baseado em documentos, responsável pelo armazenamento definitivo e centralizado de todas as operações homologadas. Sua infraestrutura escalável provê sincronização em tempo real para alimentar de forma instantânea os painéis visuais (dashboards) de governança ESG utilizados pela gerência.
+
+- **SQLite (Persistência e Contingência Local):** Banco de dados relacional leve e embutido diretamente na aplicação desktop. Atua de forma estratégica como uma camada de persistência local temporária, viabilizando o mecanismo de resiliência offline-safe. Esse componente garante que os registros logísticos continuem sendo capturados continuamente caso ocorram interrupções na conectividade com a nuvem.
+
+---
 
 <div class="logo-container">
     <img src="imagens/Visao_geral.png" alt="Logo Iveco Green Ledger" class="logo-img">
@@ -339,10 +414,38 @@ Ivec_Green_Ledger/
 └── README.md                  # Este arquivo
 ```
 
----
-## API REST - Endpoits e Integração:
+### **Modelo físico do sistema**
 
-A API REST da ApiIveco é desenvolvida em ASP.NET e exposta no domínio corporativo do ecossistema. Ela é responsável por receber as requisições assíncronas do cliente desktop WPF, processar as regras de negócio automotivas, como os cálculos de emissões e validações integradas à BrasilAPI e NHTSA, e persistir os dados consolidados no banco de dados em nuvem Firebase Firestore. Sendo implementados os seguintes endpoits:
+<div class="logo-container">
+    <img src="" alt="Logo Iveco Green Ledger" class="logo-img">
+</div>
+
+---
+
+### **Modelo lógico do sistema**
+
+<div class="logo-container">
+    <img src="" alt="Logo Iveco Green Ledger" class="logo-img">
+</div>
+
+---
+
+### **Modelagem de domínio**
+
+<div class="logo-container">
+    <img src="" alt="Logo Iveco Green Ledger" class="logo-img">
+</div>
+
+---
+
+<div align="center">
+
+## API REST - Endpoints e integração
+</div>
+
+A API REST da aplicação é desenvolvida sobre a plataforma ASP.NET Core e exposta no domínio corporativo do ecossistema. Ela é a responsável por receber as requisições assíncronas originadas pelo WPF, processando de forma centralizada as regras de negócio, como os algoritmos de cálculos de emissões baseados no GHG Protocol e as validações integradas com os serviços externos da BrasilAPI e da NHTSA. Após a conclusão dessas etapas, o back-end realiza a persistência definitiva dos dados consolidados no banco de dados em nuvem Firebase Firestore.
+
+### **Endpoints implementados:**
 
 <div align="center">
 
@@ -362,33 +465,57 @@ A API REST da ApiIveco é desenvolvida em ASP.NET e exposta no domínio corporat
 
 ### **Fluxo Detalhado:**
 
-- 1: O operador digita o chassi do veículo e clica em "Validar VIN" ;
-- 2: Aciona o ValidarVinCommand;
-- 3:  Invoca o método assíncrono correspondente dentro do ApiService;
-- 4: Envia uma requisição HTTP POST contendo o código VIN (JSON) para o endpoint;
-- 5: API recebe a requisição e repassa o chassi para a camada interna;
-- 6: A API constrói uma requisição HTTP segura direcionada para os endpoints da API da NHTSA;
-- 7: A API da NHTSA processa a decodificação dos 17 caracteres e retorna os dados técnicos do chassi;
-- 8: A ApiIveco valida a integridade dos dados retornados e persiste o novo veículo no banco de dados em nuvem Firebase Firestore;
-- 9: A  API backend responde à aplicação desktop retornando o status de sucesso e os dados decodificados em formato JSON;
-- 10: O ApiService no WPF recebe o JSON e xibindo os dados técnicos validados;
+1-) O operador digita o chassi do veículo na interface gráfica e aciona a opção para validar o código VIN.
 
+2-) Esta ação dispara imediatamente a execução do componente lógico ValidarVinCommand.
 
-### **Swagger:**
+3-) O comando invoca o método assíncrono correspondente parametrizado dentro da camada de serviço ApiService.
 
-A Documentação Swagger é o portal interativo da ApiIveco, integrado nativamente ao ecossistema ASP.NET Core 8. Ela elimina a necessidade de manuais externos estáticos ao gerar automaticamente uma interface web dinâmica que mapeia todos os endpoints RESTful do sistema. Através do Swagger, desenvolvedores e engenheiros de software conseguem visualizar instantaneamente os contratos de entrada e saída (JSON), os códigos de status HTTP esperados (como 200 OK, 400 BadRequest ou 401 Unauthorized) e os esquemas exatos das entidades de domínio. Além de servir como uma especificação viva e sempre atualizada do backend, a interface permite realizar testes de requisições em tempo real diretamente pelo navegador, agilizando drasticamente a integração com o cliente desktop WPF e com os serviços externos do Mercado Livre, BrasilAPI e NHTSA.
+4-) A aplicação envia uma requisição HTTP do tipo POST contendo o código VIN estruturado em formato JSON para o endpoint.
+
+5-) A API do back-end intercepta a requisição e encaminha o chassi recebido para o seu módulo interno de processamento.
+
+6-) A API constrói e dispara uma requisição HTTP segura direcionada aos servidores externos da NHTSA.
+
+7-) A API da NHTSA processa a decodificação dos 17 caracteres alfanuméricos e retorna os metadados técnicos do chassi.
+
+8-) A API do sistema valida a integridade desses dados retornados e realiza a persistência definitiva do novo veículo na base de dados em nuvem do Firebase Firestore.
+
+9-) O back-end responde à aplicação desktop transmitindo o status de sucesso acompanhado dos dados decodificados em formato JSON.
+
+10-) O componente ApiService local na aplicação WPF captura o JSON enviado pelo servidor.
+
+11-) A interface gráfica (View) reage instantaneamente através dos mecanismos de Data Binding e da interface INotifyPropertyChanged, exibindo os dados técnicos validados do veículo para o operador no chão de fábrica
 
 ---
 
-## Viabilidade Técnica:
+### **Swagger:**
+
+Por meio dessa interface interativa, desenvolvedores e engenheiros de software conseguem visualizar instantaneamente os contratos de entrada e saída estruturados em formato JSON, bem como os códigos de status HTTP esperados para cada operação, a exemplo das respostas 200 OK, 400 BadRequest ou 401 Unauthorized. A plataforma expõe de forma transparente os esquemas exatos das entidades de domínio, funcionando como uma especificação viva e continuamente atualizada do back-end. Além disso, o portal permite a execução de testes de requisições em tempo real diretamente pelo navegador, o que confere maior agilidade ao processo de integração com o cliente desktop WPF e com os serviços externos da BrasilAPI e da NHTSA.
+
+---
+
+### **Configuração CORS e segurança:**
+
+Para mitigar acessos não autorizados e garantir a integridade dos dados de auditoria climática da ApiIveco, estabeleceu-se uma política rígida de CORS (Cross-Origin Resource Sharing) associada ao endurecimento (hardening) dos middlewares no .NET 8. Em vez de utilizar curingas abertos, a API restringe o acesso apenas a origens homologadas, mapeando os endereços de desenvolvimento do cliente WpfIveco e os domínios oficiais de produção. A política limita o tráfego aos métodos operacionais necessários (GET, POST, PUT, DELETE) e valida cabeçalhos específicos de autenticação com suporte seguro a credenciais.
+
+Complementarmente, o sistema impõe o redirecionamento mandatório de HTTPS, interceptando requisições HTTP comuns (porta 80) para canais criptografados via TLS (porta 443) para evitar ataques Man-in-the-Middle. Foram também injetados cabeçalhos de segurança nativos nas respostas do servidor para neutralizar vetores clássicos de ataque: o X-Frame-Options (configurado como DENY) impede o encapsulamento de interfaces em iframes externos (Clickjacking); o X-XSS-Protection bloqueia scripts maliciosos injetados; o X-Content-Type-Options (nosniff) evita o mascaramento de arquivos executáveis ao impor o tipo application/json; e a Content-Security-Policy (CSP) restringe a execução de códigos em memória ao próprio domínio do servidor.
+
+---
+
+<div align="center">
+
+## Viabilidade técnica
+</div>
 
 A análise de viabilidade técnica avalia se o sistema Iveco Green Ledger pode ser desenvolvido, implantado e mantido com os recursos tecnológicos selecionados, considerando o contexto de desenvolvimento da solução .NET unificada e a realidade operacional do chão de fábrica e do pátio logístico a que se destina.
 
 ### **Infraestruturas e Tecnologias:**
 
+Todas as tecnologias adotadas no Iveco Green Ledger são gratuitas, de ampla adoção no mercado e possuem documentação extensiva, eliminando barreiras de aprendizado, dependências proprietárias de alto custo e taxas de licenciamento comercial. A tabela a seguir resume a disponibilidade, o tipo de licença e a maturidade de cada componente:
+
 <div align="center">
 
-### Infraestruturas e Tecnologias:
 | Componente | Licença | Maturidade | Observação |
 | :--- | :--- | :--- | :--- | 
 | **C# / .NET 8** | MIT(open-source) | Alta | Plataforma Microsoft estável, unificada e com suporte LTS (Long-Term Support) garantido. |
@@ -403,7 +530,7 @@ A análise de viabilidade técnica avalia se o sistema Iveco Green Ledger pode s
 
 </div>
 
-### **Requisitos Mínimos de Hardware:**
+### *Requisitos Mínimos de Hardware:*
 
 Para execução do sistema em ambiente de produção, os  requisitos mínimos recomendados são: 
 
@@ -413,7 +540,7 @@ Para execução do sistema em ambiente de produção, os  requisitos mínimos re
 - **Sistema Operacional:** Windows 10 ou Windows 11(64 - bits);
 - **Conexão com a internet:** Para o funcionamento das integrações em nuvem.
 
-### **Requisitos Mínimos de Software:**
+### *Requisitos Mínimos de Software:*
 
 Para execução do sistema em ambiente de produção, os  requisitos mínimos recomendados são: 
 
@@ -423,10 +550,10 @@ Para execução do sistema em ambiente de produção, os  requisitos mínimos re
 - **Sistema Operacional:** Windows 10 ou Windows 11(64 - bits);
 - **Conexão com a internet:** Para o funcionamento das integrações em nuvem.
 
+### Riscos técnicos e mistigações:
 
 <div align="center">
 
-### Riscos Técnicos e Mistigações:
 | Risco | Probabilidade | Impacto | Mistigação |
 | :--- | :--- | :--- | :--- | 
 | Cota gratuita do Firebase excedida com alto volume de dados | Média | Alta | Migrar para o plano Blaze (pay-as-you-go) do Firebase para suportar a escala industrial ou migrar a persistência de longo prazo para uma instância dedicada de banco de dados relacional próprio |
@@ -436,10 +563,21 @@ Para execução do sistema em ambiente de produção, os  requisitos mínimos re
 
 </div>
 
----
-## Escabilidade:
+### Escalabilidade:
 
 A arquitetura adotada para o Iveco Green Ledger foi projetada estrategicamente para suportar o crescimento gradual do volume de dados e de acessos no pátio logístico sem a necessidade de refatorações estruturais complexas. Os principais aspectos de escalabilidade são:
+
+- Escabilidade Horizontal da API;
+
+- Escabilidade de Dados Baseada em Nuvem;
+
+- Modularidade Extensível no Front-end (MVVM);
+
+- Abstração por Interfaces;
+
+- Prontidão para Microserviços.
+
+---
 
 <div align="center">
 
@@ -453,33 +591,46 @@ A arquitetura adotada para o Iveco Green Ledger foi projetada estrategicamente p
 
 </div>
 
+### *C# E.NET:*
+
+A linguagem C# oferece tipagem estática, suporte nativo a programação assíncrona (async/await) e o ecossistema .NET 8, que viabiliza tanto o desenvolvimento desktop industrial (WPF) quanto o desenvolvimento de APIs web de alta performance (ASP.NET Core) dentro de uma mesma solução unificada. A escolha por uma única linguagem para o front-end de pátio e o back-end em nuvem reduz drasticamente a curva de aprendizado, elimina barreiras de integração e facilita o compartilhamento direto das entidades de domínio (como os modelos de dados de veículos, lotes de matéria-prima e rastreamento),acelerando o ciclo de entrega.
+
+### *WPF e MVVM:*
+
+O WPF combinado com o padrão arquitetural MVVM estabelece uma separação rígida e clara entre a interface gráfica com o usuário (UI) e a lógica de apresentação do sistema. No terminal de pátio industrial da solução, as telas em XAML (Views) são completamente desacopladas das regras de negócio. Essa comunicação ocorre de forma reativa e assíncrona por meio de mecanismos nativos de Data Binding e do disparo de comandos (Commands), que interagem diretamente com a ViewModel.
+
+A ViewModel, por sua vez, atua como o cérebro da interface: ela consome os serviços locais (como o banco de contingência SQLite) e os endpoints da ApiIveco, expõe propriedades observáveis que notificam a tela sobre mudanças de estado e atualiza os dados operacionais em tempo real para o operador, garantindo uma aplicação robusta, altamente testável e de fácil manutenção.
+
+### *ASP .NET Core Web API:*
+
+A ASP.NET Core Web API constitui o núcleo unificado de serviços e inteligência de negócio do ecossistema do projeto. Desenvolvida sob uma arquitetura stateless (sem retenção de estado), ela atua como uma ponte segura e de alto desempenho entre o cliente desktop WPF e os provedores de persistência e validação.
+
+A API é estruturada rigidamente sob o padrão de separação entre controladores (Controllers), que expõem os endpoints RESTful e gerenciam as requisições HTTP (JSON), e serviços (Services), responsáveis por processar as regras de negócio complexas — como os motores de cálculo de indicadores ecológicos e pegada de carbono baseados no GHG Protocol.
+
+Ao centralizar o consumo dos serviços externos da BrasilAPI, API da NHTSA e API de rastreamento do Mercado Livre, a ASP.NET Core Web API blinda a aplicação cliente de pátio contra instabilidades externas, padroniza as respostas de dados e garante a consolidação íntegra de todos os registros históricos no banco de dados em nuvem Firebase Firestore.
+
+### *Firebase firestore:*
+
+O Firebase Firestore constitui a camada principal de persistência global e consolidação de dados em nuvem do ecossistema. Estruturado como um banco de dados NoSQL orientado a documentos, ele organiza as informações críticas do sistema, como o histórico de auditoria de chassis (VIN), o cadastro de fornecedores e os registros logísticos de rastreamento do Mercado Livre, em coleções flexíveis de alta escalabilidade.
+
+A escolha pelo Firestore elimina a complexidade de gerenciamento de infraestrutura física de servidores de banco de dados, oferecendo sincronização assíncrona, altíssima disponibilidade e mecanismos nativos de segurança baseados em regras de acesso. Ao receber as requisições tratadas e validadas pela ApiIveco, o Firestore consolida de forma definitiva os cálculos de emissões de carbono em conformidade com o GHG Protocol, servindo como uma fonte única da verdade para a geração de relatórios ecológicos e auditorias corporativas.
+
+### *BrasilAPI:*
+
+A escolha pela BrasilAPI garante uma infraestrutura de altíssima disponibilidade, sem custos de licenciamento ou limites restritivos de uso que inviabilizariam a operação. Ao centralizar essa validação no back-end, o sistema assegura que apenas cadastros íntegros, atualizados e em conformidade fiscal e jurídica sejam consolidados no banco de dados em nuvem, otimizando o fluxo de triagem no pátio industrial e blindando o cliente desktop de oscilações ou complexidades de integração direta com órgãos governamentais.
+
+### *NHTSA responsive:*
+
+A API da NHTSA (National Highway Traffic Safety Administration) é o serviço internacional de utilidade pública integrado ao ecossistema do projeto para a validação e decodificação técnica automatizada de veículos. Consumida de forma assíncrona pela ApiIveco por meio do protocolo HTTPS, ela atua como uma barreira de segurança e conformidade na triagem de entrada do pátio logístico.
+
+A API da NHTSA é o serviço internacional de utilidade pública integrado ao ecossistema do projeto para a validação e decodificação técnica automatizada de veículos. Consumida de forma assíncrona pela ApiIveco por meio do protocolo HTTPS, ela atua como uma barreira de segurança e conformidade na triagem de entrada do pátio logístico.
+
+### *API Mercado livre:*
+
+O Firebase Firestore constitui a camada principal de persistência global e consolidação de dados em nuvem do ecossistema. Estruturado como um banco de dados NoSQL orientado a documentos, ele organiza as informações críticas do sistema, como o histórico de auditoria de chassis (VIN), o cadastro de fornecedores e os registros logísticos de rastreamento do Mercado Livre, em coleções flexíveis de alta escalabilidade. Ao centralizar o consumo dos serviços externos da BrasilAPI, API da NHTSA e API de rastreamento do Mercado Livre, a ASP.NET Core Web API blinda a aplicação cliente de pátio contra instabilidades externas, padroniza as respostas de dados e garante a consolidação íntegra de todos os registros históricos no banco de dados em nuvem Firebase Firestore.
+
 ---
 
-### **WPF e MVVM:**
-
-O WPF (Windows Presentation Foundation) combinado com o padrão arquitetural MVVM (Model-View-ViewModel) estabelece uma separação rígida e clara entre a interface gráfica com o usuário (UI) e a lógica de apresentação do sistema. No terminal de pátio industrial da solução, as telas em XAML (Views) são completamente desacopladas das regras de negócio. Essa comunicação ocorre de forma reativa e assíncrona por meio de mecanismos nativos de Data Binding e do disparo de comandos (Commands), que interagem diretamente com a ViewModel. A ViewModel, por sua vez, atua como o cérebro da interface: ela consome os serviços locais (como o banco de contingência SQLite) e os endpoints da ApiIveco, expõe propriedades observáveis que notificam a tela sobre mudanças de estado e atualiza os dados operacionais em tempo real para o operador, garantindo uma aplicação robusta, altamente testável e de fácil manutenção.
-
-### **ASP.NET Core Web API:**
-
-A ASP.NET Core Web API constitui o núcleo unificado de serviços e inteligência de negócio do ecossistema do projeto. Desenvolvida sob uma arquitetura stateless (sem retenção de estado), ela atua como uma ponte segura e de alto desempenho entre o cliente desktop WPF e os provedores de persistência e validação. A API é estruturada rigidamente sob o padrão de separação entre controladores (Controllers), que expõem os endpoints RESTful e gerenciam as requisições HTTP (JSON), e serviços (Services), responsáveis por processar as regras de negócio complexas — como os motores de cálculo de indicadores ecológicos e pegada de carbono baseados no GHG Protocol. Ao centralizar o consumo dos serviços externos da BrasilAPI, API da NHTSA e API de rastreamento do Mercado Livre, a ASP.NET Core Web API blinda a aplicação cliente de pátio contra instabilidades externas, padroniza as respostas de dados e garante a consolidação íntegra de todos os registros históricos no banco de dados em nuvem Firebase Firestore.
-
-### **Firebase Firestore:**
-
-O Firebase Firestore constitui a camada principal de persistência global e consolidação de dados em nuvem do ecossistema. Estruturado como um banco de dados NoSQL orientado a documentos, ele organiza as informações críticas do sistema — como o histórico de auditoria de chassis (VIN), o cadastro de fornecedores e os registros logísticos de rastreamento do Mercado Livre — em coleções flexíveis de alta escalabilidade. A escolha pelo Firestore elimina a complexidade de gerenciamento de infraestrutura física de servidores de banco de dados, oferecendo sincronização assíncrona, altíssima disponibilidade e mecanismos nativos de segurança baseados em regras de acesso. Ao receber as requisições tratadas e validadas pela ApiIveco, o Firestore consolida de forma definitiva os cálculos de emissões de carbono em conformidade com o GHG Protocol, servindo como uma fonte única da verdade para a geração de relatórios ecológicos e auditorias corporativas. 
-
-### **BrasilAPI:**
-
-O Firebase Firestore constitui a camada principal de persistência global e consolidação de dados em nuvem do ecossistema. Estruturado como um banco de dados NoSQL orientado a documentos, ele organiza as informações críticas do sistema — como o histórico de auditoria de chassis (VIN), o cadastro de fornecedores e os registros logísticos de rastreamento do Mercado Livre — em coleções flexíveis de alta escalabilidade. A escolha pela BrasilAPI garante uma infraestrutura de altíssima disponibilidade, sem custos de licenciamento ou limites restritivos de uso que inviabilizariam a operação. Ao centralizar essa validação no back-end, o sistema assegura que apenas cadastros íntegros, atualizados e em conformidade fiscal e jurídica sejam consolidados no banco de dados em nuvem, otimizando o fluxo de triagem no pátio industrial e blindando o cliente desktop de oscilações ou complexidades de integração direta com órgãos governamentais.
-
-### **NHTSA Responsive:**
-
-A API da NHTSA (National Highway Traffic Safety Administration) é o serviço internacional de utilidade pública integrado ao ecossistema do projeto para a validação e decodificação técnica automatizada de veículos. Consumida de forma assíncrona pela ApiIveco por meio do protocolo HTTPS, ela atua como uma barreira de segurança e conformidade na triagem de entrada do pátio logístico. A API da NHTSA é o serviço internacional de utilidade pública integrado ao ecossistema do projeto para a validação e decodificação técnica automatizada de veículos. Consumida de forma assíncrona pela ApiIveco por meio do protocolo HTTPS, ela atua como uma barreira de segurança e conformidade na triagem de entrada do pátio logístico.
-
-### **API Mercado Livre:**
-
-O Firebase Firestore constitui a camada principal de persistência global e consolidação de dados em nuvem do ecossistema. Estruturado como um banco de dados NoSQL orientado a documentos, ele organiza as informações críticas do sistema — como o histórico de auditoria de chassis (VIN), o cadastro de fornecedores e os registros logísticos de rastreamento do Mercado Livre — em coleções flexíveis de alta escalabilidade. Ao centralizar o consumo dos serviços externos da BrasilAPI, API da NHTSA e API de rastreamento do Mercado Livre, a ASP.NET Core Web API blinda a aplicação cliente de pátio contra instabilidades externas, padroniza as respostas de dados e garante a consolidação íntegra de todos os registros históricos no banco de dados em nuvem Firebase Firestore.
-
----
 ## Arquitetura Do Projeto MVVM:
 
 O padrão arquitetural MVVM (Model-View-ViewModel) foi adotado no desenvolvimento do cliente desktop para garantir o completo desacoplamento entre a interface gráfica com o usuário e as regras de apresentação da aplicação de pátio. Abaixo está o fluxo de comunicação entre as camadas da nossa aplicação.
