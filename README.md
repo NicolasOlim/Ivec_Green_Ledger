@@ -733,6 +733,12 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 
 ---
 
+### **Diagrama de fluxo de Validaçao de Veiculo**
+
+<img src="imagens/fluxodologin.png" alt="Logo Iveco Green Ledger" width="750">
+
+---
+
 ### **Diagrama de fluxo do sistema completo**
 
 <img src="imagens/fluxodosistemacompleto.png" alt="Logo Iveco Green Ledger" width="750">
