@@ -727,6 +727,13 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 ## Diagramas
 </div>
 
+### **Diagrama de fluxo do Projeto (Visao Geral)**
+
+<img src="imagens/fluxodologin.png" alt="Logo Iveco Green Ledger" width="750">
+
+---
+
+
 ### **Diagrama de fluxo do login**
 
 <img src="imagens/fluxodologin.png" alt="Logo Iveco Green Ledger" width="750">
@@ -735,13 +742,19 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 
 ### **Diagrama de fluxo de Validaçao de Veiculo**
 
-<img src="imagens/fluxodologin.png" alt="Logo Iveco Green Ledger" width="750">
+<img src="imagens/Diagrama de Fluxo de Validaçao de Veiculo.png" alt="Logo Iveco Green Ledger" width="850">
 
 ---
 
-### **Diagrama de fluxo do sistema completo**
+### **Diagrama de fluxo do Calculo da Pegada de Carbono**
 
-<img src="imagens/fluxodosistemacompleto.png" alt="Logo Iveco Green Ledger" width="750">
+<img src="imagens/Diagrama de Fluxo do Calculo da Pegada de carbono.png" alt="Logo Iveco Green Ledger" width="850">
+
+---
+
+### **Diagrama de fluxo do Registro das Peças**
+
+<img src="imagens/Diagrama de Fluxo do Calculo da Pegada de carbono.png" alt="Logo Iveco Green Ledger" width="850">
 
 ---
 
@@ -749,11 +762,27 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 
 <img src="imagens/diagrama de caso de uso.png" alt="Logo Iveco Green Ledger" width="350">
 
+
 ---
+
+### **Diagrama de Dominio (MVVM)**
+
+<img src="imagens/Diagrama de Dominio (MVVM).png" alt="Logo Iveco Green Ledger" width="750">
+
+---
+
 
 ### **Diagrama sequencial**
 
 <img src="imagens/DashboardESG.png" alt="Logo Iveco Green Ledger" width="750">
+
+---
+
+### **Diagrama de fluxo de Classes**
+
+<img src="imagens/Diagrama de Fluxo das Classes.png" alt="Logo Iveco Green Ledger" width="550">
+
+
 
 ### **Requisitos funcionais**
 
