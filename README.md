@@ -567,68 +567,44 @@ O Firebase Firestore constitui a camada principal de persistência global e cons
 ## Arquitetura do projeto MVVM
 </div>
 
-O padrão arquitetural MVVM (Model-View-ViewModel) foi adotado no desenvolvimento do cliente desktop para garantir o completo desacoplamento entre a interface gráfica com o usuário e as regras de apresentação da aplicação de pátio. Abaixo está o fluxo de comunicação entre as camadas da nossa aplicação.
+O padrão arquitetural MVVM foi adotado no desenvolvimento do cliente desktop para garantir o completo desacoplamento entre a interface gráfica com o usuário e as regras de apresentação da aplicação de pátio. Ao isolar a lógica de controle dos elementos visuais da tela, essa abordagem elimina a necessidade de codificação direta nos arquivos de código associados à interface. Essa separação rígida garante que as alterações estéticas no layout gráfico possam ser realizadas de forma independente, sem o risco de corromper ou afetar o comportamento das regras operacionais subjacentes que gerenciam o fluxo logístico de entrada de dados.
 
+No ambiente de chão de fábrica, essa divisão estrutural reduz de forma significativa a complexidade envolvida na manutenção corretiva e evolutiva do software. Além de otimizar a legibilidade do código-fonte, a arquitetura viabiliza a execução de testes unitários automatizados diretamente sobre as camadas de controle, de maneira isolada e sem dependência de simulações visuais complexas. Como resultado direto, o ecossistema atinge maior robustez operacional, blindando as rotinas essenciais de validação de insumos e chassis contra falhas inesperadas no terminal de atendimento.
 
 ---
+
 ## Módulos do Sistema:
 
 Iveco Green Ledger é organizado em módulos funcionais isolados através do padrão MVVM, cada um com escopo operacional e status de desenvolvimento bem definidos. A tabela abaixo apresenta o panorama atual da solução:
 
-<div align="center">
+### *Módulo: Cadastro de veículos*
 
-| Módulo | Descrição | Status |
-| :--- | :--- | :--- | 
-| Mapa | Integração com a API do Mercado Livre para localização geográfica e monitoramento em tempo real dos caminhões de suprimentos | Disponível |
-| Dashboard | KPIs e indicadores ecológicos de pegada de carbono computados em tempo real com base nas diretrizes do GHG Protocol | Disponível |
-| Triagem e Cadastro De Resíduo | Registro, classificação e auditoria automatizada de veículos utilizando a BrasilAPI (CNPJ) e a API da NHTSA (chassi/VIN) | Disponível |
-| Sicronização em Nuvem | Motor de persistência global e consolidação assíncrona de dados estruturados através do Firebase Firestore | Disponível |
-| Contigência Offline | Mecanismo de persistência descentralizada em banco SQLite para garantir a operação contínua do pátio em caso de queda de internet | Implementação Futura |
-| Relatórios | Exportação de históricos operacionais, balanço de emissões de carbono e dados consolidados para auditoria corporativa | Disponível |
-| Central de Notificações | Alertas automáticos na interface WPF sobre inconformidades em chassis, atrasos de cargas ou desvios de rotas logísticas | Implementação Futura |
-
-</div>
-
----
-
-### **Módulo: Mapa**
-Este módulo é responsável por monitorar o fluxo logístico externo antes da chegada ao pátio. Permite ao sistema rastrear caminhões de suprimentos e insumos em tempo real, utilizando a API do Mercado Livre (Mercado Envios / Tracking API). Os dados geográficos, históricos de movimentação e previsões de entrega coletados de forma assíncrona são processados e salvos automaticamente no Firebase Firestore para vincular o transporte às metas de emissões de escopo 3.
-
-### **Módulo: Dashboard**
-
-<p align="center">
-  <img src="imagens/DashboardESG.png" alt="Logo Iveco Green Ledger" width="450">
-</p>
-
-Este módulo centraliza a inteligência ecológica da aplicação através de uma interface analítica e reativa construída em WPF. Ele consome diretamente os endpoints de cálculo da ApiIveco, que processa dados operacionais com base nas diretrizes internacionais do GHG Protocol. Os gráficos e indicadores de pegada de carbono são atualizados em tempo real na tela do operador à medida que novos dados de insumos e transportes entram no sistema.
-
-### **Módulo: Cadastro de Veículos**
-
-<p align="center">
-  <img src="imagens/rastreabilidade.png" alt="Logo Iveco Green Ledger" width="450">
-</p>
+<img src="imagens/rastreabilidade.png" alt="Logo Iveco Green Ledger" width="750">
 
 Este é o módulo principal de controle de acesso e conformidade do pátio industrial. Ele permite o registro e a auditoria instantânea de veículos na recepção através de uma triagem automatizada: o CNPJ do fornecedor é validado nas bases federais pela BrasilAPI e o número de chassi (VIN) é decodificado tecnicamente via API da NHTSA. O módulo previne erros humanos de digitação e garante que apenas cadastros 100% íntegros sigam para o fluxo de pesagem e cálculo de carbono.
 
-### **Módulo: Sincronização em Nuvem**
+### *Módulo: Sincronização em nuvem*
 
 Este módulo atua de forma invisível nos bastidores como o motor de persistência global da solução. Ele gerencia as chamadas feitas pela ApiIveco ao Firebase Firestore, garantindo que as coleções NoSQL de documentos estruturados sejam atualizadas de forma escalável e com alta disponibilidade. Ele consolida de maneira definitiva o histórico de auditorias e relatórios ambientais, servindo como a fonte centralizada da verdade de todo o ecossistema.
 
-### **Módulo: Relatórios**
+### *Módulo: Relatorio*
 
-<p align="center">
-  <img src="imagens/centralrelatorios.png" alt="Logo Iveco Green Ledger" width="450">
-</p>
+<img src="imagens/centralrelatorios.png" alt="Logo Iveco Green Ledger" width="750">
 
 Este módulo consolida de forma analítica todos os dados históricos processados pelo sistema. Ele permite aos gestores e auditores extrair relatórios ambientais completos e balanços consolidados das emissões de carbono geradas pela frota e pela cadeia de suprimentos. As informações, estruturadas sob os parâmetros do GHG Protocol, são recuperadas diretamente do Firebase Firestore através da ApiIveco e apresentadas prontas para exportação corporativa, garantindo transparência e conformidade jurídica para fins de auditoria interna e externa.
 
-### **Módulo: Central de Notificações**
+### **Módulo: Dashboard**
 
-Projetado como uma evolução estratégica para as próximas etapas do sistema, este módulo atuará no monitoramento preditivo e na comunicação em tempo real da interface WPF com o operador de pátio. Ele enviará alertas visuais e sonoros instantâneos em cenários críticos da operação logística, como a identificação de inconformidades estruturais em chassis analisados pela API da NHTSA, inconsistências cadastrais de CNPJ detectadas pela BrasilAPI ou desvios de rotas e atrasos severos de caminhões rastreados pela API do Mercado Livre.
+<img src="imagens/DashboardESG.png" alt="Logo Iveco Green Ledger" width="750">
+
+Este módulo centraliza a inteligência ecológica da aplicação através de uma interface analítica e reativa construída em WPF. Ele consome diretamente os endpoints de cálculo da ApiIveco, que processa dados operacionais com base nas diretrizes internacionais do GHG Protocol. Os gráficos e indicadores de pegada de carbono são atualizados em tempo real na tela do operador à medida que novos dados de insumos e transportes entram no sistema.
 
 ---
 
 <div align="center">
+
+## Processo de desenvolvimento
+</div>
 
 ### **Processo de Desenvolvimento**
 | Fase | Status |
@@ -641,7 +617,7 @@ Projetado como uma evolução estratégica para as próximas etapas do sistema, 
 | Fase 6 - Expansão Futura | Em Progresso ⚙️| 
 | Central de Notificações |Implementação Futura 💡| 
 
-</div>
+---
 
 ### **Ambiente de Desenvolvimento**
 
@@ -652,15 +628,23 @@ Projetado como uma evolução estratégica para as próximas etapas do sistema, 
 - **Banco de dados:** Firebase e SQLite.
 
 ---
-## Business Model Canvas:
+
+<div align="center">
+
+## Business model canvas
+</div>
+
 
 <div class="logo-container" align="center">
     <img src="imagens/bussiness model canvas.png" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
+
 ---
 
+<div align="center">
 
-## Viabilidade Econômica:
+## Viabilidade econômica
+</div>
 
 A viabilidade econômica do projeto se consolida pela expressiva redução de custos operacionais e pelo ganho de eficiência logística no pátio industrial da Iveco. Ao automatizar a triagem de veículos com as APIs da NHTSA e BrasilAPI, o sistema elimina os custos decorrentes de erros humanos de digitação, fraudes cadastrais e o tempo ocioso de caminhões em filas de espera. Além disso, a adoção de uma arquitetura Open-Source baseada em .NET 8 e SQLite, combinada à infraestrutura sob demanda e altamente escalável do Firebase Firestore, minimiza o investimento inicial em servidores físicos e licenças de software proprietárias. Sob a ótica estratégica, o motor de cálculo alinhado ao GHG Protocol posiciona a companhia em estrita conformidade com as exigências globais de ESG, mitigando riscos de sanções ambientais e abrindo portas para incentivos fiscais e captação de fundos verdes, o que garante um retorno sobre o investimento.
 
@@ -668,7 +652,6 @@ A viabilidade econômica do projeto se consolida pela expressiva redução de cu
 
 Por tratar-se de um projeto acadêmico focado em inovação industrial, os custos de engenharia e desenvolvimento foram essencialmente de tempo, pesquisa e capacitação da equipe. A tabela abaixo projeta esses custos em valores reais de mercado, considerando as horas técnicas investidas e a remuneração média de desenvolvedores Júnior/Pleno no Brasil em 2026 para o desenvolvimento do ecossistema.
 
-<div align="center">
 
 | Item | Hora estimada | Valor por Hora | Custo Total |
 | :--- | :--- | :--- | :--- | 
@@ -680,14 +663,39 @@ Por tratar-se de um projeto acadêmico focado em inovação industrial, os custo
 | Testes, Validações e Homologação | 25h |  R$ 45,00 |  R$ 1.125,00 | 
 | Total | 220h |  - |  R$ 10.375,00 | 
 
+---
+
+<div align="center">
+
+## Requisitos
 </div>
 
----
-### **Beneficios e Retorno Esperado**
+### **Requisitos funcionais**
 
-A adoção do Iveco Green Ledger no ecossistema de transporte e triagem de pátio pode gerar benefícios econômicos quantificáveis em múltiplas frentes operacionais e estratégicas. Os valores e métricas abaixo constituem estimativas fundamentadas nas médias do setor de logística automotiva brasileiro e nos gargalos operacionais identificados em pátios industriais de grande porte.
+Os requisitos funcionais descrevem as ações, facilidades e comportamentos que o sistema Green Ledger deve oferecer:
 
-### **Redução da Emissão de CO2**
+- **RF - 001: Autenticação de Usuários:** O sistema deve permitir o controle de acesso de operários da portaria, gestores de pátio e analistas ambientais através de login e senha integrados ao Firebase.
+
+- **RF - 002: Triagem de Entrada de Veículos:** O sistema deve registrar o ingresso de caminhões no pátio logístico da Iveco, capturando dados do motorista, placa e hora de entrada.
+
+- **RF - 003: Integração e Decodificação de Chassi (VIN):** O sistema deve consumir a API da NHTSA para decodificar automaticamente o número do chassi do veículo, extraindo o modelo, ano de fabricação e especificações de motorização.
+
+- **RF - 004: Rastreamento de Entregas e Rotas:** O sistema deve integrar-se com a API do Mercado Livre (ou serviços equivalentes de logística) para monitorar o status do trajeto e a quilometragem percorrida pela frota parceira.
+
+- **RF - 005: Sincronização Híbrida e Operação Offline:** Persistência dos dados localmente no banco SQLite caso haja queda de internet, sincronizando tudo com o Firebase Firestore de forma automática assim que a conexão for restabelecida.
+
+- **RF - 006: Cálculo da Pegada de Carbono:** O sistema deve calcular as emissões de gases de efeito estufa geradas pela queima de combustível da frota com base nas diretrizes e fatores de emissão.
+
+- **RF - 007: Monitoramento:** O sistema deve contabilizar o tempo em que o veículo permaneceu parado com o motor ligado no pátio e projetar o desperdício de combustível e emissão de carbono gerados nesse intervalo.
+
+- **RF - 008: Geração de Relatórios:** O sistema deve emitir relatórios gerenciais consolidados mostrando a redução de emissões, eficiência logística e indicadores ambientais da cadeia de suprimentos da Iveco.
+
+- RF - 003: Integração e Decodificação de Chassi (VIN):
+
+
+
+
+
 
 A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na descarbonização da cadeia logística da Iveco, gerando redução direta e indireta nas emissões de Dióxido de Carbono ($CO_2$) e outros gases de efeito estufa (GEE). O impacto positivo do sistema se consolida em três pilares fundamentais: 
 - Mitigação do Tempo de Marcha Lenta;
