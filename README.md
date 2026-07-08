@@ -780,7 +780,7 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 
 ### **Diagrama sequencial**
 
-<img src="imagens/DashboardESG.png" alt="Logo Iveco Green Ledger" width="750">
+<img src="imagens/Diagrama Sequencial.png" alt="Logo Iveco Green Ledger" width="750">
 
 ---
 
