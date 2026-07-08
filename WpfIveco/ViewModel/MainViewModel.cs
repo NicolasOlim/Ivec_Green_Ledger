@@ -50,11 +50,20 @@ namespace WpfIveco.ViewModel
         /// ============================================================
 
         private string _loginError = "";
+        /// <summary>Mensagem de erro para exibição na tela de login.</summary>
         public string LoginError
         {
             get => _loginError;
-            set { _loginError = value; OnPropertyChanged(); }
+            set
+            {
+                _loginError = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(HasLoginError)); // Atualiza a visibilidade do erro
+            }
         }
+
+        /// <summary>Indica se há uma mensagem de erro de login para exibir.</summary>
+        public bool HasLoginError => !string.IsNullOrEmpty(LoginError);
 
         private string _loginEmail = "";
         public string LoginEmail
@@ -295,11 +304,11 @@ namespace WpfIveco.ViewModel
         private async Task ExecutarLoginAsync()
         {
             App.LogInfo($"Tentativa para {LoginEmail}", "LOGIN");
-            LoginError = "";
+            LoginError = ""; // Limpa erro anterior
 
             if (!await ValidarEmailAsync(LoginEmail))
             {
-                LoginError = EmailError;
+                LoginError = EmailError; // Atualiza a mensagem de erro
                 return;
             }
 
@@ -329,9 +338,10 @@ namespace WpfIveco.ViewModel
                     IsAdmin = PerfilUsuario == "Admin";
                     IsLoggedIn = true;
                     LoginSenha = "";
+                    LoginError = ""; // Limpa erro após login bem-sucedido
 
                     App.LogInfo($"Sucesso – Usuário: {NomeUsuario}, Perfil: {PerfilUsuario}", "LOGIN");
-                    await CarregarTudoAsync(); // Carregamento inicial
+                    await CarregarTudoAsync();
                 }
                 else
                 {
@@ -442,7 +452,7 @@ namespace WpfIveco.ViewModel
                 await Pecas.CarregarFornecedoresAsync();
                 await Pecas.CarregarVinsAsync();
                 await Pecas.CarregarPecasAsync();
-                await Analises.AtualizarAsync(); // Carrega os dados ESG inicialmente
+                await Analises.AtualizarAsync();
 
                 App.LogInfo("Carregamento concluído.", "CARREGAR");
             }

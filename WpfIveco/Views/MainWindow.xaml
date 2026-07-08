@@ -215,8 +215,6 @@
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-
-                                                <!-- Ícone de usuário -->
                                                 <Border Grid.Column="0" Width="32" Height="32" CornerRadius="16" Background="#D1D1D6">
                                                     <TextBlock FontFamily="Segoe MDL2 Assets" 
                                                                Text="&#xE77B;" 
@@ -226,12 +224,10 @@
                                                                VerticalAlignment="Center"
                                                                AutomationProperties.Name="Ícone do usuário"/>
                                                 </Border>
-
                                                 <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
                                                     <TextBlock Text="{Binding NomeUsuario, FallbackValue='Usuário'}" Foreground="{StaticResource TextPrimary}" FontSize="13" FontWeight="SemiBold"/>
                                                     <TextBlock Text="{Binding PerfilUsuario, FallbackValue='Perfil'}" Foreground="{StaticResource TextSecondary}" FontSize="11"/>
                                                 </StackPanel>
-
                                                 <TextBlock Grid.Column="2" FontFamily="Segoe MDL2 Assets" Text="&#xE70D;" Foreground="{StaticResource TextSecondary}" FontSize="12" VerticalAlignment="Center" Margin="10,0,0,0"/>
                                             </Grid>
                                         </Border>
@@ -247,7 +243,6 @@
                                 </ToggleButton.Template>
                             </ToggleButton>
 
-                            <!-- Popup do perfil -->
                             <Popup IsOpen="{Binding IsChecked, ElementName=BtnMenuPerfil}" 
                                    PlacementTarget="{Binding ElementName=BtnMenuPerfil}" 
                                    Placement="Top" 
@@ -266,8 +261,6 @@
                                         <TextBlock Text="Nível de Acesso" FontSize="11" Foreground="#6B7280"/>
                                         <TextBlock Text="{Binding PerfilUsuario, FallbackValue='Administrador'}" FontSize="13" Foreground="#111827" FontWeight="Medium" Margin="0,2,0,16"/>
                                         <Separator Background="#E5E5EA" Margin="0,0,0,12"/>
-
-                                        <!-- Botão que ABRE o modal (substituído) -->
                                         <Button Click="BtnAbrirModalSair_Click" Background="Transparent" BorderThickness="0" Cursor="Hand" HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xF3B1;" Foreground="#EF4444" FontSize="16" VerticalAlignment="Center"/>
@@ -285,30 +278,22 @@
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <!-- Top Bar -->
                         <RowDefinition Height="*"/>
-                        <!-- Conteúdo -->
                     </Grid.RowDefinitions>
 
-                    <!-- Top Bar / Notificações -->
                     <Border Grid.Row="0" Background="Transparent" Padding="0,15,30,0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-
-                            <!-- Sino de Notificações -->
                             <Button x:Name="BtnNotificacoes" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,0,20,0" ToolTip="Ver notificações">
                                 <Grid>
                                     <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9F5;" FontSize="24" Foreground="#6B7280" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    <!-- Badge de notificações -->
                                     <Border Background="#EF4444" CornerRadius="10" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8,-6,0,0">
                                         <TextBlock Text="3" Foreground="White" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
                                 </Grid>
                             </Button>
-
                         </StackPanel>
                     </Border>
 
-                    <!-- ScrollViewer / Abas -->
                     <ScrollViewer Grid.Row="1" Padding="40" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                         <ContentControl>
                             <ContentControl.Style>
@@ -482,6 +467,25 @@
                             </Grid>
                         </Border>
 
+                        <!-- Mensagem de erro de login -->
+                        <TextBlock Text="{Binding LoginError}" 
+                                   Foreground="Red" 
+                                   FontSize="14" 
+                                   FontWeight="SemiBold" 
+                                   Margin="0,0,0,16" 
+                                   TextWrapping="Wrap">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasLoginError}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
                         <Button Command="{Binding FazerLoginCommand}" Background="#0A5B43" Padding="0,18" Cursor="Hand" BorderThickness="0">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
@@ -527,20 +531,16 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Ícone alterado para Vermelho -->
                     <Border Grid.Row="0" Grid.Column="0" Width="64" Height="64" CornerRadius="32" Background="#FEF2F2" BorderBrush="#FECACA" BorderThickness="1" VerticalAlignment="Top" Margin="0,0,16,0">
                         <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xF3B1;" FontSize="28" Foreground="#DC2626" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,0,0,0"/>
                     </Border>
 
-                    <!-- Textos -->
                     <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,4,0,24">
                         <TextBlock Text="Confirmar Saída" FontSize="22" FontWeight="Bold" Foreground="#1E293B" Margin="0,0,0,8"/>
                         <TextBlock Text="Você realmente deseja encerrar sua sessão atual e voltar para a tela de login?" FontSize="15" Foreground="#64748B" TextWrapping="Wrap" LineHeight="22"/>
                     </StackPanel>
 
-                    <!-- Botões -->
                     <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <!-- Cancelar -->
                         <Button Click="BtnFecharModalSair_Click" Background="White" Cursor="Hand" Margin="0,0,12,0">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
@@ -551,7 +551,6 @@
                             </Button.Template>
                         </Button>
 
-                        <!-- Sair (Alterado de Azul para Verde) -->
                         <Button Click="BtnConfirmarSaida_Click" Background="#16A34A" Cursor="Hand">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
@@ -572,22 +571,18 @@
         </Grid>
 
         <!-- ========================================== -->
-        <!-- NOTIFICAÇÃO TOAST (Pop-up flutuante)        -->
+        <!-- NOTIFICAÇÃO TOAST                            -->
         <!-- ========================================== -->
         <Border x:Name="ToastContainer" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60" Panel.ZIndex="1000" CornerRadius="12" Padding="16,14" MaxWidth="600">
             <Border.Style>
                 <Style TargetType="Border">
                     <Setter Property="Background" Value="#1E293B"/>
-                    <!-- Cinza escuro padrão -->
                     <Style.Triggers>
-                        <!-- Muda a cor de fundo e o ícone baseado no tipo de notificação -->
                         <DataTrigger Binding="{Binding NotificationType}" Value="Success">
                             <Setter Property="Background" Value="#10B981"/>
-                            <!-- Verde -->
                         </DataTrigger>
                         <DataTrigger Binding="{Binding NotificationType}" Value="Error">
                             <Setter Property="Background" Value="#EF4444"/>
-                            <!-- Vermelho -->
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsNotificationVisible}" Value="True">
                             <Setter Property="Visibility" Value="Visible"/>
@@ -600,23 +595,19 @@
             </Border.Effect>
 
             <StackPanel Orientation="Horizontal">
-                <!-- Ícone dinâmico -->
                 <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="20" Foreground="White" Margin="0,0,12,0" VerticalAlignment="Center">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Text" Value="&#xE73E;"/>
-                            <!-- CheckMark -->
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding NotificationType}" Value="Error">
                                     <Setter Property="Text" Value="&#xE711;"/>
-                                    <!-- Cancel/Erro -->
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </TextBlock.Style>
                 </TextBlock>
 
-                <!-- Mensagem -->
                 <TextBlock Text="{Binding NotificationMessage, FallbackValue='Operação realizada com sucesso!'}" Foreground="White" FontSize="14" FontWeight="Medium" VerticalAlignment="Center"/>
             </StackPanel>
         </Border>
