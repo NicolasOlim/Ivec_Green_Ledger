@@ -729,20 +729,20 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 
 ### **Diagrama Analises ESG (Caso de uso)**
 
-<img src="imagens/ANALISESESG DIAGRAMA.png" alt="Logo Iveco Green Ledger" width="750">
+<img src="imagens/ANALISESESG DIAGRAMA.png" alt="Logo Iveco Green Ledger" width="850">
 
 ---
 
 
 ### **Diagrama do login (Caso de uso)**
 
-<img src="imagens/DIAGRAMA DE FLUXO DO LOGIN.png" alt="Logo Iveco Green Ledger" width="750">
+<img src="imagens/DIAGRAMA DE FLUXO DO LOGIN.png" alt="Logo Iveco Green Ledger" width="850">
 
 ---
 
-### **Diagrama de fluxo de Validaçao de Veiculo**
+### **Diagrama de Fornecedores (Caso de uso)**
 
-<img src="imagens/Diagrama de Fluxo de Validaçao de Veiculo.png" alt="Logo Iveco Green Ledger" width="850">
+<img src="imagens/FORNECEDORES DIAGRMA.png" alt="Logo Iveco Green Ledger" width="850">
 
 ---
 
@@ -766,7 +766,7 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 
 ### **Diagrama de caso de uso**
 
-<img src="imagens/diagrama de caso de uso.png" alt="Logo Iveco Green Ledger" width="350">
+<img src="imagens/diagrama de caso de uso.png" alt="Logo Iveco Green Ledger" width="850">
 
 
 ---
