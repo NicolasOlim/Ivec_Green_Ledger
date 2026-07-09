@@ -746,9 +746,9 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 
 ---
 
-### **Diagrama de fluxo de Validaçao de Fornecedor**
+### **Peças e Componentes (caso de uso)**
 
-<img src="imagens/Diagrama de Fluxo de Validaçao de Fornecedor.png" alt="Logo Iveco Green Ledger" width="850">
+<img src="imagens/PEÇAS E COMPONENTES.png" alt="Logo Iveco Green Ledger" width="850">
 
 ---
 
