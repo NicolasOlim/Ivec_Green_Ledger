@@ -778,11 +778,18 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 ---
 
 
-### **Diagrama sequencial**
+### **Diagrama sequencial do Login**
 
 <img src="imagens/Diagrama Sequencial.png" alt="Logo Iveco Green Ledger" width="750">
 
 ---
+
+### **Diagrama sequencial do Fornecedor**
+
+<img src="imagens/Diagrama Sequencial do Fornecedor.png" alt="Logo Iveco Green Ledger" width="750">
+
+---
+
 
 ### **Diagrama de fluxo de Classes**
 
