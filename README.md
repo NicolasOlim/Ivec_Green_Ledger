@@ -811,7 +811,6 @@ A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na
 | Emissão diária de CO2 em marcha lenta | 45,0 kg de CO2 por dia |  6,0 kg - 9,0 kg de CO2 por dia |  
 | Economia mensal de CO2 | - | 900 kg - 1,100 kg de CO2 por dia |  
 | Economia anual estimada de CO2 | - | 10,8 t - 13,2 t de CO2 por ano |  
-| Domínio e Certificado SSL | R$ 0,00 | R$ 5,00 - R$ 40,00 |  
 
 </div>
 
