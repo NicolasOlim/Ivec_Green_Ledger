@@ -757,9 +757,21 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 
 ---
 
-### **Diagrama de caso de uso**
+### **Diagrama de Caso de Uso Admin**
 
-<img src="imagens/diagrama de caso de uso.png" alt="Logo Iveco Green Ledger" width="850">
+<img src="imagens/Caso de Uso Admin.png" alt="Logo Iveco Green Ledger" width="850">
+
+
+---
+### **Diagrama de Caso de Uso Operador**
+
+<img src="imagens/Caso de Uso Operador.png" alt="Logo Iveco Green Ledger" width="850">
+
+
+---
+### **Diagrama de Caso de Uso Sistema**
+
+<img src="imagens/Caso de Uso Sistema.png" alt="Logo Iveco Green Ledger" width="850">
 
 
 ---
