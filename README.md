@@ -796,12 +796,6 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 ---
 
 
-### **Diagrama de fluxo de Classes**
-
-<img src="----------------" alt="Logo Iveco Green Ledger" width="550">
-
-
-
 ### **Requisitos funcionais**
 
 A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na descarbonização da cadeia logística da Iveco, gerando redução direta e indireta nas emissões de Dióxido de Carbono ($CO_2$) e outros gases de efeito estufa (GEE). O impacto positivo do sistema se consolida em três pilares fundamentais: 
