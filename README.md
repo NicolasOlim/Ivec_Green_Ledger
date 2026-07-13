@@ -371,11 +371,7 @@ Ivec_Green_Ledger/
 
 ---
 
-### **Modelagem de domínio**
 
-<img src="imagens/Visao_geral.png" alt="Logo Iveco Green Ledger" width="750">
-
----
 
 <div align="center">
 
