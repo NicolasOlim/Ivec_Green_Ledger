@@ -300,9 +300,6 @@ O ecossistema Iveco Green Ledger foi projetado sob uma arquitetura de serviços 
 
 ---
 
-<img src="imagens/Visao_geral.png" alt="Logo Iveco Green Ledger" width="750">
-
----
 
 | ID | Caso de Uso | Ator Principal | Descrição Operacional |
 | :--- | :--- | :--- | :--- |
