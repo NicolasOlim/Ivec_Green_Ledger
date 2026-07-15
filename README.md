@@ -853,6 +853,113 @@ Visando a alta disponibilidade do chão de fábrica, a lógica de armazenamento 
 Esse módulo realiza a varredura no banco local, extrai os dados gerados e resolve possíveis conflitos de concorrência de horários e faz o upload em lote para a nuvem, atualizando os dashboards gerenciais de forma transparente para o usuário final.
 
 ---
+
+<br><br><br><br><br>
+
+**PLANO DE IMPLANTAÇÃO DE SOFTWARE:**  
+
+
+## SUMÁRIO
+
+**1 PLANEJAMENTO ESTRATÉGICO**  
+&nbsp;&nbsp;&nbsp;&nbsp;1.1 DEFINIÇÃO DO SISTEMA  
+&nbsp;&nbsp;&nbsp;&nbsp;1.2 PÚBLICO-ALVO E CLIENTE  
+&nbsp;&nbsp;&nbsp;&nbsp;1.3 AMBIENTE DE INSTALAÇÃO  
+&nbsp;&nbsp;&nbsp;&nbsp;1.4 ESPECIFICAÇÕES DE HARDWARE  
+&nbsp;&nbsp;&nbsp;&nbsp;1.5 PRÉ-REQUISITOS DE SOFTWARE  
+&nbsp;&nbsp;&nbsp;&nbsp;1.6 ARQUITETURA DE BANCO DE DADOS  
+&nbsp;&nbsp;&nbsp;&nbsp;1.7 MIGRAÇÃO DE DADOS  
+&nbsp;&nbsp;&nbsp;&nbsp;1.8 RESPONSABILIDADES POR ETAPA  
+&nbsp;&nbsp;&nbsp;&nbsp;1.9 CRONOGRAMA E PRAZOS  
+&nbsp;&nbsp;&nbsp;&nbsp;1.10 MÉTODO DE VALIDAÇÃO  
+&nbsp;&nbsp;&nbsp;&nbsp;1.11 GESTÃO DE PROBLEMAS DURANTE A INSTALAÇÃO  
+&nbsp;&nbsp;&nbsp;&nbsp;1.12 APROVAÇÃO PARA ENTRADA EM PRODUÇÃO  
+**2 CRONOGRAMA RESUMIDO DE IMPLANTAÇÃO**  
+**3 DISTRIBUIÇÃO DAS RESPONSABILIDADES TÉCNICAS**  
+**4 LEVANTAMENTO DA INFRAESTRUTURA NECESSÁRIA**  
+**5 PLANO DE VALIDAÇÃO DO SISTEMA**  
+**6 PLANO DE CONTINGÊNCIA**  
+**7 CONSIDERAÇÕES FINAIS**  
+
+## 1 PLANEJAMENTO ESTRATÉGICO
+
+### 1.1 DEFINIÇÃO DO SISTEMA
+Será implantado o ecossistema Iveco Green Ledger, um software distribuído desenhado para a automação da cubagem volumétrica e para a rastreabilidade ambiental das emissões da cadeia de suprimentos, focado especificamente no Escopo 3 do GHG Protocol.
+
+### 1.2 PÚBLICO-ALVO E CLIENTE
+O cliente final é a empresa IVECO. A solução beneficiará diretamente os colaboradores operacionais do pátio logístico (portaria e recepção) e as instâncias gerenciais e de governança socioambiental (ESG) da administração.
+
+### 1.3 AMBIENTE DE INSTALAÇÃO
+A interface de usuário em WPF será instalada localmente nas estações de trabalho do chão de fábrica (portaria logística). Paralelamente, o back-end (API REST) e o banco de dados principal ficarão alojados e configurados em um ambiente de nuvem corporativa.
+
+### 1.4 ESPECIFICAÇÕES DE HARDWARE
+A solução desktop foi desenhada para operar nos computadores industriais da portaria que possuam sistemas operacionais Windows (10 ou 11, 64-bits). Recomenda-se, no mínimo, um processador Intel Core i3 e 4GB de memória RAM para suportar com fluidez a carga de renderização gráfica requerida pelo framework da aplicação.
+
+### 1.5 PRÉ-REQUISITOS DE SOFTWARE
+Os terminais clientes requerem a pré-instalação do ambiente de execução Microsoft .NET Runtime 8.0, o qual é indispensável para o funcionamento da interface em WPF. No ambiente de servidor na nuvem, será exigida a instalação e configuração do ASP.NET Core Runtime 8.0.
+
+### 1.6 ARQUITETURA DE BANCO DE DADOS
+Sim, o sistema possui banco de dados estruturado em uma arquitetura de persistência híbrida. Localmente nos terminais, utiliza-se o SQLite como repositório relacional de contingência *offline*. Na nuvem, é utilizado o Google Firebase Firestore (banco NoSQL orientado a documentos) para a consolidação dos dados e a geração de inteligência analítica corporativa em tempo real.
+
+### 1.7 MIGRAÇÃO DE DADOS
+Será necessária a migração de informações. Uma vez que o pátio logístico da montadora ainda depende de preenchimentos manuais em fichas e formulários de papel, será fundamental realizar a migração inicial do histórico de fornecedores já autorizados, bem como configurar os índices e fatores normativos de emissão do GHG Protocol diretamente no banco de dados Firestore antes do início da operação.
+
+### 1.8 RESPONSABILIDADES POR ETAPA
+A divisão de tarefas será conduzida com base na arquitetura do sistema. Os alunos Erick Silva e Alice Andrade assumirão, prioritariamente, o foco no cliente desktop, na interface visual, na usabilidade adaptada ao chão de fábrica e na integridade do banco SQLite. Os alunos Nicolas Oliveira e Vinícius Augusto focarão no provisionamento dos serviços de nuvem (Firebase), na arquitetura estrutural da API e na segurança do tráfego de dados.
+
+### 1.9 CRONOGRAMA E PRAZOS
+A implantação total do sistema estima-se em um período de 1 (uma) semana útil. Este tempo abrangerá a estruturação em blocos de provisionamento na nuvem, a migração inicial de dados, a instalação progressiva nos terminais físicos de atendimento e os testes com a equipe.
+
+### 1.10 MÉTODO DE VALIDAÇÃO
+A validação será executada mediante a submissão de dados reais de inventário e logística. O operador deverá realizar a leitura do número de um chassi (VIN) autêntico para atestar o funcionamento do processo de decodificação junto à API externa da NHTSA. Simultaneamente, informará um CNPJ para atestar a homologação de fornecedores pela BrasilAPI, confirmando, em seguida, se o motor de cálculo submeteu a pegada de CO2 correspondente aos dashboards da nuvem de forma correta.
+
+### 1.11 GESTÃO DE PROBLEMAS DURANTE A INSTALAÇÃO
+O sistema possui arquitetura resiliente. Caso ocorra uma interrupção de conectividade com os servidores em nuvem durante a implantação ou uso, a aplicação assume automaticamente a contingência para o banco SQLite local, acumulando as cargas em arquivos JSON para a sincronização assíncrona assim que a conexão retornar. Em caso de falha crítica nos computadores, o plano prevê a reversão temporária para o registro manual para evitar gargalos e filas de caminhões.
+
+### 1.12 APROVAÇÃO PARA ENTRADA EM PRODUÇÃO
+A aprovação e a liberação formal ("Go-Live") serão de responsabilidade do Administrador do sistema — perfil representativo da gestão central. Caberá a ele homologar os parâmetros ecológicos de cálculo da aplicação e validar os registros gerados nos relatórios e nos logs estruturados de auditoria.
+
+## 2 CRONOGRAMA RESUMIDO DE IMPLANTAÇÃO
+
+* **Nuvem e Segurança:** Configuração das instâncias do Firebase Firestore, implantação da API ASP.NET Core no servidor e estabelecimento das regras de CORS e diretrizes de segurança HTTP.
+* **Homologação:** Inserção do catálogo de dados padrão dos parceiros logísticos e parametrização da matriz de fatores de cálculo do GHG Protocol.
+* **Instalação Local:** Implantação do pacote executável do software WPF e geração das tabelas do banco SQLite nos terminais físicos.
+* **Testes e Transição:** Simulação de fluxo de triagem, validações operacionais de leitura de frotas e treinamento prático assistido aos usuários finais.
+
+## 3 DISTRIBUIÇÃO DAS RESPONSABILIDADES TÉCNICAS
+
+* **Erick Silva Fernandes de Araújo:** Responsável pela instalação do software nos ambientes desktop industriais, pela condução dos testes práticos de simulação de queda de rede e pelo monitoramento do motor SQLite para assegurar a persistência de dados em borda.
+* **Vinícius Augusto Oliveira:** Responsável por acompanhar a adaptação e usabilidade da interface gráfica (WPF - padrão MVVM) e por aplicar os treinamentos práticos de operação para os funcionários da portaria e analistas.
+* **Nicolas de Oliveira:** Encarregado pelo *deploy* do back-end (API REST) nos servidores e por garantir que os microsserviços de validação de dados internacionais (NHTSA) e nacionais (BrasilAPI) operem dentro da latência adequada.
+* **Alice Virgília Andrade:** Designado para modelar e estruturar as coleções no banco de dados não-relacional Firestore, auditar a integridade das requisições JSON e validar as camadas de segurança e permissões de perfil na plataforma.
+
+## 4 LEVANTAMENTO DA INFRAESTRUTURA NECESSÁRIA
+
+* **Servidores/Cloud:** Acesso homologado a um ambiente de hospedagem web (compatível com a API em .NET 8) e uma conta provisionada no Google Cloud Platform para o alojamento e gestão do Firebase Firestore.
+* **Equipamentos Locais:** Computadores localizados na portaria logística e salas de gestão, compatíveis com o ambiente Windows (Requisitos Mínimos: Windows 10/11 64-bits, Processador Intel Core i5, 8GB RAM e 1.5GB de disco) para executar a aplicação rica do cliente WPF.
+* **Conectividade:** Conexão de rede banda larga estável corporativa e acesso liberado às portas necessárias para garantir a sincronização com a nuvem e o consumo de APIs externas.
+
+## 5 PLANO DE VALIDAÇÃO DO SISTEMA
+
+A etapa de homologação e validação final deve atestar o funcionamento pleno dos três pilares fundamentais do sistema *Iveco Green Ledger*:
+1. **Segurança e Autenticação:** Verificar se o acesso ao painel principal está devidamente restrito aos usuários cadastrados e se o controle de perfis (Administrador/Operador) obedece à hierarquia correta.
+2. **Eficiência e Confiabilidade na Triagem:** Atestar que, ao se introduzir o documento da carga (CNPJ) e o chassi do veículo de transporte (VIN), a plataforma os decodifica e valida contra as bases governamentais de forma rápida e livre de gargalos.
+3. **Consistência e Atualização Automática:** Garantir que os Dashboards ESG renderizados pela aplicação reflitam em tempo real as métricas de emissão de carbono (Escopo 3) consoante às novas pesagens e entradas registradas no pátio.
+
+## 6 PLANO DE CONTINGÊNCIA
+
+Tendo em vista a natureza do ambiente industrial e logístico fabril (propenso a oscilações de sinal de rede), o plano de contingência prescreve as seguintes medidas:
+* **Falta de Conectividade:** Caso a internet venha a cair, a aplicação entrará automaticamente em *Modo de Operação Local*. O operador continuará registrando a entrada de lotes, fornecedores, pesos e chassis no banco de dados relacional embutido (SQLite) sem interromper a fila de veículos.
+* **Restauração de Rede:** Assim que os sensores do sistema detectarem o restabelecimento da conexão, uma rotina programada (*background worker*) iniciará a leitura da fila pendente no SQLite e empacotará os dados de forma autônoma para os servidores na nuvem.
+* **Indisponibilidade de Hardware:** Na eventualidade remota de uma queima de equipamentos ou *blackout* total nos computadores da portaria, a equipe retornará provisoriamente aos processos manuais (fichas em papel e planilhas *offline*) até a substituição física das máquinas pelo suporte de TI.
+
+## 7 CONSIDERAÇÕES FINAIS
+
+A implantação da plataforma *Iveco Green Ledger* apresenta alta viabilidade, unindo robustez técnica e benefícios operacionais/econômicos evidentes. A transição dos antigos processos manuais e cálculos aproximados de poluição para um mecanismo de precisão analítica (gerado automaticamente durante a recepção das cargas) tem a capacidade de erradicar erros de conformidade e o indesejado tempo de ociosidade no pátio da montadora.
+
+Apoiado pelo mecanismo de contingência e construído sobre a escalável arquitetura MVVM acoplada a recursos *Cloud*, o sistema atende amplamente à premissa do projeto de integrar eficiência logística às rigorosas diretrizes ambientais, garantindo que as metas globais de sustentabilidade corporativa da empresa se materializem em ativos transparentes, otimizados e prontos para processos de auditoria.
+
+</div>
 <div align="center">
  
 ## Considerações Finais:
