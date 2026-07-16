@@ -283,7 +283,9 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 ## Arquitetura e Modelagem Do Sistema
 </div>
 
-O Green Ledger adota uma arquitetura distribuída e desacoplada, separando claramente as responsabilidades entre o cliente desktop de pátio, a API REST corporativa e a camada de persistência híbrida. Esta seção descreve cada componente técnico, suas integrações de borda com serviços externos e os padrões de resiliência a falhas de rede.
+O Green Ledger adota uma arquitetura distribuída e desacoplada, separando claramente as responsabilidades entre o cliente desktop de pátio, a API REST corporativa e a camada de persistência híbrida. Esta seção descreve cada componente técnico, suas integrações de borda com serviços externos e os padrões de resiliência a falhas de rede. 
+
+<img src="imagens/visãogeralarquitetura.png" alt="Logo Iveco Green Ledger" width="750">
 
 ### **Visão Geral Da Arquitetura:**
 
