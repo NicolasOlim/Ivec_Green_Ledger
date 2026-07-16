@@ -899,7 +899,7 @@ A solução desktop foi desenhada para operar nos computadores industriais da po
 Os terminais clientes requerem a pré-instalação do ambiente de execução Microsoft .NET Runtime 8.0, o qual é indispensável para o funcionamento da interface em WPF. No ambiente de servidor na nuvem, será exigida a instalação e configuração do ASP.NET Core Runtime 8.0.
 
 ### 1.6 ARQUITETURA DE BANCO DE DADOS
-Sim, o sistema possui banco de dados estruturado em uma arquitetura de persistência híbrida. Localmente nos terminais, utiliza-se o SQLite como repositório relacional de contingência *offline*. Na nuvem, é utilizado o Google Firebase Firestore (banco NoSQL orientado a documentos) para a consolidação dos dados e a geração de inteligência analítica corporativa em tempo real.
+Sim, o sistema possui banco de dados estruturado em uma arquitetura de persistência híbrida. Localmente nos terminais, utiliza-se o SQLite e na nuvem, é utilizado o Google Firebase Firestore (banco SQL orientado a documentos) para a consolidação dos dados e a geração de inteligência analítica corporativa em tempo real.
 
 ### 1.7 MIGRAÇÃO DE DADOS
 Será necessária a migração de informações. Uma vez que o pátio logístico da montadora ainda depende de preenchimentos manuais em fichas e formulários de papel, será fundamental realizar a migração inicial do histórico de fornecedores já autorizados, bem como configurar os índices e fatores normativos de emissão do GHG Protocol diretamente no banco de dados Firestore antes do início da operação.
