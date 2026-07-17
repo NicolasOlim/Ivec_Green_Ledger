@@ -639,7 +639,7 @@ Este módulo centraliza a inteligência ecológica da aplicação através de um
 
 
 <div class="logo-container" align="center">
-    <img src="imagens/bussiness model canvas.png" alt="Logo Iveco Green Ledger" class="logo-img">
+    <img src="imagens/Canvas.png" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 
 ---
