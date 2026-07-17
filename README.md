@@ -737,63 +737,43 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 
 ### **Diagrama de Caso de Uso do Login Perfil de Operador**
 
-<img src="imagens/FORNECEDORES DIAGRMA.png" alt="Logo Iveco Green Ledger" width="850">
+<img src="imagens/diagramaperfildooperador.png" alt="Logo Iveco Green Ledger" width="850">
 
 ---
 
-### **Peças e Componentes (caso de uso)**
+### **Diagrama de Caso de Uso Das Peças e Componentes**
 
-<img src="imagens/PEÇAS E COMPONENTES.png" alt="Logo Iveco Green Ledger" width="850">
+<img src="imagens/diagramadoescopodosistema.png" alt="Logo Iveco Green Ledger" width="850">
+
+---
+
+### **Diagrama de Caso de Uso do Sistema**
+
+<img src="imagens/casodeusodosistema.png" alt="Logo Iveco Green Ledger" width="850">
 
 ---
 
 ### **Diagrama de fluxo do Calculo da Pegada de Carbono**
 
-<img src="imagens/Diagrama de Fluxo do Calculo da Pegada de carbono.png" alt="Logo Iveco Green Ledger" width="850">
+<img src="imagens/diagramadefluxocálculo.png" alt="Logo Iveco Green Ledger" width="850">
 
 ---
-
-### **Diagrama de fluxo do Registro das Peças**
-
-<img src="imagens/Diagrama de Fluxo Registro das peças.png" alt="Logo Iveco Green Ledger" width="850">
-
----
-
-### **Diagrama de Caso de Uso Admin**
-
-<img src="imagens/Caso de Uso Admin.png" alt="Logo Iveco Green Ledger" width="850">
-
-
----
-### **Diagrama de Caso de Uso Operador**
-
-<img src="imagens/Caso de Uso Operador.png" alt="Logo Iveco Green Ledger" width="850">
-
-
----
-### **Diagrama de Caso de Uso Sistema**
-
-<img src="imagens/Caso de Uso Sistema.png" alt="Logo Iveco Green Ledger" width="850">
-
-
----
-
-### **Diagrama de Dominio (MVVM)**
-
-<img src="imagens/Diagrama de Dominio (MVVM).png" alt="Logo Iveco Green Ledger" width="750">
-
----
-
 
 ### **Diagrama sequencial do Login**
 
-<img src="imagens/Diagrama Sequencial.png" alt="Logo Iveco Green Ledger" width="750">
+<img src="imagens/diagramdesequencialogin.png" alt="Logo Iveco Green Ledger" width="750">
 
 ---
 
 ### **Diagrama sequencial do Fornecedor**
 
-<img src="imagens/Diagrama de Fluxo de Validaçao de Fornecedor.png" alt="Logo Iveco Green Ledger" width="750">
+<img src="imagens/diagramadesequenciafornecedor.png" alt="Logo Iveco Green Ledger" width="750">
+
+---
+
+### **Diagrama de Dominio (MVVM)**
+
+<img src="imagens/diagramadedomínio.png" alt="Logo Iveco Green Ledger" width="750">
 
 ---
 
