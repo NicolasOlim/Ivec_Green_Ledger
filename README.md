@@ -360,13 +360,13 @@ Ivec_Green_Ledger/
 
 ### **Modelo físico do sistema**
 
-<img src="imagens/MODELOFISICODOSISTEMA.jpeg" alt="Logo Iveco Green Ledger" width="750">
+<img src="imagens/modelofisicodosistema.png" alt="Logo Iveco Green Ledger" width="750">
 
 ---
 
 ### **Modelo lógico do sistema**
 
-<img src="imagens/Visao_geral.png" alt="Logo Iveco Green Ledger" width="750">
+<img src="imagens/modelologicodosistema.png" alt="Logo Iveco Green Ledger" width="750">
 
 ---
 
