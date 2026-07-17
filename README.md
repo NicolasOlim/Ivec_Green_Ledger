@@ -722,16 +722,16 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 ## Diagramas
 </div>
 
-### **Diagrama Analises ESG (Caso de uso)**
+### **Diagrama de Caso de uso sobre Analises ESG**
 
 <img src="imagens/ANALISESESG DIAGRAMA.png" alt="Logo Iveco Green Ledger" width="850">
 
 ---
 
 
-### **Diagrama do login (Caso de uso)**
+### **Diagrama de Caso de Uso do Login**
 
-<img src="imagens/DIAGRAMA DE FLUXO DO LOGIN.png" alt="Logo Iveco Green Ledger" width="850">
+<img src="imagens/diagramadecasodeusodologin.png" alt="Logo Iveco Green Ledger" width="850">
 
 ---
 
