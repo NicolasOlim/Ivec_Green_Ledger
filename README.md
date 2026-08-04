@@ -86,13 +86,19 @@ O desenvolvimento do sistema foi realizado em etapas bem organizadas, divididas 
 
  Este capítulo descreve o contexto organizacional que motivou o desenvolvimento da Green Ledger, os atores envolvidos e as regras de negócio que orientaram a modelagem do sistema. 
 
+---
+
 ### Contexto organizacional:
  Para sanar os gargalos operacionais e ambientais identificados na planta da Iveco, o sistema foi estruturado a partir de uma arquitetura de serviços desacoplados com armazenamento balanceado entre a rede local e a nuvem. O ciclo de vida da informação inicia-se com o mapeamento físico dos insumos que chegam à fábrica e com a validação das características técnicas dos veículos de transporte. Previamente, o analista de governança socioambiental configura no sistema os índices oficiais de emissão do GHG Protocol e homologa a lista de fornecedores autorizados na base de dados centralizada.
+
+---
 
 ### Atores do sistema: 
 
 ### *Empresa IVECO*
 A Iveco atua como o ator institucional e gestor central da plataforma. Suas responsabilidades concentram-se na parametrização dos índices oficiais de emissão de gases poluentes baseados no GHG Protocol e na homologação inicial de fornecedores autorizados. A organização utiliza o ecossistema como uma ferramenta de auditoria climática automatizada, consolidando os relatórios de pegada ecológica gerados no chão de fábrica para prestar contas a órgãos reguladores e auditorias externas de governança ESG.
+
+---
 
 ### *Usuário do sistema*
  Este ator compreende os profissionais internos que interagem diretamente com a interface do software para gerenciar o fluxo logístico e ambiental. Suas atribuições e responsabilidades no ecossistema envolvem:
@@ -107,6 +113,8 @@ A Iveco atua como o ator institucional e gestor central da plataforma. Suas resp
 
 - Análise de Indicadores Ambientais
 
+---
+
 ### *Administrador*
  Este ator representa o perfil de nível gerencial e de governança técnica com privilégios totais de controle sobre o ecossistema. Suas responsabilidades e ações práticas na plataforma englobam: 
 
@@ -116,6 +124,8 @@ A Iveco atua como o ator institucional e gestor central da plataforma. Suas resp
 
 - Auditoria de Conformidade e Gestão de Logs
 
+---
+
 ### *Sistema green ledger*
 - Controle de Cubagem e Gestão de Inventário
 
@@ -124,6 +134,8 @@ A Iveco atua como o ator institucional e gestor central da plataforma. Suas resp
 - Validação Automatizada de Fornecedores e Chassis
 
 - Emissão de Relatórios
+
+---
 
 ### Regra de negócio: 
 1. Um lote de matéria-prima pertence obrigatoriamente a um fornecedor;
@@ -149,12 +161,16 @@ A Iveco atua como o ator institucional e gestor central da plataforma. Suas resp
 
 Este capítulo apresenta os três níveis de modelagem do banco de dados do sistema Green Ledger: conceitual, lógico e físico, conforme as metodologias de modelagem relacional adotadas no curso. 
 
+---
+
 ### **Modelo Conceitual (DER) :**
 
  <img src="Banco de Dados/MODELO CONCEITUAL DO BANCO.jpg" alt="Logo Iveco Green Ledger" width="750">
 
 
 O modelo conceitual representa as entidades do domínio e seus relacionamentos em nível de abstração, sem preocupação com tipos de dados ou chaves de implementação. A modelagem segue a notação do BRModelo, utilizando Diagrama Entidade- Relacionamento (DER). 
+
+---
 
 ### **Entidades e Atributos:**
 
@@ -167,7 +183,6 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 | **senhaHash** | Atributo | Senha criptografada para acesso |
 | **perfil** | Atributo | Permissão para acesso ao sistema |
 
-
 ---
 
 #### Fornecedor
@@ -177,7 +192,6 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 | **cnpj** | Atributo | CNPJ do fornecedor |
 | **razaoSocial** | Atributo | Razão Social ou nome empresarial |
 | **status** | Atributo | Estado lógico do fornecedor no sistema |
-
 
 ---
 
@@ -190,7 +204,6 @@ O modelo conceitual representa as entidades do domínio e seus relacionamentos e
 | **quantidadeKg** | Atributo | Massa total do lote em Kg |
 | **pegadaCarbonoPorKg** | Atributo | Fator de emissão de carbono po Kg |
 | **dataProducao** | Atributo | Data e hora em que o lote foi produzido |
-
 
 ---
 
@@ -248,7 +261,6 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 
 ---
 
-
 #### Fornecedor
 | Coluna | Chave/relacionamento | Tipo | Descrição |
 | :--- | :--- | :--- |  :--- |
@@ -257,7 +269,6 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 | **razaosocial** | - | TEXT | Nome empresarial |
 | **status** | - | TEXT | Estado do cadastro |
 | **perfil** | - | TEXT | Nivel de permissão |
-
 
 ---
 
@@ -268,7 +279,6 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 | **modelo** | - | TEXT | Modelo do veículo comercial |
 | **marca** | - | TEXT | Fabricante do automóvel |
 | **dataMontagem** | - | DATETIME | Data e hora de entrada para a montagem |
-
 
 ---
 
@@ -281,7 +291,6 @@ O modelo lógico do ecossistema converte as entidades conceituais em estruturas 
 | **nomeComponente** | - | REAL | Nome da peça em quilogramas |
 | **pesoKg** | - | REAL | Peso de peça em quilogramas |
 | **totalCO2Calculado** | - | - | Total de carbono calculado para essa peça |
-
 
 ---
 
@@ -309,7 +318,6 @@ O ecossistema Iveco Green Ledger foi projetado sob uma arquitetura de serviços 
 
 ---
 
-
 | ID | Caso de Uso | Ator Principal | Descrição Operacional |
 | :--- | :--- | :--- | :--- |
 | **UC01** | Efetuar Autenticação (Login) | Administrador / Operador | Realiza a validação das credenciais do usuário comparando o hash da senha no banco de dados. |
@@ -329,9 +337,13 @@ O ecossistema Iveco Green Ledger foi projetado sob uma arquitetura de serviços 
 
 O cliente desktop segue rigorosamente o padrão MVVM (Model-View-ViewModel), complementado por uma camada de serviços, estabelecendo quatro divisões claras de responsabilidade:
 
+---
+
 ### **Base ViewModel e INotifyPropertyChanged:**
 
 A BaseViewModel atua como a classe mãe de todas as ViewModels do projeto, centralizando a lógica de comunicação reativa com a interface. Sua principal função é herdar e implementar a interface INotifyPropertyChanged, expondo o evento PropertyChanged. Através de um método auxiliar (geralmente chamado OnPropertyChanged ou RaisePropertyChanged), ela dispara um alerta para a View sempre que o valor de uma propriedade do Model ou do estado interno é alterado pelo operador ou por um processo assíncrono. Isso ativa o mecanismo de Data Binding bidirecional do WPF, garantindo que as telas atualizem seus elementos gráficos em tempo real de forma automática, mantendo o código totalmente limpo e livre de acoplamento visual.
+
+---
 
 ### **Relay Command:**
 
@@ -364,6 +376,7 @@ Ivec_Green_Ledger/
 ├── Ivec_Green_Ledger.sln      # Solução .NET unificada
 └── README.md                  # Este arquivo
 ```
+---
 
 ### **Modelo físico do sistema**
 
@@ -376,8 +389,6 @@ Ivec_Green_Ledger/
 <img src="imagens/modelologicodosistema.png" alt="Logo Iveco Green Ledger" width="750">
 
 ---
-
-
 
 <div align="center">
 
@@ -403,6 +414,8 @@ A API REST da aplicação é desenvolvida sobre a plataforma ASP.NET Core e expo
 | **POST** | /api/veiculo-componente | Associa componentes/lotes a um veículo, processa o cálculo final do GHG Protocol e consolida o registro no Firebase | 
 
 </div>
+
+---
 
 ### **Fluxo Detalhado:**
 
@@ -451,6 +464,8 @@ Complementarmente, o sistema impõe o redirecionamento mandatório de HTTPS, int
 
 A análise de viabilidade técnica avalia se o sistema Iveco Green Ledger pode ser desenvolvido, implantado e mantido com os recursos tecnológicos selecionados, considerando o contexto de desenvolvimento da solução .NET unificada e a realidade operacional do chão de fábrica e do pátio logístico a que se destina.
 
+---
+
 ### **Infraestruturas e Tecnologias:**
 
 Todas as tecnologias adotadas no Iveco Green Ledger são gratuitas, de ampla adoção no mercado e possuem documentação extensiva, eliminando barreiras de aprendizado, dependências proprietárias de alto custo e taxas de licenciamento comercial. A tabela a seguir resume a disponibilidade, o tipo de licença e a maturidade de cada componente:
@@ -471,6 +486,8 @@ Todas as tecnologias adotadas no Iveco Green Ledger são gratuitas, de ampla ado
 
 </div>
 
+---
+
 ### *Requisitos Mínimos de Hardware:*
 
 Para execução do sistema em ambiente de produção, os  requisitos mínimos recomendados são: 
@@ -481,6 +498,8 @@ Para execução do sistema em ambiente de produção, os  requisitos mínimos re
 - **Sistema Operacional:** Windows 10 ou Windows 11(64 - bits);
 - **Conexão com a internet:** Para o funcionamento das integrações em nuvem.
 
+---
+
 ### *Requisitos Mínimos de Software:*
 
 Para execução do sistema em ambiente de produção, os  requisitos mínimos recomendados são: 
@@ -490,6 +509,8 @@ Para execução do sistema em ambiente de produção, os  requisitos mínimos re
 - **Navegador WEB:**  500MB de espaço em disco disponível;
 - **Sistema Operacional:** Windows 10 ou Windows 11(64 - bits);
 - **Conexão com a internet:** Para o funcionamento das integrações em nuvem.
+
+---
 
 ### Riscos Técnicos e Mistigações:
 
@@ -503,6 +524,8 @@ Para execução do sistema em ambiente de produção, os  requisitos mínimos re
 | Incompatibilidade ou quebra de contrato em atualizações das API’s | Baixa | Médio | Criação de contratos de integração isolados por meio de interfaces (Services/Interface/) na ApiIveco, permitindo a substituição do provedor de dados de chassi ou CNPJ com impacto zero no cliente WPF |
 
 </div>
+
+---
 
 ### Escalabilidade:
 
@@ -532,15 +555,21 @@ A arquitetura adotada para o Iveco Green Ledger foi projetada estrategicamente p
 
 </div>
 
+---
+
 ### *C# E.NET:*
 
 A linguagem C# oferece tipagem estática, suporte nativo a programação assíncrona (async/await) e o ecossistema .NET 8, que viabiliza tanto o desenvolvimento desktop industrial (WPF) quanto o desenvolvimento de APIs web de alta performance (ASP.NET Core) dentro de uma mesma solução unificada. A escolha por uma única linguagem para o front-end de pátio e o back-end em nuvem reduz drasticamente a curva de aprendizado, elimina barreiras de integração e facilita o compartilhamento direto das entidades de domínio (como os modelos de dados de veículos, lotes de matéria-prima e rastreamento),acelerando o ciclo de entrega.
+
+---
 
 ### *WPF e MVVM:*
 
 O WPF combinado com o padrão arquitetural MVVM estabelece uma separação rígida e clara entre a interface gráfica com o usuário (UI) e a lógica de apresentação do sistema. No terminal de pátio industrial da solução, as telas em XAML (Views) são completamente desacopladas das regras de negócio. Essa comunicação ocorre de forma reativa e assíncrona por meio de mecanismos nativos de Data Binding e do disparo de comandos (Commands), que interagem diretamente com a ViewModel.
 
 A ViewModel, por sua vez, atua como o cérebro da interface: ela consome os serviços locais (como o banco de contingência SQLite) e os endpoints da ApiIveco, expõe propriedades observáveis que notificam a tela sobre mudanças de estado e atualiza os dados operacionais em tempo real para o operador, garantindo uma aplicação robusta, altamente testável e de fácil manutenção.
+
+---
 
 ### *ASP .NET Core Web API:*
 
@@ -550,21 +579,29 @@ A API é estruturada rigidamente sob o padrão de separação entre controladore
 
 Ao centralizar o consumo dos serviços externos da BrasilAPI, API da NHTSA e API de rastreamento do Mercado Livre, a ASP.NET Core Web API blinda a aplicação cliente de pátio contra instabilidades externas, padroniza as respostas de dados e garante a consolidação íntegra de todos os registros históricos no banco de dados em nuvem Firebase Firestore.
 
+---
+
 ### *Firebase firestore:*
 
 O Firebase Firestore constitui a camada principal de persistência global e consolidação de dados em nuvem do ecossistema. Estruturado como um banco de dados NoSQL orientado a documentos, ele organiza as informações críticas do sistema, como o histórico de auditoria de chassis (VIN), o cadastro de fornecedores e os registros logísticos de rastreamento do Mercado Livre, em coleções flexíveis de alta escalabilidade.
 
 A escolha pelo Firestore elimina a complexidade de gerenciamento de infraestrutura física de servidores de banco de dados, oferecendo sincronização assíncrona, altíssima disponibilidade e mecanismos nativos de segurança baseados em regras de acesso. Ao receber as requisições tratadas e validadas pela ApiIveco, o Firestore consolida de forma definitiva os cálculos de emissões de carbono em conformidade com o GHG Protocol, servindo como uma fonte única da verdade para a geração de relatórios ecológicos e auditorias corporativas.
 
+---
+
 ### *BrasilAPI:*
 
 A escolha pela BrasilAPI garante uma infraestrutura de altíssima disponibilidade, sem custos de licenciamento ou limites restritivos de uso que inviabilizariam a operação. Ao centralizar essa validação no back-end, o sistema assegura que apenas cadastros íntegros, atualizados e em conformidade fiscal e jurídica sejam consolidados no banco de dados em nuvem, otimizando o fluxo de triagem no pátio industrial e blindando o cliente desktop de oscilações ou complexidades de integração direta com órgãos governamentais.
+
+---
 
 ### *NHTSA responsive:*
 
 A API da NHTSA (National Highway Traffic Safety Administration) é o serviço internacional de utilidade pública integrado ao ecossistema do projeto para a validação e decodificação técnica automatizada de veículos. Consumida de forma assíncrona pela ApiIveco por meio do protocolo HTTPS, ela atua como uma barreira de segurança e conformidade na triagem de entrada do pátio logístico.
 
 A API da NHTSA é o serviço internacional de utilidade pública integrado ao ecossistema do projeto para a validação e decodificação técnica automatizada de veículos. Consumida de forma assíncrona pela ApiIveco por meio do protocolo HTTPS, ela atua como uma barreira de segurança e conformidade na triagem de entrada do pátio logístico.
+
+---
 
 ### *API Mercado livre:*
 
@@ -587,21 +624,29 @@ No ambiente de chão de fábrica, essa divisão estrutural reduz de forma signif
 
 Iveco Green Ledger é organizado em módulos funcionais isolados através do padrão MVVM, cada um com escopo operacional e status de desenvolvimento bem definidos. A tabela abaixo apresenta o panorama atual da solução:
 
+---
+
 ### *Módulo: Cadastro de veículos*
 
 <img src="imagens/rastreabilidade.png" alt="Logo Iveco Green Ledger" width="750">
 
 Este é o módulo principal de controle de acesso e conformidade do pátio industrial. Ele permite o registro e a auditoria instantânea de veículos na recepção através de uma triagem automatizada: o CNPJ do fornecedor é validado nas bases federais pela BrasilAPI e o número de chassi (VIN) é decodificado tecnicamente via API da NHTSA. O módulo previne erros humanos de digitação e garante que apenas cadastros 100% íntegros sigam para o fluxo de pesagem e cálculo de carbono.
 
+---
+
 ### *Módulo: Sincronização em nuvem*
 
 Este módulo atua de forma invisível nos bastidores como o motor de persistência global da solução. Ele gerencia as chamadas feitas pela ApiIveco ao Firebase Firestore, garantindo que as coleções NoSQL de documentos estruturados sejam atualizadas de forma escalável e com alta disponibilidade. Ele consolida de maneira definitiva o histórico de auditorias e relatórios ambientais, servindo como a fonte centralizada da verdade de todo o ecossistema.
+
+---
 
 ### *Módulo: Relatorio*
 
 <img src="imagens/centralrelatorios.png" alt="Logo Iveco Green Ledger" width="750">
 
 Este módulo consolida de forma analítica todos os dados históricos processados pelo sistema. Ele permite aos gestores e auditores extrair relatórios ambientais completos e balanços consolidados das emissões de carbono geradas pela frota e pela cadeia de suprimentos. As informações, estruturadas sob os parâmetros do GHG Protocol, são recuperadas diretamente do Firebase Firestore através da ApiIveco e apresentadas prontas para exportação corporativa, garantindo transparência e conformidade jurídica para fins de auditoria interna e externa.
+
+---
 
 ### **Módulo: Dashboard**
 
@@ -657,6 +702,8 @@ Este módulo centraliza a inteligência ecológica da aplicação através de um
 </div>
 
 A viabilidade econômica do projeto se consolida pela expressiva redução de custos operacionais e pelo ganho de eficiência logística no pátio industrial da Iveco. Ao automatizar a triagem de veículos com as APIs da NHTSA e BrasilAPI, o sistema elimina os custos decorrentes de erros humanos de digitação, fraudes cadastrais e o tempo ocioso de caminhões em filas de espera. Além disso, a adoção de uma arquitetura Open-Source baseada em .NET 8 e SQLite, combinada à infraestrutura sob demanda e altamente escalável do Firebase Firestore, minimiza o investimento inicial em servidores físicos e licenças de software proprietárias. Sob a ótica estratégica, o motor de cálculo alinhado ao GHG Protocol posiciona a companhia em estrita conformidade com as exigências globais de ESG, mitigando riscos de sanções ambientais e abrindo portas para incentivos fiscais e captação de fundos verdes, o que garante um retorno sobre o investimento.
+
+---
 
 ### **Custos de Desenvolvimento**
 
@@ -734,7 +781,6 @@ Os requisitos funcionais descrevem as ações, facilidades e comportamentos que 
 <img src="imagens/ANALISESESG DIAGRAMA.png" alt="Logo Iveco Green Ledger" width="850">
 
 ---
-
 
 ### **Diagrama de Caso de Uso do Login Perfil de Admin**
 
@@ -817,10 +863,14 @@ O sistema opera sob o modelo de validação em barreira, o que significa que nen
 
 - **Homologação Cadastral e Fiscal:** Para mitigar riscos fiscais na cadeia de suprimentos, o CNPJ da transportadora associada à carga é submetido à BrasilAPI. Se o cadastro retornar com situação inválida ou inexistente perante os órgãos reguladores, o sistema impede a finalização do registro de entrada, exigindo intervenção ou liberação manual por parte de um supervisor de logística.
 
+---
+
  **2-) Motor de Cálculo Ambiental:** 
 A grande inteligência ecológica do projeto reside na automatização do inventário de emissões de Gases de Efeito Estufa (GEE), focando especificamente nas emissões indiretas da cadeia de valor (Escopo 3).
 
 - **Cálculo Baseado em Distância e Combustível:** Os fatores de emissão variam dinamicamente se o caminhão utiliza Diesel S10, Diesel S500 ou Gás Natural Veicular (GNV). O ano do modelo (extraído no fluxo da NHTSA) aplica um fator de degradação e eficiência, tornando o cálculo altamente preciso e auditável.
+
+---
 
  **3-) Algoritmo de Monitoramento:** 
 A marcha lenta de veículos pesados dentro das dependências da fábrica representa um dos maiores gargalos ocultos de sustentabilidade e custo. O Iveco Green Ledger implementa uma regra de negócio severa para combater esse cenário:
@@ -828,6 +878,8 @@ A marcha lenta de veículos pesados dentro das dependências da fábrica represe
 - **Contabilização do Tempo de Pátio:** O sistema registra o timestamp (carimbo de data/hora) exato no momento em que a portaria autoriza a entrada do veículo e quando a balança/doca registra a pesagem ou descarga.
 
 - **Métrica de Desperdício:** Com base no delta de tempo em minutos gasto pelo caminhão trafegando ou esperando em fila com o motor ligado no pátio, o algoritmo calcula o desperdício de combustível presumido (sabendo que um motor pesado consome em média de 2 a 3,5 litros de óleo diesel por hora em marcha lenta). O sistema projeta instantaneamente a quantidade de $CO_2$ liberada desnecessariamente na atmosfera naquele intervalo, gerando alertas no painel do Analista de ESG caso o tempo de pátio ultrapasse a meta operacional estipulada de 15 minutos.
+
+---
 
 **4-) Regra de Persistência Resiliência:** 
 Visando a alta disponibilidade do chão de fábrica, a lógica de armazenamento foi arquitetada para ser tolerante a falhas completas de infraestrutura de rede:
