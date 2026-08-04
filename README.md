@@ -24,7 +24,7 @@ O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclu
 - [Mini Mundo Da Demanda](#mini-mundo-da-demanda)
 - [Modelagem Do Banco De Dados](#modelagem-do-banco-de-dados)
 - [Arquitetura e Modelagem Do Sistema](#arquitetura-e-modelagem-do-sistema)
-- [API REST - Endpoints e Integração](#api-rest-endpoints-e-integracão)
+- [API REST - Endpoints e Integração](#api-rest---endpoints-e-integração)
 - [Viabilidade Técnica](#viabilidade-técnica)
 - [Arquitetura do Projeto MVVM](#arquitetura-do-projeto-MVVM)
 - [Processo de Desenvolvimento](#processo-de-desenvolvimento)
