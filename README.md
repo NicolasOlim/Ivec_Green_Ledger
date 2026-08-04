@@ -419,27 +419,27 @@ A API REST da aplicação é desenvolvida sobre a plataforma ASP.NET Core e expo
 
 ### **Fluxo Detalhado:**
 
-1-) O operador digita o chassi do veículo na interface gráfica e aciona a opção para validar o código VIN.
+**1-)** O operador digita o chassi do veículo na interface gráfica e aciona a opção para validar o código VIN.
 
-2-) Esta ação dispara imediatamente a execução do componente lógico ValidarVinCommand.
+**2-)** Esta ação dispara imediatamente a execução do componente lógico ValidarVinCommand.
 
-3-) O comando invoca o método assíncrono correspondente parametrizado dentro da camada de serviço ApiService.
+**3-)** O comando invoca o método assíncrono correspondente parametrizado dentro da camada de serviço ApiService.
 
-4-) A aplicação envia uma requisição HTTP do tipo POST contendo o código VIN estruturado em formato JSON para o endpoint.
+**4-)** A aplicação envia uma requisição HTTP do tipo POST contendo o código VIN estruturado em formato JSON para o endpoint.
 
-5-) A API do back-end intercepta a requisição e encaminha o chassi recebido para o seu módulo interno de processamento.
+**5-)** A API do back-end intercepta a requisição e encaminha o chassi recebido para o seu módulo interno de processamento.
 
-6-) A API constrói e dispara uma requisição HTTP segura direcionada aos servidores externos da NHTSA.
+**6-)** A API constrói e dispara uma requisição HTTP segura direcionada aos servidores externos da NHTSA.
 
-7-) A API da NHTSA processa a decodificação dos 17 caracteres alfanuméricos e retorna os metadados técnicos do chassi.
+**7-)** A API da NHTSA processa a decodificação dos 17 caracteres alfanuméricos e retorna os metadados técnicos do chassi.
 
-8-) A API do sistema valida a integridade desses dados retornados e realiza a persistência definitiva do novo veículo na base de dados em nuvem do Firebase Firestore.
+**8-)** A API do sistema valida a integridade desses dados retornados e realiza a persistência definitiva do novo veículo na base de dados em nuvem do Firebase Firestore.
 
-9-) O back-end responde à aplicação desktop transmitindo o status de sucesso acompanhado dos dados decodificados em formato JSON.
+**9-)** O back-end responde à aplicação desktop transmitindo o status de sucesso acompanhado dos dados decodificados em formato JSON.
 
-10-) O componente ApiService local na aplicação WPF captura o JSON enviado pelo servidor.
+**10-)** O componente ApiService local na aplicação WPF captura o JSON enviado pelo servidor.
 
-11-) A interface gráfica (View) reage instantaneamente através dos mecanismos de Data Binding e da interface INotifyPropertyChanged, exibindo os dados técnicos validados do veículo para o operador no chão de fábrica
+**11-)** A interface gráfica (View) reage instantaneamente através dos mecanismos de Data Binding e da interface INotifyPropertyChanged, exibindo os dados técnicos validados do veículo para o operador no chão de fábrica
 
 ---
 
@@ -854,7 +854,7 @@ A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na
 
 A camada de regras de negócio do ecossistema Iveco Green Ledger constitui o núcleo de inteligência da aplicação, sendo responsável por ditar o comportamento da ApiIveco e orientar as tomadas de decisão da interface cliente WpfIveco. Esta seção detalha as diretrizes operacionais, validações de pátio e o motor de cálculo ambiental que governam o projeto.
 
-**1-) Fluxo de Triagem e Orquestração Logística:** 
+## **1-) Fluxo de Triagem e Orquestração Logística:** 
 O sistema opera sob o modelo de validação em barreira, o que significa que nenhum veículo de transporte de carga tem sua entrada autorizada ou concluída no pátio logístico da Iveco sem passar por uma verificação multifacetada e automatizada. As regras que regem essa barreira consistem em:
 
 - **Automação do Vínculo de Ordem de Coleta:** O sistema intercepta o código identificador da viagem (via leitura de QR Code ou digitação de contingência). A aplicação dispara uma requisição assíncrona integrada ao microsserviço de rotas (baseado na API do Mercado Livre), verificando o status do trajeto. Caso a rota conste como "Cancelada" ou "Concluída", o fluxo de triagem é imediatamente interrompido por uma trava de negócio, notificando o operador de portaria.
@@ -865,14 +865,14 @@ O sistema opera sob o modelo de validação em barreira, o que significa que nen
 
 ---
 
- **2-) Motor de Cálculo Ambiental:** 
+ ## **2-) Motor de Cálculo Ambiental:** 
 A grande inteligência ecológica do projeto reside na automatização do inventário de emissões de Gases de Efeito Estufa (GEE), focando especificamente nas emissões indiretas da cadeia de valor (Escopo 3).
 
 - **Cálculo Baseado em Distância e Combustível:** Os fatores de emissão variam dinamicamente se o caminhão utiliza Diesel S10, Diesel S500 ou Gás Natural Veicular (GNV). O ano do modelo (extraído no fluxo da NHTSA) aplica um fator de degradação e eficiência, tornando o cálculo altamente preciso e auditável.
 
 ---
 
- **3-) Algoritmo de Monitoramento:** 
+ ## **3-) Algoritmo de Monitoramento:** 
 A marcha lenta de veículos pesados dentro das dependências da fábrica representa um dos maiores gargalos ocultos de sustentabilidade e custo. O Iveco Green Ledger implementa uma regra de negócio severa para combater esse cenário:
 
 - **Contabilização do Tempo de Pátio:** O sistema registra o timestamp (carimbo de data/hora) exato no momento em que a portaria autoriza a entrada do veículo e quando a balança/doca registra a pesagem ou descarga.
@@ -881,7 +881,7 @@ A marcha lenta de veículos pesados dentro das dependências da fábrica represe
 
 ---
 
-**4-) Regra de Persistência Resiliência:** 
+## **4-) Regra de Persistência Resiliência:** 
 Visando a alta disponibilidade do chão de fábrica, a lógica de armazenamento foi arquitetada para ser tolerante a falhas completas de infraestrutura de rede:
 
 - **Garantia de Operação:** Durante a execução do aplicativo desktop WpfIveco, o sistema testa periodicamente a conectividade com o backend na nuvem. Detectada qualquer oscilação ou queda na internet, o fluxo de triagem não é bloqueado. A regra de negócio instrui o sistema a persistir todos os registros de entrada, cálculos do GHG e validações em andamento no banco de dados embutido e local SQLite.
