@@ -1,21 +1,29 @@
-# 📦🍃 Iveco Green Ledger – Sistema de Rastreamento Inteligente  - Parte destinada sobre a migração e o banco de dados
+# 📦🍃 Iveco Green Ledger – Plano de Migração
 
  <div class="logo-container" align="center">
     <img src="imagens/imagemmigração.webp" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 
+## **1. Dados do Sistema**
 
-## PLANO DE MIGRAÇÃO
+Esta seção estabelece as informações fundamentais de identificação do software, contextualizando o escopo da aplicação e o ambiente de destino no processo de migração de dados da Iveco:
 
-## **1-) Dados do Sistema**
-
-| Parâmetro | Detalhe/especificação | 
+| Parâmetro | Detalhe / Valor | 
 | :--- | :--- | 
-| **Nome do Sistema:** | Iveco Green Ledger |   
-| **Versão da Aplicação** | 1.0.0(Release Candidate/Implantação Inicial) | 
-| **Finalidade Módulo** | Automação da Cubagem Volumétrica e Rastreabilidade Ambiental de Emissões (Escopo 3 - GHG Protocol) |
-| **Cliente Final** | IVECO(Portaria Logística e Gestão ESG) | 
-| **Ambiente de Destino** | Aplicação Desktop Local(WPF) + Persistência em Nuvem via Firebase | 
-| **Contexto Acadêmico** | Curso Técnico em Desenvolvimento de Sistemas - SENAI/Escola de Programação e Robótica | 
+| **Nome do Sistema** | Iveco Green Ledger |   
+| **Versão** | Release Operacional Base (.NET 8) | 
+| **Domínio de Aplicação** | Triagem logística de pátio, rastreabilidade de suprimentos e cálculo automatizado de pegada de carbono Escopo 3 (GHG Protocol) |
+| **Cliente Final** | IVECO (Portaria Logística e Gestão ESG) | 
+| **Ambiente Alvo da Migração** | Operações da fábrica e base de dados de fornecedores/clientes da Iveco | 
 
+---
 
+## **2. Banco Utilizado**
+### 2.1 Visão Geral da Arquitetura de Dados
+O sistema Iveco Green Ledger adota uma arquitetura de banco de dados híbrido, combinando persistência em nuvem (NoSQL) com armazenamento em borda. Essa abordagem foi projetada para atuar diretamente nas demandas críticas de ambientes industriais e pátios logísticos, garantindo alta disponibilidade, sincronização em tempo real, consistência de dados e resiliência a falhas de conectividade.
+
+### 2.2 Tecnologias Selecionadas e Justificativa
+
+**- Firebase Firestore**
+
+**- SQLITE**
