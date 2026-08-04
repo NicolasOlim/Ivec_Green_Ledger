@@ -811,30 +811,30 @@ A camada de regras de negócio do ecossistema Iveco Green Ledger constitui o nú
 **1-) Fluxo de Triagem e Orquestração Logística:** 
 O sistema opera sob o modelo de validação em barreira, o que significa que nenhum veículo de transporte de carga tem sua entrada autorizada ou concluída no pátio logístico da Iveco sem passar por uma verificação multifacetada e automatizada. As regras que regem essa barreira consistem em:
 
-- Automação do Vínculo de Ordem de Coleta: O sistema intercepta o código identificador da viagem (via leitura de QR Code ou digitação de contingência). A aplicação dispara uma requisição assíncrona integrada ao microsserviço de rotas (baseado na API do Mercado Livre), verificando o status do trajeto. Caso a rota conste como "Cancelada" ou "Concluída", o fluxo de triagem é imediatamente interrompido por uma trava de negócio, notificando o operador de portaria.
+- **Automação do Vínculo de Ordem de Coleta:** O sistema intercepta o código identificador da viagem (via leitura de QR Code ou digitação de contingência). A aplicação dispara uma requisição assíncrona integrada ao microsserviço de rotas (baseado na API do Mercado Livre), verificando o status do trajeto. Caso a rota conste como "Cancelada" ou "Concluída", o fluxo de triagem é imediatamente interrompido por uma trava de negócio, notificando o operador de portaria.
 
-- Decodificação Técnica de Frota (Mecanismo VIN): Ao capturar o chassi do caminhão, a API interna dispara uma consulta à API da NHTSA. O sistema valida se o chassi possui o padrão internacional de 17 caracteres. O retorno da API externa é processado para extrair o ano de fabricação, o modelo e a capacidade de carga do motor. Esses dados técnicos são injetados diretamente na memória do sistema e salvos no banco de dados NoSQL (Firebase Firestore), servindo de insumo indispensável para o cálculo posterior de pegada ecológica.
+- **Decodificação Técnica de Frota (Mecanismo VIN):** Ao capturar o chassi do caminhão, a API interna dispara uma consulta à API da NHTSA. O sistema valida se o chassi possui o padrão internacional de 17 caracteres. O retorno da API externa é processado para extrair o ano de fabricação, o modelo e a capacidade de carga do motor. Esses dados técnicos são injetados diretamente na memória do sistema e salvos no banco de dados NoSQL (Firebase Firestore), servindo de insumo indispensável para o cálculo posterior de pegada ecológica.
 
-- Homologação Cadastral e Fiscal: Para mitigar riscos fiscais na cadeia de suprimentos, o CNPJ da transportadora associada à carga é submetido à BrasilAPI. Se o cadastro retornar com situação inválida ou inexistente perante os órgãos reguladores, o sistema impede a finalização do registro de entrada, exigindo intervenção ou liberação manual por parte de um supervisor de logística.
+- **Homologação Cadastral e Fiscal:** Para mitigar riscos fiscais na cadeia de suprimentos, o CNPJ da transportadora associada à carga é submetido à BrasilAPI. Se o cadastro retornar com situação inválida ou inexistente perante os órgãos reguladores, o sistema impede a finalização do registro de entrada, exigindo intervenção ou liberação manual por parte de um supervisor de logística.
 
  **2-) Motor de Cálculo Ambiental:** 
 A grande inteligência ecológica do projeto reside na automatização do inventário de emissões de Gases de Efeito Estufa (GEE), focando especificamente nas emissões indiretas da cadeia de valor (Escopo 3).
 
-- Cálculo Baseado em Distância e Combustível: Os fatores de emissão variam dinamicamente se o caminhão utiliza Diesel S10, Diesel S500 ou Gás Natural Veicular (GNV). O ano do modelo (extraído no fluxo da NHTSA) aplica um fator de degradação e eficiência, tornando o cálculo altamente preciso e auditável.
+- **Cálculo Baseado em Distância e Combustível:** Os fatores de emissão variam dinamicamente se o caminhão utiliza Diesel S10, Diesel S500 ou Gás Natural Veicular (GNV). O ano do modelo (extraído no fluxo da NHTSA) aplica um fator de degradação e eficiência, tornando o cálculo altamente preciso e auditável.
 
  **3-) Algoritmo de Monitoramento:** 
 A marcha lenta de veículos pesados dentro das dependências da fábrica representa um dos maiores gargalos ocultos de sustentabilidade e custo. O Iveco Green Ledger implementa uma regra de negócio severa para combater esse cenário:
 
-- Contabilização do Tempo de Pátio: O sistema registra o timestamp (carimbo de data/hora) exato no momento em que a portaria autoriza a entrada do veículo e quando a balança/doca registra a pesagem ou descarga.
+- **Contabilização do Tempo de Pátio:** O sistema registra o timestamp (carimbo de data/hora) exato no momento em que a portaria autoriza a entrada do veículo e quando a balança/doca registra a pesagem ou descarga.
 
-- Métrica de Desperdício: Com base no delta de tempo em minutos gasto pelo caminhão trafegando ou esperando em fila com o motor ligado no pátio, o algoritmo calcula o desperdício de combustível presumido (sabendo que um motor pesado consome em média de 2 a 3,5 litros de óleo diesel por hora em marcha lenta). O sistema projeta instantaneamente a quantidade de $CO_2$ liberada desnecessariamente na atmosfera naquele intervalo, gerando alertas no painel do Analista de ESG caso o tempo de pátio ultrapasse a meta operacional estipulada de 15 minutos.
+- **Métrica de Desperdício:** Com base no delta de tempo em minutos gasto pelo caminhão trafegando ou esperando em fila com o motor ligado no pátio, o algoritmo calcula o desperdício de combustível presumido (sabendo que um motor pesado consome em média de 2 a 3,5 litros de óleo diesel por hora em marcha lenta). O sistema projeta instantaneamente a quantidade de $CO_2$ liberada desnecessariamente na atmosfera naquele intervalo, gerando alertas no painel do Analista de ESG caso o tempo de pátio ultrapasse a meta operacional estipulada de 15 minutos.
 
 **4-) Regra de Persistência Resiliência:** 
 Visando a alta disponibilidade do chão de fábrica, a lógica de armazenamento foi arquitetada para ser tolerante a falhas completas de infraestrutura de rede:
 
-- Garantia de Operação: Durante a execução do aplicativo desktop WpfIveco, o sistema testa periodicamente a conectividade com o backend na nuvem. Detectada qualquer oscilação ou queda na internet, o fluxo de triagem não é bloqueado. A regra de negócio instrui o sistema a persistir todos os registros de entrada, cálculos do GHG e validações em andamento no banco de dados embutido e local SQLite.
+- **Garantia de Operação:** Durante a execução do aplicativo desktop WpfIveco, o sistema testa periodicamente a conectividade com o backend na nuvem. Detectada qualquer oscilação ou queda na internet, o fluxo de triagem não é bloqueado. A regra de negócio instrui o sistema a persistir todos os registros de entrada, cálculos do GHG e validações em andamento no banco de dados embutido e local SQLite.
 
-- Sincronização Eventual em Lote: Assim que os serviços de rede detectam que a conexão com o Firebase Firestore foi restabelecida, uma rotina em segundo plano (background worker) é disparada de forma assíncrona. 
+- **Sincronização Eventual em Lote:** Assim que os serviços de rede detectam que a conexão com o Firebase Firestore foi restabelecida, uma rotina em segundo plano (background worker) é disparada de forma assíncrona. 
 Esse módulo realiza a varredura no banco local, extrai os dados gerados e resolve possíveis conflitos de concorrência de horários e faz o upload em lote para a nuvem, atualizando os dashboards gerenciais de forma transparente para o usuário final.
 
 ---
@@ -848,15 +848,17 @@ Será implantado no ecossistema Iveco Green Ledger, um software distribuído pro
 
 ### 1.2 Público-alvo e Cliente
 O cliente final é a montadora IVECO. A solução beneficiará diretamente:  
-- Nível Operacional: Colaboradores do pátio logístico (portaria e recepção de cargas). 
-- Nível Tático/Estratégico: Instâncias gerenciais, analistas de logística e governança socioambiental (ESG) da administração central.
+- **Nível Operacional:** Colaboradores do pátio logístico (portaria e recepção de cargas). 
+
+- **Nível Tático/Estratégico:** Instâncias gerenciais, analistas de logística e governança socioambiental (ESG) da administração central.
 
 ---
 
 ### 1.3 Ambiente de Instalação
 A arquitetura distribuída do sistema divide-se em duas frentes de implantação:  
-- Client (Frontend): A interface rica de usuário desenvolvida em WPF será instalada localmente nos computadores físicos das portarias de triagem. 
-- Server (Backend e Banco de Dados): A API REST baseada em ASP.NET Core e o banco de dados principal de consolidação residirão em ambiente de nuvem corporativa pública (Google Cloud Platform).
+- **Client (Frontend):** A interface rica de usuário desenvolvida em WPF será instalada localmente nos computadores físicos das portarias de triagem. 
+
+- **Server (Backend e Banco de Dados):** A API REST baseada em ASP.NET Core e o banco de dados principal de consolidação residirão em ambiente de nuvem corporativa pública (Google Cloud Platform).
 
 ---
 
@@ -888,9 +890,11 @@ O ecossistema utiliza o Google Firebase Firestore (banco SQL) hospedado em nuvem
 ---
 
 ### 1.7 Migração de Dados
-Será necessária a migração de informações do modelo analógico para o digital. Como o pátio logístico da montadora ainda depende de preenchimentos manuais em fichas e formulários de papel, as seguintes etapas de migração inicial são obrigatórias antes do início da operação:  
-1-) Histórico de Fornecedores: Higienização, tratamento e carga inicial da base de parceiros logísticos já homologados. 
-2-) Fatores de Emissão: Configuração prévia dos índices e fatores de cálculo do GHG Protocol diretamente no banco de dados Firestore para garantir a integridade do motor de cálculo.
+Será necessária a migração de informações do modelo analógico para o digital. Como o pátio logístico da montadora ainda depende de preenchimentos manuais em fichas e formulários de papel, as seguintes etapas de migração inicial são obrigatórias antes do início da operação:
+
+1-) **Histórico de Fornecedores:** Higienização, tratamento e carga inicial da base de parceiros logísticos já homologados. 
+
+2-) **Fatores de Emissão:** Configuração prévia dos índices e fatores de cálculo do GHG Protocol diretamente no banco de dados Firestore para garantir a integridade do motor de cálculo.
 
 ---
 
@@ -913,16 +917,19 @@ A implantação total do sistema estima-se em um período de 1 (uma) semana úti
 ### 1.10 Método de Avaliação
 A validação será executada mediante a submissão de dados reais de inventário e logística: 
 
-1-) Leitura de Chassi (VIN): O operador realizará a leitura de um VIN autêntico para atestar o funcionamento do processo de decodificação automatizado junto à API externa da NHTSA. 
-2-) Homologação do Fornecedor: Informará um CNPJ ativo para validar a consulta e retorno de dados cadastrais via BrasilAPI. 
-3-) Cálculo de Emissões: O motor de cálculo processará os dados e o usuário confirmará se as informações de CO₂ correspondentes foram submetidas aos dashboards na nuvem de forma correta.
+1-) **Leitura de Chassi (VIN):** O operador realizará a leitura de um VIN autêntico para atestar o funcionamento do processo de decodificação automatizado junto à API externa da NHTSA. 
+
+2-) **Homologação do Fornecedor:** Informará um CNPJ ativo para validar a consulta e retorno de dados cadastrais via BrasilAPI. 
+
+3-) **Cálculo de Emissões:** O motor de cálculo processará os dados e o usuário confirmará se as informações de CO₂ correspondentes foram submetidas aos dashboards na nuvem de forma correta.
 
 ---
 
 ### 1.11 Gestão de Problemas Durante a Instalação
 O plano de mitigação foca na estabilidade da conexão e na redundância física: 
-- Falha de Conectividade: Por depender de serviços externos e APIs de validação em tempo real (NHTSA e BrasilAPI), o sistema exige conexão ativa. Em caso de queda de link, o fluxo de triagem deve ser direcionadotemporariamente para o registro manual de contingência da portaria para evitar filas.
-- Falha de Hardware: Em caso de queima ou travamento de computadores na portaria, o plano prevê a substituição física imediata do terminal por uma máquina sobressalente já configurada com o ambiente de execução do sistema.
+- **Falha de Conectividade:** Por depender de serviços externos e APIs de validação em tempo real (NHTSA e BrasilAPI), o sistema exige conexão ativa. Em caso de queda de link, o fluxo de triagem deve ser direcionado temporariamente para o registro manual de contingência da portaria para evitar filas.
+
+- **Falha de Hardware:** Em caso de queima ou travamento de computadores na portaria, o plano prevê a substituição física imediata do terminal por uma máquina sobressalente já configurada com o ambiente de execução do sistema.
 
 ---
 
@@ -955,16 +962,20 @@ Para viabilizar a arquitetura híbrida projetada para o Iveco Green Ledger, a in
 
 ## 4-) Plano de Validação do Sistema
 A etapa de homologação e validação final deve atestar de maneira prática o funcionamento pleno dos três pilares fundamentais do sistema: 
-1. Segurança e Autenticação: Verificar se o acesso ao painel principal está devidamente restrito aos usuários cadastrados e se o controle de perfis (Administrador/Operador) obedece estritamente à hierarquia e níveis de acesso configurados. 
-2. Eficiência e Confiabilidade na Triagem: Atestar que, ao se introduzir o documento de carga (CNPJ) e o chassi do veículo de transporte (VIN), a plataforma os decodifica e os valida contra as bases governamentais e internacionais de forma rápida e sem qualquer tipo de gargalo operacional. 
-3. Consistência e Atualização Automática: Garantir que os Dashboards renderizados pela aplicação reflitam em tempo real as métricas de emissão de carbono. 
+1. **Segurança e Autenticação:** Verificar se o acesso ao painel principal está devidamente restrito aos usuários cadastrados e se o controle de perfis (Administrador/Operador) obedece estritamente à hierarquia e níveis de acesso configurados. 
+
+2. **Eficiência e Confiabilidade na Triagem:** Atestar que, ao se introduzir o documento de carga (CNPJ) e o chassi do veículo de transporte (VIN), a plataforma os decodifica e os valida contra as bases governamentais e internacionais de forma rápida e sem qualquer tipo de gargalo operacional. 
+
+3. **Consistência e Atualização Automática:** Garantir que os Dashboards renderizados pela aplicação reflitam em tempo real as métricas de emissão de carbono. 
 
 ---
 
 ## 5-) Plano de Contingência
 Tendo em vista a natureza do fluxo logístico contínuo da montadora, o plano de contingência prescreve as seguintes medidas: 
-- Indisponibilidade de Rede ou Serviços Externos: Caso ocorra perda de conexão com a internet ou instabilidade nas APIs externas de validação (NHTSA/BrasilAPI), a aplicação exibirá um alerta de timeout. O operador de triagem deverá utilizar o protocolo alternativo da empresa (fichas manuais ou planilhas locais) até o restabelecimento dos serviços de rede, garantindo que o fluxo de caminhões não seja interrompido.
-- Pane de Equipamento Físico: Na eventualidade de falha crítica nos computadores da portaria, a equipe retornará provisoriamente aos processos manuais de registro até que o suporte de TI efetue a substituição física da máquina ou o reestabelecimento do terminal. 
+
+- **Indisponibilidade de Rede ou Serviços Externos:** Caso ocorra perda de conexão com a internet ou instabilidade nas APIs externas de validação (NHTSA/BrasilAPI), a aplicação exibirá um alerta de timeout. O operador de triagem deverá utilizar o protocolo alternativo da empresa (fichas manuais ou planilhas locais) até o restabelecimento dos serviços de rede, garantindo que o fluxo de caminhões não seja interrompido.
+ 
+- **Pane de Equipamento Físico:** Na eventualidade de falha crítica nos computadores da portaria, a equipe retornará provisoriamente aos processos manuais de registro até que o suporte de TI efetue a substituição física da máquina ou o reestabelecimento do terminal. 
 
 ---
 
