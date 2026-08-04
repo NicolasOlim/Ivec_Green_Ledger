@@ -8,14 +8,13 @@
 
 Esta seção estabelece as informações fundamentais de identificação do software, contextualizando o escopo da aplicação e o ambiente de destino no processo de migração de dados da Iveco:
 
-| Parâmetro | Detalhe / Valor | 
-| :--- | :--- | 
-| **Nome do Sistema** | Iveco Green Ledger |   
-| **Versão** | Release Operacional Base (.NET 8) | 
+| Parâmetro | Detalhe / Valor |
+| :--- | :--- |
+| **Nome do Sistema** | Iveco Green Ledger |
+| **Versão** | Release Operacional Base (.NET 8) |
 | **Domínio de Aplicação** | Triagem logística de pátio, rastreabilidade de suprimentos e cálculo automatizado de pegada de carbono Escopo 3 (GHG Protocol) |
-| **Cliente Final** | IVECO (Portaria Logística e Gestão ESG) | 
-| **Ambiente Alvo da Migração** | Operações da fábrica e base de dados de fornecedores/clientes da Iveco | 
-
+| **Cliente Final** | IVECO (Portaria Logística e Gestão ESG) |
+| **Ambiente Alvo da Migração** | Operações da fábrica e base de dados de fornecedores/clientes da Iveco |
 ---
 
 ## **2. Banco Utilizado**
@@ -46,10 +45,10 @@ Estruturamos em uma arquitetura em camadas, dividindo com clareza as responsabil
 
 - **Componentes do Sistema:**
 
-| Componente | Função | Responsabilidades | Integração / Comunicação | 
-| :--- | :--- |  :--- |  :--- | 
-| **Aplicação Desktop: (WPF / .NET8)** | Interface do operador para uso nas estações de trabalho do pátio logístico e portaria | Realizar a triagem de insumos, leitura de dados, consulta de chassis/VINs e envio de solicitações para a API | Conecta-se ao SQLite interno exclusivamente para rotinas de cache e leitura rápida de dados frequentes, garantindo agilidade na navegação |   
-| **Backend / Web API: (ASP.NET Core / .NET 8)** | Camada central de regras de negócio e serviços | Validação de cadastros, autenticação de usuários, execução dos cálculos automatizados de pegada de carbono e homologação de transações | Expõe endpoints RESTful seguros para a aplicação Desktop e orquestra a gravação dos dados na nuvem |   
+| Componente | Função | Responsabilidades | Integração / Comunicação |
+| :--- | :--- | :--- | :--- |
+| **Aplicação Desktop: (WPF / .NET 8)** | Interface do operador para uso nas estações de trabalho do pátio logístico e portaria | Realizar a triagem de insumos, leitura de dados, consulta de chassis/VINs e envio de solicitações para a API | Conecta-se ao SQLite interno exclusivamente para rotinas de cache e leitura rápida de dados frequentes, garantindo agilidade na navegação |
+| **Backend / Web API: (ASP.NET Core / .NET 8)** | Camada central de regras de negócio e serviços | Validação de cadastros, autenticação de usuários, execução dos cálculos automatizados de pegada de carbono e homologação de transações | Expõe endpoints RESTful seguros para a aplicação Desktop e orquestra a gravação dos dados na nuvem |
 | **Armazenamento em Nuvem** | Banco de dados central e unificada | Armazenamento definitivo de lotes, veículos, fornecedores e métricas ambientais, discutindo atualizações em tempo real para dashboards e relatórios analíticos | Repositório central integrado e atualizado diretamente pela Web API |
 
 Sendo assim, a estrutura do projeto é distribuída da seguinte forma:
