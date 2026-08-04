@@ -32,7 +32,7 @@ O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclu
 - [Viabilidade Econômica](#viabilidade-econômica)
 - [Requisitos](#requisitos)
 - [Diagramas](#diagramas)
-- [Regra de Negócio](#regrra-de-negócio)
+- [Regra de Negócio](#regra-de-negócio)
 - [Considerações Finais](#considerações-finais)
 - [Referências Bibliográficas](#referências-bibliográficas)
 
