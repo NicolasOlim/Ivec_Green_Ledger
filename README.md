@@ -22,7 +22,6 @@ O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclu
 - [Problema Encontrado](#problema-encontrado)
 - [Metodologia](#metodologia)
 - [Mini Mundo Da Demanda](#mini-mundo-da-demanda)
-- [Regra de Negócio](#regra-de-negócio)
 - [Modelagem Do Banco De Dados](#modelagem-do-banco-de-dados)
 - [Arquitetura e Modelagem Do Sistema](#arquitetura-e-modelagem-do-sistema)
 - [API REST - Endpoints e Integração](#api-rest-endpoints-e-integracão)
@@ -33,6 +32,7 @@ O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclu
 - [Viabilidade Econômica](#viabilidade-econômica)
 - [Requisitos](#requisitos)
 - [Diagramas](#diagramas)
+- [Regra de Negócio](#regra-de-negócio-detalhada)
 - [Considerações Finais](#7-considerações-finais)
 - [Referências Bibliográficas](#referências-bibliográficas)
 - [Plano de Migração](./Migracao.md)
@@ -801,7 +801,7 @@ A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na
 
 <div align="center">
  
-## Regra de Negócio
+## Regra de Negócio Detalhada
 </div>
 
 A camada de regras de negócio do ecossistema Iveco Green Ledger constitui o núcleo de inteligência da aplicação, sendo responsável por ditar o comportamento da ApiIveco e orientar as tomadas de decisão da interface cliente WpfIveco. Esta seção detalha as diretrizes operacionais, validações de pátio e o motor de cálculo ambiental que governam o projeto.
