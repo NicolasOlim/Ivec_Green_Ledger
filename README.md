@@ -844,15 +844,21 @@ Esse módulo realiza a varredura no banco local, extrai os dados gerados e resol
 ### 1.1 Definição do Sistema
 Será implantado no ecossistema Iveco Green Ledger, um software distribuído projetado para a automação da cubagem volumétrica e para a rastreabilidade ambiental das emissões da cadeia de suprimentos, focado especificamente no Escopo 3 do GHG Protocol (Gases do efeito estufa). 
 
+---
+
 ### 1.2 Público-alvo e Cliente
 O cliente final é a montadora IVECO. A solução beneficiará diretamente:  
 - Nível Operacional: Colaboradores do pátio logístico (portaria e recepção de cargas). 
 - Nível Tático/Estratégico: Instâncias gerenciais, analistas de logística e governança socioambiental (ESG) da administração central.
 
+---
+
 ### 1.3 Ambiente de Instalação
 A arquitetura distribuída do sistema divide-se em duas frentes de implantação:  
 - Client (Frontend): A interface rica de usuário desenvolvida em WPF será instalada localmente nos computadores físicos das portarias de triagem. 
 - Server (Backend e Banco de Dados): A API REST baseada em ASP.NET Core e o banco de dados principal de consolidação residirão em ambiente de nuvem corporativa pública (Google Cloud Platform).
+
+---
 
 ### 1.4 Especificações de Hardware
 A aplicação desktop foi desenhada para operar nos computadores industriais da portaria. Abaixo estão listados os requisitos físicos necessários para garantir o desempenho e a renderização fluida:
@@ -864,6 +870,8 @@ A aplicação desktop foi desenhada para operar nos computadores industriais da 
 | Memóriam RAM | 4GB | 8GB (para renderização gráfica fluída em WPF) |  
 | Espaço em Disco | 500MB Livres | 1.5GB livres (garantindo cache para SQLite) |  
 
+---
+
 ### 1.5 Pré-requisitos em Software
 Para garantir a execução correta da aplicação rica e da API, os seguintes ambientes de execução (runtimes) devem ser previamente configurados nos ambientes de produção: 
 
@@ -872,13 +880,19 @@ Para garantir a execução correta da aplicação rica e da API, os seguintes am
 | Terminal Local (Cliente) | Microsoft .NET Runtime |  8.0 |  Indispensável parta execução da interface em WPF |  
 | Servidor (Nuvem) | ASP .NET Core Runtime |  8.0 |  Necessário para hospedar e rodar a API REST |  
 
+---
+
 ### 1.6 Arquitetura de Banco de Dados
 O ecossistema utiliza o Google Firebase Firestore (banco SQL) hospedado em nuvem para a consolidação, armazenamento estruturado dos dados de triagem e geração de inteligência analítica corporativa em tempo real.  
+
+---
 
 ### 1.7 Migração de Dados
 Será necessária a migração de informações do modelo analógico para o digital. Como o pátio logístico da montadora ainda depende de preenchimentos manuais em fichas e formulários de papel, as seguintes etapas de migração inicial são obrigatórias antes do início da operação:  
 1-) Histórico de Fornecedores: Higienização, tratamento e carga inicial da base de parceiros logísticos já homologados. 
 2-) Fatores de Emissão: Configuração prévia dos índices e fatores de cálculo do GHG Protocol diretamente no banco de dados Firestore para garantir a integridade do motor de cálculo.
+
+---
 
 ### 1.8 Responsabilidades por Etapa
 As tarefas foram divididas de acordo com a arquitetura do ecossistema:
@@ -889,8 +903,12 @@ As tarefas foram divididas de acordo com a arquitetura do ecossistema:
 funcionários da portaria |
 | Alice e Nicolas | Modelagem do banco e documentação | Modelagem e estruturação do banco de dados, arquitetura da API RESTem nuvem e definição das diretrizes de auditoria de segurança das requisições JSON e a documentação | 
 
+---
+
 ### 1.9 Cronograma e Prazo
 A implantação total do sistema estima-se em um período de 1 (uma) semana útil. Este tempo abrangerá a estruturação em blocos de provisionamento na nuvem, a migração inicial de dados, a instalação progressiva nos terminais físicos de atendimento e os testes operacionais de campo com a equipe.  
+
+---
 
 ### 1.10 Método de Avaliação
 A validação será executada mediante a submissão de dados reais de inventário e logística: 
@@ -899,10 +917,14 @@ A validação será executada mediante a submissão de dados reais de inventári
 2-) Homologação do Fornecedor: Informará um CNPJ ativo para validar a consulta e retorno de dados cadastrais via BrasilAPI. 
 3-) Cálculo de Emissões: O motor de cálculo processará os dados e o usuário confirmará se as informações de CO₂ correspondentes foram submetidas aos dashboards na nuvem de forma correta.
 
+---
+
 ### 1.11 Gestão de Problemas Durante a Instalação
 O plano de mitigação foca na estabilidade da conexão e na redundância física: 
 - Falha de Conectividade: Por depender de serviços externos e APIs de validação em tempo real (NHTSA e BrasilAPI), o sistema exige conexão ativa. Em caso de queda de link, o fluxo de triagem deve ser direcionadotemporariamente para o registro manual de contingência da portaria para evitar filas.
 - Falha de Hardware: Em caso de queima ou travamento de computadores na portaria, o plano prevê a substituição física imediata do terminal por uma máquina sobressalente já configurada com o ambiente de execução do sistema.
+
+---
 
 ### 1.12 Aprovação Para Entrada em Produção
 A aprovação e a liberação formal ("Go-Live") serão de responsabilidade do Administrador do sistema — perfil representativo da gestão de TI e negócios. Caberá a ele homologar os parâmetros de cálculo da aplicação e validar os registros gerados nos relatórios e nos logs estruturados de auditoria. 
