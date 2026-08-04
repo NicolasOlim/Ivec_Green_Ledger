@@ -34,12 +34,12 @@ O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclu
 - [Diagramas](#diagramas)
 - [Regra de Negócio](#regra-de-negócio-detalhada)
 - [Plano de Implantação de Software](#plano-de-implantação-de-software)
- - [1. Planejamento Estratégico](#1--planejamento-estratégico)
- - [2. Cronograma Resumido de Implementação](#2--cronograma-resumido-de-implementação)
- - [3. Levantamento da Infraestrutura Necessária](#3--levantamento-da-infraestrutura-necessária)
- - [4. Plano de Validação do Sistema](#4--plano-de-validação-do-sistema)
- - [5. Plano de Contingência](#5--plano-de-contingência)
-- [Considerações Finais](#6--considerações-finais)
+- [1. Planejamento Estratégico](#1-planejamento-estratégico)
+- [2. Cronograma Resumido de Implementação](#2-cronograma-resumido-de-implementação)
+- [3. Levantamento da Infraestrutura Necessária](#3-levantamento-da-infraestrutura-necessária)
+- [4. Plano de Validação do Sistema](#4-plano-de-validação-do-sistema)
+- [5. Plano de Contingência](#5-plano-de-contingência)
+- [Considerações Finais](#7-considerações-finais)
 - [Referências Bibliográficas](#referências-bibliográficas)
 - [Plano de Migração](./Migracao.md)
 
@@ -922,6 +922,8 @@ O plano de mitigação foca na estabilidade da conexão e na redundância físic
 ### 1.12 Aprovação Para Entrada em Produção
 A aprovação e a liberação formal ("Go-Live") serão de responsabilidade do Administrador do sistema — perfil representativo da gestão de TI e negócios. Caberá a ele homologar os parâmetros de cálculo da aplicação e validar os registros gerados nos relatórios e nos logs estruturados de auditoria. 
 
+---
+
 ## 2-) Cronograma Resumido de Implementação
 O cronograma detalha as quatro grandes fases para a transição segura dos processos de triagem da Iveco:  
 
@@ -935,6 +937,8 @@ O cronograma detalha as quatro grandes fases para a transição segura dos proce
 | Testes e Transição | Simulação de fluxo de triagem e validações operacionais de leitura de frotas  | Toda a equipe | 
 </div>
 
+---
+
 ## 3-) Levantamento da Infraestrutura Necessária
 Para viabilizar a arquitetura híbrida projetada para o Iveco Green Ledger, a infraestrutura mínima requerida divide-se em três pilares fundamentais: 
 
@@ -946,20 +950,24 @@ Para viabilizar a arquitetura híbrida projetada para o Iveco Green Ledger, a in
 | Conectividade | Conexão de rede banda larga estável.  Liberação de portas HTTPS e sincronização com a nuvem e o consumo de APIs externas de validação.  | 
 </div>
 
-## 5 Plano de Validação do Sistema
+---
+
+## 4-) Plano de Validação do Sistema
 A etapa de homologação e validação final deve atestar de maneira prática o funcionamento pleno dos três pilares fundamentais do sistema: 
 1. Segurança e Autenticação: Verificar se o acesso ao painel principal está devidamente restrito aos usuários cadastrados e se o controle de perfis (Administrador/Operador) obedece estritamente à hierarquia e níveis de acesso configurados. 
 2. Eficiência e Confiabilidade na Triagem: Atestar que, ao se introduzir o documento de carga (CNPJ) e o chassi do veículo de transporte (VIN), a plataforma os decodifica e os valida contra as bases governamentais e internacionais de forma rápida e sem qualquer tipo de gargalo operacional. 
 3. Consistência e Atualização Automática: Garantir que os Dashboards renderizados pela aplicação reflitam em tempo real as métricas de emissão de carbono. 
 
-## 6 Plano de Contingência
+---
 
+## 5-) Plano de Contingência
 Tendo em vista a natureza do fluxo logístico contínuo da montadora, o plano de contingência prescreve as seguintes medidas: 
 - Indisponibilidade de Rede ou Serviços Externos: Caso ocorra perda de conexão com a internet ou instabilidade nas APIs externas de validação (NHTSA/BrasilAPI), a aplicação exibirá um alerta de timeout. O operador de triagem deverá utilizar o protocolo alternativo da empresa (fichas manuais ou planilhas locais) até o restabelecimento dos serviços de rede, garantindo que o fluxo de caminhões não seja interrompido.
 - Pane de Equipamento Físico: Na eventualidade de falha crítica nos computadores da portaria, a equipe retornará provisoriamente aos processos manuais de registro até que o suporte de TI efetue a substituição física da máquina ou o reestabelecimento do terminal. 
 
-## 7 Considerações Finais
+---
 
+## 6-) Considerações Finais
 A implantação da plataforma Iveco Green Ledger apresenta alta viabilidade, unindo robustez técnica e benefícios operacionais/econômicos evidentes. A transição dos antigos processos manuais e cálculos aproximados de poluição para um mecanismo de precisão analítica gerado automaticamente na recepção das cargas por meio de integrações em tempo real tem a capacidade de erradicar erros de conformidade e o indesejado tempo de ociosidade no pátio da montadora.  
 
 Construído sobre a escalável arquitetura MVVM, o sistema garante a centralização e a integridade imediata das informações coletadas. Dessa forma, a plataforma atende amplamente à premissa de unir eficiência logística a rigorosas diretrizes ambientais, assegurando que as metas globais de sustentabilidade corporativa da empresa se materializem em ativos transparentes, otimizados e prontos para processos de auditoria. 
