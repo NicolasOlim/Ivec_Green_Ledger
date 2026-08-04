@@ -1,7 +1,7 @@
 # 📦🍃 Iveco Green Ledger – Manual do Usuário
 
-<div class="logo-container" align="center">
-    <img src="imagens/imagem_manual_logo.webp" alt="Logo Iveco Green Ledger" class="logo-img">
+ <div class="logo-container" align="center">
+    <img src="imagens/Iveco_greenLogo.png" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 
 Bem-vindo ao Guia de Utilização do **Iveco Green Ledger**. Este manual descreve o passo a passo para operar os principais módulos do sistema, garantindo a correta gestão ESG, o cadastro de fornecedores e a rastreabilidade da produção.
