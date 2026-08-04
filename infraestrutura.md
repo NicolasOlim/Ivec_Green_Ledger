@@ -18,7 +18,7 @@
 | Componente | Mínimo | Recomendado |
 | :--- | :--- | :--- |
 | **Processador** | Intel Core i3 | Intel Core i5 ou superior |
-| **Memória RAM** | 8 GB |16 GB  |
+| **Memória RAM** | 4 GB |12 GB  |
 | **Armazenamento** | 600 MB livres | 1,5 GB livres |
 | **Sistema Operacional** | Windows 10 (64‑bit) | Windows 11 (64‑bit) |
 | **Rede** | Placa de rede Ethernet/Wi‑Fi com acesso à internet (para sincronização) | Conexão banda larga estável |
