@@ -1052,5 +1052,7 @@ MICROSOFT. Documentação do Windows Presentation Foundation (WPF). Disponível 
 
 NHTSA. Administração Nacional de Segurança do Tráfego Rodoviário: APIs e Bancos Dados da NHTSA. Disponível em: https://www.nhtsa.gov/nhtsa-datasets-and-apis. Acesso em: 02 jun. 2026.
 
+---
+
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
-*Última atualização: 17 de julho de 2026.*
+*Última atualização: 04 de agosto de 2026.*
