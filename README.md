@@ -792,16 +792,12 @@ A implementação do Iveco Green Ledger atua como uma ferramenta estratégica na
 - Otimização de Rotas;
 - Auditoria Confiável.
 
-<div align="center">
-
 | Indicador | Sem Green Ledger | Com Green Ledger | 
 | :--- | :--- | :--- |
 | Tempo médio de triagem | 15 min por veículo |  2 minutos por veículo |  
 | Emissão diária de CO2 em marcha lenta | 45,0 kg de CO2 por dia |  6,0 kg - 9,0 kg de CO2 por dia |  
 | Economia mensal de CO2 | - | 900 kg - 1,100 kg de CO2 por dia |  
 | Economia anual estimada de CO2 | - | 10,8 t - 13,2 t de CO2 por ano |  
-
-</div>
 
 ---
 
@@ -861,8 +857,6 @@ A arquitetura distribuída do sistema divide-se em duas frentes de implantação
 ### 1.4 Especificações de Hardware
 A aplicação desktop foi desenhada para operar nos computadores industriais da portaria. Abaixo estão listados os requisitos físicos necessários para garantir o desempenho e a renderização fluida:
 
-<div align="center">
-
 | Componente | Requisito Mínimo | Requisito Recomendado | 
 | :--- | :--- | :--- |
 | Sistema Operacional | Windown 10 (64 - bit) |  Windows 11 (64 - bit) |  
@@ -870,19 +864,13 @@ A aplicação desktop foi desenhada para operar nos computadores industriais da 
 | Memóriam RAM | 4GB | 8GB (para renderização gráfica fluída em WPF) |  
 | Espaço em Disco | 500MB Livres | 1.5GB livres (garantindo cache para SQLite) |  
 
-</div>
-
 ### 1.5 Pré-requisitos em Software
 Para garantir a execução correta da aplicação rica e da API, os seguintes ambientes de execução (runtimes) devem ser previamente configurados nos ambientes de produção: 
-
-<div align="center">
 
 | Ambiente | Software/Runtime Exigido | Versão Requerida | Finalidade |
 | :--- | :--- | :--- |  :--- |
 | Terminal Local (Cliente) | Microsoft .NET Runtime |  8.0 |  Indispensável parta execução da interface em WPF |  
 | Servidor (Nuvem) | ASP .NET Core Runtime |  8.0 |  Necessário para hospedar e rodar a API REST |  
-
-</div>
 
 ### 1.6 Arquitetura de Banco de Dados
 O ecossistema utiliza o Google Firebase Firestore (banco SQL) hospedado em nuvem para a consolidação, armazenamento estruturado dos dados de triagem e geração de inteligência analítica corporativa em tempo real.  
@@ -893,16 +881,13 @@ Será necessária a migração de informações do modelo analógico para o digi
 2-) Fatores de Emissão: Configuração prévia dos índices e fatores de cálculo do GHG Protocol diretamente no banco de dados Firestore para garantir a integridade do motor de cálculo.
 
 ### 1.8 Responsabilidades por Etapa
-As tarefas foram divididas de acordo com a arquitetura do ecossistema: 
-
-<div align="center">
+As tarefas foram divididas de acordo com a arquitetura do ecossistema:
 
 | Integrantes | Foco de Atuação | Atividades e Entregas | 
 | :--- | :--- | :--- |  
 | Erick e Vinicius | Cliente Desktop (WPF) |  Foco na interface visual em WPF, usabilidade e ergonomia adaptadas ao chão de fábrica, persistência em borda com SQLite e treinamentos práticos de operação para os 
 funcionários da portaria |
 | Alice e Nicolas | Modelagem do banco e documentação | Modelagem e estruturação do banco de dados, arquitetura da API RESTem nuvem e definição das diretrizes de auditoria de segurança das requisições JSON e a documentação | 
-</div>
 
 ### 1.9 Cronograma e Prazo
 A implantação total do sistema estima-se em um período de 1 (uma) semana útil. Este tempo abrangerá a estruturação em blocos de provisionamento na nuvem, a migração inicial de dados, a instalação progressiva nos terminais físicos de atendimento e os testes operacionais de campo com a equipe.  
@@ -927,28 +912,22 @@ A aprovação e a liberação formal ("Go-Live") serão de responsabilidade do A
 ## 2-) Cronograma Resumido de Implementação
 O cronograma detalha as quatro grandes fases para a transição segura dos processos de triagem da Iveco:  
 
-<div align="center">
-
 | Fase de Implementação | Atividades Principais | Executores Responsáveis | 
 | :--- | :--- | :--- |  
 | Nuvem e Segurança | Configuração das instâncias do Firebase, implantação da API no servidor e estabelecimento das regras de CORS | Nicolas e Alice |
 | Homologação | Inserção do catálogo de dados padrão dos parceiros logísticos | Nicolas e Alice | 
 | Instalação Local | Implantação do pacote executável do software WPF e geração das tabelas do banco SQLite | Erick e Vinicius |
 | Testes e Transição | Simulação de fluxo de triagem e validações operacionais de leitura de frotas  | Toda a equipe | 
-</div>
 
 ---
 
 ## 3-) Levantamento da Infraestrutura Necessária
 Para viabilizar a arquitetura híbrida projetada para o Iveco Green Ledger, a infraestrutura mínima requerida divide-se em três pilares fundamentais: 
 
-<div align="center">
-
 | Categoria | Recursos e Especificações Requeridas | 
 | :--- | :--- | 
 | Servidores/Cloud | Acesso homologado a um ambiente de hospedagem web (compatível com a API em .NET 8). Conta no Google para alojamento, persistência e gestão do Firebase | 
 | Conectividade | Conexão de rede banda larga estável.  Liberação de portas HTTPS e sincronização com a nuvem e o consumo de APIs externas de validação.  | 
-</div>
 
 ---
 
