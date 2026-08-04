@@ -9,7 +9,7 @@
 | **Objetivo** | Automatizar a triagem de materiais no pátio da Iveco com cálculo automático da pegada de carbono, utilizando persistência centralizada em nuvem e integração contínua com APIs externas, garantindo rastreabilidade total |
 | **Público‑alvo** | Operadores de portaria, analistas de logística e gestores de sustentabilidade da Iveco. |
 
----
+
 
 ## 2. Requisitos de Hardware
 
@@ -29,7 +29,7 @@
 - **Banco de Dados Cloud:** Firebase Firestore (Google Cloud Platform) – Plano Spark (gratuito) para uso inicial, escalável para Plano mais robusto sob demanda.
 - **Conectividade:** Acesso HTTPS outbound liberado para APIs externas (BrasilAPI, NHTSA, Mercado Livre).
 
----
+
 
 ## 3. Requisitos de Software
 
@@ -48,24 +48,30 @@
 | **Firebase Admin SDK** | via NuGet | Comunicação com Firestore |
 | **Certificado SSL/TLS** | - | Comunicação HTTPS obrigatória |
 
----
+
 
 ## 4. Dependências
 
 ### 4.1 Pacotes NuGet (WPF)
 
-- `Microsoft.Extensions.Http`
-- `Newtonsoft.Json`
-- `LiveChartsCore.SkiaSharpView.WPF`
-- `QuestPDF`
-- `Serilog.Sinks.File`
+| Pacote | Versão | Finalidade |
+| :--- | :--- | :--- |
+| `Microsoft.Extensions.Http` | **8.0.0** | Cliente HTTP para consumo da API REST e serviços externos |
+| `Newtonsoft.Json` | **13.0.3** | Serialização/desserialização JSON (fallback e cache local) |
+| `LiveChartsCore.SkiaSharpView.WPF` | **2.0.0** | Exibição de gráficos e dashboards interativos |
+| `QuestPDF` | **2024.10.1** | Geração de relatórios e etiquetas em PDF |
+| `Serilog.Sinks.File` | **6.0.0** | Registro de logs em arquivo local (offline e diagnóstico) |
 
 ### 4.2 Pacotes NuGet (API)
 
-- `FirebaseAdmin`
-- `Google.Cloud.Firestore`
-- `Swashbuckle.AspNetCore`
-- `Serilog.AspNetCore`
+| Pacote | Versão | Finalidade |
+| :--- | :--- | :--- |
+| `FirebaseAdmin` | **3.1.0** | SDK oficial para autenticação e administração do Firebase |
+| `Google.Cloud.Firestore` | **3.9.0** | Cliente nativo para operações CRUD no Firestore (modo Datastore) |
+| `Swashbuckle.AspNetCore` | **7.0.0** | Geração automática da documentação Swagger/OpenAPI |
+| `Serilog.AspNetCore` | **8.0.3** | Log estruturado no lado do servidor com sinks para arquivo e console |
+
+> **Observação:** O .NET Runtime utilizado (tanto no cliente quanto no servidor) deve ser a versão **8.0.10** (último patch LTS estável). Todos os pacotes acima são compatíveis entre si e com o ecossistema .NET 8.
 
 ### 4.3 Serviços Externos (APIs de Terceiros)
 
@@ -76,7 +82,7 @@
 | **Mercado Livre Developers** | Rastreamento da rota de entrega (status) | Sim |
 | **Firebase Firestore** | Persistência definitiva e dashboards | Sim (para sync) |
 
----
+
 
 ## 5. Arquitetura do Sistema
 
@@ -86,7 +92,7 @@
 | **API REST** |  Centraliza as regras de negócio, orquestração e validações. Consome APIs externas (NHTSA, BrasilAPI, ML) e persiste os dados finais no Firebase. |
 | **Banco de Dados** | Combina **SQLite**  com **Firebase Firestore / NoSQL** . O Firestore armazena os dados consolidados, relatórios e dashboards. |
 
----
+
 
 ## 6. Riscos Identificados
 
@@ -99,7 +105,7 @@
 | **Falha de hardware no terminal de pátio** | Baixa | Médio | Manter máquina reserva configurada; protocolo de registro manual até substituição. |
 | **Ataques de brut force ou SQL Injection** | Baixa | Crítico | HTTPS mandatório, CORS restrito, hash de senhas, validação de inputs. |
 
----
+
 
 ## 7. Plano de Contingência
 
