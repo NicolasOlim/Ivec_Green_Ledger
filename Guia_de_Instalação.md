@@ -31,13 +31,12 @@ Antes de iniciar a instalação, certificamos que a máquina de destino atende o
 Seguimos as seguintes etapas para instalar a aplicação WPF nos computadores:
 
 1. **Download do Pacote:** Tinhamos uma pasta de entrega como por exemplo: (ex: `Versao_1.0.zip`) e extraído em um diretório local.
-2. **Instalação do Runtime:** Caso a máquina não possua o .NET 8, execute o instalador do *Desktop Runtime* contido na pasta de dependências ou baixe no site oficial da Microsoft.
-3. **Execução do Setup:** Localize e execute o arquivo `Setup.exe` (ou o MSI correspondente) do nosso projeto.
-4. **Assistente de Instalação:**
+2. **Execução do Setup:** Localize e execute o arquivo `Setup.exe` (ou o MSI correspondente) do nosso projeto.
+3. **Assistente de Instalação:**
    - Aceite os termos de licença (`Licenca.txt`).
    - Escolha o diretório de instalação (Exemplo: `C:\Program Files\Iveco\GreenLedger`).
    - Permita a criação de atalhos na Área de Trabalho e no Menu Iniciar.
-5. **Conclusão:** Clique em **"Finalizar"** e a aplicação será iniciada automaticamente.
+4. **Conclusão:** Clique em **"Finalizar"** e a aplicação será iniciada automaticamente.
 
 ---
 
