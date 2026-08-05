@@ -90,7 +90,7 @@
 | :--- | :--- |
 | **Cliente WPF (NET .8)** | Arquitetura MVVM,  logs NoSQL e sincronização com retry.  |
 | **API REST** |  Centraliza as regras de negócio, orquestração e validações. Consome APIs externas (NHTSA, BrasilAPI, ML) e persiste os dados finais no Firebase. |
-| **Banco de Dados** | Combina **SQLite**  com **Firebase Firestore / NoSQL** . O Firestore armazena os dados consolidados, relatórios e dashboards. |
+| **Banco de Dados** | Combina **SQLite**  com **Firebase Firestore / NoSQL** . O Firestore armazena os dados consolidados. |
 
 
 
