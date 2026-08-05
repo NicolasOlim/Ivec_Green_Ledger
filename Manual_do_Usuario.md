@@ -1,7 +1,7 @@
 # 📦🍃 Iveco Green Ledger – Manual do Usuário
 
 <div class="logo-container" align="center">
-    <img src="imagens/imagem_manual_logo.webp" alt="Logo Iveco Green Ledger" class="logo-img">
+    <img src="imagens/icone_manual.jpg" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 
 Bem-vindo ao Guia de Utilização do **Iveco Green Ledger**. Este manual detalha a operação da aplicação Desktop (WPF) instalada nas estações de trabalho e portarias da Iveco, descrevendo a navegação, os cadastros e as funcionalidades integradas à Web API e ao banco de dados em nuvem (Firebase).
@@ -32,7 +32,7 @@ O sistema exige autenticação rigorosa para garantir a segurança dos dados log
 
 <div class="logo-container" align="center">
     <!-- INSIRA AQUI A IMAGEM DA TELA DE LOGIN -->
-    <img src="imagens/placeholder_login.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
+    <img src="imagens/login.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
 
 **4.2. Verificação de E-mail de Usuário**
@@ -53,7 +53,7 @@ Este módulo é utilizado na portaria e no setor de compras para homologação e
 
 <div class="logo-container" align="center">
     <!-- INSIRA AQUI A IMAGEM DA TELA DE CADASTRO DE FORNECEDORES -->
-    <img src="imagens/placeholder_cadastro_fornecedor.png" alt="Tela de Cadastro de Fornecedor" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
+    <img src="imagens/fornecedor.png" alt="Tela de Cadastro de Fornecedor" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
 
 **5.2. Qualificação: Fornecedor Verde**
