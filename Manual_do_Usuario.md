@@ -52,7 +52,6 @@ Este módulo é utilizado na portaria e no setor de compras para homologação e
 4. Para o endereço, comece a digitar e o sistema utilizará o **Google Places** para sugerir e validar o local exato da fábrica. Salve o registro.
 
 <div class="logo-container" align="center">
-    <!-- INSIRA AQUI A IMAGEM DA TELA DE CADASTRO DE FORNECEDORES -->
     <img src="imagens/fornecedor.png" alt="Tela de Cadastro de Fornecedor" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
 
@@ -72,8 +71,7 @@ Utilizado no pátio e nas linhas de montagem para controle de ativos.
 2. Clique em **Registrar Recebimento**. Insira o código de rastreio da nota, relacione ao Fornecedor de origem e especifique a quantidade recebida.
 
 <div class="logo-container" align="center">
-    <!-- INSIRA AQUI A IMAGEM DA TELA DE REGISTRO DE LOTES -->
-    <img src="imagens/placeholder_registro_lotes.png" alt="Tela de Registro de Lotes" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
+    <img src="imagens/gestao_de_componentes.png" alt="Tela de Registro de Lotes" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
 
 **6.2. Cadastro de Veículos e Validação NHTSA**
@@ -85,10 +83,7 @@ Utilizado no pátio e nas linhas de montagem para controle de ativos.
 1. Com o Veículo criado, abra sua ficha e vá até **Componentes do Veículo**.
 2. Clique em **Adicionar Componente** e selecione o Lote de Matéria-Prima correspondente (criado no passo 6.1). Isso garante que o veículo possui rastreio de origem de peças e viabiliza a auditoria ambiental.
 
-<div class="logo-container" align="center">
-    <!-- INSIRA AQUI A IMAGEM DA TELA DE VÍNCULO DE COMPONENTES AO CHASSI -->
-    <img src="imagens/placeholder_vinculo_veiculo.png" alt="Tela de Vínculo de Componentes" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
-</div>
+
 
 ---
 
@@ -105,8 +100,7 @@ Painéis de controle abastecidos em tempo real pelas informações geradas na tr
 2. Na aba **Análises ESG**, é possível visualizar métricas sociais e de governança para fins de compliance.
 
 <div class="logo-container" align="center">
-    <!-- INSIRA AQUI A IMAGEM DO DASHBOARD ESG E GRÁFICOS -->
-    <img src="imagens/placeholder_dashboard_esg.png" alt="Dashboard de Sustentabilidade" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
+    <img src="imagens/dashboard.png" alt="Dashboard de Sustentabilidade" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
 
 ---
@@ -119,7 +113,7 @@ Painéis de controle abastecidos em tempo real pelas informações geradas na tr
 
 <div class="logo-container" align="center">
     <!-- INSIRA AQUI A IMAGEM DA TELA DE CONSULTA DE MERCADO -->
-    <img src="imagens/placeholder_consulta_mercado.png" alt="Tela de Consulta de Mercado" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
+    <img src="imagens/mercado_livre.png" alt="Tela de Consulta de Mercado" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
 
 **8.2. Abrindo um Chamado de Suporte**
