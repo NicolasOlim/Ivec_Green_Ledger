@@ -44,7 +44,7 @@
 
 | Software | Versão | Finalidade |
 | :--- | :--- | :--- |
-| **ASP.NET Core Runtime** | 8.0  | Hospedar a API REST |
+| **ASP.NET Core Runtime** | 8.0.29 | Hospedar a API REST |
 | **Firebase Admin SDK** | via NuGet | Comunicação com Firestore |
 | **Certificado SSL/TLS** | - | Comunicação HTTPS obrigatória |
 
