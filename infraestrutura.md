@@ -32,7 +32,7 @@
 
 | Software | Finalidade |
 | :--- | :--- |
-| **Microsoft .NET Runtime** | Obrigatório para execução do aplicativo WPF |
+| **Microsoft .NET Runtime** 8.0.29 | Obrigatório para execução do aplicativo WPF |
 | **Microsoft Visual C++ Redistributable** | Necessário para execução de dependências e bibliotecas nativas (ex: renderização gráfica) |
 | **Windows** | Sistema operacional base (64-bit) |
 
