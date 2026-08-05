@@ -14,13 +14,13 @@ Esta seção estabelece as informações fundamentais de identificação do soft
 | **Versão** | Release Operacional Base (.NET 8) |
 | **Domínio de Aplicação** | Triagem logística de pátio, rastreabilidade de suprimentos e cálculo automatizado de pegada de carbono Escopo 3 (GHG Protocol) |
 | **Cliente Final** | IVECO (Portaria Logística e Gestão ESG) |
-| **Ambiente Alvo da Migração** | Operações da fábrica e base de dados de fornecedores/clientes da Iveco |
+| **Ambiente Alvo da Migração** | Servidor SQL Server e operações da fábrica Iveco |
 ---
 
 ## **2. Banco Utilizado**
-O sistema Iveco Green Ledger adota uma arquitetura de banco de dados híbrido, combinando persistência em nuvem (NoSQL) com armazenamento em borda. Essa abordagem foi projetada para atuar diretamente nas demandas críticas de ambientes industriais e pátios logísticos, garantindo alta disponibilidade, sincronização em tempo real, consistência de dados e resiliência a falhas de conectividade.
+O sistema Iveco Green Ledger adota uma arquitetura de banco de dados relacional robusta e estruturada, centrada no SQL Server para a gestão corporativa e combinada com armazenamento em borda. Essa abordagem foi projetada para responder diretamente às demandas críticas de ambientes industriais e pátios logísticos, garantindo transações ACID, alta disponibilidade, integridade referencial e resiliência a falhas de conectividade.
 
-- **Firebase Firestore (Banco em Nuvem / NoSQL:**
+- **Microsoft SQL Server (Banco Relacional):**
 
 <img src="imagens/logo-firebase.png" alt="Logo Firebase Firestore" class="logo-img" style="height: 150px; width: auto; vertical-align: middle; margin-left: 15px;">
 
