@@ -1,77 +1,89 @@
 # 📦🍃 Iveco Green Ledger – Manual do Usuário
 
- <div class="logo-container" align="center">
-    <img src="imagens/Iveco_greenLogo.png" alt="Logo Iveco Green Ledger" class="logo-img">
+<div class="logo-container" align="center">
+    <img src="imagens/imagem_manual_logo.webp" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 
-Bem-vindo ao Guia de Utilização do **Iveco Green Ledger**. Este manual descreve o passo a passo para operar os principais módulos do sistema, garantindo a correta gestão ESG, o cadastro de fornecedores e a rastreabilidade da produção.
+Bem-vindo ao Guia de Utilização do **Iveco Green Ledger**. Este manual detalha a operação da aplicação Desktop (WPF) instalada nas estações de trabalho e portarias da Iveco, descrevendo a navegação, os cadastros e as funcionalidades integradas à Web API e ao banco de dados em nuvem (Firebase).
 
 ---
 
-## **1. Acesso e Configuração de Conta**
+## **1. Apresentação**
+O **Iveco Green Ledger** é um sistema projetado para a triagem logística de pátio, rastreabilidade de suprimentos e cálculo automatizado de pegada de carbono (focado no Escopo 3 do GHG Protocol). A plataforma une a operação física da fábrica aos compromissos de sustentabilidade (ESG).
 
-Esta seção orienta o usuário sobre como ingressar de forma segura na plataforma e gerenciar as suas credenciais de acesso.
+## **2. Objetivo do Sistema**
+Fornecer um ambiente confiável onde a entrada de componentes seja monitorada, os fornecedores sejam avaliados por suas práticas verdes, a montagem dos veículos seja rastreada peça a peça, e as emissões de gases de efeito estufa sejam calculadas em tempo real.
 
-**1.1. Realizando o Login**
-1. Acesse a página inicial do sistema.
-2. Insira suas credenciais (E-mail e Senha) nos campos designados.
-3. Clique em **Entrar**. O sistema autenticará seu usuário e direcionará você para o painel principal.
+## **3. Requisitos do Sistema**
+* **Ambiente:** Computador com Windows compatível com a aplicação Desktop (.NET 8 WPF).
+* **Conectividade:** Conexão à internet para a sincronização de dados com a Web API e Firebase. (O sistema utiliza cache local via SQLite para dados frequentes, mas operações de registro exigem rede).
+* **Acesso:** E-mail corporativo previamente autorizado pelo administrador.
+
+---
+
+## **4. Primeiro Acesso e Tela Inicial**
+
+O sistema exige autenticação rigorosa para garantir a segurança dos dados logísticos e industriais.
+
+**4.1. Realizando o Login**
+1. Abra o aplicativo **Iveco Green Ledger** em sua estação de trabalho.
+2. Na tela inicial, insira seu **E-mail** e **Senha** nos campos de autenticação.
+3. Clique em **Entrar**. O sistema consultará a Web API e fará a validação do seu nível de permissão (ex: Operador de Portaria, Analista ESG).
 
 <div class="logo-container" align="center">
     <!-- INSIRA AQUI A IMAGEM DA TELA DE LOGIN -->
     <img src="imagens/placeholder_login.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
 
-**1.2. Validação de E-mail e Recuperação de Senha**
-* Ao criar uma nova conta ou solicitar a redefinição de senha, o sistema enviará um e-mail automático de verificação.
-* Acesse sua caixa de entrada, localize o e-mail do Iveco Green Ledger e clique no link de validação para liberar seu acesso ou cadastrar uma nova senha.
+**4.2. Verificação de E-mail de Usuário**
+* Novos cadastros passam pelo serviço interno de validação. O sistema enviará um token/link para a caixa de e-mail corporativo para confirmar a identidade.
+* Em caso de esquecimento de senha, utilize a opção "Esqueci minha senha" para receber as instruções de redefinição validadas pelo `EmailValidationService`.
 
 ---
 
-## **2. Gestão da Cadeia de Suprimentos**
+## **5. Módulo de Fornecedores e Supply Chain**
 
-Módulo voltado para os analistas de compras e supply chain, permitindo a homologação inteligente e a avaliação ambiental de parceiros.
+Este módulo é utilizado na portaria e no setor de compras para homologação e qualificação.
 
-**2.1. Como Cadastrar um Novo Fornecedor**
-1. No menu principal, navegue até a aba **Fornecedores** e clique em **Novo Cadastro**.
-2. **Preenchimento Automático:** Digite apenas o **CNPJ** da empresa. O sistema consultará a base de dados oficial e preencherá automaticamente a Razão Social e os dados empresariais básicos.
-3. **Validação de Endereço:** Ao inserir o endereço, o sistema utilizará o mapeamento inteligente para padronizar e validar a localização exata da fábrica do parceiro.
-4. Clique em **Salvar**.
+**5.1. Cadastro de Fornecedor via API**
+1. Acesse o menu lateral e clique em **Fornecedores** > **Novo Cadastro**.
+2. No campo correspondente, digite os 14 dígitos do **CNPJ** e clique na lupa de busca.
+3. O sistema fará uma requisição à **Brasil API** e preencherá instantaneamente a Razão Social, Nome Fantasia e dados de constituição.
+4. Para o endereço, comece a digitar e o sistema utilizará o **Google Places** para sugerir e validar o local exato da fábrica. Salve o registro.
 
 <div class="logo-container" align="center">
     <!-- INSIRA AQUI A IMAGEM DA TELA DE CADASTRO DE FORNECEDORES -->
     <img src="imagens/placeholder_cadastro_fornecedor.png" alt="Tela de Cadastro de Fornecedor" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
 
-**2.2. Qualificação de Fornecedor Verde**
-1. Acesse o perfil de um fornecedor já cadastrado.
-2. Selecione a opção **Avaliação Verde** (Fornecedor Verde).
-3. Preencha o questionário de conformidade ambiental e anexe os certificados exigidos. O sistema calculará o "score" ESG do fornecedor.
+**5.2. Qualificação: Fornecedor Verde**
+1. No perfil do Fornecedor recém-criado, clique na aba **Qualificação ESG**.
+2. Marque os requisitos ambientais atendidos pela empresa e anexe as documentações solicitadas.
+3. Clique em **Homologar Fornecedor Verde**. Isso o habilitará para cálculos de redução de impacto no Escopo 3.
 
 ---
 
-## **3. Rastreabilidade de Materiais e Veículos**
+## **6. Módulo de Rastreabilidade (Triagem e Produção)**
 
-Funcionalidades destinadas aos operadores de pátio e linha de produção, essenciais para garantir que a origem das peças seja mapeada.
+Utilizado no pátio e nas linhas de montagem para controle de ativos.
 
-**3.1. Registrando a Entrada de Matéria-Prima**
-1. Navegue até o módulo de **Estoque/Produção** e selecione **Lotes de Matéria-Prima**.
-2. Clique em **Registrar Novo Lote** e insira os dados da nota fiscal, quantidade e selecione o fornecedor de origem.
+**6.1. Entrada de Matéria-Prima (Lotes)**
+1. No menu principal, acesse **Produção** > **Lotes de Matéria-Prima**.
+2. Clique em **Registrar Recebimento**. Insira o código de rastreio da nota, relacione ao Fornecedor de origem e especifique a quantidade recebida.
 
 <div class="logo-container" align="center">
     <!-- INSIRA AQUI A IMAGEM DA TELA DE REGISTRO DE LOTES -->
     <img src="imagens/placeholder_registro_lotes.png" alt="Tela de Registro de Lotes" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
 
-**3.2. Montagem e Vínculo de Componentes**
-1. Na aba de **Produção**, acesse a seção de **Componentes do Veículo**.
-2. Vincule os lotes de matérias-primas recebidos às peças específicas que estão sendo montadas, garantindo que o sistema saiba exatamente de onde veio o material de cada peça.
+**6.2. Cadastro de Veículos e Validação NHTSA**
+1. Vá até o módulo **Veículos** e clique em **Registrar Novo Veículo**.
+2. No campo **Chassi**, insira o código **VIN (Vehicle Identification Number)** de 17 caracteres.
+3. Clique em **Validar Chassi**. A plataforma consultará a base da **NHTSA** para certificar que os dados do fabricante, modelo e ano do chassi são reconhecidos globalmente.
 
-**3.3. Cadastro do Veículo Final**
-1. Vá para o módulo de **Veículos** e clique em **Cadastrar Veículo**.
-2. Insira as especificações do produto final e o número do Chassi (VIN).
-3. **Validação Internacional:** O sistema validará automaticamente o número do Chassi (VIN) garantindo que os padrões de fábrica estão corretos de acordo com normas de segurança.
-4. Vincule os componentes montados a este veículo específico para fechar o ciclo de rastreabilidade.
+**6.3. Vínculo de Componentes (Rastreio Ponta a Ponta)**
+1. Com o Veículo criado, abra sua ficha e vá até **Componentes do Veículo**.
+2. Clique em **Adicionar Componente** e selecione o Lote de Matéria-Prima correspondente (criado no passo 6.1). Isso garante que o veículo possui rastreio de origem de peças e viabiliza a auditoria ambiental.
 
 <div class="logo-container" align="center">
     <!-- INSIRA AQUI A IMAGEM DA TELA DE VÍNCULO DE COMPONENTES AO CHASSI -->
@@ -80,18 +92,17 @@ Funcionalidades destinadas aos operadores de pátio e linha de produção, essen
 
 ---
 
-## **4. Painel de Sustentabilidade (ESG)**
+## **7. Módulo de Sustentabilidade e ESG**
 
-O coração da plataforma para os gestores ambientais. Aqui são acompanhadas as metas de descarbonização e impacto da operação.
+Painéis de controle abastecidos em tempo real pelas informações geradas na triagem e produção.
 
-**4.1. Lançamento de Escopos de Emissão**
-1. Acesse o menu **Sustentabilidade** e selecione **Escopos de Emissão**.
-2. Registre as métricas de carbono, dividindo-as corretamente entre os escopos operacionais (ex: consumo de energia, logística de frota, emissões da cadeia de fornecedores).
+**7.1. Lançamento e Acompanhamento de Escopos**
+1. Acesse o menu **Sustentabilidade**.
+2. Em **Escopos de Emissão**, os valores do *Escopo 3* serão automaticamente populados pelas notas e transportes registrados dos Fornecedores. O operador pode adicionar manualmente dados de operações internas.
 
-**4.2. Acompanhamento de Gráficos e Análises ESG**
-1. No menu **Sustentabilidade**, clique em **Dashboard ESG**.
-2. Utilize os filtros de data e categoria para visualizar os **Gráficos de Emissões** gerados em tempo real pelo sistema.
-3. Acesse a aba de **Análises ESG** para exportar relatórios consolidados sobre as práticas ambientais, sociais e de governança registradas no período.
+**7.2. Gráficos Analíticos**
+1. Em **Dashboard ESG**, visualize os *Gráficos de Emissões*. O sistema processa os dados salvos no Firebase para mostrar a evolução da pegada de carbono mensal.
+2. Na aba **Análises ESG**, é possível visualizar métricas sociais e de governança para fins de compliance.
 
 <div class="logo-container" align="center">
     <!-- INSIRA AQUI A IMAGEM DO DASHBOARD ESG E GRÁFICOS -->
@@ -100,26 +111,60 @@ O coração da plataforma para os gestores ambientais. Aqui são acompanhadas as
 
 ---
 
-## **5. Consultas de Mercado e Suporte**
+## **8. Consultas de Mercado e Central de Suporte**
 
-Ferramentas auxiliares integradas diretamente à plataforma para facilitar o dia a dia comercial e operacional.
-
-**5.1. Pesquisa de Mercado**
-1. Acesse a ferramenta de **Consulta de Mercado** no menu lateral.
-2. Digite o nome de uma peça, componente ou categoria de veículo.
-3. O sistema fará uma busca integrada na base comercial externa (Mercado Livre), retornando dados de mercado para auxiliar o time comercial e de suprimentos.
+**8.1. Consulta no Mercado Livre**
+1. Acesse **Ferramentas** > **Mercado Livre**.
+2. Insira o termo da busca (ex: componente mecânico ou acessório). O sistema comunicará com a API do Mercado Livre para retornar cotações e tendências de preço, auxiliando balanços rápidos do setor de compras.
 
 <div class="logo-container" align="center">
     <!-- INSIRA AQUI A IMAGEM DA TELA DE CONSULTA DE MERCADO -->
     <img src="imagens/placeholder_consulta_mercado.png" alt="Tela de Consulta de Mercado" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
 
-**5.2. Abertura de Chamados (Suporte Técnico)**
-1. Em caso de dúvidas, erros no sistema ou necessidade de auxílio, localize o ícone de **Suporte** (geralmente no canto inferior ou no menu de usuário).
-2. Preencha o formulário descrevendo a sua solicitação.
-3. Acompanhe o status do seu chamado diretamente por este painel.
+**8.2. Abrindo um Chamado de Suporte**
+1. Para relatar falhas ou solicitar manutenção, vá em **Central de Suporte**.
+2. Preencha o assunto, descreva o problema no campo de texto e clique em **Enviar Chamado**. A requisição irá direto para o controlador da equipe de TI.
+
+---
+
+## **9. Solução de Problemas e Perguntas Frequentes (FAQ)**
+
+Abaixo, listamos 8 situações comuns na operação da plataforma e as instruções técnicas para resolvê-las.
+
+**1. O CNPJ não está sendo preenchido automaticamente ao cadastrar um fornecedor.**
+*   *Causa:* Falha na comunicação com a Brasil API ou formato inválido.
+*   *Solução:* Certifique-se de digitar os 14 números do CNPJ sem pontos ou traços. Verifique se o computador possui acesso à rede externa e se a Brasil API não está temporariamente indisponível.
+
+**2. A validação de Chassi (VIN) falhou ou retornou "Veículo Não Encontrado".**
+*   *Causa:* O número VIN (Vehicle Identification Number) digitado está fora dos padrões internacionais ou a API da NHTSA recusou o código.
+*   *Solução:* Verifique se o código possui exatamente 17 caracteres. Lembre-se que letras como 'I', 'O' e 'Q' não são usadas em chassis para evitar confusão com números.
+
+**3. O endereço do Fornecedor não é autocompletado no formulário.**
+*   *Causa:* Falha no serviço do Google Places Response.
+*   *Solução:* Digite a rua acompanhada da cidade (ex: "Av. Industrial, Nova Lima"). Caso o erro persista, o limite de requisições à API do Google pode ter sido atingido pelo backend; nesse caso, preencha manualmente e acione o suporte.
+
+**4. Não recebi o e-mail de validação de conta ou redefinição de senha.**
+*   *Causa:* Bloqueio de firewall corporativo ou atraso no *Email Validation Service*.
+*   *Solução:* Aguarde 5 minutos e verifique as pastas de "Lixo Eletrônico" ou "Spam". Se usar e-mail da Iveco, peça ao TI para liberar envios provenientes do domínio do Green Ledger.
+
+**5. Os dados cadastrados não estão aparecendo para os outros computadores do pátio.**
+*   *Causa:* Assincronia entre o banco SQLite (cache local) e o Firebase (nuvem).
+*   *Solução:* O aplicativo pode ter entrado em modo offline devido a quedas na rede, salvando apenas no SQLite. Verifique sua conexão. Assim que a rede for restaurada, o sistema subirá automaticamente a fila de registros para o Firebase e a Web API atualizará todos os painéis.
+
+**6. A pesquisa no Mercado Livre retorna tela vazia sem resultados.**
+*   *Causa:* Termos muito genéricos ou itens não listados comercialmente na plataforma.
+*   *Solução:* Refine a busca utilizando o nome técnico específico do componente ou o código da peça. Se a tela estiver demorando muito para carregar, a Web API pode estar lidando com lentidão nos servidores externos.
+
+**7. Não consigo vincular um Lote de Matéria-Prima a um Veículo (VeiculoComponente).**
+*   *Causa:* O lote não existe ou a quantidade do lote já foi totalmente alocada a outros veículos.
+*   *Solução:* Acesse o menu **Lotes de Matéria-Prima** e confira se o lote em questão foi devidamente "Registrado" ou se o saldo de peças dele já zerou na linha de produção.
+
+**8. O Dashboard de Gráficos de Emissões está em branco em um determinado mês.**
+*   *Causa:* Ausência de dados processados no `EscopoEmissaoDto` ou transações logísticas insuficientes.
+*   *Solução:* O gráfico apenas plota informações de lotes ou fornecedores devidamente marcados como "Fornecedor Verde" ou que tiveram suas rotas concluídas e salvas no banco. Certifique-se de que a triagem do mês foi finalizada no sistema.
 
 ---
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
-*Última atualização: 04 de agosto de 2026.*
+*Última atualização: 05 de agosto de 2026.*
