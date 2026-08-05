@@ -51,10 +51,10 @@
 | Pacote | Finalidade |
 | :--- | :--- |
 | `Microsoft.Extensions.Http` | Cliente HTTP para consumo da API REST e serviços externos |
-| `Newtonsoft.Json` | Serialização/desserialização JSON (fallback e cache local) |
+| `Newtonsoft.Json` | Serialização/desserialização JSON  |
 | `LiveChartsCore.SkiaSharpView.WPF` | Exibição de gráficos e dashboards interativos |
 | `QuestPDF` | Geração de relatórios e etiquetas em PDF |
-| `Serilog.Sinks.File` | Registro de logs em arquivo local (offline e diagnóstico) |
+| `Serilog.Sinks.File` | Registro de logs em arquivo local  |
 
 ### 4.2 Pacotes NuGet (API)
 
