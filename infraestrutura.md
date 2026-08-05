@@ -73,8 +73,8 @@
 | :--- | :--- | :---: |
 | **BrasilAPI** | Validação de CNPJ de fornecedores | Sim |
 | **NHTSA VPIC** | Decodificação do chassi (VIN) e validação da Iveco | Sim |
-| **Mercado Livre Developers** | Rastreamento da rota de entrega (status) | Sim |
-| **Firebase Firestore** | Persistência definitiva e dashboards | Sim (para sync) |
+| **Mercado Livre Developers** | Rastreamento da rota de entrega  | Sim |
+| **Firebase Firestore** | Persistência definitiva e dashboards | Sim  |
 
 ## 5. Arquitetura do Sistema
 
