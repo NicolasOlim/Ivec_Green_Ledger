@@ -21,7 +21,7 @@
 | **Memória RAM** | 4 GB |12 GB  |
 | **Armazenamento** | 600 MB livres | 1,5 GB livres |
 | **Sistema Operacional** | Windows 10 (64‑bit) | Windows 11 (64‑bit) |
-| **Rede** | Placa de rede Ethernet/Wi‑Fi com acesso à internet (para sincronização) | Conexão banda larga estável |
+| **Rede** | Placa de rede Ethernet/Wi‑Fi com acesso à internet | Conexão banda larga estável |
 
 ### 2.2 Servidor (API e Nuvem)
 
