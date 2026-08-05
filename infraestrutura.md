@@ -61,7 +61,7 @@
 | Pacote | Finalidade |
 | :--- | :--- |
 | `FirebaseAdmin` | SDK oficial para autenticação e administração do Firebase |
-| `Google.Cloud.Firestore` | Cliente nativo para operações CRUD no Firestore (modo Datastore) |
+| `Google.Cloud.Firestore` | Cliente nativo para operações CRUD no Firestore  |
 | `Swashbuckle.AspNetCore` | Geração automática da documentação Swagger/OpenAPI |
 | `Serilog.AspNetCore` | Log estruturado no lado do servidor com sinks para arquivo e console |
 
