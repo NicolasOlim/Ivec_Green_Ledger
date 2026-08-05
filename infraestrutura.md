@@ -92,8 +92,8 @@
 | **Cota gratuita do Firebase excedida** | Média | Alto | Migrar para plano Blaze ou banco relacional próprio. |
 | **Indisponibilidade das APIs externas** (NHTSA, BrasilAPI) | Média | Médio | Cache local de CNPJ/VIN já validados; fallback para verificação manual. |
 | **Incompatibilidade de versão do .NET Runtime** | Baixa | Alto | Verificar instalação do runtime adequado no checklist de implantação; distribuir instalador junto. |
-| **Falha de hardware no terminal de operação** | Baixa | Médio | Manter máquina reserva configurada; utilizar dispositivos móveis provisórios. |
-| **Ataques de brut force ou SQL Injection** | Baixa | Crítico | HTTPS mandatório, CORS restrito, hash de senhas, validação de inputs. |
+
+
 
 ## 7. Plano de Contingência
 
