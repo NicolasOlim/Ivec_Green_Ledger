@@ -99,7 +99,7 @@
 | Risco | Probabilidade | Impacto | Mitigação |
 | :--- | :--- | :--- | :--- |
 | **Queda de conectividade** | Alta | Médio | Operação offline com SQLite; sincronização automática ao reconectar. |
-| **Cota gratuita do Firebase excedida** | Média | Alto | Migrar para plano Blaze (pay‑as‑you‑go) ou banco relacional próprio. |
+| **Cota gratuita do Firebase excedida** | Média | Alto | Migrar para plano Blaze ou banco relacional próprio. |
 | **Indisponibilidade das APIs externas** (NHTSA, BrasilAPI) | Média | Médio | Cache local de CNPJ/VIN já validados; fallback para verificação manual. |
 | **Incompatibilidade de versão do .NET Runtime** | Baixa | Alto | Verificar instalação do runtime 8.0 no checklist de implantação; distribuir instalador junto. |
 | **Falha de hardware no terminal de pátio** | Baixa | Médio | Manter máquina reserva configurada; protocolo de registro manual até substituição. |
