@@ -33,7 +33,7 @@
 | Software | Finalidade |
 | :--- | :--- |
 | **Microsoft .NET Runtime** 8.0.29 | Obrigatório para execução do aplicativo WPF |
-| **Microsoft Visual C++ Redistributable** | Necessário para execução de dependências e bibliotecas nativas (ex: renderização gráfica) |
+| **Microsoft Visual C++ Redistributable** | Necessário para execução de dependências e bibliotecas nativas |
 | **Windows** | Sistema operacional base (64-bit) |
 
 ### 3.2 Servidor
