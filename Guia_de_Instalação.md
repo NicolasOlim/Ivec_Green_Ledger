@@ -1,7 +1,5 @@
 # 📦⚙️ Iveco Green Ledger – Guia de Instalação
 
-<img src="imagens/logo do guia.png" alt="Logo Firebase Firestore" class="logo-img" style="height: 150px; width: auto; vertical-align: middle; margin-left: 15px;">
-
 Este documento é voltado para descrever todos os procedimentos necessários para realizar a implantação, configuração e manutenção do projeto e portarias da Iveco.
 
 ---
