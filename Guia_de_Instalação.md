@@ -81,22 +81,22 @@ O instalador e a aplicação organizam seus arquivos nos seguintes caminhos padr
 
   - **2-) Execução do Instalador:**
     * Clica com o botão direito do mouse sobre o arquivo (`Setup.exe`) e seleciona **Executar como administrador**.
-       
-    <img src="imagens/Impletação do Sistema(Parte 1).png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px">
+
+   <img src="imagens/Executar o instalador com ADM.png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px">
        
 - **3-) Navegação pelo Assistente de Instalação:**
   
     * **Tela inicial:** Clique em **Avançar** para iniciar o processo.
 
-       (PRINT DO INSTALADOR AQUI)
+   <img src="imagens/Impletação do Sistema(Parte 1).png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px">
+       
       
-    * **Contrato de Licença:** Leia os termos de uso restrito corporativo (`Licenca.txt`), seleciona a opção "Aceito os termos do contrato de licença" e clique em **Avançar**.
-
-      (PRINT DOS TERMOS DE USO DO INSTALADOR AQUI)
+    * **Contrato de Licença:** Leia os termos de uso restrito corporativo, seleciona a opção "Aceito os termos do contrato de licença" e clique em **Avançar**.
+       
       
     * **Seleção de Destino:** Mantenha o caminho padrão (`C:\Program Files\GreenLedger`) ou altere para o diretório corporativo.
 
-      (PRINT SELECIONAR DIRTETORIO DO INSTALADOR)
+   <img src="imagens/Implementação do Sistema(Parte 3).png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px">
       
     * **Opções de Atalho:** Mantenha habilitada as opções para criação de atalhos na **Área de Trabalho** e no **Menu Iniciar**.
 
@@ -104,7 +104,7 @@ O instalador e a aplicação organizam seus arquivos nos seguintes caminhos padr
     
     * Clique em **Instalar** e aguarde a cópia dos arquivos.
 
-    (PRINT DO INSTALADOR FAZENDO INSTALAÇAO)
+    <img src="imagens/Implementação do Sistema(Parte 4).png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px">
    
     * Ao finalizar, clique em **Concluir**. A aplicação estará instalada e pronta para configuração.
    
