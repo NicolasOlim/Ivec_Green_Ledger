@@ -33,5 +33,4 @@ O ecossistema utiliza dependências e bibliotecas de código aberto para viabili
 
 | Componente / Biblioteca | Licença de Terceiros | Finalidade no projeto |
 | :--- | :--- | :--- |
-| **Aplicação Desktop (WPF / .NET 8)** | Proprietária | Interface do operador para uso nas estações de trabalho do pátio logístico e portaria: triagem de insumos, leitura de dados, consulta de chassis/VINs e envio de solicitações para a API. |
-
+| **.NET 8 SDK / WPF** | MIT License | Framwework base para desenvolvimento do cliente desktop e da API |
