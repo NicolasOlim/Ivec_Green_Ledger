@@ -34,6 +34,7 @@ O ecossistema utiliza dependências e bibliotecas de código aberto para viabili
 | Componente / Biblioteca | Licença de Terceiros | Finalidade no projeto |
 | :--- | :--- | :--- |
 | **.NET 8 SDK / WPF** | MIT License | Framwework base para desenvolvimento do cliente desktop e da API |
+| **Microsoft Visual Studio 2022** | Proprietária / Community | Ambiente de Desenvolvimento Integrado (IDE) utilizado para codificação, depuração, compilação e publicação da aplicação |
 
 ---
 
