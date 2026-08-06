@@ -8,8 +8,8 @@ Essa documentação se aplica ao manual operacional de instruções para o uso d
 
 ---
 
-## **1. Apresentação e Objetivo do Sistema**
-O **Iveco Green Ledger** é uma solução desenvolvida para gerenciar a triagem logística de pátio, a rastreabilidade de suprimentos e o cálculo automatizado da pegada de carbono, com foco no escopo 3 do GHG Protocol. O objetivo do sistema é unir a operação física da fábrica aos compromissos de sustentabilidade da IVECO, fornecendo um ambiente centralizado onde:
+## *1. Apresentação e Objetivo do Sistema*
+O *Iveco Green Ledger* é uma solução desenvolvida para gerenciar a triagem logística de pátio, a rastreabilidade de suprimentos e o cálculo automatizado da pegada de carbono, com foco no escopo 3 do GHG Protocol. O objetivo do sistema é unir a operação física da fábrica aos compromissos de sustentabilidade da IVECO, fornecendo um ambiente centralizado onde:
 
    * Fornecedores são qualificados e avaliados por suas práticas ambientais.
    * A entrada de componentes e matérias-primas é monitorada.
@@ -18,132 +18,414 @@ O **Iveco Green Ledger** é uma solução desenvolvida para gerenciar a triagem 
 
 ---
 
-## **2. Requisitos de Acesso e Conectividade**
+## *2. Requisitos de Acesso e Conectividade*
 
-- **Ambiente:** Computador com sistema operacional Windows 10(64-bit) ou superior e .NET 8 instalado.
-- **Conectividade:** A conexão ativa e obrigatória com a internet.
-- **Credenciais de Acesso:** E-mail previamente autorizado pela administração do sistema.
+- *Ambiente:* Computador com sistema operacional Windows 10(64-bit) ou superior e .NET 8 instalado.
+- *Conectividade:* A conexão ativa e obrigatória com a internet.
+- *Credenciais de Acesso:* E-mail previamente autorizado pela administração do sistema.
+
+---
+
+## *3. Autenticação e Primeiro Acesso*
+
+O acesso ao sistema é restrito para garantir a segurança dos dados industriais e de logística.
+
+- *1º Etapa - Realizando o login:*
+
+    <img src="imagens/login.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 100px solid #ddd; margin: 850px 0;">
+
+* Abra a aplicação em sua estação de trabalho;
+* Na tela inicial, insira o *e-mail* e *senha*;
+* Clique em *Entrar*, o sistema consultará a Web API para autenticar o perfil e liberar as permissões correspondentes.
+
+---
+
+- *2º Etapa - Módulo de Fornecedores:*
+
+Módulo voltado para o cadastramento, consulta cadastral automatizada e atribuição de classificação ambiental de parceiros comerciais na rede permissionada do projeto.
+
+   <img src="imagens/fornecedor.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 100px solid #ddd; margin: 850px 0;">
+
+*Cadastro e Consulta via Receita Federal*
+
+* No menu lateral de navegação, clique na opção *Fornecedores*;
+* Na tela *Gestão de Fornecedores, insira o **CNPJ* da empresa no campo de busca(formato 00.000.000/0000-00);
+* Clique no botão azul *Consultar CNPJ* para disparar a busca automatizada dos dados;
+* O sistema preencherá automaticamente as informações da empresa?
+  - *Razão Social*;
+  - *Endereço sede*;
+  - *Status RFB* que exibe a situação cadastral retomada da consulta.
+
+ *Classificação ESG e Registro no Ledger*
+
+* No menu suspenso *Categoria ESG(Atribuída)*, selecione a qualificação correspondente á empresa;
+* Após conferir os dados, clique no botão verde *Registrar no Ledger*;
+* O parceiro será salvo na rede e ficará disponível para vínculo nos módulos de produção e rastreabilidade.
+
+---
+
+- *3º Etapa - Módulo de Componentes e Rastreabilidade (Peças e Componentes):*
+
+Utilizado no pátio logístico e na linha de montagem para associar peças recebidas aos veículos cadastrados no sistema:
+ <img src="imagens/gestao_de_componentes.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 100px solid #ddd; margin: 850px 0;">
+
+*Associação e Registros de Peças ao Veículo(VIN)*
+
+* No menu lateral, acesse a opção *Peças e Componentes*;
+* Na tela *Gestão de Componentes*, preencha o formulário de cadastro;
+  - *Chassi do Veículo(VIN):* Selecione o código de 17 caracteres do veículo atrelado (ex: ZCFA1E0200812345.
+  - *Fornecedor:* Selecione o fornecedor responsável pela peça (ex: ROBERT BOSCH LIM).
+  - *Nome / Descrição da Peça:* Digite o nome do componentes (ex: Volante, Virabrequim, Cabeçote, Bloco do motor).
+  - *Peso da Peça(kg):* Insira o peso do componente em quilogramas (ex: 65.00).
+* Clique no botão verde *+ Registrar Peça*.
+
+*Histórico e Confirmação de Registros*
+
+* No painel *Últimas Peças Registradas* acompanha o histórico de itens associados e o contador total de peças;
+* A tag verde *Gravado no Ledger* indica que o componente foi slavo e vinculado ao histórico auditável do veículo.
+
+---
+
+- *4º Etapa - Módulo de Sustentabilidade, Análises ESG e Dashboard Geral:*
+
+Central de monitoramento de saúde das integrações, visão geral do sistema e emissão de relatórios corporativos:
+
+ <img src="imagens/dashboard.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 100px solid #ddd; margin: 850px 0;">
 
 
+*Visão Geral e Status dos Serviços(Dashboard)*
 
-## **4. Primeiro Acesso e Tela Inicial**
+* No menu lateral, acesse *Dashboard*;
+* No canto superior direito, monitora o tempo real o status de conexão dos serviços externos.
 
-O sistema exige autenticação rigorosa para garantir a segurança dos dados logísticos e industriais.
+*Análises ESG e Relatório*
 
-**4.1. Realizando o Login**
+* *Análises ESG:* Acesse a opção do menu lateral para visualizar métricas de impacto e consolidados ambientais;
+* *Relatórios PDF:* Clique em *Relatórios PDF* no menu lateral para emitir e exportar os relatórios oficiais de auditoria e governança.
 
-- Abra o aplicativo **Iveco Green Ledger** em sua estação de trabalho.
-- Na tela inicial, insira seu **E-mail** e **Senha** nos campos de autenticação.
+---
 
+*5º Etapa - Consultas de Mercado e Suporte:*
+
+ *Integração e Consulta no Mercado Livre*
+
+ * O sistema possui integração com a API do *Mercado Livre* para auxiliar na consulta de cotações, estimativas e tendências de preços de componentes mecânicos e insumos;
+ * O status de operação e conexão desse serviço pode ser monitorado no topo da tela *Dashboard* no indicador *Mercado Livre*.
+
+ *Abrindo um Chamado de Suporte*
+
+ * No menu lateral de navegação, acesse a opção *Dashboard*;
+ * Na parte inferior da tela, localize o painel *Registrar Solicitação de Suporte*;
+ * Preencha os campos do formulário;
+   - *Tipo de Problema:* Selecione a categoria de ocorrência no menu suspenso.
+   - *Prioridade:* Defina o nível de urgência do atendimento.
+   - *Nome do Solicitante:* Informe o seu nome ou identificação do operador.
+   - *Descrição do Problema:* Descreva detalhadamente a falha identificada ou a manutenção necessária no campo de texto.
+ * Após o preenchimento, envia a solicitação. O chamado será encaminhado diretamente para o painel da equipe.
+
+---
+
+## *9. Solução de Problemas e Perguntas Frequentes (FAQ)*
+
+ <img src="imagens/logo-faq.webp" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 100px solid #ddd; margin: 850px 0;">
+
+*-) O CNPJ não é preenchido automaticamente ao clicar em "Consultar CNPJ"*
+
+ * *Causa Provável:* Instabilidade no serviço da BrasilAPI ou CNPJ digitado em formato incorreto.
+ * *Procedimento:* 
+
+  - Certique-se de digitar os 14 números do CNPJ no formato (00.000.000./0000.00);
+  - Acesse a tela *Dashboard* para verificar se a integração com a BrasilAPI está online;
+  - Caso esteja indisponível, preencha manualmente a *Razão Social* e o *Endereço sede*.
+
+---
+
+*-) A validação do Chassi(VIN) falhou ou retornou erro na consulta*
+
+ * *Causa Provável:* O código digitado possui tamanho incorreto, contém caracteres proibidos ou a API da NHTSA está inacessível.
+ * *Procedimento:*
+
+  - Verifique que o código possui exatamente 17 caracteres alfanuméricos;
+  - Lembre de que as letras *I, **O* e *Q* não são utilizadas em chassis para evitar confusão com números;
+  - Confira no Dashboard se o indicador da NHTSA está verde;
+
+---
+
+*-) O endereço do Fornecedor não é sugerido no campo "Endereço Sede"*
+
+ * *Causa Provável:* Oscilação na API do Google ou limite de requições atingido.
+ * *Procedimento:*
+
+  - Digite o endereço completo contendo rua, número, cidade e estado;
+  - Se o status da API do Google estiver inativo no *Dashboard, faça o preenchimento manual do campo antes de clicar no botão **Registrar no Ledger*.
+
+---
+
+*-) Não recebi o e-mail de acesso ou falha na autenticação da plataforma*
+
+ * *Causa Provável:* Digitação incorreta das credenciais na tela *Acessar Plataforma* ou bloqueio pelo firewall do email da Iveco Green Ledger.
+ * *Procedimento:*
+
+  - Verifica os campos *Endereço de E-mail* e *Palavra Passe* foram preenchidos corretamente;
+  - Verifica as pastas de "lixo eletrônico" ou "Spam";
+  - Se os problemas persistir, solicite liberação junto á equipe.
+
+---
+
+*-) Um ou mais indicadores de API aparecem com luz vermelha no Dashboard"*
+
+ * *Causa Provável:* Oscilação na conexão com a internet da estação de trabalho ou indisponibilidade temporária nos servidores externos(Brasil API, Places, NHTSA, Mercado Livre).
+ * *Procedimento:*
+
+  - Verifica os cartões *Falha de Integração* e *Tempos de Resposta(API)* no Dashboard;
+  - Certifique-se de que o computador está conectado á rede;
+  - O sistema permite o preenchimento e salvamento manual até o restabelecimento das conexões.
+
+---
+
+*-) Não consigo registrar um componente na tela "Peças e Componentes"*
+
+ * *Causa Provável:* O fornecedor do item não foi previamente cadastrado na rede ou os campos obrigatórios não foram selecionados.
+ * *Procedimento:*
+
+  - Acesse a tela *Fornecedores* no menu lateral e confirme se a empresa foi devidamente gravada no Ledger;
+  - Volte em *Peças e Componentes, selecione o **Chassi do Veículo(VIN)* e o *Fornecedor* nos menus suspensos antes de clicar em *+ Registar Peça*.
+
+---
+
+*-) A peça cadastrada não é listada em "Últimas Peças Registradas"*
+
+ * *Causa Provável:* Falha na comunicação com o banco de dados do Ledger ou necessidade de atualização na interface.
+ * *Procedimento:*
+
+  - Certifique-se de preencher a *Descrição da Peça* e o *Peso da peça(kg)*;
+  - Após registar, verifique-se o card exige a tag verde *Gravado no Ledger*.
+
+---
+
+*-) Preciso relatar uma falha ou solicitar suporte para o sistema"*
+
+ * *Causa Provável:* Ocorrência de problemas técnicos, inconsistências nos dados ou necessidade de manutenção na estação de trabalho.
+ * *Procedimento:*
+
+  - Acesse o menu *Dashboard* e vá até o painel *Registar Solicitação de Suporte*;
+  - Selecione o *Tipo de Pr*
+
+Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.  
+Última atualização: 05 de agosto de 2026.
+*# 📦🍃 Iveco Green Ledger – Manual do Usuário
 
 <div class="logo-container" align="center">
-    <!-- INSIRA AQUI A IMAGEM DA TELA DE LOGIN -->
-    <img src="imagens/login.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
+    <img src="imagens/icone_manual.jpg" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 
-**4.2. Verificação de E-mail de Usuário**
-
-* Clique em **Entrar**. O sistema consultará as credenciais selecionadas pelo usuario e
- fara a liberaçao do sistema depois que tudo for autenticado .
-  
----
-
-## **8. Consultas de Mercado e Central de Suporte**
-
-**8.1. Consulta no Mercado Livre**
-1. Acesse **Ferramentas** > **Mercado Livre**.
-2. Insira o termo da busca (ex: componente mecânico ou acessório). O sistema comunicará com a API do Mercado Livre para retornar cotações e tendências de preço, auxiliando balanços rápidos do setor de compras.
-
-<div class="logo-container" align="center">
-    <!-- INSIRA AQUI A IMAGEM DA TELA DE CONSULTA DE MERCADO -->
-    <img src="imagens/mercado_livre.png" alt="Tela de Consulta de Mercado" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
-</div>
-
-**8.2. Abrindo um Chamado de Suporte**
-1. Para relatar falhas ou solicitar manutenção, vá em **Central de Suporte**.
-2. Preencha o assunto, descreva o problema no campo de texto e clique em **Enviar Chamado**. A requisição irá direto para o controlador da equipe de TI.
+Essa documentação se aplica ao manual operacional de instruções para o uso da aplicação WPF em estações de trabalho e portarias da IVECO, cobrindo navegação, cadastros, integrações de API's e visualização de dados de governança ambiental em nuvem.
 
 ---
 
-## **6. Rastreabilidade (**
+## *1. Apresentação e Objetivo do Sistema*
+O *Iveco Green Ledger* é uma solução desenvolvida para gerenciar a triagem logística de pátio, a rastreabilidade de suprimentos e o cálculo automatizado da pegada de carbono, com foco no escopo 3 do GHG Protocol. O objetivo do sistema é unir a operação física da fábrica aos compromissos de sustentabilidade da IVECO, fornecendo um ambiente centralizado onde:
 
-Utilizado nas linhas de montagem para controle de ativos.
-
-**6.1. Entrada de Matéria-Prima (Lotes)**
-1. No menu principal, acesse **Rastreabilidade** > **Busca no Blockchain**.
-2. Clique em **rastrear Origem**. Insira o código VIN do Veiculo.
-3. Clique em registrar, ele será salvo no sistema.
-
-<div class="logo-container" align="center">
-    <img src="imagens/gestao_de_componentes.png" alt="Tela de Registro de Lotes" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
-</div>
-
-**6.2. Registro de Peças e Componentes**
-
-1. Vá até o módulo **Chassi do Veículo VIN** selecione o VIN cadastrado, 
-2. vá até o módulo **Fornecedor** selecione o Fornecedor cadastrado.
-3. Clique em **Nome e Registro de peça** cadastre as informaçoes.
-4. Faça a mesma coisa em **Peso da peça (kg)**
-5. Por fim Clique em Registrar peça, o sistema vai fazer a autenticaçao e Registrar no Sistema
-
+   * Fornecedores são qualificados e avaliados por suas práticas ambientais.
+   * A entrada de componentes e matérias-primas é monitorada.
+   * A montagem e composição de veículos são rastreadas peça a peça.
+   * As emissões de gases de efeito estufa são calculadas e consolidadas em tempo real.
 
 ---
 
-## **7. Módulo de Sustentabilidade e ESG**
+## *2. Requisitos de Acesso e Conectividade*
 
-Painéis de controle abastecidos em tempo real pelas informações geradas na triagem e produção.
-
-**7.1. Lançamento e Acompanhamento de Escopos**
-1. Acesse o menu **Sustentabilidade**.
-2. Em **Escopos de Emissão**, os valores do *Escopo 3* serão automaticamente populados pelas notas e transportes registrados dos Fornecedores. O operador pode adicionar manualmente dados de operações internas.
-
-**7.2. Gráficos Analíticos**
-1. Em **Dashboard ESG**, visualize os *Gráficos de Emissões*. O sistema processa os dados salvos no Firebase para mostrar a evolução da pegada de carbono mensal.
-2. Na aba **Análises ESG**, é possível visualizar métricas sociais e de governança para fins de compliance.
-
-<div class="logo-container" align="center">
-    <img src="imagens/dashboard.png" alt="Dashboard de Sustentabilidade" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
-</div>
+- *Ambiente:* Computador com sistema operacional Windows 10(64-bit) ou superior e .NET 8 instalado.
+- *Conectividade:* A conexão ativa e obrigatória com a internet.
+- *Credenciais de Acesso:* E-mail previamente autorizado pela administração do sistema.
 
 ---
 
-## **9. Solução de Problemas e Perguntas Frequentes (FAQ)**
+## *3. Autenticação e Primeiro Acesso*
 
-Abaixo, listamos 8 situações comuns na operação da plataforma e as instruções técnicas para resolvê-las.
+O acesso ao sistema é restrito para garantir a segurança dos dados industriais e de logística.
 
-**1. O CNPJ não está sendo preenchido automaticamente ao cadastrar um fornecedor.**
-*   *Causa:* Falha na comunicação com a Brasil API ou formato inválido.
-*   *Solução:* Certifique-se de digitar os 14 números do CNPJ sem pontos ou traços. Verifique se o computador possui acesso à rede externa e se a Brasil API não está temporariamente indisponível.
+- *1º Etapa - Realizando o login:*
 
-**2. A validação de Chassi (VIN) falhou ou retornou "Veículo Não Encontrado".**
-*   *Causa:* O número VIN (Vehicle Identification Number) digitado está fora dos padrões internacionais ou a API da NHTSA recusou o código.
-*   *Solução:* Verifique se o código possui exatamente 17 caracteres. Lembre-se que letras como 'I', 'O' e 'Q' não são usadas em chassis para evitar confusão com números.
+    <img src="imagens/login.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 100px solid #ddd; margin: 850px 0;">
 
-**3. O endereço do Fornecedor não é autocompletado no formulário.**
-*   *Causa:* Falha no serviço do Google Places Response.
-*   *Solução:* Digite a rua acompanhada da cidade (ex: "Av. Industrial, Nova Lima"). Caso o erro persista, o limite de requisições à API do Google pode ter sido atingido pelo backend; nesse caso, preencha manualmente e acione o suporte.
-
-**4. Não recebi o e-mail de validação de conta ou redefinição de senha.**
-*   *Causa:* Bloqueio de firewall corporativo ou atraso no *Email Validation Service*.
-*   *Solução:* Aguarde 5 minutos e verifique as pastas de "Lixo Eletrônico" ou "Spam". Se usar e-mail da Iveco, peça ao TI para liberar envios provenientes do domínio do Green Ledger.
-
-**5. Os dados cadastrados não estão aparecendo para os outros computadores do pátio.**
-*   *Causa:* Assincronia entre o banco SQLite (cache local) e o Firebase (nuvem).
-*   *Solução:* O aplicativo pode ter entrado em modo offline devido a quedas na rede, salvando apenas no SQLite. Verifique sua conexão. Assim que a rede for restaurada, o sistema subirá automaticamente a fila de registros para o Firebase e a Web API atualizará todos os painéis.
-
-**6. A pesquisa no Mercado Livre retorna tela vazia sem resultados.**
-*   *Causa:* Termos muito genéricos ou itens não listados comercialmente na plataforma.
-*   *Solução:* Refine a busca utilizando o nome técnico específico do componente ou o código da peça. Se a tela estiver demorando muito para carregar, a Web API pode estar lidando com lentidão nos servidores externos.
-
-**7. Não consigo vincular um Lote de Matéria-Prima a um Veículo (VeiculoComponente).**
-*   *Causa:* O lote não existe ou a quantidade do lote já foi totalmente alocada a outros veículos.
-*   *Solução:* Acesse o menu **Lotes de Matéria-Prima** e confira se o lote em questão foi devidamente "Registrado" ou se o saldo de peças dele já zerou na linha de produção.
-
-**8. O Dashboard de Gráficos de Emissões está em branco em um determinado mês.**
-*   *Causa:* Ausência de dados processados no `EscopoEmissaoDto` ou transações logísticas insuficientes.
-*   *Solução:* O gráfico apenas plota informações de lotes ou fornecedores devidamente marcados como "Fornecedor Verde" ou que tiveram suas rotas concluídas e salvas no banco. Certifique-se de que a triagem do mês foi finalizada no sistema.
+* Abra a aplicação em sua estação de trabalho;
+* Na tela inicial, insira o *e-mail* e *senha*;
+* Clique em *Entrar*, o sistema consultará a Web API para autenticar o perfil e liberar as permissões correspondentes.
 
 ---
 
-*Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
-*Última atualização: 05 de agosto de 2026.*
+- *2º Etapa - Módulo de Fornecedores:*
+
+Módulo voltado para o cadastramento, consulta cadastral automatizada e atribuição de classificação ambiental de parceiros comerciais na rede permissionada do projeto.
+
+   <img src="imagens/fornecedor.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 100px solid #ddd; margin: 850px 0;">
+
+*Cadastro e Consulta via Receita Federal*
+
+* No menu lateral de navegação, clique na opção *Fornecedores*;
+* Na tela *Gestão de Fornecedores, insira o **CNPJ* da empresa no campo de busca(formato 00.000.000/0000-00);
+* Clique no botão azul *Consultar CNPJ* para disparar a busca automatizada dos dados;
+* O sistema preencherá automaticamente as informações da empresa?
+  - *Razão Social*;
+  - *Endereço sede*;
+  - *Status RFB* que exibe a situação cadastral retomada da consulta.
+
+ *Classificação ESG e Registro no Ledger*
+
+* No menu suspenso *Categoria ESG(Atribuída)*, selecione a qualificação correspondente á empresa;
+* Após conferir os dados, clique no botão verde *Registrar no Ledger*;
+* O parceiro será salvo na rede e ficará disponível para vínculo nos módulos de produção e rastreabilidade.
+
+---
+
+- *3º Etapa - Módulo de Componentes e Rastreabilidade (Peças e Componentes):*
+
+Utilizado no pátio logístico e na linha de montagem para associar peças recebidas aos veículos cadastrados no sistema:
+ <img src="imagens/RASTREABILIDADEPRINT.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 100px solid #ddd; margin: 850px 0;">
+
+*Associação e Registros de Peças ao Veículo(VIN)*
+
+* No menu lateral, acesse a opção *Peças e Componentes*;
+* Na tela *Gestão de Componentes*, preencha o formulário de cadastro;
+  - *Chassi do Veículo(VIN):* Selecione o código de 17 caracteres do veículo atrelado (ex: ZCFA1E0200812345.
+  - *Fornecedor:* Selecione o fornecedor responsável pela peça (ex: ROBERT BOSCH LIM).
+  - *Nome / Descrição da Peça:* Digite o nome do componentes (ex: Volante, Virabrequim, Cabeçote, Bloco do motor).
+  - *Peso da Peça(kg):* Insira o peso do componente em quilogramas (ex: 65.00).
+* Clique no botão verde *+ Registrar Peça*.
+
+*Histórico e Confirmação de Registros*
+
+* No painel *Últimas Peças Registradas* acompanha o histórico de itens associados e o contador total de peças;
+* A tag verde *Gravado no Ledger* indica que o componente foi slavo e vinculado ao histórico auditável do veículo.
+
+---
+
+- *4º Etapa - Módulo de Sustentabilidade, Análises ESG e Dashboard Geral:*
+
+Central de monitoramento de saúde das integrações, visão geral do sistema e emissão de relatórios corporativos:
+
+ <img src="imagens/dashboard.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 100px solid #ddd; margin: 850px 0;">
+
+
+*Visão Geral e Status dos Serviços(Dashboard)*
+
+* No menu lateral, acesse *Dashboard*;
+* No canto superior direito, monitora o tempo real o status de conexão dos serviços externos.
+
+*Análises ESG e Relatório*
+
+* *Análises ESG:* Acesse a opção do menu lateral para visualizar métricas de impacto e consolidados ambientais;
+* *Relatórios PDF:* Clique em *Relatórios PDF* no menu lateral para emitir e exportar os relatórios oficiais de auditoria e governança.
+
+---
+
+*5º Etapa - Consultas de Mercado e Suporte:*
+
+ *Integração e Consulta no Mercado Livre*
+
+ * O sistema possui integração com a API do *Mercado Livre* para auxiliar na consulta de cotações, estimativas e tendências de preços de componentes mecânicos e insumos;
+ * O status de operação e conexão desse serviço pode ser monitorado no topo da tela *Dashboard* no indicador *Mercado Livre*.
+
+ *Abrindo um Chamado de Suporte*
+
+ * No menu lateral de navegação, acesse a opção *Dashboard*;
+ * Na parte inferior da tela, localize o painel *Registrar Solicitação de Suporte*;
+ * Preencha os campos do formulário;
+   - *Tipo de Problema:* Selecione a categoria de ocorrência no menu suspenso.
+   - *Prioridade:* Defina o nível de urgência do atendimento.
+   - *Nome do Solicitante:* Informe o seu nome ou identificação do operador.
+   - *Descrição do Problema:* Descreva detalhadamente a falha identificada ou a manutenção necessária no campo de texto.
+ * Após o preenchimento, envia a solicitação. O chamado será encaminhado diretamente para o painel da equipe.
+
+---
+
+## *9. Solução de Problemas e Perguntas Frequentes (FAQ)*
+
+ <img src="imagens/logo-faq.webp" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 100px solid #ddd; margin: 850px 0;">
+
+*-) O CNPJ não é preenchido automaticamente ao clicar em "Consultar CNPJ"*
+
+ * *Causa Provável:* Instabilidade no serviço da BrasilAPI ou CNPJ digitado em formato incorreto.
+ * *Procedimento:* 
+
+  - Certique-se de digitar os 14 números do CNPJ no formato (00.000.000./0000.00);
+  - Acesse a tela *Dashboard* para verificar se a integração com a BrasilAPI está online;
+  - Caso esteja indisponível, preencha manualmente a *Razão Social* e o *Endereço sede*.
+
+---
+
+*-) A validação do Chassi(VIN) falhou ou retornou erro na consulta*
+
+ * *Causa Provável:* O código digitado possui tamanho incorreto, contém caracteres proibidos ou a API da NHTSA está inacessível.
+ * *Procedimento:*
+
+  - Verifique que o código possui exatamente 17 caracteres alfanuméricos;
+  - Lembre de que as letras *I, **O* e *Q* não são utilizadas em chassis para evitar confusão com números;
+  - Confira no Dashboard se o indicador da NHTSA está verde;
+
+---
+
+*-) O endereço do Fornecedor não é sugerido no campo "Endereço Sede"*
+
+ * *Causa Provável:* Oscilação na API do Google ou limite de requições atingido.
+ * *Procedimento:*
+
+  - Digite o endereço completo contendo rua, número, cidade e estado;
+  - Se o status da API do Google estiver inativo no *Dashboard, faça o preenchimento manual do campo antes de clicar no botão **Registrar no Ledger*.
+
+---
+
+*-) Não recebi o e-mail de acesso ou falha na autenticação da plataforma*
+
+ * *Causa Provável:* Digitação incorreta das credenciais na tela *Acessar Plataforma* ou bloqueio pelo firewall do email da Iveco Green Ledger.
+ * *Procedimento:*
+
+  - Verifica os campos *Endereço de E-mail* e *Palavra Passe* foram preenchidos corretamente;
+  - Verifica as pastas de "lixo eletrônico" ou "Spam";
+  - Se os problemas persistir, solicite liberação junto á equipe.
+
+---
+
+*-) Um ou mais indicadores de API aparecem com luz vermelha no Dashboard"*
+
+ * *Causa Provável:* Oscilação na conexão com a internet da estação de trabalho ou indisponibilidade temporária nos servidores externos(Brasil API, Places, NHTSA, Mercado Livre).
+ * *Procedimento:*
+
+  - Verifica os cartões *Falha de Integração* e *Tempos de Resposta(API)* no Dashboard;
+  - Certifique-se de que o computador está conectado á rede;
+  - O sistema permite o preenchimento e salvamento manual até o restabelecimento das conexões.
+
+---
+
+*-) Não consigo registrar um componente na tela "Peças e Componentes"*
+
+ * *Causa Provável:* O fornecedor do item não foi previamente cadastrado na rede ou os campos obrigatórios não foram selecionados.
+ * *Procedimento:*
+
+  - Acesse a tela *Fornecedores* no menu lateral e confirme se a empresa foi devidamente gravada no Ledger;
+  - Volte em *Peças e Componentes, selecione o **Chassi do Veículo(VIN)* e o *Fornecedor* nos menus suspensos antes de clicar em *+ Registar Peça*.
+
+---
+
+*-) A peça cadastrada não é listada em "Últimas Peças Registradas"*
+
+ * *Causa Provável:* Falha na comunicação com o banco de dados do Ledger ou necessidade de atualização na interface.
+ * *Procedimento:*
+
+  - Certifique-se de preencher a *Descrição da Peça* e o *Peso da peça(kg)*;
+  - Após registar, verifique-se o card exige a tag verde *Gravado no Ledger*.
+
+---
+
+*-) Preciso relatar uma falha ou solicitar suporte para o sistema"*
+
+ * *Causa Provável:* Ocorrência de problemas técnicos, inconsistências nos dados ou necessidade de manutenção na estação de trabalho.
+ * *Procedimento:*
+
+  - Acesse o menu *Dashboard* e vá até o painel *Registar Solicitação de Suporte*;
+  - Selecione o *Tipo de Pr*
+
+Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.  
+Última atualização: 05 de agosto de 2026.
+*
