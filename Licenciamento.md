@@ -35,6 +35,7 @@ O ecossistema utiliza dependências e bibliotecas de código aberto para viabili
 | :--- | :--- | :--- |
 | **.NET 8 SDK / WPF** | MIT License | Framwework base para desenvolvimento do cliente desktop e da API |
 
+---
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
 *Última atualização: 06 de agosto de 2026.*
