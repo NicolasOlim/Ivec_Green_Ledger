@@ -45,8 +45,7 @@ O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclu
 - [Infraestrutura](./infraestrutura.md)
 - [Manual do Usuário](./Manual_do_Usuario.md)
 - [Guia de Instalação](./Guia_de_Instalação.md)
-
----
+- [Licenciamenento](./Licenciamento.md)
 
 ---
 
