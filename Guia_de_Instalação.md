@@ -63,10 +63,10 @@ Para assegurar o correto funcionamento da triagem automatizada, nossa equipe tev
 O instalador e a aplicação organizam seus arquivos nos seguintes caminhos padrão do sistema operacional Windows:
 
 - **Diretório de Binários e Executáveis:**
-  * `C:\Program Files\Iveco\GreenLedger` contém o executável principal (`IvecoGreenLedger.exe`), bibliotecas (`.dll`), arquivos de dependência e o arquivo de configuração de parâmetros (`appsettings.json`).
+  * `C:\Program Files\GreenLedger` contém o executável principal (`IvecoGreenLedger.exe`), bibliotecas (`.dll`), arquivos de dependência e o arquivo de configuração de parâmetros.
 
 - **Diretório de Dados de Usuário e Cache em Borda:**
-  * `C:Users\[NomeDoUsuario]\AppData\Roaming\Iveco\GreenLedger\` contém a base de dados relacional local SQLite (`localcache.db`), arquivos de logs de execução e arquivos de estado da sessão do operador.
+  * `C:Users\[NomeDoUsuario]\AppData\Roaming\Iveco\GreenLedger\` contém arquivos de logs de execução e arquivos de estado da sessão do operador.
 
   ---
 
@@ -75,21 +75,40 @@ O instalador e a aplicação organizam seus arquivos nos seguintes caminhos padr
   Siga a sequência operacional abaixo para realizar a implantação do sistema no terminal local:
 
   - **1-) Obtenção do Pacote de Distribuição:**
-    * Faça o download do arquivo compactado referente á release (exemplo `Release_v1.0.0.zip`).
-    * Extraia o conteúdo do pacote em uma pasta temporária local na máquina.
+    * Faça o download do arquivo.
+      
+    * Extraia o conteúdo do pacote em uma pasta local na máquina.
 
   - **2-) Execução do Instalador:**
     * Clica com o botão direito do mouse sobre o arquivo (`Setup.exe`) e seleciona **Executar como administrador**.
 
+      (COLOQUE IMAGEM AQUI DO INSTALADOR + EXECUTAR COMO ADMINISTRAR)
+
 - **3-) Navegação pelo Assistente de Instalação:**
+  
     * **Tela inicial:** Clique em **Avançar** para iniciar o processo.
+
+       (PRINT DO INSTALADOR AQUI)
+      
     * **Contrato de Licença:** Leia os termos de uso restrito corporativo (`Licenca.txt`), seleciona a opção "Aceito os termos do contrato de licença" e clique em **Avançar**.
-    * **Seleção de Destino:** Mantenha o caminho padrão (`C:\Program Files\Iveco\GreenLedger`) ou altere para o diretório corporativo.
+
+      (PRINT DOS TERMOS DE USO DO INSTALADOR AQUI)
+      
+    * **Seleção de Destino:** Mantenha o caminho padrão (`C:\Program Files\GreenLedger`) ou altere para o diretório corporativo.
+
+      (PRINT SELECIONAR DIRTETORIO DO INSTALADOR)
+      
     * **Opções de Atalho:** Mantenha habilitada as opções para criação de atalhos na **Área de Trabalho** e no **Menu Iniciar**.
 
   - **4-) Conclusão:**
+    
     * Clique em **Instalar** e aguarde a cópia dos arquivos.
+
+    (PRINT DO INSTALADOR FAZENDO INSTALAÇAO)
+   
     * Ao finalizar, clique em **Concluir**. A aplicação estará instalada e pronta para configuração.
+   
+      (PRINT DO INSTALADOR MENSAGEM CONCLUIDO)
    
     ---
 
