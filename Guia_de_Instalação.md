@@ -96,7 +96,7 @@ O instalador e a aplicação organizam seus arquivos nos seguintes caminhos padr
       
     * **Seleção de Destino:** Mantenha o caminho padrão (`C:\Program Files\GreenLedger`) ou altere para o diretório corporativo.
 
-   <img src="imagens/Implementação do Sistema(Parte 3).png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px">
+   <img src="imagens/Termo de Uso.png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px">
       
     * **Opções de Atalho:** Mantenha habilitada as opções para criação de atalhos na **Área de Trabalho** e no **Menu Iniciar**.
 
