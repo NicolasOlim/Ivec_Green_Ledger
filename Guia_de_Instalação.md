@@ -81,9 +81,9 @@ O instalador e a aplicação organizam seus arquivos nos seguintes caminhos padr
 
   - **2-) Execução do Instalador:**
     * Clica com o botão direito do mouse sobre o arquivo (`Setup.exe`) e seleciona **Executar como administrador**.
-
-      (COLOQUE IMAGEM AQUI DO INSTALADOR + EXECUTAR COMO ADMINISTRAR)
-
+       
+    <img src="imagens/Impletação do Sistema(Parte 1).png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px">
+       
 - **3-) Navegação pelo Assistente de Instalação:**
   
     * **Tela inicial:** Clique em **Avançar** para iniciar o processo.
