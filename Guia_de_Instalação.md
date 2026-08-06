@@ -29,7 +29,7 @@ Antes de iniciar a implantação nos terminais de atendimento, valide se a esta�
 
 | Componente | Requisito Mínimo | Requisito Recomendado |
 | :--- | :--- | :--- |
-| **Processador** | Dual Core 2.0 GHz (x64) | Quas-Core 2.8 GHz ou superior(Intel i5/i7 ou AMD Ryzen 5 |
+| **Processador** | Dual Core 2.0 GHz (x64) | Intel i5 ou superior 
 | **Memória RAM** | 8GB | 16GB |
 | **Armazenamento** | 600MB livres em disco | 1.5GB livres em disco(SSD) |
 | **Resolução de Tela** | 1366 x 768 pixels | 1920 x 1080 pixels(Full HD) |
