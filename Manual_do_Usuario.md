@@ -32,9 +32,6 @@ O acesso ao sistema é restrito para garantir a segurança dos dados industriais
 
 - **1º Etapa - Realizando o login:**
 
-    <img src="imagens/login.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 100px solid #ddd; margin: 850px 0;">
-
-
 ---
 
 ## **4. Primeiro Acesso e Tela Inicial**
