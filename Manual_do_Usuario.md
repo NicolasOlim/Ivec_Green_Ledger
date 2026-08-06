@@ -177,5 +177,3 @@ Utilizado no pátio logístico e na linha de montagem para associar peças receb
 Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.  
 Última atualização: 05 de agosto de 2026.
 *# 📦🍃 Iveco Green Ledger – Manual do Usuário
-
-*
