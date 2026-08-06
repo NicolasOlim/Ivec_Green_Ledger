@@ -123,4 +123,4 @@
 ---
 
 *Documento elaborado para o Projeto de TCC – SENAI Nova Lima, conforme atividade prática de Infraestrutura de Software.*
-*Última atualização: 04/08/2026.*
+*Última atualização: 06/08/2026.*
