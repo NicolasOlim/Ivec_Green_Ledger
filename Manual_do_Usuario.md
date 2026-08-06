@@ -39,9 +39,10 @@ O acesso ao sistema é restrito para garantir a segurança dos dados industriais
 O sistema exige autenticação rigorosa para garantir a segurança dos dados logísticos e industriais.
 
 **4.1. Realizando o Login**
-1. Abra o aplicativo **Iveco Green Ledger** em sua estação de trabalho.
-2. Na tela inicial, insira seu **E-mail** e **Senha** nos campos de autenticação.
-3. Clique em **Entrar**. O sistema consultará a Web API e fará a validação do seu nível de permissão (ex: Operador de Portaria, Analista ESG).
+
+- Abra o aplicativo **Iveco Green Ledger** em sua estação de trabalho.
+- Na tela inicial, insira seu **E-mail** e **Senha** nos campos de autenticação.
+
 
 <div class="logo-container" align="center">
     <!-- INSIRA AQUI A IMAGEM DA TELA DE LOGIN -->
@@ -49,53 +50,49 @@ O sistema exige autenticação rigorosa para garantir a segurança dos dados log
 </div>
 
 **4.2. Verificação de E-mail de Usuário**
-* Novos cadastros passam pelo serviço interno de validação. O sistema enviará um token/link para a caixa de e-mail corporativo para confirmar a identidade.
-* Em caso de esquecimento de senha, utilize a opção "Esqueci minha senha" para receber as instruções de redefinição validadas pelo `EmailValidationService`.
 
+* Clique em **Entrar**. O sistema consultará as credenciais selecionadas pelo usuario e
+ fara a liberaçao do sistema depois que tudo for autenticado .
+  
 ---
 
 ## **5. Módulo de Fornecedores e Supply Chain**
 
-Este módulo é utilizado na portaria e no setor de compras para homologação e qualificação.
+Este módulo é utilizado na para homologação e qualificação dos Fornecedores.
 
 **5.1. Cadastro de Fornecedor via API**
+
 1. Acesse o menu lateral e clique em **Fornecedores** > **Novo Cadastro**.
 2. No campo correspondente, digite os 14 dígitos do **CNPJ** e clique na lupa de busca.
-3. O sistema fará uma requisição à **Brasil API** e preencherá instantaneamente a Razão Social, Nome Fantasia e dados de constituição.
-4. Para o endereço, comece a digitar e o sistema utilizará o **Google Places** para sugerir e validar o local exato da fábrica. Salve o registro.
+3. O sistema fará uma requisição à **Brasil API** e preencherá instantaneamente a Razão Social, Nome  e dados de constituição.
+4. Para o endereço, comece a digitar e o sistema vai sugerir e validar o local da fábrica. Salve o registro.
 
 <div class="logo-container" align="center">
     <img src="imagens/fornecedor.png" alt="Tela de Cadastro de Fornecedor" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
 
-**5.2. Qualificação: Fornecedor Verde**
-1. No perfil do Fornecedor recém-criado, clique na aba **Qualificação ESG**.
-2. Marque os requisitos ambientais atendidos pela empresa e anexe as documentações solicitadas.
-3. Clique em **Homologar Fornecedor Verde**. Isso o habilitará para cálculos de redução de impacto no Escopo 3.
-
 ---
 
-## **6. Módulo de Rastreabilidade (Triagem e Produção)**
+## **6. Rastreabilidade (**
 
-Utilizado no pátio e nas linhas de montagem para controle de ativos.
+Utilizado nas linhas de montagem para controle de ativos.
 
 **6.1. Entrada de Matéria-Prima (Lotes)**
-1. No menu principal, acesse **Produção** > **Lotes de Matéria-Prima**.
-2. Clique em **Registrar Recebimento**. Insira o código de rastreio da nota, relacione ao Fornecedor de origem e especifique a quantidade recebida.
+1. No menu principal, acesse **Rastreabilidade** > **Busca no Blockchain**.
+2. Clique em **rastrear Origem**. Insira o código VIN do Veiculo.
+3. Clique em registrar, ele será salvo no sistema.
 
 <div class="logo-container" align="center">
     <img src="imagens/gestao_de_componentes.png" alt="Tela de Registro de Lotes" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
 
-**6.2. Cadastro de Veículos e Validação NHTSA**
-1. Vá até o módulo **Veículos** e clique em **Registrar Novo Veículo**.
-2. No campo **Chassi**, insira o código **VIN (Vehicle Identification Number)** de 17 caracteres.
-3. Clique em **Validar Chassi**. A plataforma consultará a base da **NHTSA** para certificar que os dados do fabricante, modelo e ano do chassi são reconhecidos globalmente.
+**6.2. Registro de Peças e Componentes**
 
-**6.3. Vínculo de Componentes (Rastreio Ponta a Ponta)**
-1. Com o Veículo criado, abra sua ficha e vá até **Componentes do Veículo**.
-2. Clique em **Adicionar Componente** e selecione o Lote de Matéria-Prima correspondente (criado no passo 6.1). Isso garante que o veículo possui rastreio de origem de peças e viabiliza a auditoria ambiental.
-
+1. Vá até o módulo **Chassi do Veículo VIN** selecione o VIN cadastrado, 
+2. vá até o módulo **Fornecedor** selecione o Fornecedor cadastrado.
+3. Clique em **Nome e Registro de peça** cadastre as informaçoes.
+4. Faça a mesma coisa em **Peso da peça (kg)**
+5. Por fim Clique em Registrar peça, o sistema vai fazer a autenticaçao e Registrar no Sistema
 
 
 ---
