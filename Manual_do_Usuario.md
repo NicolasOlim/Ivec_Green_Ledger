@@ -24,15 +24,7 @@ O **Iveco Green Ledger** é uma solução desenvolvida para gerenciar a triagem 
 - **Conectividade:** A conexão ativa e obrigatória com a internet.
 - **Credenciais de Acesso:** E-mail previamente autorizado pela administração do sistema.
 
----
 
-## **3. Autenticação e Primeiro Acesso**
-
-O acesso ao sistema é restrito para garantir a segurança dos dados industriais e de logística.
-
-- **1º Etapa - Realizando o login:**
-
----
 
 ## **4. Primeiro Acesso e Tela Inicial**
 
