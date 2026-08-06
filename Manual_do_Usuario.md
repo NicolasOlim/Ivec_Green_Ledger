@@ -48,20 +48,20 @@ O sistema exige autenticação rigorosa para garantir a segurança dos dados log
   
 ---
 
-## **5. Módulo de Fornecedores e Supply Chain**
+## **8. Consultas de Mercado e Central de Suporte**
 
-Este módulo é utilizado na para homologação e qualificação dos Fornecedores.
-
-**5.1. Cadastro de Fornecedor via API**
-
-1. Acesse o menu lateral e clique em **Fornecedores** > **Novo Cadastro**.
-2. No campo correspondente, digite os 14 dígitos do **CNPJ** e clique na lupa de busca.
-3. O sistema fará uma requisição à **Brasil API** e preencherá instantaneamente a Razão Social, Nome  e dados de constituição.
-4. Para o endereço, comece a digitar e o sistema vai sugerir e validar o local da fábrica. Salve o registro.
+**8.1. Consulta no Mercado Livre**
+1. Acesse **Ferramentas** > **Mercado Livre**.
+2. Insira o termo da busca (ex: componente mecânico ou acessório). O sistema comunicará com a API do Mercado Livre para retornar cotações e tendências de preço, auxiliando balanços rápidos do setor de compras.
 
 <div class="logo-container" align="center">
-    <img src="imagens/fornecedor.png" alt="Tela de Cadastro de Fornecedor" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
+    <!-- INSIRA AQUI A IMAGEM DA TELA DE CONSULTA DE MERCADO -->
+    <img src="imagens/mercado_livre.png" alt="Tela de Consulta de Mercado" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
+
+**8.2. Abrindo um Chamado de Suporte**
+1. Para relatar falhas ou solicitar manutenção, vá em **Central de Suporte**.
+2. Preencha o assunto, descreva o problema no campo de texto e clique em **Enviar Chamado**. A requisição irá direto para o controlador da equipe de TI.
 
 ---
 
@@ -104,23 +104,6 @@ Painéis de controle abastecidos em tempo real pelas informações geradas na tr
 <div class="logo-container" align="center">
     <img src="imagens/dashboard.png" alt="Dashboard de Sustentabilidade" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
 </div>
-
----
-
-## **8. Consultas de Mercado e Central de Suporte**
-
-**8.1. Consulta no Mercado Livre**
-1. Acesse **Ferramentas** > **Mercado Livre**.
-2. Insira o termo da busca (ex: componente mecânico ou acessório). O sistema comunicará com a API do Mercado Livre para retornar cotações e tendências de preço, auxiliando balanços rápidos do setor de compras.
-
-<div class="logo-container" align="center">
-    <!-- INSIRA AQUI A IMAGEM DA TELA DE CONSULTA DE MERCADO -->
-    <img src="imagens/mercado_livre.png" alt="Tela de Consulta de Mercado" class="logo-img" style="height: 250px; width: auto; border: 1px solid #ddd; margin: 10px 0;">
-</div>
-
-**8.2. Abrindo um Chamado de Suporte**
-1. Para relatar falhas ou solicitar manutenção, vá em **Central de Suporte**.
-2. Preencha o assunto, descreva o problema no campo de texto e clique em **Enviar Chamado**. A requisição irá direto para o controlador da equipe de TI.
 
 ---
 
