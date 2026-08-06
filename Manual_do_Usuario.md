@@ -4,20 +4,36 @@
     <img src="imagens/icone_manual.jpg" alt="Logo Iveco Green Ledger" class="logo-img">
 </div>
 
-Bem-vindo ao Guia de Utilização do **Iveco Green Ledger**. Este manual detalha a operação da aplicação Desktop (WPF) instalada nas estações de trabalho e portarias da Iveco, descrevendo a navegação, os cadastros e as funcionalidades integradas à Web API e ao banco de dados em nuvem (Firebase).
+Essa documentação se aplica ao manual operacional de instruções para o uso da aplicação WPF em estações de trabalho e portarias da IVECO, cobrindo navegação, cadastros, integrações de API's e visualização de dados de governança ambiental em nuvem.
 
 ---
 
-## **1. Apresentação**
-O **Iveco Green Ledger** é um sistema projetado para a triagem logística de pátio, rastreabilidade de suprimentos e cálculo automatizado de pegada de carbono (focado no Escopo 3 do GHG Protocol). A plataforma une a operação física da fábrica aos compromissos de sustentabilidade (ESG).
+## **1. Apresentação e Objetivo do Sistema**
+O **Iveco Green Ledger** é uma solução desenvolvida para gerenciar a triagem logística de pátio, a rastreabilidade de suprimentos e o cálculo automatizado da pegada de carbono, com foco no escopo 3 do GHG Protocol. O objetivo do sistema é unir a operação física da fábrica aos compromissos de sustentabilidade da IVECO, fornecendo um ambiente centralizado onde:
 
-## **2. Objetivo do Sistema**
-Fornecer um ambiente confiável onde a entrada de componentes seja monitorada, os fornecedores sejam avaliados por suas práticas verdes, a montagem dos veículos seja rastreada peça a peça, e as emissões de gases de efeito estufa sejam calculadas em tempo real.
+   * Fornecedores são qualificados e avaliados por suas práticas ambientais.
+   * A entrada de componentes e matérias-primas é monitorada.
+   * A montagem e composição de veículos são rastreadas peça a peça.
+   * As emissões de gases de efeito estufa são calculadas e consolidadas em tempo real.
 
-## **3. Requisitos do Sistema**
-* **Ambiente:** Computador com Windows compatível com a aplicação Desktop (.NET 8 WPF).
-* **Conectividade:** Conexão à internet para a sincronização de dados com a Web API e Firebase. (O sistema utiliza cache local via SQLite para dados frequentes, mas operações de registro exigem rede).
-* **Acesso:** E-mail corporativo previamente autorizado pelo administrador.
+---
+
+## **2. Requisitos de Acesso e Conectividade**
+
+- **Ambiente:** Computador com sistema operacional Windows 10(64-bit) ou superior e .NET 8 instalado.
+- **Conectividade:** A conexão ativa e obrigatória com a internet.
+- **Credenciais de Acesso:** E-mail previamente autorizado pela administração do sistema.
+
+---
+
+## **3. Autenticação e Primeiro Acesso**
+
+O acesso ao sistema é restrito para garantir a segurança dos dados industriais e de logística.
+
+- **1º Etapa - Realizando o login:**
+
+    <img src="imagens/login.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 250px; width: auto; border: 100px solid #ddd; margin: 850px 0;">
+
 
 ---
 
