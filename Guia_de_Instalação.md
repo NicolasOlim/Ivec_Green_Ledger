@@ -108,7 +108,7 @@ O instalador e a aplicação organizam seus arquivos nos seguintes caminhos padr
    
     * Ao finalizar, clique em **Concluir**. A aplicação estará instalada e pronta para configuração.
    
-      (PRINT DO INSTALADOR MENSAGEM CONCLUIDO)
+      <img src="imagens/Conclusão da Implementação.png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px"> 
    
     ---
 
