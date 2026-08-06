@@ -1,0 +1,43 @@
+TERMOS DE USO E LICENCIAMENTO DE SOFTWARE
+Ivec Green Ledger - Sistema de Análise e Gestão ESG
+
+Este documento estabelece as condições gerais de uso e o modelo de licenciamento comercial do sistema Ivec Green Ledger. Ao instalar, acessar, publicar ou utilizar este software, o Cliente (Pessoa Jurídica ou Física) concorda expressamente com todos os termos, restrições e modelos comerciais aqui descritos.
+
+1. MODELO DE LICENCIAMENTO E COMERCIALIZAÇÃO
+Para se adequar às exigências do mercado atual de software B2B (Business-to-Business) focado em ambientes corporativos On-Premise, o Ivec Green Ledger adota a seguinte arquitetura comercial:
+
+1.1. Licenciamento por Servidor (Per-Server)
+A licença concedida é estritamente vinculada ao servidor host (físico ou máquina virtual). O Cliente adquire o direito de instalar e processar a aplicação (API, serviços acoplados e Banco de Dados) em 1 (um) único servidor de produção por licença ativa. Ambientes segregados e exclusivos de homologação ou testes (staging) não consomem licenças adicionais, desde que não processem dados em operação comercial real.
+
+1.2. Mecanismo de Validação (Sem Hardkey)
+Tendo em vista a modernização da infraestrutura de TI e o uso crescente de virtualização, o sistema dispensa integralmente o uso de chaves físicas (como Hardkeys ou dongles USB). O controle da licença e da autenticidade da instalação é feito via Chave Digital de Ativação (Software Key), vinculada à identificação do hardware ou emitente. O servidor do cliente poderá exigir acesso à internet de forma esporádica para validar o token criptográfico de licenciamento (sem trafegar dados sensíveis ou informações de negócio).
+
+1.3. Modelo de Vendas: Assinatura Corporativa (Subscription)
+A comercialização do software é regida pelo modelo de Assinatura Anual. O pagamento recorrente da anuidade garante ao Cliente:
+- Direito irrestrito de uso das funcionalidades operacionais pelo período de vigência (12 meses).
+- Acesso a pacotes de atualizações contendo novas features, integração com APIs terceiras (como NHTSA e BrasilAPI) e patches de segurança.
+- Suporte técnico remoto (Nível 1 e 2) durante o horário comercial.
+
+Penalidade por Inadimplência: Em caso de não renovação da assinatura anual, findado um período de carência pré-estabelecido, a chave digital expirará e o sistema entrará em "Modo Leitura" (Read-Only), permitindo apenas a consulta e extração de relatórios de dados históricos, mas impedindo o cadastro de novas métricas, emissões ou fornecedores.
+
+2. DIREITOS E RESTRIÇÕES DE USO
+A licença outorgada é não exclusiva e intransferível. Visando resguardar a propriedade intelectual da solução, é expressamente proibido ao Cliente ou seus operadores:
+- Comercializar, sublicenciar, alugar ou transferir a licença, o instalador ou os artefatos publicados do software a terceiros.
+- Realizar engenharia reversa, descompilação, ou tentar extrair o código-fonte (C#/.NET) e regras de banco de dados da aplicação.
+- Alterar os scripts do instalador, injetar modificações não autorizadas ou adulterar os mecanismos de checagem da licença digital.
+
+3. PROTEÇÃO DE DADOS PESSOAIS (ADEQUAÇÃO À LGPD)
+Definição de Papéis (LGPD): O Cliente atua exclusivamente como Controlador dos dados imputados no sistema (incluindo dados de funcionários, fornecedores e auditorias). Devido ao modelo de implantação local (On-Premise) no servidor do Cliente, os Desenvolvedores do Ivec Green Ledger não têm acesso ao banco de dados e não atuam como Operadores de dados.
+A segurança física e lógica da infraestrutura que hospeda as informações é responsabilidade do Cliente, devendo este assegurar a base legal correta para o tratamento de qualquer dado pessoal cadastrado.
+
+4. OBRIGAÇÕES DE INFRAESTRUTURA, BACKUP E SEGURANÇA
+Em alinhamento aos manuais técnicos e guias de implantação que acompanham o produto, o Cliente está ciente de que o desempenho seguro do sistema depende da sua infraestrutura:
+- Rotinas de Backup: Os Desenvolvedores são inteiramente isentos de responsabilidade por perda de histórico ou falhas em bancos de dados. É responsabilidade indelegável do Cliente executar, monitorar e validar as rotinas diárias de backup da base relacional.
+- Atualização e Rollback: Antes de aplicar qualquer atualização de versão fornecida pelos desenvolvedores, a equipe técnica do Cliente deve realizar snapshots ou cópias completas do banco de dados e da pasta da aplicação, assegurando que o procedimento de rollback possa ser executado prontamente se o ambiente apresentar instabilidades nos testes de homologação.
+- Segurança de Perímetro: O gerenciamento do Firewall, restrições de rede, controle de portas abertas (para a API) e instalação de antivírus que não bloqueiem falsos-positivos nos executáveis do sistema cabem aos gestores de TI da Contratante.
+
+5. LIMITAÇÃO DE RESPONSABILIDADE
+O Ivec Green Ledger é disponibilizado no estado em que se encontra ("As Is"). Em nenhuma circunstância a equipe de desenvolvimento, autores ou distribuidores do software serão responsabilizados por lucros cessantes, perdas financeiras, interrupção de processos produtivos, auditorias negativas ou danos indiretos advindos do uso ou da inabilidade momentânea de uso do software, bem como de decisões corporativas tomadas com base nos painéis gráficos do sistema.
+
+6. FORO E LEGISLAÇÃO APLICÁVEL
+Este contrato é regido pelas leis vigentes na República Federativa do Brasil. As partes elegem o foro da Comarca de Nova Lima, Estado de Minas Gerais, com renúncia de qualquer outro, por mais privilegiado que seja, para dirimir eventuais litígios ou controvérsias decorrentes da interpretação ou aplicação dos presentes Termos de Uso.
