@@ -1,11 +1,8 @@
 # 📦🍃  Iveco Green Ledger – Guia de Instalação
 
  <div class="logo-container" align="center">
-    <img src="imagens/logo-documentação-guiadeusuario.jpg" alt="Logo Iveco Green Ledger" class="logo-img">
+ <img src="imagens/logo-documentação-guiadeusuario.jpg" alt="Logo Firebase Firestore" class="logo-img" style="height: 350px; width: auto; vertical-align: middle; margin-left: 15px;">
 </div>
-
-
-Este documento específica todos os procedimentos operacionais e técnicos necessários para o planejamento, implantação, configuração de ambiente, validação, manutenção e desinstalação do software **Iveco Green Ledger** nas estações de trabalho localizadas nas portarias e pátios logísticos da IVECO.
 
 ---
 
@@ -23,8 +20,8 @@ Este documento específica todos os procedimentos operacionais e técnicos neces
 ---
 
 ## **2. Requisitos de Infraestrutura e Pré-requisitos**
-Antes de iniciar a implantação nos terminais de atendimento, valide se a estação de trabalho atende integralmente aos requisitos especificados abaixo:
 
+Antes de iniciar a implantação nas estações de trabalho, valide se a máquina atende integralmente aos requisitos especificados abaixo:
 **Hardware:**
 
 | Componente | Requisito Mínimo | Requisito Recomendado |
