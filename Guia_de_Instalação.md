@@ -4,9 +4,8 @@
  <img src="imagens/logo-documentação-guiadeusuario.jpg" alt="Logo Firebase Firestore" class="logo-img" style="height: 350px; width: auto; vertical-align: middle; margin-left: 15px;">
 </div>
 
----
 
-## **1. Informações Gerais**
+## **Informações Gerais**
 - **Nome do Sistema:** Iveco Green Ledger
 - **Versão Atual:** 1.0 (Release Operacional Base)
 - **Tipo de Aplicação:** Cliente Desktop com execução distribuída em borda e integração em nuvem
@@ -19,31 +18,31 @@
 
 ---
 
-## **2. Requisitos de Infraestrutura e Pré-requisitos**
+## **Requisitos de Infraestrutura e Pré-requisitos**
 
 Antes de iniciar a implantação nas estações de trabalho, valide se a máquina atende integralmente aos requisitos especificados abaixo:
 **Hardware:**
 
 | Componente | Requisito Mínimo | Requisito Recomendado |
 | :--- | :--- | :--- |
-| **Processador** | Dual Core 2.0 GHz (x64) | Intel i5 ou superior 
-| **Memória RAM** | 8GB | 16GB |
-| **Armazenamento** | 600MB livres em disco | 1.5GB livres em disco(SSD) |
-| **Resolução de Tela** | 1366 x 768 pixels | 1920 x 1080 pixels(Full HD) |
+| Processador | Dual Core 2.0 GHz (x64) | Intel i5 ou superior 
+| Memória RAM | 8GB | 16GB |
+| Armazenamento | 600MB livres em disco | 1.5GB livres em disco(SSD) |
+| Resolução de Tela | 1366 x 768 pixels | 1920 x 1080 pixels(Full HD) |
 
 ---
 
 **Software e Dependências Globais:**
 
 - **Sistema Operacional:** Windows 10 ou superior.
-- **Framework obrigatório: .NET 8 Desktop Runtime(x64)**
+- **Framework obrigatório:** .NET 8 Desktop Runtime(x64)
 - **Privilégios de Sistema:** Conta de usuário do Windows com permissões de Administrador local.
 
----
+
 
 **Matriz de Conectividade e Liberação de Rede**
 
-Para assegurar o correto funcionamento da triagem automatizada, nossa equipe teve que garantir a liberação das rotas e serviços listados abaixo nas portas 80 (HTTP) e 443 (HTTPS):
+Para assegurar o correto funcionamento da triagem automatizada,tivemos que garantir a liberação das rotas e serviços listados abaixo nas portas 80 (HTTP) e 443 (HTTPS):
 
 | Provedor / Endpoint | Finalidade Operacional | Protocolo / Porta |
 | :--- | :--- | :--- |
@@ -55,59 +54,56 @@ Para assegurar o correto funcionamento da triagem automatizada, nossa equipe tev
 
 ---
 
-## **3. Mapeamento da Estrutura de Diretórios**
+## **Mapeamento da Estrutura de Diretórios**
 
 O instalador e a aplicação organizam seus arquivos nos seguintes caminhos padrão do sistema operacional Windows:
 
-- **Diretório de Binários e Executáveis:**
+**Diretório de Binários e Executáveis:**
   * `C:\Program Files\GreenLedger` contém o executável principal (`IvecoGreenLedger.exe`), bibliotecas (`.dll`), arquivos de dependência e o arquivo de configuração de parâmetros.
 
-- **Diretório de Dados de Usuário e Cache em Borda:**
+**Diretório de Dados de Usuário e Cache em Borda:**
   * `C:Users\[NomeDoUsuario]\AppData\Roaming\Iveco\GreenLedger\` contém arquivos de logs de execução e arquivos de estado da sessão do operador.
 
   ---
 
-  ## **4. Passo a Passo do Processo de Instalação**
+## **Passo a Passo do Processo de Instalação**
 
   Siga a sequência operacional abaixo para realizar a implantação do sistema no terminal local:
 
-  - **1-) Obtenção do Pacote de Distribuição:**
-    * Faça o download do arquivo.
-      
-    * Extraia o conteúdo do pacote em uma pasta local na máquina.
+  **1º Etapa - Obtenção do Pacote de Distribuição:**
 
-  - **2-) Execução do Instalador:**
-    * Clica com o botão direito do mouse sobre o arquivo (`Setup.exe`) e seleciona **Executar como administrador**.
+ * Faça o download do pacote oficial de instalação.
+ * Extraia o arquivo `.zip` em um diretório temporário local.
 
-   <img src="imagens/Executar o instalador com ADM.png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px">
-       
-- **3-) Navegação pelo Assistente de Instalação:**
-  
-    * **Tela inicial:** Clique em **Avançar** para iniciar o processo.
+---
 
-   <img src="imagens/Impletação do Sistema(Parte 1).png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px">
-       
-      
-    * **Contrato de Licença:** Leia os termos de uso restrito corporativo, seleciona a opção "Aceito os termos do contrato de licença" e clique em **Avançar**.
-       
-      
-    * **Seleção de Destino:** Mantenha o caminho padrão (`C:\Program Files\GreenLedger`) ou altere para o diretório corporativo.
+  **2º Etapa - Execução do Instalador:**
 
-   <img src="imagens/Termo de Uso.png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px">
-      
-    * **Opções de Atalho:** Mantenha habilitada as opções para criação de atalhos na **Área de Trabalho** e no **Menu Iniciar**.
+ <img src="imagens/Executar o instalador com ADM.png" alt="Tela de Login do Sistema" class="logo-img" style="height: 300px; width: auto; border: 150px solid #ddd; margin: 850px 0;">
 
-  - **4-) Conclusão:**
-    
-    * Clique em **Instalar** e aguarde a cópia dos arquivos.
+ * Navegue até a pasta extraída.
+ * Clique com o botão direito do mouse sobre o arquivo `Setup.exe` e selecione **Executar como Administrador**.
 
-    <img src="imagens/Implementação do Sistema(Parte 4).png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px">
-   
-    * Ao finalizar, clique em **Concluir**. A aplicação estará instalada e pronta para configuração.
-   
-      <img src="imagens/Conclusão da Implementação.png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px"> 
-   
-    ---
+---
+
+  **3º Etapa - Assistente de Instalação (GUI):**
+
+ <img src="imagens/Impletação do Sistema(Parte 1).png" alt="Tela de Login do Sistema" class="logo-img" style="height: 300px; width: auto; border: 150px solid #ddd; margin: 850px 0;">
+
+ * **Boas-vindas:** Na tela inicial do assistente, clique em **Avançar**.
+ * **Termos de Licença:** Leia o Contrato de Licença de Uso Corporativo Iveco, marque a opção "Aceito os termos do contrato de licença" e clique em **Avançar**.
+ * **Diretório de Destino:** Mantenha o caminho padrão ou altere para a unidade desejada.
+
+<img src="imagens/Implementação do Sistema(Parte 4).png" alt="Tela de Login do Sistema" class="logo-img" style="height: 300px; width: auto; border: 150px solid #ddd; margin: 850px 0;">
+
+ * **Atalhos:** Mantenha marcada as opções de criação de atalho na **Área de Trabalho** e no **Menu Iniciar**.
+ * **Cópia de Arquivos:** Clique no botão **Instalar** e aguarde a extração e registro de binários.
+
+ <img src="imagens/Conclusão da Implementação.png" alt="Logo Iveco Green Ledger" class="sistema-img" width="600px" height="600px"> 
+ 
+ * **Conclusão:** Ao finalizar, marque a opção "Executar" e clique em concluir
+
+     ---
 
     ## **5. Configuração Inicial**
 
@@ -172,7 +168,7 @@ Quando uma nova release for disponibilizada, sigamos este protocolo para garanti
 
 ## **8. Resolução de Problemas:**
 
-| Erro / Sintoma | Causa Provável | Procedimento da Resolução |
+| Erro | Causa Provável | Procedimento da Resolução |
 | :--- | :--- | :--- |
 | O instalador fecha ou exibe mensagem de erro do .NET | O .NET 8 não está instalado na máquina | Faça o download e instale o .NET 8 antes de executar o instalador novamente |
 | Erro de comunicação com o servidor / a API não responde | Ausência de conexão com a internet, URL incorreta ou bloqueio | Verificar a conexão da internet, confirmar a chave e apontar para o endereço correto, liberação das portas |
@@ -192,4 +188,4 @@ Caso seja necessário remover o software da estação de trabalho:
 ---
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
-*Última atualização: 06 de agosto de 2026.*
+*Última atualização: 07 de agosto de 2026.*
