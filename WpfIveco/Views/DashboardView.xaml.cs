@@ -47,11 +47,11 @@ namespace WpfIveco.Views
             // Task.WhenAll executa as requisições em paralelo. 
             // Isso é muito mais rápido do que verificar uma API de cada vez, e não trava a interface gráfica (UI).
             await Task.WhenAll(
-                SetStatus(StatusBrasilApi, "https://brasilapi.com.br/api/cnpj/v1/00000000000191"),
-                SetStatus(StatusGooglePlaces, "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-23.5,-46.6&radius=100&key=SUA_CHAVE"),
-                SetStatus(StatusNhtsa, "https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/1GNCS18Z2M0115561?format=json"),
-                SetStatus(StatusMercadoLivre, "https://api.mercadolibre.com/sites/MLB/search?q=test")
-            );
+    SetStatus(StatusBrasilApi, "https://brasilapi.com.br/api/cnpj/v1/00000000000191"),
+    SetStatus(StatusGooglePlaces, "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-23.5,-46.6&radius=100&key=SUA_CHAVE"),
+    SetStatus(StatusNhtsa, "https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/1GNCS18Z2M0115561?format=json"),
+    SetStatus(StatusMercadoLivre, "https://api.mercadolibre.com/sites/MLB/search?q=test")
+);
         }
 
         /// <summary>
@@ -61,23 +61,21 @@ namespace WpfIveco.Views
         {
             try
             {
-                // HttpCompletionOption.ResponseHeadersRead otimiza a memória, 
-                // pois não precisamos baixar o corpo da resposta inteiro só para saber o status.
                 var response = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                bool ok = response.IsSuccessStatusCode || ((int)response.StatusCode >= 300 && (int)response.StatusCode < 400);
 
-                // Consideramos sucesso qualquer código 2xx ou redirecionamentos 3xx.
-                bool ok = response.IsSuccessStatusCode ||
-                          ((int)response.StatusCode >= 300 && (int)response.StatusCode < 400);
-
-                // Atualiza a cor da Elipse na UI.
                 indicator.Fill = ok
-                    ? new SolidColorBrush(Color.FromRgb(16, 185, 129))   // Verde (API Online)
-                    : new SolidColorBrush(Color.FromRgb(239, 68, 68));   // Vermelho (API Offline ou Erro)
+                    ? new SolidColorBrush(Color.FromRgb(16, 185, 129)) // Verde
+                    : new SolidColorBrush(Color.FromRgb(239, 68, 68)); // Vermelho
+
+                indicator.ToolTip = ok ? "Online" : $"Offline - {response.StatusCode}";
+                App.LogInfo($"Status {url}: {(ok ? "OK" : "FALHA")} - {response.StatusCode}", "DASH");
             }
-            catch
+            catch (Exception ex)
             {
-                // Se a requisição der timeout ou cair, garantimos que fique vermelho em vez de travar o app.
                 indicator.Fill = new SolidColorBrush(Color.FromRgb(239, 68, 68));
+                indicator.ToolTip = $"Erro: {ex.Message}";
+                App.LogError($"Falha ao verificar {url}: {ex.Message}", "DASH");
             }
         }
 

@@ -8,24 +8,24 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using WpfIveco.Data;
 using WpfIveco.Models;
 using WpfIveco.ViewModels;
-using WpfIveco.DTO;
 
 namespace WpfIveco.ViewModels
 {
     /// <summary>
-    /// ViewModel para a gestão de fornecedores.
-    /// Gerencia consulta de CNPJ, cadastro e listagem de fornecedores.
-    /// A categoria ESG é persistida diretamente na API (Firestore).
+    /// ViewModel para a tela de gestão de fornecedores.
+    /// Gerencia consulta de CNPJ (Brasil API), cadastro de fornecedores e fallback offline.
     /// </summary>
     public class FornecedorViewModel : ViewModelBase
     {
         private readonly HttpClient _httpClient;
+        private readonly LocalDatabaseService _localDb;
 
-        /// ============================================================
-        /// PROPRIEDADES
-        /// ============================================================
+        // ============================================================
+        // PROPRIEDADES (BINDINGS)
+        // ============================================================
 
         private string _cnpjBusca = "";
         public string CnpjBusca
@@ -85,29 +85,34 @@ namespace WpfIveco.ViewModels
             set { _categoriaEsg = value; OnPropertyChanged(); }
         }
 
-        /// ============================================================
-        /// COMANDOS
-        /// ============================================================
+        // ============================================================
+        // COMANDOS
+        // ============================================================
 
         public ICommand ConsultarCnpjCommand { get; }
         public ICommand SalvarFornecedorCommand { get; }
 
-        /// ============================================================
-        /// CONSTRUTOR
-        /// ============================================================
+        // ============================================================
+        // CONSTRUTOR
+        // ============================================================
 
         public FornecedorViewModel(HttpClient httpClient)
         {
             App.LogInfo("Construtor", "FORNEC");
             _httpClient = httpClient;
+            _localDb = new LocalDatabaseService();
             ConsultarCnpjCommand = new RelayCommand(async p => await ConsultarCnpjAsync());
             SalvarFornecedorCommand = new RelayCommand(async p => await SalvarFornecedorAsync());
         }
 
-        /// ============================================================
-        /// MÉTODOS PÚBLICOS
-        /// ============================================================
+        // ============================================================
+        // MÉTODOS PÚBLICOS
+        // ============================================================
 
+        /// <summary>
+        /// Carrega a lista de fornecedores, priorizando a API.
+        /// Se falhar, busca no SQLite local.
+        /// </summary>
         public async Task CarregarFornecedoresAsync()
         {
             App.LogInfo("CarregarFornecedoresAsync iniciado", "FORNEC");
@@ -115,29 +120,59 @@ namespace WpfIveco.ViewModels
             {
                 var response = await _httpClient.GetAsync("api/dados/fornecedores");
                 App.LogInfo($"GET Fornecedores → {(int)response.StatusCode}", "FORNEC");
-                if (!response.IsSuccessStatusCode) return;
 
-                var json = await response.Content.ReadAsStringAsync();
-                var fornecedores = JsonSerializer.Deserialize<List<FornecedorModel>>(json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                if (fornecedores != null)
+                if (response.IsSuccessStatusCode)
                 {
-                    ListaFornecedores = new ObservableCollection<FornecedorModel>(fornecedores);
-                    App.LogInfo($"{fornecedores.Count} fornecedores carregados", "FORNEC");
+                    var json = await response.Content.ReadAsStringAsync();
+                    var fornecedores = JsonSerializer.Deserialize<List<FornecedorModel>>(json,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    if (fornecedores != null && fornecedores.Count > 0)
+                    {
+                        ListaFornecedores = new ObservableCollection<FornecedorModel>(fornecedores);
+                        App.LogInfo($"{fornecedores.Count} fornecedores carregados da API", "FORNEC");
+                        // Atualiza cache local em background
+                        _ = _localDb.SalvarFornecedoresAsync(fornecedores);
+                        return;
+                    }
                 }
+
+                // Fallback para dados locais
+                App.LogWarning("API indisponível, usando dados locais (fornecedores)", "FORNEC");
+                await CarregarFornecedoresLocaisAsync();
             }
             catch (Exception ex)
             {
                 App.LogError($"Erro ao carregar fornecedores: {ex.Message}", "FORNEC");
+                await CarregarFornecedoresLocaisAsync();
+            }
+        }
+
+        // ============================================================
+        // MÉTODOS PRIVADOS
+        // ============================================================
+
+        /// <summary>
+        /// Carrega fornecedores do banco local SQLite.
+        /// </summary>
+        private async Task CarregarFornecedoresLocaisAsync()
+        {
+            var locais = await _localDb.GetFornecedoresAsync();
+            if (locais.Any())
+            {
+                ListaFornecedores = new ObservableCollection<FornecedorModel>(locais);
+                App.LogInfo($"Carregados {locais.Count} fornecedores do SQLite", "FORNEC");
+            }
+            else
+            {
                 ListaFornecedores = new ObservableCollection<FornecedorModel>();
             }
         }
 
-        /// ============================================================
-        /// MÉTODOS PRIVADOS
-        /// ============================================================
-
+        /// <summary>
+        /// Consulta um CNPJ na Brasil API via backend.
+        /// Preenche os campos do formulário com os dados retornados.
+        /// </summary>
         private async Task ConsultarCnpjAsync()
         {
             App.LogInfo($"Consultando CNPJ: {CnpjBusca}", "FORNEC");
@@ -165,18 +200,12 @@ namespace WpfIveco.ViewModels
 
                     NomeFornecedorEncontrado = fornecedor.GetProperty("nome").GetString();
                     LocalizacaoFornecedorEncontrado = fornecedor.GetProperty("localizacao").GetString();
+                    StatusRfb = fornecedor.TryGetProperty("situacao", out var sit) ? sit.GetString() : "ATIVA (assumido)";
 
-                    // Status RFB
-                    var situacao = fornecedor.TryGetProperty("situacao", out var sit)
-                        ? sit.GetString()
-                        : "ATIVA (assumido)";
-                    StatusRfb = situacao;
-
-                    // Verifica se o fornecedor já está cadastrado na lista
+                    // Verifica se o fornecedor já está cadastrado na lista local
                     var fornecedorExistente = ListaFornecedores.FirstOrDefault(f => f.Cnpj == cnpjLimpo);
                     if (fornecedorExistente != null)
                     {
-                        // Carrega a categoria ESG salva na API
                         CategoriaEsg = fornecedorExistente.CategoriaEsg ?? "Não avaliado";
                         MensagemCadastro = $"Fornecedor já cadastrado. Categoria ESG: {CategoriaEsg}";
                         App.LogInfo($"Fornecedor encontrado. Categoria: {CategoriaEsg}", "FORNEC");
@@ -187,7 +216,6 @@ namespace WpfIveco.ViewModels
                         MensagemCadastro = "Fornecedor novo! Clique em 'Registrar no Ledger' para salvar.";
                         App.LogInfo("Fornecedor novo – categoria definida como 'Não avaliado'", "FORNEC");
                     }
-
                     IsErro = false;
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -202,8 +230,7 @@ namespace WpfIveco.ViewModels
                 }
                 else
                 {
-                    var erro = await response.Content.ReadAsStringAsync();
-                    App.LogError($"Erro na consulta: {erro}", "FORNEC");
+                    App.LogError($"Erro na consulta: {await response.Content.ReadAsStringAsync()}", "FORNEC");
                     MensagemCadastro = "Erro ao consultar CNPJ. Tente novamente.";
                     IsErro = true;
                 }
@@ -217,11 +244,13 @@ namespace WpfIveco.ViewModels
         }
 
         /// <summary>
-        /// Salva o fornecedor no Firestore via API, incluindo a categoria ESG selecionada.
+        /// Salva o fornecedor no backend (Firestore via API).
+        /// Se a API falhar, salva localmente no SQLite (modo offline).
         /// </summary>
         private async Task SalvarFornecedorAsync()
         {
             App.LogInfo($"Salvando fornecedor: {NomeFornecedorEncontrado}", "FORNEC");
+
             if (string.IsNullOrWhiteSpace(NomeFornecedorEncontrado))
             {
                 App.LogWarning("Nome vazio – abortando", "FORNEC");
@@ -230,18 +259,19 @@ namespace WpfIveco.ViewModels
                 return;
             }
 
+            var cnpjLimpo = CnpjBusca.Replace(".", "").Replace("/", "").Replace("-", "");
+            var fornecedor = new FornecedorModel
+            {
+                Id = Guid.NewGuid().ToString().Substring(0, 8), // ID temporário
+                Nome = NomeFornecedorEncontrado,
+                Localizacao = LocalizacaoFornecedorEncontrado,
+                Cnpj = cnpjLimpo,
+                CategoriaEsg = CategoriaEsg
+            };
+
             try
             {
-                var cnpjLimpo = CnpjBusca.Replace(".", "").Replace("/", "").Replace("-", "");
-                var fornecedor = new
-                {
-                    Id = "",
-                    Nome = NomeFornecedorEncontrado,
-                    Localizacao = LocalizacaoFornecedorEncontrado,
-                    Cnpj = cnpjLimpo,
-                    CategoriaEsg = CategoriaEsg // Agora enviando a categoria
-                };
-
+                // Tenta salvar na API
                 var response = await _httpClient.PostAsJsonAsync("api/dados/fornecedores", fornecedor);
                 App.LogInfo($"POST Fornecedor → {(int)response.StatusCode}", "FORNEC");
 
@@ -250,6 +280,9 @@ namespace WpfIveco.ViewModels
                     App.LogInfo($"Fornecedor registrado com sucesso! Categoria: {CategoriaEsg}", "FORNEC");
                     MensagemCadastro = "Fornecedor registrado com sucesso!";
                     IsErro = false;
+
+                    // Salva também localmente (para manter sincronia)
+                    _ = _localDb.SalvarFornecedoresAsync(new List<FornecedorModel> { fornecedor });
 
                     // Limpa os campos
                     CnpjBusca = "";
@@ -262,17 +295,38 @@ namespace WpfIveco.ViewModels
                 }
                 else
                 {
-                    var erro = await response.Content.ReadAsStringAsync();
-                    App.LogError($"Falha ao salvar: {erro}", "FORNEC");
-                    MensagemCadastro = $"Erro ao salvar: {erro}";
-                    IsErro = true;
+                    // Se a API falhou, tenta salvar localmente (offline)
+                    App.LogWarning("API falhou. Salvando fornecedor localmente.", "FORNEC");
+                    var salvouLocal = await _localDb.SalvarFornecedorOfflineAsync(fornecedor);
+                    if (salvouLocal)
+                    {
+                        MensagemCadastro = "Fornecedor salvo OFFLINE! Será sincronizado quando a internet voltar.";
+                        IsErro = false;
+                        await CarregarFornecedoresLocaisAsync(); // Atualiza a lista com os dados locais
+                    }
+                    else
+                    {
+                        MensagemCadastro = "Erro ao salvar fornecedor (online e offline).";
+                        IsErro = true;
+                    }
                 }
             }
             catch (Exception ex)
             {
+                // Exceção de rede – fallback offline
                 App.LogError($"Erro de conexão ao salvar fornecedor: {ex.Message}", "FORNEC");
-                MensagemCadastro = "Erro de conexão. Verifique sua rede.";
-                IsErro = true;
+                var salvouLocal = await _localDb.SalvarFornecedorOfflineAsync(fornecedor);
+                if (salvouLocal)
+                {
+                    MensagemCadastro = "Fornecedor salvo OFFLINE! Será sincronizado quando a internet voltar.";
+                    IsErro = false;
+                    await CarregarFornecedoresLocaisAsync();
+                }
+                else
+                {
+                    MensagemCadastro = "Erro de conexão. Não foi possível salvar (offline).";
+                    IsErro = true;
+                }
             }
         }
     }

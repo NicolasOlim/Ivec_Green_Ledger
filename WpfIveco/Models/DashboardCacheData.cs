@@ -12,7 +12,6 @@ namespace WpfIveco.Models
     internal class DashboardCacheData
     {
         public int ConsultasHoje { get; set; }
-        public double FalhasIntegracao { get; set; }
         public int TempoRespostaMs { get; set; }
         public int UsoServidor { get; set; }
         public string VariacaoConsultas { get; set; }

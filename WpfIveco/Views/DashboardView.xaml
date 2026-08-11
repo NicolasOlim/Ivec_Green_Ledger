@@ -132,8 +132,9 @@
             </StackPanel>
         </Grid>
 
-        <!-- Cards com bindings dinâmicos -->
-        <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,32">
+        <!-- Cards com bindings dinâmicos - AGORA COM 3 COLUNAS (Falhas removida) -->
+        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,32">
+            <!-- Card: Consultas Hoje -->
             <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,16,0">
                 <StackPanel>
                     <TextBlock Text="Consultas Hoje" FontSize="13" Foreground="{StaticResource TextSecondary}" FontWeight="Medium" Margin="0,0,0,8"/>
@@ -142,14 +143,7 @@
                 </StackPanel>
             </Border>
 
-            <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,16,0">
-                <StackPanel>
-                    <TextBlock Text="Falhas de Integração" FontSize="13" Foreground="{StaticResource TextSecondary}" FontWeight="Medium" Margin="0,0,0,8"/>
-                    <TextBlock Text="{Binding Dashboard.FalhasIntegracao, StringFormat={}{0:N1}%}" FontSize="28" FontWeight="Bold" Foreground="#EF4444"/>
-                    <TextBlock Text="2 instabilidades nas últimas 24h" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,8,0,0"/>
-                </StackPanel>
-            </Border>
-
+            <!-- Card: Tempo de Resposta -->
             <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,16,0">
                 <StackPanel>
                     <TextBlock Text="Tempo de Resposta (API)" FontSize="13" Foreground="{StaticResource TextSecondary}" FontWeight="Medium" Margin="0,0,0,8"/>
@@ -158,6 +152,7 @@
                 </StackPanel>
             </Border>
 
+            <!-- Card: Uso do Servidor -->
             <Border Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,0,0">
                 <StackPanel>
                     <TextBlock Text="Uso do Servidor" FontSize="13" Foreground="{StaticResource TextSecondary}" FontWeight="Medium" Margin="0,0,0,8"/>
