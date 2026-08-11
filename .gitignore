@@ -11,7 +11,14 @@
 [Oo]ut/
 x64/
 x86/
-
+# ==========================================
+# Banco de dados local (SQLite)
+# ==========================================
+Database/
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
 # ==========================================
 # Arquivos do Visual Studio e IDEs
 # ==========================================
@@ -23,32 +30,26 @@ x86/
 *.userosscache
 *.sln.docstates
 *.userprefs
-
 # ==========================================
 # Dependências (.NET / NuGet)
 # ==========================================
 packages/
 *.nupkg
-
 # ==========================================
 # Credenciais e Segredos (Específico do seu projeto)
 # ==========================================
 # Ignora qualquer chave JSON do Firebase pelo nome do arquivo
 *firebase-key.json
 *firebase-admin.json
-
 # Garante que qualquer arquivo JSON dentro das pastas de chaves seja ignorado
 **/chave_Banco/*.json
 **/chave_Api/*.json
-
 # Caminhos exatos (apenas por garantia extra)
 ApiIveco/chave_Banco/firebase-admin.json
 ApiIveco/chave_Api/firebase-key.json
-
 # Ignora configurações locais que possam ter senhas de banco de dados
 appsettings.Development.json
 appsettings.*.json
-
 # ==========================================
 # Outros arquivos temporários do sistema
 # ==========================================
