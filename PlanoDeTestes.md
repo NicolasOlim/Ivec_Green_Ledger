@@ -136,20 +136,73 @@ A elaboração dos testes é fundamentada nos seguintes artefatos e especificaç
 
 | ID | Funcionalidade | Cenário | Entrada | Resultado esperado | Resultado obtido | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :---|
-| CT - 001 | Login | Credenciais válidas | Usuário: `admin@iveco.com`, Senha: `Iveco@2026` | Sistema efetua login e exibe a aba `Dashboard` | Login realizado com sucesso e aba de dashboard carregada | - |
-| CT - 002 | Login | Senha inválida | Usuário: `admin@iveco.com`, Senha: `SenhaErrada` | Sistema exibe mensagens de erro "Credenciais inválidas" e mantém usuário na tela de login | Mensagem de erro exibida corretamente e o usuário permanece na tela de login | - |
-| CT - 003 | Dashboard | Status das API's externas | Navegar até o Dashboard e aguardar, pois tem uma atualização automática | Indicadores (BrasilAPI, NHTSA, MErcado Livre) ficam verdes indicando "sucesso" ou vermelhos indicando "falha" | Brasil API: Verde, Google Maps: Vermelho (por ser uma chave inválida), NHTSA: Verde e Mercado Livre: Vermelho | - |
-| CT - 004 | Dashboard | Remoção do card "Falhas de integração" | Visualizar o Dashboard após alteração no código | O card "Falhas de Integração" não deve aparecer. Os outros 3 cards devem estar alinhado | Card removido com sucesso | - |
-| CT - 005 | Fornecedores | Consulta CNPJ válido | Digitar CNPJ `00.000.000/0001-91` e clicar em "consultar" | Campos "Razão Social", "Endereço" e "Status RFB" são preenchidos. Categoria ESG é dado como "Não avaliado" | - | - |
-| CT - 006 | Fornecedores | Salvar fornecedor | Após consulta, selecionar categoria e clicar em "Registrar no Ledger" | Sistema exibe "Fornecedor registrado com sucesso". E o fornecedor aparece na lista | Todos os campos preenchidos, Status FRB: `ATIVA` e Categoria ESG: `Não avaliado` | - |
-| CT - 007 | Peças | Cadastro com dados incompletos | Deixar o campo "Nome da Peça" vazio e clicar em "Registrar" | MessageBox: "Preencha o nome da peça. O cadastro é bloqueado | Sucesso, fornecedor salvo na API e no SQLite local | - |
-| CT - 008 | Fornecedores | Cadastro bem sucedido | Selecionar VIN, Fornecedor, Nome e Peso | Sistema exibe sucesso e a peça aparece no topo da lista com status "Gravado no Ledger" | Mens | - |
-| CT - 009 | Rastreabilidade | VIN válido IVECO | Digitar VIN `1GNCS18Z2M0115561` e clicar em "Rastrear Origem" | Sistema valida com a NHTSA, salva no Ledger e exibe mensagem de sucesso | - | - |
-| CT - 010 | Rastreabilidade | VIN inválido | Digitar VIN `12345678901234567` (não é da IVECO) | Sistema rejeita e exibe "Este VIN não pertence a um veículo IVECO válido" | - | - |
-| CT - 011 | Relatórios | Geração de PDF | Selecionar "Veículos" e clicar em "Gerar e baixar PDF" | Ao salvar, o PDF é gerado e aberto automaticamente | - | - |
-| CT - 012 | Dashboard | Tempo de resposta da API | Medir o tempo de resposta do endpoint `pegada-media` | O valor deve ser exibido no card "Tempo de Resposta(API)" | - | - |
+| CT - 001 | Login | Credenciais válidas | Usuário: `admin@iveco.com`, Senha: `Iveco@2026` | Sistema efetua login e exibe a aba `Dashboard` | Login realizado com sucesso e aba de dashboard carregada | Sucesso |
+| CT - 002 | Login | Senha inválida | Usuário: `admin@iveco.com`, Senha: `SenhaErrada` | Sistema exibe mensagens de erro "Credenciais inválidas" e mantém usuário na tela de login | Mensagem de erro exibida corretamente e o usuário permanece na tela de login | Sucesso |
+| CT - 003 | Dashboard | Status das API's externas | Navegar até o Dashboard e aguardar, pois tem uma atualização automática | Indicadores (BrasilAPI, NHTSA, MErcado Livre) ficam verdes indicando "sucesso" ou vermelhos indicando "falha" | Brasil API: Verde, Google Maps: Vermelho (por ser uma chave inválida), NHTSA: Verde e Mercado Livre: Vermelho | Sucesso |
+| CT - 004 | Dashboard | Remoção do card "Falhas de integração" | Visualizar o Dashboard após alteração no código | O card "Falhas de Integração" não deve aparecer. Os outros 3 cards devem estar alinhado | Card removido com sucesso | Sucesso |
+| CT - 005 | Fornecedores | Consulta CNPJ válido | Digitar CNPJ `00.000.000/0001-91` e clicar em "consultar" | Campos "Razão Social", "Endereço" e "Status RFB" são preenchidos. Categoria ESG é dado como "Não avaliado" | Todos os campos preenchidos, Status FRB: `ATIVA` e Categoria ESG: `Não avaliado` | Sucesso |
+| CT - 006 | Fornecedores | Salvar fornecedor | Após consulta, selecionar categoria e clicar em "Registrar no Ledger" | Sistema exibe "Fornecedor registrado com sucesso". E o fornecedor aparece na lista | Sucesso e o fornecedor salvo na API e no SQLite local | Sucesso |
+| CT - 007 | Peças | Cadastro com dados incompletos | Deixar o campo "Nome da Peça" vazio e clicar em "Registrar" | MessageBox: "Preencha o nome da peça. O cadastro é bloqueado | Mensagem exibida e o cadastro não prossegue | Sucesso |
+| CT - 008 | Fornecedores | Cadastro bem sucedido | Selecionar VIN, Fornecedor, Nome e Peso | Sistema exibe sucesso e a peça aparece no topo da lista com status "Gravado no Ledger" | Sucesso e peça salva online e no SQLite local | Sucesso |
+| CT - 009 | Rastreabilidade | VIN válido IVECO | Digitar VIN `1GNCS18Z2M0115561` e clicar em "Rastrear Origem" | Sistema valida com a NHTSA, salva no Ledger e exibe mensagem de sucesso | Sucesso e veículo salvo online e no SQLite | Sucesso |
+| CT - 010 | Rastreabilidade | VIN inválido | Digitar VIN `12345678901234567` (não é da IVECO) | Sistema rejeita e exibe "Este VIN não pertence a um veículo IVECO válido" | Mensagem de erro exibida e veículo não é salvo | Sucesso |
+| CT - 011 | Relatórios | Geração de PDF | Selecionar "Veículos" e clicar em "Gerar e baixar PDF" | Ao salvar, o PDF é gerado e aberto automaticamente | PDF gerado com dados corretos | Falha |
+| CT - 012 | Dashboard | Tempo de resposta da API | Medir o tempo de resposta do endpoint `pegada-media` | O valor deve ser exibido no card "Tempo de Resposta(API)" | Valor será exibido | Sucesso |
 
 ---
+
+## **Análise de Riscos**
+
+A análise de riscos do projeto mapeia cenários operacionais estratégicos, seus impactos e as respectivas de teste associadas aos casos de teste.
+
+A indisponibilidade da **API Brasil (CNPJ)** apresenta impacto alto por impedir o cadastro de fornecedores, com probabilidade média, sendo tratada via testes de timeout e mensagens de erro **CT-005**. De forma semelhante, a **API da NHTSA** possui impacto alto por afetar a rastreabilidade e probabilidade média, exigindo validações de VIN e tratamento de exceção **CT-009 e CT-010**. A inacessibilidade do backend é um risco crítico, embora de baixa probabilidade, validado por testes de timeout de 10 segundos e exibição de alerta **CT-006 e CT-008**.
+
+Em relação á interface e desempenho, o risco de cache do Dashboard obsoleto, que pode apresentar dados, possui impacto médio e alta probabilidade, sendo mitigado pela validação do tempo de expiração do cache em 60s **CT-003**. A falha na geração do PDF possui baixo impacto e baixa probabilidade, tratado com particionamento de equivalência e análise de valor limite **CT-007 e CT-010**, enquanto a remoção de componentes de causar regressão possui impacto e probabilidade médios, sendo avaliada por meio de testes de regressão visual após alterações no XAML **CT-004 e CT-003**.
+
+---
+
+## **Cenários Selecionados para Reteste/Regressão**
+
+Nossa equipe selecionou 5 cenários que podem apresentar defeito e descrevemos o processo que será utilizado após a correção:
+
+| Cenário | Defeito Relacionado | Reteste | Regressão | 
+| :--- | :--- | :--- | :--- 
+| 1-) Geração de PDF | BUG-001 (Em aberto) | Credenciais válidas | Reexcutar CT-011, gerar o PDF e verificar se ele abre automaticamente no leitor padrão após a correção | Validar CT-012 (Tempo de resposta da API e CT-001 (Login) para garantir que não sejam afetadas | 
+| 2-) Remoção do card | BUG-004 (Preventivo) | Verificar se o card realmente sumiu da interface e se os 3 cards restantes continuam alinhados | Verificar CT-003 (Status das API's externas) e CT-001 (Login) para garantir que não sejam afetados | 
+| 3-) Consulta CNPJ com API indisponível | BUG-005 (Preventivo) | Simular falha da API, consultar um CNPJ e verificar se o sistema exibe mensagem de erro | Verificar CT-005 (Consulta CNPJ válido) e CT-006 (Salvar fornecedor) para garantir que continua salvando| 
+| 4-) Validação de VIN inválido | BUG-006 (Preventivo) | Digitar um VIN com caracteres proibidos (`"I", "O", "Q"`) | Verificar CT-009 (VIN válido IVECO) para garantir que continua salvando corretamente | 
+| 5-) Cadastro de peça com dados incompletos | BUG-007 (Preventivo) | Deixar o campo "Nome da Peça" vazio e verificar se o sistema bloqueia o cadastro com a mensagem correta | Verificar CT-008 (Cadastro bem sucedido) para garantir que o cadastro completo continua funcionando | 
+
+---
+
+# **Critérios de Entrada e Saída**
+
+**Critérios de Entrada:**
+
+   - Código fonte da versão a ser testada devidamente compilado e sem erros de build;
+   - Ambiente de teste configurado com o banco SQL Server e SQLite inicializados com dados de homologação;
+   - Aplicação WPF instalada ou executável gerado na estação de testes;
+   - Web API ativa e respondendo endpoints de teste;
+   - Casos de testes documentados e revisados neste mesmo arquivo;
+   - Dados de testes preparados (usuário admin, CNPJ, VIN).
+
+**Critérios de Saída:**
+
+   - Testes planejados e executados;
+   - Nenhum defeito com severidade crítica;
+   - Defeitos com severidade alta corrigidos;
+   - Evidências de testes consolidadas e anexadas á documentação;
+   - Riscos residuais avaliados e documentados;
+   - Defeitos conhecidos são de baixa severidade e documentados.
+
+---
+
+## **Defeitos Identificados:**
+
+**1-) Falha na abertura de PDF**
+
+Ao gerar e salvar o relatório em PDF na aba de veículos, o arquivo é gravado normalmente, mas a janela do leitor 
+
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
 *Última atualização: 10 de agosto de 2026.*
