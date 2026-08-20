@@ -33,6 +33,7 @@ namespace ApiIveco.Service
         /// <summary>Cache em memória para otimização de consultas.</summary>
         private readonly IMemoryCache _cache;
 
+
         /// <summary>Nome da coleção de fornecedores no Firestore.</summary>
         private readonly string _collectionFornecedor = "fornecedores";
 
