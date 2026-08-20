@@ -143,28 +143,23 @@ namespace Iveco.Testes.Controllers
         }
 
         [Fact]
-        public async Task PostVeiculo_ComVinValido_DeveChamarCriarVeiculo_EGerarComponentes_ERetornarOk()
+        public async Task PostVeiculo_ComVinValido_DeveChamarServicosERetornarOk()
         {
-            // Arrange
             var veiculo = new Veiculo { Vin = "NOVO" };
-            var veiculoCriado = new Veiculo { Vin = "NOVO", Modelo = "Daily" };
-            _dadosServiceMock.Setup(s => s.ListarVeiculo())
-                .ReturnsAsync(new List<Veiculo>());
-            _dadosServiceMock.Setup(s => s.CriarVeiculo(veiculo))
-                .ReturnsAsync(veiculoCriado);
+            var criado = new Veiculo { Vin = "NOVO", Modelo = "Daily" };
+            _dadosServiceMock.Setup(s => s.ListarVeiculo()).ReturnsAsync(new List<Veiculo>());
+            _dadosServiceMock.Setup(s => s.CriarVeiculo(veiculo)).ReturnsAsync(criado);
+            // CORREÇÃO: retorna uma lista vazia, pois o controller não usa o valor de retorno
             _dadosServiceMock.Setup(s => s.GerarComponentesParaVeiculoAsync(veiculo.Vin))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(new List<VeiculoComponente>());
 
-            // Act
             var resultado = await _controller.PostVeiculo(veiculo);
 
-            // Assert
             _dadosServiceMock.Verify(s => s.CriarVeiculo(veiculo), Times.Once);
             _dadosServiceMock.Verify(s => s.GerarComponentesParaVeiculoAsync(veiculo.Vin), Times.Once);
-
-            var okResult = Assert.IsType<OkObjectResult>(resultado);
-            var expected = new { mensagem = "Veículo registrado e peças vinculadas com sucesso!", veiculo = veiculoCriado };
-            Assert.Equal(expected, okResult.Value);
+            var ok = Assert.IsType<OkObjectResult>(resultado);
+            var expected = new { mensagem = "Veículo registrado e peças vinculadas com sucesso!", veiculo = criado };
+            Assert.Equal(expected, ok.Value);
         }
 
         [Fact]

@@ -28,8 +28,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IEmailValidationService, EmailValidationService>();
 builder.Services.AddScoped<IEmailValidationService, EmailValidationService>();
-builder.Services.AddScoped<ITeamsNotificationService, TeamsNotificationService>();
-
 
 /// 3. SWAGGER
 builder.Services.AddSwaggerGen(options =>
