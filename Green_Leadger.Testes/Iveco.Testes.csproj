@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ApiIveco\ApiIveco.csproj" />
+    <ProjectReference Include="..\WpfIveco\WpfIveco.csproj" />
   </ItemGroup>
 
   <ItemGroup>
