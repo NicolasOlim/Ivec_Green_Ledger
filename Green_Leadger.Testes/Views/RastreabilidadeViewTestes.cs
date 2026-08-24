@@ -1,17 +1,18 @@
-﻿using ApiIveco.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using WpfIveco.Views;
+using Xunit;
 
 namespace Iveco.Testes.Views
 {
     public class RastreabilidadeViewTestes
     {
+        [Fact]
+        public void Construtor_DeveInicializarComponentes()
+        {
+            // Arrange & Act
+            var view = new RastreabilidadeView();
 
-      ///  private static Fornecedor CriarFornecedor(int id = 1, string nome ="LCT_Mob", string localização = "Bahia", string cnpj = "85926502759", string categoria = "Ouro")
-
-
+            // Assert
+            Assert.NotNull(view);
+        }
     }
 }
