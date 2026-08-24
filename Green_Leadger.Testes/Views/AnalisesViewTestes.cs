@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using WpfIveco.Views;
+using Xunit;
 
 namespace Iveco.Testes.Views
 {
-    internal class AnalisesViewTestes
+    public class AnalisesViewTestes
     {
+        [Fact]
+        public void Construtor_DeveInicializarComponentes()
+        {
+            // Arrange & Act
+            var view = new AnalisesView();
+
+            // Assert
+            Assert.NotNull(view);
+        }
     }
 }
