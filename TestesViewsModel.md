@@ -341,5 +341,145 @@ public void CT19_AdicionarPeca_FaltandoVinOuFornecedor_DeveBloquear()
 
 - ***CT20 / CT21 Validação de VIN:*** 
 
-  * **Método:** `CT17_CT18_AdicionarPeca_ValidacaoDePeso` e `CT19_AdicionarPeca_FaltandoVinOuFornecedor_DeveBloquear`.
-  * **O que verifica:** Bloqueia pesos negativos, aceita o limite inferior de zero (0.0) e valores comuns (65.50), e exige vínculos obrigatórios (VIN e Fornecedor).
+  * **Método:** `CT20_CT21_ValidarVin_EntradasInavlidasELimites_DevemSerRejeitadas`.
+  * **Entradas:** `16 caracteres, 18 caracteres, caracteres proibidos (' I ', ' O ', ' Q ') e VIN válido IVECO ( " ZCFA1E02008123456 ")`.
+  * **O que verifica:** Garante a rejeição de VINs fora do tamanho exato de 17 caracteres ou contendo os caracteres ilegais I, O e Q.
+
+```csharp
+
+[Theory]
+[InlineData("1234567890123456")]   // 16 caracteres (Inválido)
+[InlineData("123456789012345678")] // 18 caracteres (Inválido)
+[InlineData("123456789I1234567")]  // Contém 'I' proibido (Inválido)
+[InlineData("123456789O1234567")]  // Contém 'O' proibido (Inválido)
+[InlineData("123456789Q1234567")]  // Contém 'Q' proibido (Inválido)
+[InlineData("ZCFA1E02008123456")]  // Padrão válido IVECO (Válido)
+public void CT20_CT21_ValidarVin_EntradasInvalidasELimites_DevemSerRejeitadas(string vin)
+{
+    // Arrange
+    var viewModel = new RastreabilidadeViewModel(null);
+    viewModel.PesquisaVin = vin;
+
+    // Act
+    bool podePesquisar = viewModel.PesquisarVinCommand.CanExecute(null);
+
+    // Assert
+    bool ehValido = vin.Length == 17 && !vin.Contains("I") && !vin.Contains("O") && !vin.Contains("Q");
+    Assert.Equal(ehValido, podePesquisar);
+}
+
+```
+
+---
+
+
+ **Módulo 6 - Autenticação, Relatórios e Infraestrutura MVVM**
+
+- ***CT23: Autenticação de usuário com falha (`MainViewModel.cs`):*** 
+
+  * **Método:** `CT23_FazerLogin_SenhaIncorreta_DeveSinalizarErroNaInterface`.
+  * **Entradas:** `LoginEmail = " admin@iveco.com ", LoginSenha = " senhaErrada "`.
+  * **O que verifica:** Sinaliza erro na interface (`HasLoginError = true`, mensagem de erro preenchida) e impede o acesso (`IsLoggedIn == false`) ao fornecer credenciais incorretas.
+
+ ```csharp
+
+[Fact]
+public void CT23_FazerLogin_SenhaIncorreta_DeveSinalizarErroNaInterface()
+{
+    // Arrange
+    var viewModel = new MainViewModel();
+    viewModel.LoginEmail = "admin@iveco.com";
+    viewModel.LoginSenha = "senhaErrada";
+
+    // Act
+    viewModel.FazerLoginCommand.Execute(null);
+
+    // Assert
+    Assert.True(viewModel.HasLoginError);
+    Assert.False(string.IsNullOrEmpty(viewModel.LoginError));
+    Assert.False(viewModel.IsLoggedIn);
+}
+
+```
+
+---
+
+- ***Teste: Alteração de contexto de relatório (`RelatorioViewModelTestes.cs`):*** 
+
+  * **Método:** `MudarTipoRelatorio_DeveAtualizarATagDeContextoCorretamente`.
+  * **Entradas:** `tipoSelecionado = " Fornecedores "`.
+  * **O que verifica:** Confirma se o comando de mudança de relatório atualiza corretamente a propriedade `TipoRelatorio` com a tag do contexto desejado.
+ 
+ ```csharp
+
+[Fact]
+ public void MudarTipoRelatorio_DeveAtualizarATagDeContextoCorretamente()
+ {
+     // Arrange
+     var httpClient = new HttpClient { BaseAddress = new Uri("https://apiivecogreenledger.runasp.net/") };
+     var viewModel = new RelatoriosViewModel(httpClient);
+     string tipoSelecionado = "Fornecedores";
+ 
+     // Act
+     viewModel.MudarTipoRelatorioCommand.Execute(tipoSelecionado);
+ 
+     // Assert
+     Assert.Equal(tipoSelecionado, viewModel.TipoRelatorio);
+ }
+
+```
+
+---
+
+- ***Teste: Disponibilidade do comando de geração em PDF (`RelatorioViewModelTestes.cs`):*** 
+
+  * **Método:** `GerarRelatorioPdfCommand_DeveEstarDisponivelSempre`.
+  * **Entradas:** `null`.
+  * **O que verifica:** Assegura que o botão de exportar PDF permaneça sempre habilitado para execução ( `CanExecute == true`).
+
+```csharp
+
+ [Fact]
+ public void GerarRelatorioPdfCommand_DeveEstarDisponivelSempre()
+ {
+     // Arrange
+     var httpClient = new HttpClient { BaseAddress = new Uri("https://apiivecogreenledger.runasp.net/") };
+     var viewModel = new RelatoriosViewModel(httpClient);
+ 
+     // Act
+     bool podeGerar = viewModel.GerarRelatorioPdfCommand.CanExecute(null);
+ 
+     // Assert
+     Assert.True(podeGerar, "O botão de gerar relatório nunca deve estar desabilitado na view.");
+ }
+
+```
+
+---
+
+- ***Teste: Notificação de alteração de propriedade (`ViewModelBaseTestes.cs`):*** 
+
+  * **Método:** `OnPropertyChanged_DeveDispararEvento_ComONomeDaPropriedadeCorreta`.
+  * **Entradas:** `Teste Green Ledger` á propriedade `MinhaPropriedade`.
+  * **O que verifica:** Certifica que a infraestrutura MVVM dispara o evento `PropertyChanged` informando o nome exato da propriedade alterada.
+
+```csharp
+
+[Fact]
+public void OnPropertyChanged_DeveDispararEvento_ComONomeDaPropriedadeCorreta()
+{
+    // Arrange
+    var viewModel = new ViewModelMock();
+    string propriedadeAlterada = null;
+    viewModel.PropertyChanged += (sender, args) => { propriedadeAlterada = args.PropertyName; };
+
+    // Act
+    viewModel.MinhaPropriedade = "Teste Green Ledger";
+
+    // Assert
+    Assert.Equal(nameof(ViewModelMock.MinhaPropriedade), propriedadeAlterada);
+}
+
+```
+
+---
