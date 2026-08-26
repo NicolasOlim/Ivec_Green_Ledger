@@ -1,102 +1,49 @@
-# 📦🍃 Iveco Green Ledger – Documentação de Testes Unitários
+# 📦🍃 Iveco Green Ledger – Testes Executados Na View Model
 
-## 1. Informações Gerais
-- **Nome do Aluno:** Erick Silva Fernandes de Araújo
-- **Turma:** Desenvolvimento de Sistemas
-- **Nome da Equipe:** Green Ledger
-- **Data de Entrega:** 25/08/2026
-- **Componente Escolhido:** ViewModel (Camada de Apresentação / Padrão MVVM)
-- **Classes e Módulos Testados:** `AnalisesViewModel`, `DashboardViewModel`, `FornecedorViewModel`, `MainViewModel`, `PecasViewModel`, `RastreabilidadeViewModel`, `RelatorioViewModel` e `ViewModelBase`
-- **Métodos Testados:** `AtualizarAsync()`, `AtualizarPegadaMediaAsync()`, `CanExecute()` dos comandos de busca (`ConsultarCnpjCommand`, `PesquisarVinCommand`, `SalvarFornecedorCommand`, `AdicionarPecaManualCommand`), `FazerLoginCommand.Execute()` e `OnPropertyChanged()`
+ <div class="logo-container" align="center">
+ <img src="imagens/logo - teste - viewmodel.jpg" alt="Logo Teste Service" class="logo-img" style="height: 350px; width: auto; vertical-align: middle; margin-left: 15px;">
+</div>
 
-## 2. Justificativa da Escolha
-A camada de ViewModel centraliza todas as regras de apresentação, validação de formulários, comandos executáveis (`ICommand`) e a comunicação com serviços e APIs externas no padrão MVVM. A escolha por testar esse componente se deve ao fato de que falhas na validação de entrada, falta de resiliência a quedas de rede ou inconsistências no estado da interface afetam diretamente a experiência do usuário final no ecossistema WPF. Garantir a cobertura unitária dessa camada assegura que a lógica da interface funcione de forma estável e previsível antes mesmo da integração com telas gráficas ou bancos de dados.
+## **Informações Gerais**
+- **Nome do Sistema:** Iveco Green Ledger.
+- **Componentes Testados:** `AnalisesViewModel`, `DashboardViewModel`, `FornecedorViewModel`, `MainViewModel`, `PecasViewModel`, `RastreabilidadeViewModel`, `RelatoriosViewModel`, `ViewModelBase`, `DashboardView`, `FornecedoresView` e `MainWindow`.
+- **Arquivo de Teste:** `AnalisesViewModelTestes.cs`, `DashboardViewModelTestes.cs`, `FornecedorViewModelTestes.cs`, `MainViewModelTestes.cs`, `PecasViewModelTestes.cs`, `RastreabilidadeViewModelTestes.cs`, `RelatoriosViewModelTestes.cs`, `ViewModelBaseTestes.cs` e suítes de Views.
+- **Autor da Suíte:** [🧑‍💻 Erick Silva](https://github.com/erick190813)
+- **Data de Entrega:** 25 de Agosto de 2026.
+- **Arquitetura Técnica dos Testes:** 
 
-## 3. Responsabilidade do Componente
-As ViewModels gerenciam o estado da interface, expõem propriedades com notificação de alteração (`INotifyPropertyChanged`) e fornecem comandos (`ICommand`) para a execução de ações assíncronas e consultas HTTP a APIs externas.
-
-- **O que o componente faz:** Controla os dados exibidos nas telas, valida se as ações dos usuários podem ser executadas e processa as respostas de serviços externos.
-- **Problema que resolve:** Isola a lógica da interface gráfica do WPF, garantindo que botões e campos só fiquem habilitados com dados válidos e aplicando respostas de fallback caso APIs externas estejam inacessíveis.
-
-## 4. Estratégia de Testes e Comportamentos Mapeados
-Os cenários foram definidos a partir das regras de negócio de cada tela, utilizando o manipulador `MockHttpMessageHandler` para interceptar requisições HTTP e simular as respostas das APIs sem necessidade de conexão com a rede.
-
-- **Cenários Válidos:** Formatação de valores, atualização de médias de emissão e preenchimento de dados de CNPJ válidos.
-- **Cenários Inválidos:** Inserção de CNPJ com letras, senhas incorretas no login, ausência de categorias ESG ou ausência de vínculos de VIN e fornecedor.
-- **Valores Limites e Exceções:** Validação de peso de peças, tamanhos e caracteres de VIN e tratamento de erros de rede.
-- **Situações Não Testadas (Fora do Escopo):** Renderização direta de elementos e conexão em tempo real com o banco de dados.
-
-## 5. Testes Desenvolvidos (Padrão AAA)
-Os testes foram executados na estrutura Arrange, Act e Assert:
-
-### Teste 01: CT06_CT07_CarregarTotalEmissoes_DeveFormatarEconomiaGeradaCorretamente (`AnalisesViewModel`)
-- **O que verifica:** Se a conversão do total de emissões e preço de carbono é formatada em milhares ("K") ou milhões ("M").
-- **Arrange:** Instanciação do `MockHttpMessageHandler` configurado com respostas JSON simuladas para emissões e preço de carbono, criando o HttpClient com a URI mockada.
-- **Act:** Chamada do método `viewModel.AtualizarAsync()`.
-- **Assert:** Verificação do resultado por meio da asserção `Assert.Equal(formatacaoEsperada, viewModel.EconomiaGerada)`.
-
-### Teste 02: CT09_PrecoCarbonoFalha_DeveUsarFallbackCorretamente (`AnalisesViewModelTestes`)
-- **O que verifica:** A utilização do valor padrão de fallback ($150,0) quando a chamada HTTP para obter o preço do carbono retorna erro 500.
-- **Arrange:** Configuração do mock de rede para responder com `HttpStatusCode.InternalServerError` na rota de preço do carbono.
-- **Act:** Invocação do método `viewModel.AtualizarAsync()`.
-- **Assert:** Confirmação por `Assert.Equal("R$ 150,0K", viewModel.EconomiaGerada)`.
-
-### Teste 03: CT03_AtualizarPegadaMedia_ComFalhaDeRede_NaoDeveQuebrarAcesso (`DashboardViewModelTestes`)
-- **O que verifica:** O comportamento do sistema ao enfrentar a ausência de conexão com a internet durante a consulta da pegada média.
-- **Arrange:** Configuração do `SendAsyncFunc` no mock para lançar uma exceção `HttpRequestException("Sem internet")`.
-- **Act:** Execução assíncrona de `viewModel.AtualizarPegadaMediaAsync()`.
-- **Assert:** Verificação por `Assert.Equal("Indisponível", viewModel.PegadaMediaFormatada)`.
-
-### Teste 04: CT13_ConsultarCnpj_ComCnpjInvalido_NaoDevePermitirBusca (`FornecedoresViewModelTestes`)
-- **O que verifica:** O bloqueio da busca de CNPJ caso a string informada contenha caracteres alfabéticos.
-- **Arrange:** Atribuição da string `"123AB/0001"` à propriedade `CnpjBusca` do `FornecedorViewModel`.
-- **Act:** Avaliação do método `viewModel.ConsultarCnpjCommand.CanExecute(null)`.
-- **Assert:** `Assert.False(podeExecutar)` com mensagem indicando que a consulta não deve ser permitida fora do formato numérico.
-
-### Teste 05: CT20_CT21_ValidarVin_EntradasInvalidasELimites_DevemSerRejeitadas (`RastreabilidadeViewModelTestes` / `MainViewModelTestes`)
-- **O que verifica:** A validação do campo de busca por VIN, rejeitando códigos de 16 ou 18 caracteres ou contendo as letras 'I', 'O' e 'Q', e aceitando o padrão correto de 17 caracteres.
-- **Arrange:** Injeção parametrizada de strings via `[Theory]` e `[InlineData]` na propriedade.
-- **Act:** Execução de `PesquisarVinCommand.CanExecute(null)`.
-- **Assert:** Comparação do resultado retornado pelo comando com a regra de validação esperada.
-
-### Teste 06: CT17_CT18_AdicionarPeca_ValidacaoDePeso (`PecasViewModelTestes`)
-- **O que verifica:** A aceitação de pesos positivos e iguais a zero (0.0 e 65.50) e o bloqueio para pesos negativos (-5.0).
-- **Arrange:** Atribuição do peso de teste e preenchimento dos vínculos obrigatórios (VIN, fornecedor e nome da peça).
-- **Act:** Execução de `viewModel.AdicionarPecaManualCommand.CanExecute(null)`.
-- **Assert:** `Assert.Equal(esperado, podeExecutar)`.
-
-### Teste 07: `OnPropertyChanged_DeveDispararEvento_ComONomeDaPropriedadeCorreta` (`ViewModelBaseTestes`)
-- **O que verifica:** Se o método `OnPropertyChanged` dispara o evento `PropertyChanged` notificando o nome exato da propriedade modificada.
-- **Arrange:** Instanciação da classe de teste `ViewModelMock` e subscrição ao evento `PropertyChanged`.
-- **Act:** Alteração da propriedade `viewModel.MinhaPropriedade = "Teste Green Ledger"`.
-- **Assert:** Confirmação por `Assert.Equal(nameof(ViewModelMock.MinhaPropriedade), propriedadeAlterada)`.
-
-## 6. Técnicas e Recursos Aplicados
-A tabela a seguir relaciona as bibliotecas, dependências do projeto e técnicas utilizadas na criação dos testes unitários:
-
-| Recurso / Ferramenta | Versão / Tipo | Aplicação nos Testes |
-| :--- | :--- | :--- |
-| **xUnit** | 2.9.3 / Framework | Framework de testes responsáveis pela estrutura das rotinas e pelas anotações `Fact`, `Theory` e `InlineData`. |
-| **Microsoft.NET.Test.Sdk** | 18.9.0 / SDK | Pacote SDK para descoberta, compilação e suporte à execução no ecossistema .NET. |
-| **xunit.runner.visualstudio** | 4.0.0 / Adaptador | Adaptador para integração e execução no Gerenciador de Testes do Visual Studio. |
-| **Moq** | 4.20.72 / Biblioteca | Biblioteca utilizada para criação de mocks e simulação de objetos. |
-| **MockHttpMessageHandler** | Classe Customizada | Herda de `HttpMessageHandler` para interceptar chamadas HTTP e injetar respostas simuladas via delegando `SendAsyncFunc`. |
-
-> Para validar a entrada de dados (como CNPJ, VIN e peso de peças), os testes foram divididos entre dados que o sistema deve aceitar e dados que deve rejeitar. Também foram testados os limites exatos das regras, garantindo que o sistema bloqueie pesos negativos enquanto aceita valores a partir do zero, e valide o tamanho exato do VIN (aceitando apenas 17).
-
-## 7. Relato de Defeitos e Correções
-Durante a fase de desenvolvimento e execução dos testes unitários da classe `DashboardViewModelTestes`, identificou-se uma inconformidade no tratamento de exceções de rede.
-
-- **Identificação:** Ocorreu durante a execução do teste `CT03_AtualizarPegadaMedia`.
-- **Comportamento Observado:** A simulação de falha de conexão com a internet através da injeção de uma `HttpRequestException` resultava na interrupção do método `AtualizarPegadaMediaAsync()`, pois a exceção não estava sendo tratada na ViewModel.
-- **Comportamento Esperado:** A ViewModel deveria capturar a exceção de rede e definir o texto "Indisponível" na propriedade `PegadaMediaFormatada` para exibição segura na interface gráfica.
-- **Correção Aplicada:** Foi implementado um bloco `try-catch` capturando especificamente `HttpRequestException` dentro do método `AtualizarPegadaMediaAsync()` na classe `DashboardViewModel`. Com a alteração, a propriedade passou a receber a string amigável em caso de erro de conexão, garantindo a aprovação do teste e a estabilidade do sistema.
-
-## 8. Aprendizado e Contribuição para o Projeto
-A criação dos testes unitários para a camada ViewModel permitiu validar a lógica de apresentação e as regras de entrada do projeto Green Ledger sem dependência direta de redes externas ou bancos de dados ativos. O uso da classe `MockHttpMessageHandler` garantiu a simulação de falhas de servidor (HTTP 500) e ausência de internet, assegurando que os mecanismos de fallback e tratamento defensivo funcionem conforme o esperado.
-
-Em termos de aprendizado individual, a atividade proporcionou o domínio prático do padrão MVVM desacoplado, o uso do framework xUnit com testes parametrizados (`[Theory]`) e a estruturação de mocks HTTP no ambiente .NET.
+  * **Framework de Testes:** xUnit (v2.9.3).
+  * **SDK & Test Runner:** Microsoft.NET.Test.Sdk (v18.9.0) e xunit.runner.visualstudio (v4.0.0).
+  * **Simulação de Requisições HTTP (Mocks):** Classe auxiliar da `MockHttpMessageHandler` (que herda de `HttpMessageHandler` e Moq (v4.20.72) para intercepção de endpoints de APIs externas.
+  * **Acesso a Membros Privados de UI:** Utilização do (`System.Reflection.BindingFlags`) para invocação de manipuladores de eventos de controle em Views WPF (`TextChanged`, `TextInput`, `Click`)
+  * **Testes Parametrizados:** Utilização de `[Theory]` e `[InlineData]` para testes de limites em VINs / Chassis, formatação de valores econômicos e validação de peso de peças.
+  * **Padrão de Execução:** AAA (Arrange, Act, Assert) com asserções `Assert.Equal`, `Assert.False`, `Assert.True`, `Assert.Contains`, `Assert.Null`, `Assert.NotNull` e `Assert.IsType`.
 
 ---
-*Documentação elaborada como requisito para a avaliação do projeto de Trabalho de Conclusão de Curso (TCC) do Curso Técnico em Desenvolvimento de Sistemas.*  
-**SENAI - Nova Lima, MG | 2026**
+
+## **Objetivo e Responsabilidade dos Componentes**
+
+As camadas de ViewModel e View centralizam as regras da interface visual WPF, comandos executáveis (`ICommand`), validação de formulários e integração assíncrona com APIs HTTP.
+
+**1-) `Analises`, `Dashboard`, `Fornecedor`, `Main`, `Pecas`, `Rastreabilidade`, `Relatorios`)**
+
+ * **O que faz?** Controla o estado da interface, executa rotinas assíncronas de chamadas HTTP (cálculo de pegada de carbono, busca de CNPJ e preços de emissões), valida regras de execução de comandos (`CanExecute`) e dispara notificações de propriedade (`INotifyPropertyChanged`).
+ * **Problema que resolve:** Isola a lógica da interface gráfica do WPF, impedindo ações inválidas na interface (como salvar fornecedor sem categoria ESG, cadastrar peças sem peso ou pesquisar VINs fora do padrão) e garantindo fallbacks caso APIs externas fiquem indisponíveis.
+
+**2-) `DashboardView`, `FornecedoresView` e `MainWindow`**
+
+ * **O que faz?** Gerencia comportamentos nativos da janela WPF (minimizar, maximizar, fechar), interceptação de entrada de texto nos campos (`TextCompositionEventArgs`) e formatação dinâmica de máscaras em tempo real.
+ * **Problema que resolve:** Bloqueia a inserção de caracteres não numéricos em campos numéricos e garante a aplicação correta de máscaras (ex: formato de CNPJ) sem comprometer o fluxo de interação.
+
+**3-) `MockHttpMessageHandler`**
+
+ * **O que faz?** Herda de `HttpMessageHandler` e expõe a propriedade `SendAsyncFunc` para simular retornos `HttpResponseMessage` (200 OK, 500 InternalServerError, 404 Not Found).
+ * **Problema que resolve:** Elimina a dependência de serviços online ativos e instabilidades de conexão durante a execução da suíte de testes unitários.
+
+---
+
+## **Mapeamento da Estrutura de Diretórios**
+
+Os arquivos de testes de ViewModel estão organizados na pasta `ViewModel` da suíte de testes:
+
+<img src="imagens/mapeamento - dos - diretorios.jpeg" alt="Logo Firebase Firestore" class="logo-img" style="height: 100px; width: auto; vertical-align: middle; margin-left: 10px;">
