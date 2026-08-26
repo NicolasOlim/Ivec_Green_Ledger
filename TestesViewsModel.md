@@ -46,4 +46,300 @@ As camadas de ViewModel e View centralizam as regras da interface visual WPF, co
 
 Os arquivos de testes de ViewModel estão organizados na pasta `ViewModel` da suíte de testes:
 
-<img src="imagens/mapeamento - dos - diretorios.jpeg" alt="Logo Firebase Firestore" class="logo-img" style="height: 100px; width: auto; vertical-align: middle; margin-left: 10px;">
+<img src="imagens/mapeamentodaviewmodel.jpeg" alt="Logo Firebase Firestore" class="logo-img" style="height: 300px; width: auto; vertical-align: middle; margin-left: 10px;">
+
+ * **`AnalisesViewModelTestes.cs`:** Validações de conversão e formatação de dados monetários / emissões com mock de API REST.
+ * **`DashboardViewModelTestes.cs`:** Validação do cálculo de pegada média e resiliência contra falhas de rede.
+ * **`FornecedoresViewModelTestes.cs`:** Consulta via BrasilAPI, formatação automática de CNPJ e restrições ESG.
+ * **`MainViewModel.cs`:** Controle de autenticação de usuários e navegação no estado da aplicação.
+ * **`PecasViewModelTestes.cs`:** Validações de vínculos obrigatórios e limites de peso de peças veiculares.
+ * **RelatorioViewmodelTestes.cs:** Alternância de contexto e disponibilização de geração do relatórios PDF.
+ * **ViewModelBaseTestes.cs:** Verificação da infraestrutura do evento `PropertyChanged`.
+
+---
+
+## **Detalhamento dos Testes Unitários e de UI**
+
+ **Módulo 1 - Mocks de Comunicação HTTP (`Helpers/MockHttpMessageHandler.cs`)**
+
+ ```csharp
+
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Iveco.Testes.Helpers
+{
+    public class MockHttpMessageHandler : HttpMessageHandler
+    {
+        public Func<HttpRequestMessage, HttpResponseMessage> SendAsyncFunc { get; set; }
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(SendAsyncFunc(request));
+        }
+    }
+}
+
+```
+
+---
+
+ **Módulo 2 - Regras de Análises e Indicadores (`AnalisesViewModelTestes.cs`)**
+
+- ***CT06 / CT07 Formatação de economia gerada:*** 
+
+  * **Método:** `CT06_CT07_CarregarTotalEmissoes_DeveFormatarEconomiaGeradaCorretamente`.
+  * **Entradas:** `[InlineData]: (1000.0, " R$ 150, OK ", (1000000.0, " R$ 150, OM")`. 
+  * **O que verifica:** Garante que grandes volumes de emissões e valores de precificação de carbono sejam formatados corretamente ente K e M.
+
+ ```csharp
+
+[Theory]
+[InlineData(1000.0, "R$ 150,0K")]
+[InlineData(1000000.0, "R$ 150,0M")]
+public async Task CT06_CT07_CarregarTotalEmissoes_DeveFormatarEconomiaGeradaCorretamente(double totalEmissoes, string formatacaoEsperada)
+{
+    // Arrange
+    var mockHandler = new MockHttpMessageHandler();
+    mockHandler.SendAsyncFunc = request =>
+    {
+        if (request.RequestUri.AbsolutePath.Contains("total-emissoes"))
+            return new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent($"{{\"totalEmissoes\": {totalEmissoes * 1000}}}") };
+        if (request.RequestUri.AbsolutePath.Contains("preco-carbono"))
+            return new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent("{\"preco\": 150.0}") };
+
+        return new HttpResponseMessage { StatusCode = HttpStatusCode.NotFound };
+    };
+
+    var httpClient = new HttpClient(mockHandler) { BaseAddress = new Uri("https://api.fake.com/") };
+    var viewModel = new AnalisesViewModel(httpClient);
+
+    // Act
+    await viewModel.AtualizarAsync();
+
+    // Assert
+    Assert.Equal(formatacaoEsperada, viewModel.EconomiaGerada);
+}
+
+```
+
+---
+
+- ***CT09 Fallback ao falhar API de preço de carbono:*** 
+
+  * **Método:** `CT09_PrecoCarbonoFalha_DeveUsarFallbackCorretamente`.
+  * **Entradas:** Retorno `HttpStatusCode.InternalServerError` na rota `preco-carbono`.
+  * **O que verifica:** Confirma o uso do valor fallback de RS150.0 por tonelada em caso de erro 500 ou instabilidade na API externa.
+
+ ```csharp
+
+[Fact]
+public async Task CT09_PrecoCarbonoFalha_DeveUsarFallbackCorretamente()
+{
+    // Arrange
+    var mockHandler = new MockHttpMessageHandler();
+    mockHandler.SendAsyncFunc = request =>
+    {
+        if (request.RequestUri.AbsolutePath.Contains("total-emissoes"))
+            return new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent("{\"totalEmissoes\": 1000000}") }; // 1000 ton
+        if (request.RequestUri.AbsolutePath.Contains("preco-carbono"))
+            return new HttpResponseMessage { StatusCode = HttpStatusCode.InternalServerError }; // Simulando falha
+
+        return new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent("{}") };
+    };
+
+    var httpClient = new HttpClient(mockHandler) { BaseAddress = new Uri("https://api.fake.com/") };
+    var viewModel = new AnalisesViewModel(httpClient);
+
+    // Act
+    await viewModel.AtualizarAsync();
+
+    // Assert (Fallback é 150.0. 1000 ton * 150 = 150.000 -> "R$ 150,0K")
+    Assert.Equal("R$ 150,0K", viewModel.EconomiaGerada);
+}
+
+```
+
+---
+
+ **Módulo 3 - Painel Principal e Resiliência de Rede**
+
+- ***CT01 Atualização da pegada média com sucesso:*** 
+
+  * **Método:** `CT01_AtualizarPegadaMedia_ComSucesso_DeveAtualizarPropriedades`.
+  * **O que verifica:** Confirma o preenchimento da propriedade formatada ao receber resposta válida da API.
+
+```csharp
+
+[Fact]
+public async Task CT01_AtualizarPegadaMedia_ComSucesso_DeveAtualizarPropriedades()
+{
+    // Arrange
+    var mockHandler = new MockHttpMessageHandler();
+    mockHandler.SendAsyncFunc = request => new HttpResponseMessage
+    {
+        StatusCode = HttpStatusCode.OK,
+        Content = new StringContent(JsonSerializer.Serialize(new { pegadaMedia = 590.4 }))
+    };
+    var httpClient = new HttpClient(mockHandler) { BaseAddress = new Uri("https://api.fake.com/") };
+    var viewModel = new DashboardViewModel(httpClient);
+
+    // Act
+    await viewModel.AtualizarPegadaMediaAsync();
+
+    // Assert
+    Assert.Contains("590", viewModel.PegadaMediaFormatada);
+}
+
+```
+
+---
+
+- ***CT03 Resiliência contra queda de conexão:*** 
+
+  * **Método:** `CT03_AtualizarPegadaMedia_ComFalhaDeRede_NaoDeveQuebrarAcesso`.
+  * **O que verifica:** Assegura que exceções do tipo `HttpRequestException` definam a propriedade como `Indisponível` sem interrupção abrupta da aplicação.
+
+```csharp
+
+[Fact]
+public async Task CT03_AtualizarPegadaMedia_ComFalhaDeRede_NaoDeveQuebrarAcesso()
+{
+    // Arrange
+    var mockHandler = new MockHttpMessageHandler();
+    mockHandler.SendAsyncFunc = request => throw new HttpRequestException("Sem internet");
+    var httpClient = new HttpClient(mockHandler) { BaseAddress = new Uri("https://api.fake.com/") };
+    var viewModel = new DashboardViewModel(httpClient);
+
+    // Act
+    await viewModel.AtualizarPegadaMediaAsync();
+
+    // Assert
+    Assert.Equal("Indisponível", viewModel.PegadaMediaFormatada);
+}
+
+```
+
+---
+
+ **Módulo 4 - Gestão de Fornecedores e CNPJ (`FornecedoresViewModelTestes.cs`)**
+
+- ***CT12 / CT13 / CT15 Validações de CNPJ e Categorias ESG:*** 
+
+  * **Método:** `CT13_ConsultarCNPJ_ComCnpjInvalido_NaoDevePermitirBusca`, `CT15_SalvarFornecedor_SemCategoriaEsg_DeveBloquearComando` e `CT12_ConsultarCnpj_ComSucesso_DevePreencherDados`.
+  * **O que verifica:** Bloqueia comandos com CNPJ contendo letras ou ausência de categoria ESG, e preenche a razão social após retorno positivos da consulta HTTP.
+
+
+```csharp
+
+[Fact]
+public void CT13_ConsultarCnpj_ComCnpjInvalido_NaoDevePermitirBusca()
+{
+    // Arrange
+    var viewModel = new FornecedorViewModel(null);
+    viewModel.CnpjBusca = "123AB/0001"; // Inválido (letras inseridas)
+
+    // Act
+    bool podeExecutar = viewModel.ConsultarCnpjCommand.CanExecute(null);
+
+    // Assert
+    Assert.False(podeExecutar, "O comando de consulta não deve ser permitido para um CNPJ fora do formato numérico.");
+}
+
+[Fact]
+public void CT15_SalvarFornecedor_SemCategoriaEsg_DeveBloquearComando()
+{
+    // Arrange
+    var viewModel = new FornecedorViewModel(null);
+    viewModel.NomeFornecedorEncontrado = "Iveco Parceiro";
+    viewModel.CategoriaEsg = string.Empty; // Vazio (Obrigatório para o Ledger)
+
+    // Act
+    bool podeExecutar = viewModel.SalvarFornecedorCommand.CanExecute(null);
+
+    // Assert
+    Assert.False(podeExecutar, "O salvamento no Ledger não deve ocorrer sem a atribuição prévia de uma categoria ESG.");
+}
+
+[Fact]
+public async Task CT12_ConsultarCnpj_ComSucesso_DevePreencherDados()
+{
+    // Arrange
+    var mockHandler = new MockHttpMessageHandler();
+    mockHandler.SendAsyncFunc = request => new HttpResponseMessage
+    {
+        StatusCode = HttpStatusCode.OK,
+        Content = new StringContent("{\"razao_social\": \"BOSCH LTDA\", \"municipio\": \"Curitiba\", \"uf\": \"SP\"}")
+    };
+    var httpClient = new HttpClient(mockHandler) { BaseAddress = new Uri("https://brasilapi.com.br/") };
+    var viewModel = new FornecedorViewModel(httpClient);
+    viewModel.CnpjBusca = "00000000000191";
+
+    // Act
+    viewModel.ConsultarCnpjCommand.Execute(null);
+    await Task.Delay(100);
+
+    // Assert
+    Assert.Contains("BOSCH", viewModel.NomeFornecedorEncontrado);
+}
+```
+
+---
+
+ **Módulo 5 - Peças e Rastreabilidade de VIN (`PecasViewModelTestes.cs`, `RastreabilidadeViewModelTestes.cs` e `MainViewModelTestes.cs`)**
+
+- ***CT17 / CT18 / CT19 Regras de peças veiculares:*** 
+
+  * **Método:** `CT17_CT18_AdicionarPeca_ValidacaoDePeso` e `CT19_AdicionarPeca_FaltandoVinOuFornecedor_DeveBloquear`.
+  * **O que verifica:** Bloqueia pesos negativos, aceita o limite inferior de zero (0.0) e valores comuns (65.50), e exige vínculos obrigatórios (VIN e Fornecedor).
+
+ ```csharp
+
+[Theory]
+[InlineData(-5.00, false)] // Negativo (Inválido)
+[InlineData(0.00, true)]   // Limite inferior (Válido)
+[InlineData(65.50, true)]  // Caso comum (Válido)
+public void CT17_CT18_AdicionarPeca_ValidacaoDePeso(double peso, bool esperado)
+{
+    // Arrange
+    var viewModel = new PecasViewModel(null);
+    viewModel.VinSelecionado = "ZCFA1E02008123456";
+    viewModel.FornecedorSelecionado = new WpfIveco.Models.FornecedorModel { Nome = "Bosch" };
+    viewModel.NovaPecaNome = "Motor";
+    viewModel.NovaPecaPesoKg = peso;
+
+    // Act
+    bool podeExecutar = viewModel.AdicionarPecaManualCommand.CanExecute(null);
+
+    // Assert
+    Assert.Equal(esperado, podeExecutar);
+}
+
+[Fact]
+public void CT19_AdicionarPeca_FaltandoVinOuFornecedor_DeveBloquear()
+{
+    // Arrange
+    var viewModel = new PecasViewModel(null);
+    viewModel.VinSelecionado = null; // Faltando VIN
+    viewModel.FornecedorSelecionado = null; // Faltando Fornecedor
+    viewModel.NovaPecaNome = "Filtro de Ar";
+    viewModel.NovaPecaPesoKg = 2.5;
+
+    // Act
+    bool podeExecutar = viewModel.AdicionarPecaManualCommand.CanExecute(null);
+
+    // Assert
+    Assert.False(podeExecutar, "O comando deve ser bloqueado se faltar vínculos obrigatórios (VIN/Fornecedor).");
+}
+
+```
+
+---
+
+- ***CT20 / CT21 Validação de VIN:*** 
+
+  * **Método:** `CT17_CT18_AdicionarPeca_ValidacaoDePeso` e `CT19_AdicionarPeca_FaltandoVinOuFornecedor_DeveBloquear`.
+  * **O que verifica:** Bloqueia pesos negativos, aceita o limite inferior de zero (0.0) e valores comuns (65.50), e exige vínculos obrigatórios (VIN e Fornecedor).
