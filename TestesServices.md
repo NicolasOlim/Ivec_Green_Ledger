@@ -39,6 +39,9 @@
 
 Os arquivos de testes unitários estão organizados na pasta `Service` do projeto de testes:
 
+<img src="imagens/mapeamento - dos - diretorios.jpeg" alt="Logo Firebase Firestore" class="logo-img" style="height: 100px; width: auto; vertical-align: middle; margin-left: 10px;">
+
+
  * **`DadosServiceTestes.cs`:** Contém 6 métodos de testes focados em validações de domínio de lotes, peças, fornecedores e veículos.
  * **`EmailValidationServiceTestes.cs`:** Contém 3 métodos de teste focados nas regras de email corporativo.
 
@@ -306,6 +309,8 @@ public async Task ExcluirVeiculo_VinVazioOuNulo_DeveLancarArgumentException(stri
 ## **Execução e Resultados no Gerenciador de Testes**
 
 A execução completa dos 9 métodos de teste resultou em 19 execuções individuais aprovadas no Visual Studio.
+
+<img src="imagens/execução dos testes.jpeg" alt="Logo Firebase Firestore" class="logo-img" style="height: 300px; width: auto; vertical-align: middle; margin-left: 35px;">
 
 - **Resumo da Suíte:** 
 
