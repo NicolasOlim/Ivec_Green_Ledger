@@ -1,93 +1,321 @@
+# 📦🍃  Iveco Green Ledger – Testes Executados Na Service
 
-# 📦🍃 Iveco Green Ledger – Documentação de Testes Unitários
+ <div class="logo-container" align="center">
+ <img src="imagens/logo-teste-service.png" alt="Logo Teste Service" class="logo-img" style="height: 350px; width: auto; vertical-align: middle; margin-left: 15px;">
+</div>
 
-## 1. Informações Gerais
-- **Nome da Aluna:** Alice Virgília Andrade
-- **Turma:** Desenvolvimento de Sistemas
-- **Nome da Equipe:** Green Ledger
-- **Data de Entrega:** 25/08/2026
-- **Componentes Escolhidos:** `DadosServiceTestes` e `EmailValidationServiceTestes`
-- **Métodos e Serviços Testados:** `CriarLoteMateriaPrima()`, `CriarVeiculoComponente()`, `ExcluirFornecedor()`, `ExcluirVeiculo()`, `ValidateEmailAsync()`
+## **Informações Gerais**
+- **Nome do Sistema:** Iveco Green Ledger
+- **Componente Testado:** `EmailValidationService` e `DadosService`
+- **Arquivo de Teste:** `EmailValidationServiceTestes.cs` e `DadosServiceTestes.cs`
+- **Autor da Suíte:** [🧑‍💻 Alice Andrade](https://github.com/aliceandradee)
+- **Data de Entrega:** 25 de Agosto de 2026
+- **Arquitetura Técnica dos Testes:** 
 
-## 2. Justificativa da Escolha
-A opção pela camada de Services deu-se por se tratar do componente com as regras de negócio mais diretas e objetivas da aplicação. Como os serviços trabalham prioritariamente com validações puras em C# (como checagem de limites numéricos, violações temporais e validação de domínio de e-mail), esse módulo ofereceu o caminho mais intuitivo para aplicar os conceitos do padrão AAA (Arrange, Act, Assert) sem a necessidade de manipular bindings de interface gráfica (WPF/XAML) ou conexões de rede ativas.
-
-## 3. Responsabilidade do Componente
-Os serviços testados são responsáveis por validar a consistência e a integridade das informações enviadas à API antes de qualquer operação de persistência ou consulta.
-
-- **DadosService:** Gerencia as regras de negócio para criação de lotes de matéria-prima, cadastro de componentes de veículos e exclusão de fornecedores e veículos, garantindo que nenhum dado inconsistente chegue à camada de dados.
-- **EmailValidationService:** Valida a autenticidade e o formato dos e-mails de usuários corporativos, aplicando higienização de strings (`Trim`), verificação de caixa alta/baixa.
-
-## 4. Estratégia de Testes e Comportamentos Mapeados
-A estratégia adotada utilizou objetos simulados (mocks) via biblioteca Moq para isolar o componente de log (`ILogger<DadosService>`) e o cache em memória (`IMemoryCache`). Para garantir que os testes avaliem exclusivamente as regras de validação, a instância do banco de dados (`FireBaseData`) foi definida como nula nos cenários de teste.
-
-- **Cenários Válidos:** Aceitação de e-mails do domínio, mesmo com espaços antes/depois ou letras maiúsculas ("ADMIN@IVECO.COM").
-- **Cenários Inválidos:** Rejeição de e-mails de domínios genéricos (gmail.com, yahoo.com), tentativas de burla de subdomínio (iveco.com.br), strings nulas ou em branco, IDs de fornecedor vazios e VINs nulos.
-- **Fora do Escopo:** Persistência de dados real no Firebase e comunicação de rede HTTP de ponta a ponta.
-
-## 5. Testes Desenvolvidos (Padrão AAA)
-Os testes foram executados na estrutura Arrange, Act e Assert:
-
-### Teste 01: CriarLoteMateriaPrima_QuantidadeInvalida_DeveLancarArgumentException (`DadosServiceTestes`)
-- **O que verifica:** O bloqueio da criação de lotes de matéria-prima com quantidade igual a zero ou negativa.
-- **Arrange:** Instanciação de um objeto `LoteMateriaPrima` com `QuantidadeKg` inválida.
-- **Act & Assert:** Execução assíncrona do método validando o disparo de `ArgumentException` com a mensagem *"A quantidade de matéria-prima (Kg) deve ser maior que zero."*.
-
-### Teste 02: CriarLoteMateriaPrima_PegadaCarbonoNegativa_DeveLancarArgumentException (`DadosServiceTestes`)
-- **O que verifica:** O lançamento de exceção ao tentar cadastrar um fator de pegada de carbono negativo.
-- **Arrange:** Criação do lote com `PegadaCarbonoPorKg = -0.5`.
-- **Act & Assert:** `Assert.ThrowsAsync<ArgumentException>` confirmando a mensagem *"O fator de Pegada de Carbono não pode ser um número negativo."*.
-
-### Teste 03: CriarLoteMateriaPrima_DataNoFuturo_DeveLancarArgumentException (`DadosServiceTestes`)
-- **O que verifica:** A rejeição de lotes de matéria-prima com data de produção posterior à data atual (violação temporal).
-- **Arrange:** Criação do lote com `PegadaCarbonoPorKg = -0.5`.
-- **Act & Assert:** `Assert.ThrowsAsync<ArgumentException>` confirmando a mensagem *"O fator de Pegada de Carbono não pode ser um número negativo."*. *(Nota: Conforme a documentação original)*
-
-### Teste 04: ExcluirFornecedor_IdVazioOuNulo_DeveLancarArgumentException` e `ExcluirVeiculo_VinVazioOuNulo_DeveLancarArgumentException (`DadosServiceTestes`)
-- **O que verifica:** Impedimento de chamadas de exclusão com identificadores nulos ou vazios antes do acesso à base de dados.
-- **Arrange:** Passagem de strings `""` e `null` via `[InlineData]`.
-- **Act & Assert:** Validação do disparo de `ArgumentException` garantindo a higienização dos parâmetros.
-
-### Teste 05: ValidateEmailAsync_EmailComDominioIveco_DeveRetornarTrue (`EmailValidationServiceTestes`)
-- **O que verifica:** A aprovação e sanitização de e-mails corporativos válidos com o domínio.
-- **Arrange:** Instanciação do `EmailValidationService` com dados de entrada incluindo espaços e caracteres maiúsculos.
-- **Act:** Chamada do método `ValidateEmailAsync(email)`.
-- **Assert:** Asserções `Assert.True(resultado.isValid)` e verificação da mensagem de sucesso.
-
-### Teste 06: ValidateEmailAsync_EmailSemDominioIveco_DeveRetornarFalse (`EmailValidationServiceTestes`)
-- **O que verifica:** O bloqueio de e-mails externos ou com falsos domínios.
-- **Arrange:** Entradas como "usuario@gmail.com", "funcionario@iveco.com.br" e "iveco.com@yahoo.com".
-- **Act:** Execução do método de validação.
-- **Assert:** Asserção `Assert.False(resultado.isValid)` com mensagem *"Apenas e-mails com domínio @iveco.com são permitidos."*.
-
-## 6. Técnicas e Recursos Aplicados
-A tabela a seguir relaciona as bibliotecas, dependências do projeto e técnicas utilizadas na criação dos testes unitários:
-
-| Recurso / Ferramenta | Versão / Tipo | Aplicação nos Testes |
-| :--- | :--- | :--- |
-| **xUnit** | Framework | Gerenciamento e execução dos testes com as anotações `[Fact]` e `[Theory]` para testes simples e parametrizados. |
-| **Moq** | Biblioteca Mock | Simulação das interfaces de dependência `ILogger<DadosService>` e `IMemoryCache`. |
-| **Parametrização (`[InlineData]`)** | Recurso xUnit | Execução do mesmo método de teste com diferentes entradas (strings nulas, vazias, zeros e números negativos). |
-| **`Assert.ThrowsAsync`** | Asserção xUnit | Validação de métodos assíncronos que devem obrigatoriamente interromper a execução e disparar exceção (`ArgumentException`). |
-| **`Assert.True` / `Assert.False`** | Asserção xUnit | Validação do retorno booleano da propriedade `isValid` no serviço de e-mail. |
-| **`Assert.Equal`** | Asserção xUnit | Comparação exata entre as mensagens de erro/sucesso esperadas e as efetivamente retornadas. |
-
-> Para as validações de regras de negócio, a suíte dividiu as entradas diretamente entre cenários aceitos e rejeitados, testando as fronteiras numéricas (valores maiores que zero) e temporais (datas presentes/passadas vs. futuras), enquanto aceita valores a partir do zero, e valide o tamanho exato do VIN (aceitando apenas 17).
-
-## 7. Relato de Defeitos e Correções
-Durante o desenvolvimento dos testes para o serviço `EmailValidationService`, identificou-se uma inconformidade com e-mails corporativos que continham espaços acidentais nas extremidades ou letras maiúsculas.
-
-- **Identificação:** Identificado na execução do teste `ValidateEmailAsync_EmailComDominioIveco_DeveRetornarTrue` com a entrada `" ADMIN@IVECO.COM"`.
-- **Comportamento Observado:** A validação falhava ao tentar comparar a string bruta diretamente com a extensão do domínio, resultando em recusa indevida de e-mails válidos.
-- **Comportamento Esperado:** O serviço deveria remover espaços em branco das pontas (`Trim()`) e ignorar a diferença entre maiúsculas e minúsculas antes de verificar o domínio `@iveco.com`.
-- **Correção Aplicada:** Foi adicionada a sanitização do parâmetro de e-mail no método `ValidateEmailAsync()`, aplicando `Trim().ToLowerInvariant()` antes do processamento. A alteração garantiu a aprovação de todos os testes de validação de e-mail.
-
-## 8. Aprendizado e Contribuição para o Projeto
-A implementação dos testes unitários na camada de serviços garantiu que as validações essenciais do sistema Green Ledger sejam executadas com segurança no backend antes do envio de dados ao Firebase. Isso reduz chamadas desnecessárias à base de dados e evita o armazenamento de registros inconsistentes ou fora dos padrões corporativos da IVECO.
-
-Individualmente, o desenvolvimento dessa suíte proporcionou o domínio de testes assíncronos no C#, uso avançado da biblioteca Moq para isolamento de dependências (`ILogger` e `IMemoryCache`) e a aplicação de testes parametrizados para cobertura eficiente de múltiplos cenários de erro.
+  * **Framework de Testes:** xUnit (v2.9.3)
+  * **Simulação de Dependências (Mocks):** Moq (v4.20.72) para isolamento de `ILogger` e `IMemoryCache`
+  * **Testes Parametrizados:** Utilização de `[Theory]` e `[InlineData]` para validação de múltiplos cenários por método
+  * **Padrão de Execução:** AAA (Arrange, Act, Assert) com asserções `Assert.True`, `Assert.False`, `Assert.Equal` e `Assert.ThrowsAsync`
 
 ---
-*Documentação elaborada como requisito para a avaliação do projeto de Trabalho de Conclusão de Curso (TCC) do Curso Técnico em Desenvolvimento de Sistemas.*  
-**SENAI - Nova Lima, MG | 2026**
+
+  ## **Objetivo e Respónsabilidade dos Componentes:**
+
+  As classes de serviço centralizam as regras de negócio cruciais de segurança de acesso e integridade de dados na API do projeto.
+
+  **1-) `EmailValidationService`**
+
+  * **O que faz?** Valida se o email informado no cadastro / login pertence estritamente ao domínio corporativo `@iveco.com`, tratando espaços extras e caracteres maiúsculos / minúsculos.
+  * **Problema que resolve:** Impede o acesso indevido por emails de provedores públicos (`gmail`, `yahoo`) ou com extensões incorretas (`.com.br`).
+
+**2-) DadosService:** 
+
+ * **O que faz?** Intercepta chamadas de criação de lotes de matéria prima, cadastro de peças e exclusões de registros.
+ * **Problema que resolve:** Impede a gravação de dados inconsistentes (pesos zerados, pegada de carbono negativa, datas no futuro e IDs / VINs nulos) no banco de dados Firebase / SQLite.
+
+---
+
+## **Mapeamento da Estrutura de Diretórios:**
+
+Os arquivos de testes unitários estão organizados na pasta `Service` do projeto de testes:
+
+ * **`DadosServiceTestes.cs`:** Contém 6 métodos de testes focados em validações de domínio de lotes, peças, fornecedores e veículos.
+ * **`EmailValidationServiceTestes.cs`:** Contém 3 métodos de teste focados nas regras de email corporativo.
+
+  ---
+
+  ## **Detalhamento dos 9 Testes Unitários**
+
+  A suíte completa é composta por 9 métodos de teste que se desdobram em 19 execuções individuais no Gerenciador de Testes devido o uso do `InlineData`. 
+
+  **Módulo 1 - Validações de Email (`EmailValidationServiceTestes.cs)`**
+
+- ***Teste 01: Emails válidos com domínio IVECO:*** 
+
+  * **Método:** `ValidateEmailAsync_EmailComDominioIveco_DeveRetornarTrue`
+  * **Entradas:** `[InlineData]: " funcionario@iveco.com ", " ADMIN@IVECO.COM ", " teste.ponto@iveco.com "` (3 execuções)
+  * **O que verifica:** Confirma que os emails com domínio @iveco.com são aceitos, mesmo com espaços extras ou letras maiúsculas
+
+```csharp
+
+[Theory]
+[InlineData("funcionario@iveco.com")]
+[InlineData("  ADMIN@IVECO.COM  ")]
+[InlineData("teste.ponto@iveco.com")]
+public async Task ValidateEmailAsync_EmailComDominioIveco_DeveRetornarTrue(string email)
+{
+    // Arrange
+    var service = new EmailValidationService();
+
+    // Act
+    var resultado = await service.ValidateEmailAsync(email);
+
+    // Assert
+    Assert.True(resultado.isValid);
+    Assert.Equal("E-mail válido (domínio IVECO).", resultado.message);
+}
+
+```
+
+---
+
+- ***Teste 02: Emails sem domínio IVECO:*** 
+
+  * **Método:** `ValidateEmailAsync_EmailSemDominioIveco_DeveRetornarFalse`
+  * **Entradas:** `[InlineData]: " usuario@gmail.com ", " funcionario@iveco.com.br ", " iveco.com@yahoo.com "` (3 execuções)
+  * **O que verifica:** Bloqueia emails fora do padrão corporativo ou com falsos domínios
+
+```csharp
+
+[Theory]
+[InlineData("usuario@gmail.com")]
+[InlineData("funcionario@iveco.com.br")]
+[InlineData("iveco.com@yahoo.com")]
+public async Task ValidateEmailAsync_EmailSemDominioIveco_DeveRetornarFalse(string email)
+{
+    // Arrange
+    var service = new EmailValidationService();
+
+    // Act
+    var resultado = await service.ValidateEmailAsync(email);
+
+    // Assert
+    Assert.False(resultado.isValid);
+    Assert.Equal("Apenas e-mails com domínio @iveco.com são permitidos.", resultado.message);
+}
+
+```
+
+---
+
+- ***Teste 03: Email nulo, vazio ou apenas espaços:*** 
+
+  * **Método:** `ValidateEmailAsync_EmailNuloOuVazio_DeveRetornarFalse`
+  * **Entradas:** `[InlineData]: "", "  ", null` (3 execuções)
+  * **O que verifica:** Impede o prosseguimento da validação caso o campo esteja em branco.
+
+```csharp
+
+[Theory]
+[InlineData("")]
+[InlineData("   ")]
+[InlineData(null)]
+public async Task ValidateEmailAsync_EmailNuloOuVazio_DeveRetornarFalse(string email)
+{
+    // Arrange
+    var service = new EmailValidationService();
+
+    // Act
+    var resultado = await service.ValidateEmailAsync(email);
+
+    // Assert
+    Assert.False(resultado.isValid);
+    Assert.Equal("O e-mail é obrigatório.", resultado.message);
+}
+
+```
+
+---
+
+**Módulo 2 - Validações de Dados (`DadosServiceTestes.cs)`**
+
+- ***Teste 04: Quantidade de matéria-prima inválida:*** 
+
+  * **Método:** `CriarLoteMateriaPrima_QuantidadeInvalida_DeveLancarArgumentException`
+  * **Entradas:** `[InlineData]: 0, -10.5` (2 execuções)
+  * **O que verifica:** Bloqueia a criação de lotes com quantidade menor ou igual a zero
+
+```csharp
+
+[Theory]
+[InlineData(0)]
+[InlineData(-10.5)]
+public async Task CriarLoteMateriaPrima_QuantidadeInvalida_DeveLancarArgumentException(double quantidadeInvalida)
+{
+    // Arrange
+    var lote = new LoteMateriaPrima
+    {
+        QuantidadeKg = quantidadeInvalida,
+        PegadaCarbonoPorKg = 1.0
+    };
+
+    // Act & Assert
+    var excecao = await Assert.ThrowsAsync<ArgumentException>(() => _dadosService.CriarLoteMateriaPrima(lote));
+    Assert.Equal("A quantidade de matéria-prima (Kg) deve ser maior que zero.", excecao.Message);
+}
+
+```
+
+---
+
+- ***Teste 05: Pegada de carbono negativa:*** 
+
+  * **Método:** `CriarLoteMateriaPrima_PegadaCarbonoNegativa_DeveLancarArgumentException`
+  * **Entradas:** `[InlineData]: PegadaCarbonoPorKg = -0.5` (1 execução)
+  * **O que verifica:** Impede a inserção de fatores de emissão negativos
+
+```csharp
+
+[Fact]
+public async Task CriarLoteMateriaPrima_PegadaCarbonoNegativa_DeveLancarArgumentException()
+{
+    // Arrange
+    var lote = new LoteMateriaPrima
+    {
+        QuantidadeKg = 100,
+        PegadaCarbonoPorKg = -0.5
+    };
+
+    // Act & Assert
+    var excecao = await Assert.ThrowsAsync<ArgumentException>(() => _dadosService.CriarLoteMateriaPrima(lote));
+    Assert.Equal("O fator de Pegada de Carbono não pode ser um número negativo.", excecao.Message);
+}
+
+```
+
+---
+
+- ***Teste 06: Data de Produção no futuro:*** 
+
+  * **Método:** `CriarLoteMateriaPrima_DataNoFuturo_DeveLancarArgumentException`
+  * **Entradas:** `[Fact]: DataProducao = DateTime.UtcNow.AddDays(1)` (1 execução)
+  * **O que verifica:** Rejeita registros de produção com data posterior ao dia atual
+
+```csharp
+
+[Fact]
+public async Task CriarLoteMateriaPrima_DataNoFuturo_DeveLancarArgumentException()
+{
+    // Arrange
+    var lote = new LoteMateriaPrima
+    {
+        QuantidadeKg = 100,
+        PegadaCarbonoPorKg = 1.0,
+        DataProducao = DateTime.UtcNow.AddDays(1)
+    };
+
+    // Act & Assert
+    var excecao = await Assert.ThrowsAsync<ArgumentException>(() => _dadosService.CriarLoteMateriaPrima(lote));
+    Assert.Equal("Violação Temporal: A data de produção do lote não pode estar no futuro.", excecao.Message);
+}
+
+```
+
+---
+
+- ***Teste 07: Peso de peça / componente inválido:*** 
+
+  * **Método:** `CriarLoteMateriaPrima_PesoInvalido_DeveLancarArgumentException`
+  * **Entradas:** `[InlineData]: 0, -5` (2 execuções)
+  * **O que verifica:** Impede o cadastro de componentes veiculares sem peso
+
+```csharp
+
+[Theory]
+[InlineData(0)]
+[InlineData(-5)]
+public async Task CriarVeiculoComponente_PesoInvalido_DeveLancarArgumentException(double pesoInvalido)
+{
+    // Arrange
+    var componente = new VeiculoComponente { PesoKg = pesoInvalido };
+
+    // Act & Assert
+    var excecao = await Assert.ThrowsAsync<ArgumentException>(() => _dadosService.CriarVeiculoComponente(componente));
+    Assert.Equal("O peso da peça deve ser maior que zero.", excecao.Message);
+}
+
+```
+
+---
+
+- ***Teste 08: Exclusão de fornecedor sem ID:*** 
+
+  * **Método:** `ExcluirFornecedor_IdVazioOuNulo_DeveLancarArgumentException`
+  * **Entradas:** `[InlineData]: "", null` (2 execuções)
+  * **O que verifica:** Garante que a exclusão exija um ID válido
+
+```csharp
+
+[Theory]
+[InlineData("")]
+[InlineData(null)]
+public async Task ExcluirFornecedor_IdVazioOuNulo_DeveLancarArgumentException(string idInvalido)
+{
+    // Act & Assert
+    var excecao = await Assert.ThrowsAsync<ArgumentException>(() => _dadosService.ExcluirFornecedor(idInvalido));
+    Assert.Equal("O ID do fornecedor não pode ser nulo ou vazio.", excecao.Message);
+}
+
+```
+
+---
+
+- ***Teste 09: Exclusão de veículo sem VIN:*** 
+
+  * **Método:** `ExcluirVeiculo_VinVazioOuNulo_DeveLancarArgumentException`
+  * **Entradas:** `[InlineData]: "", null` (2 execuções)
+  * **O que verifica:** Impede tentativas de exclusão de veículos sem informar o Chassi / VIN
+
+```Csharp
+
+[Theory]
+[InlineData("")]
+[InlineData(null)]
+public async Task ExcluirVeiculo_VinVazioOuNulo_DeveLancarArgumentException(string vinInvalido)
+{
+    // Act & Assert
+    var excecao = await Assert.ThrowsAsync<ArgumentException>(() => _dadosService.ExcluirVeiculo(vinInvalido));
+    Assert.Equal("O VIN não pode ser nulo ou vazio.", excecao.Message);
+}
+
+```
+
+---
+
+## ** Ferramentas, Mocks e Recursos Utilizados**
+
+| Recurso / Ferramenta | Versão / Tipo | Finalidade na suíte de testes |
+| :--- | :--- | :--- |
+| **xUnit** | 2.9.3 (Framework) | Mapeamento e execução dos testes `[Fact], [Theory], [InlineData]` |
+| **Moq** | 4.20.72 (Biblioteca) | Isolamento do logger (`ÌLogger<DadosService>`) e do cache (`IMemoryCache`) |
+| **Assert.ThrowAsync** | Método xUnit | Captura e validação de exceções `ArgumentException` em métodos assíncronos |
+| **Assert.True / Assert.False** | Método xUnit | Verificação dos retornos booleanos na validação de email |
+
+---
+
+## **Execução e Resultados no Gerenciador de Testes**
+
+A execução completa dos 9 métodos de teste resultou em 19 execuções individuais aprovadas no Visual Studio.
+
+- **Resumo da Suíte:** 
+
+  * **Status Geral:** 100% aprovados
+  * **Total de execuções individuais:** 19 testes aprovados (9 do EmailValidation + 10 do DadosService)
+  * **Tempo total de execução:** 179 ms
+
+---
+
+
+*Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
+*Última atualização: 26 de agosto de 2026.*
 
