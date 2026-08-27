@@ -17,9 +17,14 @@ namespace WpfIveco.ViewModels
     /// <summary>
     /// ViewModel para a tela de gestão de fornecedores.
     /// Gerencia consulta de CNPJ (Brasil API), cadastro de fornecedores e fallback offline.
+    /// CORREÇÃO: Adicionada validação dos dígitos verificadores do CNPJ antes de chamar a API.
     /// </summary>
     public class FornecedorViewModel : ViewModelBase
     {
+        // ============================================================
+        // CAMPOS PRIVADOS
+        // ============================================================
+
         private readonly HttpClient _httpClient;
         private readonly LocalDatabaseService _localDb;
 
@@ -99,7 +104,7 @@ namespace WpfIveco.ViewModels
         public FornecedorViewModel(HttpClient httpClient)
         {
             App.LogInfo("Construtor", "FORNEC");
-            _httpClient = httpClient;
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _localDb = new LocalDatabaseService();
             ConsultarCnpjCommand = new RelayCommand(async p => await ConsultarCnpjAsync());
             SalvarFornecedorCommand = new RelayCommand(async p => await SalvarFornecedorAsync());
@@ -109,10 +114,6 @@ namespace WpfIveco.ViewModels
         // MÉTODOS PÚBLICOS
         // ============================================================
 
-        /// <summary>
-        /// Carrega a lista de fornecedores, priorizando a API.
-        /// Se falhar, busca no SQLite local.
-        /// </summary>
         public async Task CarregarFornecedoresAsync()
         {
             App.LogInfo("CarregarFornecedoresAsync iniciado", "FORNEC");
@@ -131,13 +132,11 @@ namespace WpfIveco.ViewModels
                     {
                         ListaFornecedores = new ObservableCollection<FornecedorModel>(fornecedores);
                         App.LogInfo($"{fornecedores.Count} fornecedores carregados da API", "FORNEC");
-                        // Atualiza cache local em background
                         _ = _localDb.SalvarFornecedoresAsync(fornecedores);
                         return;
                     }
                 }
 
-                // Fallback para dados locais
                 App.LogWarning("API indisponível, usando dados locais (fornecedores)", "FORNEC");
                 await CarregarFornecedoresLocaisAsync();
             }
@@ -152,9 +151,6 @@ namespace WpfIveco.ViewModels
         // MÉTODOS PRIVADOS
         // ============================================================
 
-        /// <summary>
-        /// Carrega fornecedores do banco local SQLite.
-        /// </summary>
         private async Task CarregarFornecedoresLocaisAsync()
         {
             var locais = await _localDb.GetFornecedoresAsync();
@@ -170,8 +166,39 @@ namespace WpfIveco.ViewModels
         }
 
         /// <summary>
+        /// Valida os dígitos verificadores de um CNPJ (algoritmo padrão da Receita Federal).
+        /// CORREÇÃO: Adicionado para evitar chamadas desnecessárias à API.
+        /// </summary>
+        private bool ValidarCnpj(string cnpj)
+        {
+            if (cnpj.Length != 14) return false;
+
+            int[] multiplicador1 = { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+            int[] multiplicador2 = { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+
+            string tempCnpj = cnpj.Substring(0, 12);
+            int soma = 0;
+            for (int i = 0; i < 12; i++)
+                soma += int.Parse(tempCnpj[i].ToString()) * multiplicador1[i];
+
+            int resto = soma % 11;
+            int digito1 = resto < 2 ? 0 : 11 - resto;
+            tempCnpj += digito1;
+
+            soma = 0;
+            for (int i = 0; i < 13; i++)
+                soma += int.Parse(tempCnpj[i].ToString()) * multiplicador2[i];
+
+            resto = soma % 11;
+            int digito2 = resto < 2 ? 0 : 11 - resto;
+
+            return cnpj.EndsWith($"{digito1}{digito2}");
+        }
+
+        /// <summary>
         /// Consulta um CNPJ na Brasil API via backend.
         /// Preenche os campos do formulário com os dados retornados.
+        /// CORREÇÃO: Validação dos dígitos do CNPJ antes de chamar a API.
         /// </summary>
         private async Task ConsultarCnpjAsync()
         {
@@ -186,9 +213,22 @@ namespace WpfIveco.ViewModels
                 return;
             }
 
+            // Remove formatação
+            var cnpjLimpo = CnpjBusca.Replace(".", "").Replace("/", "").Replace("-", "");
+
+            // ============================================================
+            // CORREÇÃO: Valida os dígitos verificadores antes de chamar a API
+            // ============================================================
+            if (!ValidarCnpj(cnpjLimpo))
+            {
+                App.LogWarning("CNPJ com dígitos inválidos", "FORNEC");
+                MensagemCadastro = "CNPJ inválido (dígitos verificadores incorretos).";
+                IsErro = true;
+                return;
+            }
+
             try
             {
-                var cnpjLimpo = CnpjBusca.Replace(".", "").Replace("/", "").Replace("-", "");
                 var response = await _httpClient.GetAsync($"api/dados/fornecedores/buscar-cnpj/{cnpjLimpo}");
                 App.LogInfo($"GET buscar-cnpj → {(int)response.StatusCode}", "FORNEC");
 
@@ -202,7 +242,6 @@ namespace WpfIveco.ViewModels
                     LocalizacaoFornecedorEncontrado = fornecedor.GetProperty("localizacao").GetString();
                     StatusRfb = fornecedor.TryGetProperty("situacao", out var sit) ? sit.GetString() : "ATIVA (assumido)";
 
-                    // Verifica se o fornecedor já está cadastrado na lista local
                     var fornecedorExistente = ListaFornecedores.FirstOrDefault(f => f.Cnpj == cnpjLimpo);
                     if (fornecedorExistente != null)
                     {
@@ -262,7 +301,7 @@ namespace WpfIveco.ViewModels
             var cnpjLimpo = CnpjBusca.Replace(".", "").Replace("/", "").Replace("-", "");
             var fornecedor = new FornecedorModel
             {
-                Id = Guid.NewGuid().ToString().Substring(0, 8), // ID temporário
+                Id = Guid.NewGuid().ToString().Substring(0, 8),
                 Nome = NomeFornecedorEncontrado,
                 Localizacao = LocalizacaoFornecedorEncontrado,
                 Cnpj = cnpjLimpo,
@@ -271,7 +310,6 @@ namespace WpfIveco.ViewModels
 
             try
             {
-                // Tenta salvar na API
                 var response = await _httpClient.PostAsJsonAsync("api/dados/fornecedores", fornecedor);
                 App.LogInfo($"POST Fornecedor → {(int)response.StatusCode}", "FORNEC");
 
@@ -281,28 +319,25 @@ namespace WpfIveco.ViewModels
                     MensagemCadastro = "Fornecedor registrado com sucesso!";
                     IsErro = false;
 
-                    // Salva também localmente (para manter sincronia)
                     _ = _localDb.SalvarFornecedoresAsync(new List<FornecedorModel> { fornecedor });
 
-                    // Limpa os campos
                     CnpjBusca = "";
                     NomeFornecedorEncontrado = "";
                     LocalizacaoFornecedorEncontrado = "";
                     StatusRfb = "Aguardando consulta";
                     CategoriaEsg = "Não avaliado";
 
-                    await CarregarFornecedoresAsync(); // Recarrega a lista
+                    await CarregarFornecedoresAsync();
                 }
                 else
                 {
-                    // Se a API falhou, tenta salvar localmente (offline)
                     App.LogWarning("API falhou. Salvando fornecedor localmente.", "FORNEC");
                     var salvouLocal = await _localDb.SalvarFornecedorOfflineAsync(fornecedor);
                     if (salvouLocal)
                     {
                         MensagemCadastro = "Fornecedor salvo OFFLINE! Será sincronizado quando a internet voltar.";
                         IsErro = false;
-                        await CarregarFornecedoresLocaisAsync(); // Atualiza a lista com os dados locais
+                        await CarregarFornecedoresLocaisAsync();
                     }
                     else
                     {
@@ -313,7 +348,6 @@ namespace WpfIveco.ViewModels
             }
             catch (Exception ex)
             {
-                // Exceção de rede – fallback offline
                 App.LogError($"Erro de conexão ao salvar fornecedor: {ex.Message}", "FORNEC");
                 var salvouLocal = await _localDb.SalvarFornecedorOfflineAsync(fornecedor);
                 if (salvouLocal)

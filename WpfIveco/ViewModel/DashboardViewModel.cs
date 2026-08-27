@@ -16,15 +16,19 @@ namespace WpfIveco.ViewModels
     /// ViewModel para o Dashboard principal.
     /// Gerencia a exibição da pegada média de carbono e métricas gerais do sistema.
     /// Utiliza cache em memória e fallback para SQLite quando a API está offline.
+    /// CORREÇÃO: Paralelização das chamadas HTTP para reduzir tempo de resposta.
     /// </summary>
     public class DashboardViewModel : ViewModelBase
     {
+        // ============================================================
+        // CAMPOS PRIVADOS
+        // ============================================================
+
         private readonly HttpClient _httpClient;
         private readonly LocalDatabaseService _localDb;
         private string _pegadaMediaFormatada = "Carregando...";
         private readonly Stopwatch _stopwatch = new Stopwatch();
 
-        // Cache em memória (expira em 60 segundos)
         private static readonly MemoryCache _cache = MemoryCache.Default;
         private const int CacheDurationSeconds = 60;
 
@@ -73,7 +77,7 @@ namespace WpfIveco.ViewModels
         public DashboardViewModel(HttpClient httpClient)
         {
             App.LogInfo("Construtor", "DASH");
-            _httpClient = httpClient;
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _localDb = new LocalDatabaseService();
             _stopwatch.Start();
         }
@@ -82,21 +86,14 @@ namespace WpfIveco.ViewModels
         // MÉTODO PRINCIPAL
         // ============================================================
 
-        /// <summary>
-        /// Atualiza todos os dados do dashboard.
-        /// Tenta obter da API; se falhar, busca do SQLite local.
-        /// Também utiliza cache em memória para evitar chamadas repetidas.
-        /// </summary>
         public async Task AtualizarPegadaMediaAsync()
         {
             App.LogInfo("Atualizando dados do dashboard...", "DASH");
 
             try
             {
-                // Chave do cache baseada na data/hora (atualiza a cada minuto)
                 string cacheKey = $"DashboardData_{DateTime.Now:yyyyMMddHHmm}";
 
-                // 1. Tenta recuperar do cache em memória
                 DashboardCacheData cachedData = null;
                 try
                 {
@@ -109,25 +106,24 @@ namespace WpfIveco.ViewModels
 
                 if (cachedData != null)
                 {
-                    App.LogInfo("Usando dados em cache para o dashboard", "DASH");
+                    App.LogInfo("Usando dados em cache", "DASH");
                     AplicarDadosCache(cachedData);
                     return;
                 }
 
-                // 2. Tenta carregar da API
+                // ============================================================
+                // CORREÇÃO: Paraleliza as chamadas para a API
+                // ============================================================
                 bool apiOk = await CarregarDadosDaApi();
 
                 if (!apiOk)
                 {
-                    // 3. Se a API falhou, carrega do SQLite
-                    App.LogWarning("API indisponível, carregando dados locais para o dashboard", "DASH");
+                    App.LogWarning("API indisponível, carregando dados locais", "DASH");
                     await CarregarDadosLocais();
                 }
 
-                // 4. Variação (simulada, pode ser ajustada)
                 VariacaoConsultas = "+12%";
 
-                // 5. Salva no cache em memória
                 var dadosCache = new DashboardCacheData
                 {
                     ConsultasHoje = ConsultasHoje,
@@ -140,7 +136,7 @@ namespace WpfIveco.ViewModels
                 try
                 {
                     _cache.Set(cacheKey, dadosCache, DateTimeOffset.Now.AddSeconds(CacheDurationSeconds));
-                    App.LogInfo($"Dados do dashboard salvos em cache por {CacheDurationSeconds} segundos", "DASH");
+                    App.LogInfo($"Dados salvos em cache por {CacheDurationSeconds} segundos", "DASH");
                 }
                 catch (Exception cacheEx)
                 {
@@ -152,7 +148,6 @@ namespace WpfIveco.ViewModels
             catch (Exception ex)
             {
                 App.LogError($"Erro ao carregar dados do dashboard: {ex.Message}", "DASH");
-                // Mantém valores anteriores ou define fallback
                 if (ConsultasHoje == 0)
                 {
                     ConsultasHoje = 0;
@@ -168,17 +163,20 @@ namespace WpfIveco.ViewModels
         // ============================================================
 
         /// <summary>
-        /// Tenta carregar todos os dados da API.
+        /// Tenta carregar todos os dados da API em paralelo.
         /// Retorna true se todos os endpoints responderem com sucesso.
+        /// CORREÇÃO: Agora usa Task.WhenAll para executar as chamadas simultaneamente.
         /// </summary>
         private async Task<bool> CarregarDadosDaApi()
         {
             try
             {
-                await CarregarPegadaMedia();
-                await CarregarConsultasHoje();
-                await CarregarTempoResposta();
-                await CarregarUsoServidor();
+                await Task.WhenAll(
+                    CarregarPegadaMedia(),
+                    CarregarConsultasHoje(),
+                    CarregarTempoResposta(),
+                    CarregarUsoServidor()
+                );
                 return true;
             }
             catch
@@ -187,14 +185,10 @@ namespace WpfIveco.ViewModels
             }
         }
 
-        /// <summary>
-        /// Carrega os dados do SQLite para exibição no dashboard.
-        /// </summary>
         private async Task CarregarDadosLocais()
         {
             try
             {
-                // Conta os registros locais
                 var totalVeiculos = await _localDb.GetTotalVeiculosAsync();
                 var totalFornecedores = await _localDb.GetTotalFornecedoresAsync();
                 var totalPecas = await _localDb.GetTotalPecasAsync();
@@ -202,9 +196,8 @@ namespace WpfIveco.ViewModels
 
                 if (ConsultasHoje > 0)
                 {
-                    // Estimativa de uso baseada na quantidade de dados
                     UsoServidor = ConsultasHoje > 50 ? 60 : (ConsultasHoje > 30 ? 45 : 30);
-                    TempoRespostaMs = 150; // tempo estimado para acesso local
+                    TempoRespostaMs = 150;
                     PegadaMediaFormatada = "Dados locais (offline)";
                 }
                 else
@@ -272,19 +265,16 @@ namespace WpfIveco.ViewModels
         {
             try
             {
-                // Obtém contagem de veículos
                 var resultadoVeiculos = await _httpClient.GetAsync("api/dados/veiculos");
                 var veiculos = await resultadoVeiculos.Content.ReadAsStringAsync();
                 var listaVeiculos = JsonSerializer.Deserialize<List<VeiculoModel>>(veiculos,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                // Obtém contagem de fornecedores
                 var resultadoFornecedores = await _httpClient.GetAsync("api/dados/fornecedores");
                 var fornecedores = await resultadoFornecedores.Content.ReadAsStringAsync();
                 var listaFornecedores = JsonSerializer.Deserialize<List<FornecedorModel>>(fornecedores,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                // Obtém contagem de peças
                 var resultadoPecas = await _httpClient.GetAsync("api/dados/componentes");
                 var pecas = await resultadoPecas.Content.ReadAsStringAsync();
                 var listaPecas = JsonSerializer.Deserialize<List<PecaModel>>(pecas,
@@ -294,13 +284,8 @@ namespace WpfIveco.ViewModels
                 ConsultasHoje = total;
                 VariacaoConsultas = "+12%";
 
-                // ============================================================
-                // CORREÇÃO: Extrai os tempos de resposta dos cabeçalhos HTTP
-                // Os cabeçalhos vêm como string, então usamos int.TryParse para converter com segurança.
-                // ============================================================
                 int tempoVeiculos = 0, tempoFornecedores = 0, tempoPecas = 0;
 
-                // Tenta obter o cabeçalho "X-Response-Time" de cada resposta
                 if (resultadoVeiculos.Headers.TryGetValues("X-Response-Time", out var valoresVeiculos))
                     int.TryParse(valoresVeiculos.FirstOrDefault(), out tempoVeiculos);
 
@@ -341,7 +326,7 @@ namespace WpfIveco.ViewModels
             }
             catch
             {
-                TempoRespostaMs = 120; // fallback
+                TempoRespostaMs = 120;
             }
         }
 
@@ -350,7 +335,6 @@ namespace WpfIveco.ViewModels
             try
             {
                 var totalItens = ConsultasHoje;
-                // Estimativa inicial baseada na quantidade de dados
                 if (totalItens > 50)
                     UsoServidor = 60;
                 else if (totalItens > 30)
@@ -362,7 +346,6 @@ namespace WpfIveco.ViewModels
                 else
                     UsoServidor = 5;
 
-                // Tenta obter valor real do health check (se disponível)
                 try
                 {
                     var response = await _httpClient.GetAsync("api/dados/health");
@@ -380,14 +363,14 @@ namespace WpfIveco.ViewModels
                 }
                 catch
                 {
-                    // Fallback silencioso – mantém a estimativa
+                    // Fallback silencioso
                 }
 
                 App.LogInfo($"Uso do servidor estimado: {UsoServidor}%", "DASH");
             }
             catch
             {
-                UsoServidor = 42; // fallback
+                UsoServidor = 42;
             }
         }
     }

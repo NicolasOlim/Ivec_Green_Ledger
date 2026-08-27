@@ -13,14 +13,19 @@ namespace WpfIveco.ViewModel
     /// <summary>
     /// ViewModel principal da aplicação. Gerencia autenticação, navegação entre abas,
     /// inicialização dos sub-ViewModels e carregamento global de dados.
+    /// CORREÇÃO: Removido bypass de SSL, URL lida de App.config, HttpClient instanciado uma única vez.
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
-        private HttpClient _httpClient;
+        // ============================================================
+        // CAMPOS PRIVADOS
+        // ============================================================
 
-        /// ============================================================
-        /// SUB-VIEWMODELS
-        /// ============================================================
+        private readonly HttpClient _httpClient;
+
+        // ============================================================
+        // SUB-VIEWMODELS
+        // ============================================================
 
         public DashboardViewModel Dashboard { get; }
         public RastreabilidadeViewModel Rastreabilidade { get; }
@@ -29,9 +34,9 @@ namespace WpfIveco.ViewModel
         public AnalisesViewModel Analises { get; }
         public RelatoriosViewModel Relatorios { get; }
 
-        /// ============================================================
-        /// ESTADO DE LOGIN
-        /// ============================================================
+        // ============================================================
+        // ESTADO DE LOGIN
+        // ============================================================
 
         private bool _isBusy = false;
         public bool IsBusy { get => _isBusy; set { _isBusy = value; OnPropertyChanged(); } }
@@ -45,12 +50,11 @@ namespace WpfIveco.ViewModel
         private bool _modoCadastro = false;
         public bool ModoCadastro { get => _modoCadastro; set { _modoCadastro = value; OnPropertyChanged(); } }
 
-        /// ============================================================
-        /// CAMPOS DE LOGIN E CADASTRO
-        /// ============================================================
+        // ============================================================
+        // CAMPOS DE LOGIN E CADASTRO
+        // ============================================================
 
         private string _loginError = "";
-        /// <summary>Mensagem de erro para exibição na tela de login.</summary>
         public string LoginError
         {
             get => _loginError;
@@ -58,11 +62,10 @@ namespace WpfIveco.ViewModel
             {
                 _loginError = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(HasLoginError)); // Atualiza a visibilidade do erro
+                OnPropertyChanged(nameof(HasLoginError));
             }
         }
 
-        /// <summary>Indica se há uma mensagem de erro de login para exibir.</summary>
         public bool HasLoginError => !string.IsNullOrEmpty(LoginError);
 
         private string _loginEmail = "";
@@ -112,9 +115,9 @@ namespace WpfIveco.ViewModel
         private string _perfilUsuario = "Sessão não iniciada";
         public string PerfilUsuario { get => _perfilUsuario; set { _perfilUsuario = value; OnPropertyChanged(); } }
 
-        /// ============================================================
-        /// VALIDAÇÃO DE E-MAIL
-        /// ============================================================
+        // ============================================================
+        // VALIDAÇÃO DE E-MAIL
+        // ============================================================
 
         private string _emailError = "";
         public string EmailError
@@ -137,9 +140,9 @@ namespace WpfIveco.ViewModel
             set { _isValidatingEmail = value; OnPropertyChanged(); }
         }
 
-        /// ============================================================
-        /// NAVEGAÇÃO E CONFIGURAÇÕES
-        /// ============================================================
+        // ============================================================
+        // NAVEGAÇÃO E CONFIGURAÇÕES
+        // ============================================================
 
         private string _abaAtiva = "Dashboard";
         public string AbaAtiva
@@ -152,7 +155,6 @@ namespace WpfIveco.ViewModel
                     _abaAtiva = value;
                     OnPropertyChanged();
 
-                    // Atualiza dados ao abrir a aba (somente se logado)
                     if (IsLoggedIn)
                     {
                         switch (_abaAtiva)
@@ -163,14 +165,13 @@ namespace WpfIveco.ViewModel
                             case "Analises":
                                 _ = Analises.AtualizarAsync();
                                 break;
-                                // Outras abas podem ser adicionadas conforme necessário
                         }
                     }
                 }
             }
         }
 
-        private string _apiUrlConfig = "https://apiivecogreenledger.runasp.net/";
+        private string _apiUrlConfig;
         public string ApiUrlConfig
         {
             get => _apiUrlConfig;
@@ -178,16 +179,16 @@ namespace WpfIveco.ViewModel
             {
                 _apiUrlConfig = value;
                 OnPropertyChanged();
-                InicializarHttpClient(value);
+                // Não recria o HttpClient para evitar problemas com requisições em andamento
             }
         }
 
         private string _statusSimulador = "Desativado";
         public string StatusSimulador { get => _statusSimulador; set { _statusSimulador = value; OnPropertyChanged(); } }
 
-        /// ============================================================
-        /// COMANDOS
-        /// ============================================================
+        // ============================================================
+        // COMANDOS
+        // ============================================================
 
         public ICommand FazerLoginCommand { get; }
         public ICommand FazerCadastroCommand { get; }
@@ -197,14 +198,24 @@ namespace WpfIveco.ViewModel
         public ICommand LigarDesligarSimuladorCommand { get; }
         public ICommand EsqueciMinhaSenhaCommand { get; }
 
-        /// ============================================================
-        /// CONSTRUTOR
-        /// ============================================================
+        // ============================================================
+        // CONSTRUTOR
+        // ============================================================
 
         public MainViewModel()
         {
             App.LogInfo("Construtor iniciado", "MAIN");
-            InicializarHttpClient(_apiUrlConfig);
+
+            // Lê a URL do App.config
+            _apiUrlConfig = System.Configuration.ConfigurationManager.AppSettings["ApiBaseUrl"]
+                ?? "https://apiivecogreenledger.runasp.net/";
+
+            // ============================================================
+            // CORREÇÃO: Removido o bypass SSL (ServerCertificateCustomValidationCallback)
+            // Isso garante que a aplicação valide certificados em produção.
+            // ============================================================
+            _httpClient = new HttpClient { BaseAddress = new Uri(_apiUrlConfig) };
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "IvecoWpfApp/1.0");
 
             Dashboard = new DashboardViewModel(_httpClient);
             Rastreabilidade = new RastreabilidadeViewModel(_httpClient);
@@ -226,24 +237,10 @@ namespace WpfIveco.ViewModel
             App.LogInfo("Construtor finalizado", "MAIN");
         }
 
-        /// ============================================================
-        /// MÉTODOS PRIVADOS
-        /// ============================================================
+        // ============================================================
+        // MÉTODOS PRIVADOS
+        // ============================================================
 
-        private void InicializarHttpClient(string baseUrl)
-        {
-            App.LogInfo($"Inicializando HttpClient com base: {baseUrl}", "MAIN");
-            var handler = new HttpClientHandler
-            {
-                ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
-            };
-            _httpClient = new HttpClient(handler) { BaseAddress = new Uri(baseUrl) };
-            _httpClient.DefaultRequestHeaders.Add("User-Agent", "IvecoWpfApp/1.0");
-        }
-
-        /// <summary>
-        /// Valida o e-mail chamando o endpoint da API.
-        /// </summary>
         private async Task<bool> ValidarEmailAsync(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -298,23 +295,19 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        /// <summary>
-        /// Executa o login do usuário via API.
-        /// </summary>
         private async Task ExecutarLoginAsync()
         {
             App.LogInfo($"Tentativa para {LoginEmail}", "LOGIN");
-            LoginError = ""; // Limpa erro anterior
+            LoginError = "";
 
             if (!await ValidarEmailAsync(LoginEmail))
             {
-                LoginError = EmailError; // Atualiza a mensagem de erro
+                LoginError = EmailError;
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(LoginSenha))
             {
-                App.LogWarning("Senha vazia – abortando", "LOGIN");
                 LoginError = "Por favor, introduza a sua palavra-passe.";
                 return;
             }
@@ -325,8 +318,6 @@ namespace WpfIveco.ViewModel
             {
                 IsBusy = true;
                 var response = await _httpClient.PostAsJsonAsync("api/dados/login", credenciais);
-                App.LogInfo($"Resposta HTTP: {(int)response.StatusCode}", "LOGIN");
-
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
@@ -338,21 +329,17 @@ namespace WpfIveco.ViewModel
                     IsAdmin = PerfilUsuario == "Admin";
                     IsLoggedIn = true;
                     LoginSenha = "";
-                    LoginError = ""; // Limpa erro após login bem-sucedido
-
-                    App.LogInfo($"Sucesso – Usuário: {NomeUsuario}, Perfil: {PerfilUsuario}", "LOGIN");
+                    LoginError = "";
                     await CarregarTudoAsync();
                 }
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
-                    App.LogError($"Falha: {erro}", "LOGIN");
                     LoginError = "Credenciais inválidas ou acesso negado à plataforma.";
                 }
             }
             catch
             {
-                App.LogError("Erro de conexão ou resposta inválida no login", "LOGIN");
                 LoginError = "Erro ao conectar ao servidor. Verifique sua ligação de rede.";
             }
             finally
@@ -361,44 +348,32 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        /// <summary>
-        /// Executa o cadastro de um novo usuário via API.
-        /// </summary>
         private async Task ExecutarCadastroAsync()
         {
             App.LogInfo($"Tentativa para {LoginEmail}", "CADASTRO");
-
             if (!await ValidarEmailAsync(LoginEmail))
             {
                 MessageBox.Show(EmailError, "E-mail inválido", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-
             if (string.IsNullOrWhiteSpace(CadastroNome))
             {
-                App.LogWarning("Nome vazio – abortando", "CADASTRO");
                 MessageBox.Show("Preencha o nome completo.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-
             if (string.IsNullOrWhiteSpace(LoginSenha))
             {
-                App.LogWarning("Senha vazia – abortando", "CADASTRO");
                 MessageBox.Show("Preencha a senha.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             var novoUser = new { Nome = CadastroNome, Email = LoginEmail, Senha = LoginSenha, Acesso = CadastroPerfil };
-
             try
             {
                 IsBusy = true;
                 var response = await _httpClient.PostAsJsonAsync("api/dados/cadastrar", novoUser);
-                App.LogInfo($"Resposta HTTP: {(int)response.StatusCode}", "CADASTRO");
-
                 if (response.IsSuccessStatusCode)
                 {
-                    App.LogInfo("Sucesso!", "CADASTRO");
                     MessageBox.Show("Conta criada com sucesso!\nJá pode fazer login.", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
                     ModoCadastro = false;
                     CadastroNome = "";
@@ -407,13 +382,11 @@ namespace WpfIveco.ViewModel
                 else
                 {
                     var erro = await response.Content.ReadAsStringAsync();
-                    App.LogError($"Falha: {erro}", "CADASTRO");
                     MessageBox.Show($"Erro ao criar conta: {erro}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch
             {
-                App.LogError("Erro de conexão no cadastro", "CADASTRO");
                 MessageBox.Show("Erro de conexão. Verifique sua rede.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
@@ -437,13 +410,9 @@ namespace WpfIveco.ViewModel
             AbaAtiva = "Dashboard";
         }
 
-        /// <summary>
-        /// Carrega todos os dados do sistema (chamado após o login).
-        /// </summary>
         private async Task CarregarTudoAsync()
         {
             App.LogInfo("Carregando todos os dados...", "CARREGAR");
-
             try
             {
                 await Dashboard.AtualizarPegadaMediaAsync();
@@ -453,8 +422,6 @@ namespace WpfIveco.ViewModel
                 await Pecas.CarregarVinsAsync();
                 await Pecas.CarregarPecasAsync();
                 await Analises.AtualizarAsync();
-
-                App.LogInfo("Carregamento concluído.", "CARREGAR");
             }
             catch (Exception ex)
             {
@@ -462,36 +429,21 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        /// <summary>
-        /// Atualiza apenas os dados da aba "Análises ESG" (chamado ao abrir a aba).
-        /// </summary>
-        private async Task AtualizarAnalisesAsync()
-        {
-            App.LogInfo("Atualizando dados ESG (aba aberta)", "MAIN");
-            await Analises.AtualizarAsync();
-        }
-
-        /// <summary>
-        /// Dispara a solicitação assíncrona para recuperação da senha corporativa.
-        /// </summary>
         private async Task ExecutarEsqueciSenhaAsync()
         {
             LoginError = "";
-
             if (string.IsNullOrWhiteSpace(LoginEmail))
             {
                 LoginError = "Por favor, preencha o campo de e-mail corporativo para iniciar a redefinição.";
                 return;
             }
-
             try
             {
                 IsBusy = true;
                 var response = await _httpClient.PostAsJsonAsync("api/dados/recuperar-senha", new { Email = LoginEmail });
-
                 if (response.IsSuccessStatusCode)
                 {
-                    MessageBox.Show("As instruções de recuperação foram despachadas para o seu e-mail corporativo cadastrado.", "Recuperação", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("As instruções de recuperação foram despachadas para o seu e-mail corporativo.", "Recuperação", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
