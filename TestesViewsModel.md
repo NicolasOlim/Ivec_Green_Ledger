@@ -87,15 +87,15 @@ namespace Iveco.Testes.Helpers
 
 ---
 
- **Módulo 2 - Regras de Análises e Indicadores (`AnalisesViewModelTestes.cs`)**
+## **Módulo 2 - Regras de Análises e Indicadores (`AnalisesViewModelTestes.cs`)**
 
-- ***CT06 / CT07 Formatação de economia gerada:*** 
+- ***CT06 / CT07: Formatação de economia gerada:*** 
 
   * **Método:** `CT06_CT07_CarregarTotalEmissoes_DeveFormatarEconomiaGeradaCorretamente`.
-  * **Entradas:** `[InlineData]: (1000.0, " R$ 150, OK ", (1000000.0, " R$ 150, OM")`. 
-  * **O que verifica:** Garante que grandes volumes de emissões e valores de precificação de carbono sejam formatados corretamente ente K e M.
+  * **Entradas:** `[InlineData]: (1000.0, "R$ 150,OK"), (1000000.0, " R$ 150,0M ")`.
+  * **O que verifica:** Garante que grandes volumes de emissões e valores de precificação de carbono sejam formatados corretamente com sufixos K e M.
 
- ```csharp
+```csharp
 
 [Theory]
 [InlineData(1000.0, "R$ 150,0K")]
@@ -126,15 +126,13 @@ public async Task CT06_CT07_CarregarTotalEmissoes_DeveFormatarEconomiaGeradaCorr
 
 ```
 
----
-
-- ***CT09 Fallback ao falhar API de preço de carbono:*** 
+- ***CT09: Fallback ao falhar API de Preço de Carbono:*** 
 
   * **Método:** `CT09_PrecoCarbonoFalha_DeveUsarFallbackCorretamente`.
   * **Entradas:** Retorno `HttpStatusCode.InternalServerError` na rota `preco-carbono`.
-  * **O que verifica:** Confirma o uso do valor fallback de RS150.0 por tonelada em caso de erro 500 ou instabilidade na API externa.
+  * **O que verifica:** Confirma que o uso do valor fallback de R% 150.0 por toneladas em caso de erro 500 ou instabilidade na API externa.
 
- ```csharp
+```csharp
 
 [Fact]
 public async Task CT09_PrecoCarbonoFalha_DeveUsarFallbackCorretamente()
@@ -165,14 +163,14 @@ public async Task CT09_PrecoCarbonoFalha_DeveUsarFallbackCorretamente()
 
 ---
 
- **Módulo 3 - Painel Principal e Resiliência de Rede**
+## **Módulo 3 - Painel Principal e Resiliência na Rede (`DashboardViewModelTestes.cs`)**
 
-- ***CT01 Atualização da pegada média com sucesso:*** 
+- ***CT01: Atualização da pegada média com sucesso:*** 
 
   * **Método:** `CT01_AtualizarPegadaMedia_ComSucesso_DeveAtualizarPropriedades`.
   * **O que verifica:** Confirma o preenchimento da propriedade formatada ao receber resposta válida da API.
 
-```csharp
+ ```csharp
 
 [Fact]
 public async Task CT01_AtualizarPegadaMedia_ComSucesso_DeveAtualizarPropriedades()
@@ -196,12 +194,10 @@ public async Task CT01_AtualizarPegadaMedia_ComSucesso_DeveAtualizarPropriedades
 
 ```
 
----
-
-- ***CT03 Resiliência contra queda de conexão:*** 
+- ***CT03: Resiliência contra queda de conexão:*** 
 
   * **Método:** `CT03_AtualizarPegadaMedia_ComFalhaDeRede_NaoDeveQuebrarAcesso`.
-  * **O que verifica:** Assegura que exceções do tipo `HttpRequestException` definam a propriedade como `Indisponível` sem interrupção abrupta da aplicação.
+  * **O que verifica:** Assegura que exceções do tipo `HttpRequestException` definam a propriedade como `" Indisponível " sem interrupção abrupta da aplicação`.
 
 ```csharp
 
@@ -225,15 +221,14 @@ public async Task CT03_AtualizarPegadaMedia_ComFalhaDeRede_NaoDeveQuebrarAcesso(
 
 ---
 
- **Módulo 4 - Gestão de Fornecedores e CNPJ (`FornecedoresViewModelTestes.cs`)**
+## **Módulo 4 - Gestão de Fornecedores e CNPJ (`FornecedoresViewModelTestes.cs`)**
 
-- ***CT12 / CT13 / CT15 Validações de CNPJ e Categorias ESG:*** 
+- ***CT12 / CT13 / CT15: Validações de CNPJ e categoria ESG:*** 
 
-  * **Método:** `CT13_ConsultarCNPJ_ComCnpjInvalido_NaoDevePermitirBusca`, `CT15_SalvarFornecedor_SemCategoriaEsg_DeveBloquearComando` e `CT12_ConsultarCnpj_ComSucesso_DevePreencherDados`.
-  * **O que verifica:** Bloqueia comandos com CNPJ contendo letras ou ausência de categoria ESG, e preenche a razão social após retorno positivos da consulta HTTP.
+  * **Método:** `CT13_ConsultaCnpj_ComCnpjInvalido_NaoDevePermitirBusca`, `CT15_SalvarFornecedor_SemCategoriaEsg_DeveBloquearComando`, `CT12_ConsultarCnpj_ComSucesso_DevePreencherDados`.
+  * **O que verifica:** Bloqueia comandos com CNPJ contendo letras ou ausência de categorias ESG, e preenche a razão social após retorno positivo da consulta HTTP.
 
-
-```csharp
+ ```csharp
 
 [Fact]
 public void CT13_ConsultarCnpj_ComCnpjInvalido_NaoDevePermitirBusca()
@@ -285,18 +280,19 @@ public async Task CT12_ConsultarCnpj_ComSucesso_DevePreencherDados()
     // Assert
     Assert.Contains("BOSCH", viewModel.NomeFornecedorEncontrado);
 }
+
 ```
 
 ---
 
- **Módulo 5 - Peças e Rastreabilidade de VIN (`PecasViewModelTestes.cs`, `RastreabilidadeViewModelTestes.cs` e `MainViewModelTestes.cs`)**
+## **Módulo 5 - Peças e Rastreabilidade de VIN (`PecasViewModelTestes.cs`, `RastreabilidadeViewModelTestes.cs` e `MainViewModelTestes.cs`)**
 
-- ***CT17 / CT18 / CT19 Regras de peças veiculares:*** 
+- ***CT17 / CT18 / CT19: Regras de peças e veiculares:*** 
 
   * **Método:** `CT17_CT18_AdicionarPeca_ValidacaoDePeso` e `CT19_AdicionarPeca_FaltandoVinOuFornecedor_DeveBloquear`.
-  * **O que verifica:** Bloqueia pesos negativos, aceita o limite inferior de zero (0.0) e valores comuns (65.50), e exige vínculos obrigatórios (VIN e Fornecedor).
+  * **O que verifica:** Bloqueia pesos negativos, aceita o limite inferio zero (0.0) e valores comuns (65.50), e exige vínculos obrigatórios (VIN e Fornecedor).
 
- ```csharp
+```csharp
 
 [Theory]
 [InlineData(-5.00, false)] // Negativo (Inválido)
@@ -337,15 +333,13 @@ public void CT19_AdicionarPeca_FaltandoVinOuFornecedor_DeveBloquear()
 
 ```
 
----
+- ***CT20 / CT21: Validação de VIN:*** 
 
-- ***CT20 / CT21 Validação de VIN:*** 
-
-  * **Método:** `CT20_CT21_ValidarVin_EntradasInavlidasELimites_DevemSerRejeitadas`.
-  * **Entradas:** `16 caracteres, 18 caracteres, caracteres proibidos (' I ', ' O ', ' Q ') e VIN válido IVECO ( " ZCFA1E02008123456 ")`.
+  * **Método:** `CT20_CT21_ValidarVin_EntradasInvalidasELimites_DevemSerRejeitadas`.
+  * **Entradas:** `[InlineData]: 16 caracteres, 18 caracteres, caracteres proibidos ('I', 'O', 'Q') e VIN válido IVECO ("ZCFA1E02008123456")`
   * **O que verifica:** Garante a rejeição de VINs fora do tamanho exato de 17 caracteres ou contendo os caracteres ilegais I, O e Q.
 
-```csharp
+ ```csharp
 
 [Theory]
 [InlineData("1234567890123456")]   // 16 caracteres (Inválido)
@@ -372,14 +366,13 @@ public void CT20_CT21_ValidarVin_EntradasInvalidasELimites_DevemSerRejeitadas(st
 
 ---
 
+## **Módulo 6 - Autenticação, Relatórios e Infarestrutura MVVM**
 
- **Módulo 6 - Autenticação, Relatórios e Infraestrutura MVVM**
-
-- ***CT23: Autenticação de usuário com falha (`MainViewModel.cs`):*** 
+- ***CT23: Autenticação de usuário com falha (`MainViewModelTestes.cs`):*** 
 
   * **Método:** `CT23_FazerLogin_SenhaIncorreta_DeveSinalizarErroNaInterface`.
   * **Entradas:** `LoginEmail = " admin@iveco.com ", LoginSenha = " senhaErrada "`.
-  * **O que verifica:** Sinaliza erro na interface (`HasLoginError = true`, mensagem de erro preenchida) e impede o acesso (`IsLoggedIn == false`) ao fornecer credenciais incorretas.
+  * **O que verifica:** Sinaliza erro na interface (`HasLoginError == true`, mensagem de erro preenchida) e impede o acesso (`IsLoggedIn == false`) ao fornecer credenciais incorretas.
 
  ```csharp
 
@@ -402,65 +395,59 @@ public void CT23_FazerLogin_SenhaIncorreta_DeveSinalizarErroNaInterface()
 
 ```
 
----
-
 - ***Teste: Alteração de contexto de relatório (`RelatorioViewModelTestes.cs`):*** 
 
   * **Método:** `MudarTipoRelatorio_DeveAtualizarATagDeContextoCorretamente`.
-  * **Entradas:** `tipoSelecionado = " Fornecedores "`.
-  * **O que verifica:** Confirma se o comando de mudança de relatório atualiza corretamente a propriedade `TipoRelatorio` com a tag do contexto desejado.
- 
+  * **Entradas:** `tipoSelecionado = " Fornecedore "`.
+  * **O que verifica:** Confirma se o comando de mudança de relatórios atualiza corretamente a propriedade `TipoRelatorio` com a tag do contexto desejado.
+
  ```csharp
 
 [Fact]
- public void MudarTipoRelatorio_DeveAtualizarATagDeContextoCorretamente()
- {
-     // Arrange
-     var httpClient = new HttpClient { BaseAddress = new Uri("https://apiivecogreenledger.runasp.net/") };
-     var viewModel = new RelatoriosViewModel(httpClient);
-     string tipoSelecionado = "Fornecedores";
- 
-     // Act
-     viewModel.MudarTipoRelatorioCommand.Execute(tipoSelecionado);
- 
-     // Assert
-     Assert.Equal(tipoSelecionado, viewModel.TipoRelatorio);
- }
+public void MudarTipoRelatorio_DeveAtualizarATagDeContextoCorretamente()
+{
+    // Arrange
+    var httpClient = new HttpClient { BaseAddress = new Uri("https://apiivecogreenledger.runasp.net/") };
+    var viewModel = new RelatoriosViewModel(httpClient);
+    string tipoSelecionado = "Fornecedores";
+
+    // Act
+    viewModel.MudarTipoRelatorioCommand.Execute(tipoSelecionado);
+
+    // Assert
+    Assert.Equal(tipoSelecionado, viewModel.TipoRelatorio);
+}
 
 ```
-
----
 
 - ***Teste: Disponibilidade do comando de geração em PDF (`RelatorioViewModelTestes.cs`):*** 
 
   * **Método:** `GerarRelatorioPdfCommand_DeveEstarDisponivelSempre`.
   * **Entradas:** `null`.
-  * **O que verifica:** Assegura que o botão de exportar PDF permaneça sempre habilitado para execução ( `CanExecute == true`).
+  * **O que verifica:** Assegura que o botão de exportar PDF permaneça sempre habilitado para execução (`CanExecute == true`).
 
 ```csharp
 
- [Fact]
- public void GerarRelatorioPdfCommand_DeveEstarDisponivelSempre()
- {
-     // Arrange
-     var httpClient = new HttpClient { BaseAddress = new Uri("https://apiivecogreenledger.runasp.net/") };
-     var viewModel = new RelatoriosViewModel(httpClient);
- 
-     // Act
-     bool podeGerar = viewModel.GerarRelatorioPdfCommand.CanExecute(null);
- 
-     // Assert
-     Assert.True(podeGerar, "O botão de gerar relatório nunca deve estar desabilitado na view.");
- }
+[Fact]
+public void GerarRelatorioPdfCommand_DeveEstarDisponivelSempre()
+{
+    // Arrange
+    var httpClient = new HttpClient { BaseAddress = new Uri("https://apiivecogreenledger.runasp.net/") };
+    var viewModel = new RelatoriosViewModel(httpClient);
+
+    // Act
+    bool podeGerar = viewModel.GerarRelatorioPdfCommand.CanExecute(null);
+
+    // Assert
+    Assert.True(podeGerar, "O botão de gerar relatório nunca deve estar desabilitado na view.");
+}
 
 ```
 
----
-
 - ***Teste: Notificação de alteração de propriedade (`ViewModelBaseTestes.cs`):*** 
 
-  * **Método:** `OnPropertyChanged_DeveDispararEvento_ComONomeDaPropriedadeCorreta`.
-  * **Entradas:** `Teste Green Ledger` á propriedade `MinhaPropriedade`.
+  * **Método:** `OnPropertyChanged_DeveDispararEvento_ComONomeDaPRopriedadeCorreta`.
+  * **Entradas:** Atribuição do valor `Teste Green Ledger` á propriedade `MinhaPropriedade`.
   * **O que verifica:** Certifica que a infraestrutura MVVM dispara o evento `PropertyChanged` informando o nome exato da propriedade alterada.
 
 ```csharp
@@ -483,3 +470,127 @@ public void OnPropertyChanged_DeveDispararEvento_ComONomeDaPropriedadeCorreta()
 ```
 
 ---
+
+## **Módulo 7 - Testes de Componentes Visuais WPF (`Views`)**
+
+- ***Teste: Bloqueio de caracteres alfabéticos em campos numéricos (`FornecedoresView.xaml.cs`):*** 
+
+  * **Método:** `NumberValidationTextBox_ComLetras_DeveBloquear`.
+  * **Entradas:** Objeto `TextCompositionEventArgs` simulando a digitação da string `"abc"`.
+  * **O que verifica:** Invoca o manipulador privado `NumberValidationTextBox` e garante que o evento seja marcado como tratado (`Handled = true`), impedindo a entrada de letras.
+
+ ```csharp
+
+[Fact]
+public void NumberValidationTextBox_ComLetras_DeveBloquear()
+{
+    // Arrange
+    var view = new FornecedoresView();
+    var textBox = new TextBox();
+    var args = new TextCompositionEventArgs(
+        InputManager.Current.PrimaryKeyboardDevice,
+        new TextComposition(InputManager.Current, textBox, "abc")
+    );
+    args.RoutedEvent = TextCompositionManager.TextInputEvent;
+
+    // Act
+    var method = typeof(FornecedoresView).GetMethod("NumberValidationTextBox", BindingFlags.NonPublic | BindingFlags.Instance);
+    method?.Invoke(view, new object[] { textBox, args });
+
+    // Assert
+    Assert.True(args.Handled, "Letras devem ser bloqueadas.");
+}
+
+```
+
+- ***Teste: Aplicação automática da máscara CNPJ (`FornecedoresView.xaml.cs`):*** 
+
+  * **Método:** `CnpjTextBox_TextChanged_DeveFormatarCNPJ`.
+  * **Entradas:** String sem pontuação `12345678000199` no campo de texto.
+  * **O que verifica:** Confirma se o evento `TextChanged` formata dinamicamente o texto do campo para o padrão `"12.345.678/0001-99"`.
+
+```csharp
+
+[Fact]
+public void CnpjTextBox_TextChanged_DeveFormatarCNPJ()
+{
+    // Arrange
+    var view = new FornecedoresView();
+    var textBox = new TextBox { Text = "12345678000199" };
+
+    // Act
+    var method = typeof(FornecedoresView).GetMethod("CnpjTextBox_TextChanged", BindingFlags.NonPublic | BindingFlags.Instance);
+    var eventArgs = new TextChangedEventArgs(TextBox.TextChangedEvent, new UndoAction());
+    method?.Invoke(view, new object[] { textBox, eventArgs });
+
+    // Assert
+    Assert.Equal("12.345.678/0001-99", textBox.Text);
+}
+
+```
+
+- ***Teste: Minimização da janela principal (`MainWindow.xaml.cs`):*** 
+
+  * **Método:** `MinimizeButton_Click_DeveMinimizarJanela`.
+  * **Entradas:** Estado inicial da janela como `WindowmState.Normal` e evento de clique do botão.
+  * **O que verifica:** Valida se a execução do manipulador do botão altera a propriedade `WindowState` da janela para `WindowmState.Minimized`.
+
+ ```csharp
+
+[Fact]
+public void MinimizeButton_Click_DeveMinimizarJanela()
+{
+    // Arrange
+    var window = new MainWindow();
+    window.WindowState = WindowState.Normal;
+
+    // Act
+    var method = typeof(MainWindow).GetMethod("MinimizeButton_Click", BindingFlags.NonPublic | BindingFlags.Instance);
+    method?.Invoke(window, new object[] { window, new RoutedEventArgs() });
+
+    // Assert
+    Assert.Equal(WindowState.Minimized, window.WindowState);
+}
+```
+
+---
+
+## **Ferramentas, Mocks e Recursos Utilizados**
+
+| Recurso / Ferramenta | Versão / Tipo | Finalidade na suíte de testes |
+| :--- | :--- | :--- |
+| **xUnit** | 2.9.3 (Framework) | Mapeamento e execução dos testes `[Fact], [Theory], [InlineData]` |
+| **Moq** | 18.9.0 (SDK) | Suporte á compilação e suporte á execução no ecossistema .NET |
+| **xunit.runner.visualstudio** | 4.0.0 (Adaptador) | Integração e execução direta no Gerenciador de Testes do Visual Studio |
+| **Moq** | 4.20.72 (Biblioteca) | Criação de mocks e simulação de dependências de serviços e loggers |
+| **MockHttpMessageHandler** | Custom Helper | Intercepção de chamadas `HttpClient` para mock de APIs externas |
+| **System.Reflection** | `BindingFlags` | Invocação direta de métodos privados e acesso a manipuladores de UI em Views WPF |
+| **System.Windows.Input** | WPF | Simulação de eventos de teclado (`TextCompositionEventArgs`) e alteração de texto (`TextChangedEventArgs`) |
+
+---
+
+## **Execução e Resultados no Gerenciador de Testes**
+
+A execução da suíte de ViewModel e UI registrou as métricas no Gerenciador de Testes do Visual Studio durante o ciclo de ajuste de bindings e rotas mockadas.
+
+<img src="imagens/mapeamentodaviewmodel.jpeg" alt="Mapeamento da ViewModel" class="logo-img" style="height: 300px; width: auto; vertical-align: middle; margin-left: 35px;">
+
+- **Resumo da Suíte:** 
+
+  * **Status Geral:** 108 métodos mapeados.
+  * **Total de execuções individuais:** 27 testes executados em 410ms (3 Aprovados, 24 em fase de ref)
+  * **Tempo total de execução:** 179 ms (3 Aprovados, 24 em fase de refatoração de mocks e bindings WPF)
+
+---
+
+## **Relato de Defeitos e Correções**
+
+Durante a fase de desenvolvimento e execução dos testes unitários na classe `DashboardViewModelTestes`, identificou-se uma falha de conversão de tipos ao desinstalizar a resposta da API de pegada de carbono. A propriedade `pegadeaMedia` vinha formatada como double no JSON, mas a ViewModel esperava uma string já formatada, gerando `NullReferenceException`.
+
+ * **Causa Raiz:** Ausência de conversão explicita no parser da resposta HTTP na ViewModel.
+ * **Ação Corretiva:** Inclusão de tratamento defensivo com fallback para `"Indisponível"` caso o campo retornado seja nulo ou incompatível, garantindo que a interface permaneça estável sem crashar o sistema.
+
+---
+
+*Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
+*Última atualização: 27 de agosto de 2026.*
