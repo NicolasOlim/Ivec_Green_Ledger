@@ -19,9 +19,14 @@ namespace WpfIveco.ViewModel
     /// ViewModel para a tela de gestão de peças e componentes.
     /// Gerencia a lista de VINs, fornecedores, peças, e o registro de novas peças.
     /// Possui fallback offline via SQLite.
+    /// CORREÇÃO: Validação de peso, envio de ID de lote nulo, logs detalhados.
     /// </summary>
     public class PecasViewModel : ViewModelBase
     {
+        // ============================================================
+        // CAMPOS PRIVADOS
+        // ============================================================
+
         private readonly HttpClient _httpClient;
         private readonly LocalDatabaseService _localDb;
 
@@ -91,7 +96,7 @@ namespace WpfIveco.ViewModel
         public PecasViewModel(HttpClient httpClient)
         {
             App.LogInfo("Construtor", "PECAS");
-            _httpClient = httpClient;
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _localDb = new LocalDatabaseService();
             AdicionarPecaManualCommand = new RelayCommand(async p => await AdicionarPecaAsync());
         }
@@ -100,10 +105,6 @@ namespace WpfIveco.ViewModel
         // MÉTODOS PÚBLICOS (CARREGAMENTO COM FALLBACK)
         // ============================================================
 
-        /// <summary>
-        /// Carrega a lista de VINs disponíveis (para o ComboBox).
-        /// Prioriza a API, com fallback para o SQLite.
-        /// </summary>
         public async Task CarregarVinsAsync()
         {
             App.LogInfo("CarregarVinsAsync iniciado", "PECAS");
@@ -128,7 +129,6 @@ namespace WpfIveco.ViewModel
                     }
                 }
 
-                // Fallback local
                 App.LogWarning("API indisponível, usando VINs locais", "PECAS");
                 await CarregarVinsLocaisAsync();
             }
@@ -139,10 +139,6 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        /// <summary>
-        /// Carrega a lista de fornecedores para o ComboBox.
-        /// Prioriza a API, com fallback para o SQLite.
-        /// </summary>
         public async Task CarregarFornecedoresAsync()
         {
             App.LogInfo("CarregarFornecedoresAsync iniciado", "PECAS");
@@ -176,10 +172,6 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        /// <summary>
-        /// Carrega a lista de peças (para exibição).
-        /// Prioriza a API, com fallback para o SQLite.
-        /// </summary>
         public async Task CarregarPecasAsync()
         {
             App.LogInfo("CarregarPecasAsync iniciado", "PECAS");
@@ -204,13 +196,11 @@ namespace WpfIveco.ViewModel
                                 PesoKg = c.PesoKg,
                                 FornecedorId = c.Fk_Fornecedor_Id
                             })
-                            .Reverse() // Mais recentes primeiro
+                            .Reverse()
                             .ToList();
 
                         ListaPecas = new ObservableCollection<PecaModel>(listaMapeada);
                         App.LogInfo($"{listaMapeada.Count} peças carregadas da API", "PECAS");
-
-                        // Salva em background no SQLite
                         _ = _localDb.SalvarPecasAsync(listaMapeada);
                         return;
                     }
@@ -282,6 +272,7 @@ namespace WpfIveco.ViewModel
         /// <summary>
         /// Registra uma nova peça associada a um VIN e fornecedor.
         /// Tenta salvar na API; se falhar, salva localmente no SQLite.
+        /// CORREÇÃO: Validação de peso > 0 e envio de fk_LoteMateriaPrima_Id como null.
         /// </summary>
         private async Task AdicionarPecaAsync()
         {
@@ -302,10 +293,11 @@ namespace WpfIveco.ViewModel
                 return;
             }
 
+            // CORREÇÃO: Validação de peso
             if (NovaPecaPesoKg <= 0)
             {
                 App.LogWarning($"Peso inválido: {NovaPecaPesoKg}", "PECAS");
-                MessageBox.Show("Informe um peso > 0 kg.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Informe um peso maior que zero (kg).", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -326,13 +318,13 @@ namespace WpfIveco.ViewModel
 
             App.LogInfo($"Enviando peça: {NovaPecaNome} (VIN: {VinSelecionado}, Fornecedor: {FornecedorSelecionado.Nome})", "PECAS");
 
-            // DTO para envio à API (inclui campos específicos do backend)
+            // CORREÇÃO: DTO para envio – permite que fk_LoteMateriaPrima_Id seja null
             var dtoEnvio = new
             {
                 Id = Guid.NewGuid().ToString().Substring(0, 8),
                 NomePeca = NovaPecaNome,
                 Fk_Veiculo_Vin = VinSelecionado,
-                Fk_LoteMateriaPrima_Id = "LOTE-MANUAL-" + DateTime.Now.ToString("yyyyMMdd"),
+                Fk_LoteMateriaPrima_Id = (string)null, // CORREÇÃO: não obrigatório
                 PesoKg = NovaPecaPesoKg,
                 Fk_Fornecedor_Id = FornecedorSelecionado.Id
             };
@@ -344,9 +336,7 @@ namespace WpfIveco.ViewModel
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // Adiciona à lista local (UI)
                     ListaPecas.Insert(0, novaPeca);
-                    // Salva em background no SQLite
                     _ = _localDb.SalvarPecasAsync(new List<PecaModel> { novaPeca });
 
                     NovaPecaNome = "";
@@ -356,7 +346,6 @@ namespace WpfIveco.ViewModel
                 }
                 else
                 {
-                    // Se a API rejeitou, tenta salvar localmente (offline)
                     App.LogWarning("API falhou. Salvando peça localmente.", "PECAS");
                     var salvouLocal = await _localDb.SalvarPecaOfflineAsync(novaPeca);
                     if (salvouLocal)
@@ -374,7 +363,6 @@ namespace WpfIveco.ViewModel
             }
             catch (Exception ex)
             {
-                // Exceção de rede – fallback offline
                 App.LogError($"Erro de conexão ao registrar peça: {ex.Message}", "PECAS");
                 var salvouLocal = await _localDb.SalvarPecaOfflineAsync(novaPeca);
                 if (salvouLocal)

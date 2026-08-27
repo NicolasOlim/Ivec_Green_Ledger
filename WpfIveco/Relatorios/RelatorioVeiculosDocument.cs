@@ -8,14 +8,15 @@ using WpfIveco.Models;
 namespace WpfIveco.Relatorios
 {
     /// <summary>
-    /// Documento PDF para relatório de veículos e componentes vinculados.
+    /// Documento PDF para relatório de veículos.
+    /// CORREÇÃO: Exibe mensagem "Nenhum veículo encontrado" se a lista estiver vazia.
     /// </summary>
     public class RelatorioVeiculosDocument : IDocument
     {
         private readonly List<VeiculoModel> _veiculos;
         private readonly List<PecaModel> _pecas;
 
-        // Paleta de cores baseada no tema do XAML
+        // Paleta de cores
         private readonly string TextPrimary = "#1C1C1E";
         private readonly string TextSecondary = "#6C6C70";
         private readonly string AppleBlue = "#007AFF";
@@ -23,44 +24,29 @@ namespace WpfIveco.Relatorios
         private readonly string BackgroundGray = "#F5F5F7";
         private readonly string BorderGray = "#C6C6C8";
 
-        /// <summary>
-        /// Inicializa o relatório com listas de veículos e peças.
-        /// </summary>
-        /// <param name="veiculos">Lista de veículos a serem exibidos.</param>
-        /// <param name="pecas">Lista de peças vinculadas.</param>
         public RelatorioVeiculosDocument(List<VeiculoModel> veiculos, List<PecaModel> pecas)
         {
-            _veiculos = veiculos;
-            _pecas = pecas;
+            _veiculos = veiculos ?? new List<VeiculoModel>();
+            _pecas = pecas ?? new List<PecaModel>();
         }
 
-        /// <summary>
-        /// Retorna os metadados padrão do documento.
-        /// </summary>
         public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
 
-        /// <summary>
-        /// Compõe a estrutura do documento PDF.
-        /// </summary>
         public void Compose(IDocumentContainer container)
         {
-            container
-                .Page(page =>
-                {
-                    page.Margin(20, Unit.Millimetre);
-                    page.Size(PageSizes.A4);
-                    page.PageColor(Colors.White);
-                    page.DefaultTextStyle(x => x.FontSize(10).FontFamily(Fonts.SegoeUI).FontColor(TextPrimary));
+            container.Page(page =>
+            {
+                page.Margin(20, Unit.Millimetre);
+                page.Size(PageSizes.A4);
+                page.PageColor(Colors.White);
+                page.DefaultTextStyle(x => x.FontSize(10).FontFamily(Fonts.SegoeUI).FontColor(TextPrimary));
 
-                    page.Header().Element(ComposeHeader);
-                    page.Content().Element(ComposeContent);
-                    page.Footer().Element(ComposeFooter);
-                });
+                page.Header().Element(ComposeHeader);
+                page.Content().Element(ComposeContent);
+                page.Footer().Element(ComposeFooter);
+            });
         }
 
-        /// <summary>
-        /// Compõe o cabeçalho do relatório (título, data, ID).
-        /// </summary>
         private void ComposeHeader(IContainer container)
         {
             container.PaddingBottom(15).BorderBottom(4).BorderColor(AppleGreen).Row(row =>
@@ -81,9 +67,6 @@ namespace WpfIveco.Relatorios
             });
         }
 
-        /// <summary>
-        /// Compõe o conteúdo principal (resumo, tabela de veículos, tabela de peças).
-        /// </summary>
         private void ComposeContent(IContainer container)
         {
             container.PaddingVertical(10).Column(column =>
@@ -108,29 +91,32 @@ namespace WpfIveco.Relatorios
                     row.RelativeItem().Column(col =>
                     {
                         col.Item().Text("Status Geral").FontSize(10).FontColor(TextSecondary);
-                        col.Item().Text("Em Conformidade").FontSize(14).SemiBold().FontColor(AppleGreen);
+                        col.Item().Text(_veiculos.Count > 0 ? "Em Conformidade" : "Sem dados").FontSize(14).SemiBold()
+                            .FontColor(_veiculos.Count > 0 ? AppleGreen : TextSecondary);
                     });
                 });
 
-                /// Tabela de veículos
+                // Tabela de veículos
                 column.Item().Column(col =>
                 {
-                    col.Item().PaddingBottom(5).BorderBottom(1).BorderColor(BorderGray).Text("Rastreabilidade de Veículos").FontSize(16).SemiBold();
+                    col.Item().PaddingBottom(5).BorderBottom(1).BorderColor(BorderGray)
+                        .Text("Rastreabilidade de Veículos").FontSize(16).SemiBold();
                     col.Item().PaddingTop(10).Element(ComposeTabelaVeiculos);
                 });
 
-                /// Tabela de peças
-                column.Item().Column(col =>
+                // Tabela de peças (apenas se houver peças)
+                if (_pecas.Count > 0)
                 {
-                    col.Item().PaddingBottom(5).BorderBottom(1).BorderColor(BorderGray).Text("Componentes Vinculados (Amostragem)").FontSize(16).SemiBold();
-                    col.Item().PaddingTop(10).Element(ComposeTabelaPecas);
-                });
+                    column.Item().Column(col =>
+                    {
+                        col.Item().PaddingBottom(5).BorderBottom(1).BorderColor(BorderGray)
+                            .Text("Componentes Vinculados (Amostragem)").FontSize(16).SemiBold();
+                        col.Item().PaddingTop(10).Element(ComposeTabelaPecas);
+                    });
+                }
             });
         }
 
-        /// <summary>
-        /// Compõe a tabela com os veículos (VIN, Modelo, Data, Status).
-        /// </summary>
         private void ComposeTabelaVeiculos(IContainer container)
         {
             container.Table(table =>
@@ -138,64 +124,81 @@ namespace WpfIveco.Relatorios
                 table.ColumnsDefinition(columns =>
                 {
                     columns.RelativeColumn(2); // VIN
-                    columns.RelativeColumn(2); /// Modelo
-                    columns.RelativeColumn(2); /// Data
-                    columns.RelativeColumn(2); /// Status
+                    columns.RelativeColumn(2); // Modelo
+                    columns.RelativeColumn(2); // Data
+                    columns.RelativeColumn(2); // Status
                 });
 
-                /// Headers
+                // Headers
                 table.Header(header =>
                 {
-                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray).Text("VIN (Chassi)").SemiBold().FontColor(TextSecondary);
-                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray).Text("Modelo").SemiBold().FontColor(TextSecondary);
-                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray).Text("Montagem").SemiBold().FontColor(TextSecondary);
-                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray).Text("Auditoria").SemiBold().FontColor(TextSecondary);
+                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray)
+                        .Text("VIN (Chassi)").SemiBold().FontColor(TextSecondary);
+                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray)
+                        .Text("Modelo").SemiBold().FontColor(TextSecondary);
+                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray)
+                        .Text("Montagem").SemiBold().FontColor(TextSecondary);
+                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray)
+                        .Text("Auditoria").SemiBold().FontColor(TextSecondary);
                 });
 
-                /// Dados
-                foreach (var v in _veiculos)
+                // CORREÇÃO: Se não houver dados, exibe uma linha com mensagem
+                if (_veiculos.Count == 0)
                 {
-                    table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text(v.Vin).SemiBold();
-                    table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text(v.Modelo ?? "Modelo Padrão");
-                    table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text(v.DataMontagem?.ToString("dd/MM/yyyy") ?? "-");
-                    table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text("Validado no Ledger").FontColor(AppleGreen).SemiBold();
+                    table.Cell().ColumnSpan(4).Padding(10).AlignCenter()
+                        .Text("Nenhum veículo encontrado no sistema.").FontColor(TextSecondary).Italic();
+                }
+                else
+                {
+                    foreach (var v in _veiculos)
+                    {
+                        table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text(v.Vin).SemiBold();
+                        table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text(v.Modelo ?? "Modelo Padrão");
+                        table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text(v.DataMontagem?.ToString("dd/MM/yyyy") ?? "-");
+                        table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text("Validado no Ledger").FontColor(AppleGreen).SemiBold();
+                    }
                 }
             });
         }
 
-        /// <summary>
-        /// Compõe a tabela com as peças vinculadas (Componente, VIN, Status).
-        /// </summary>
         private void ComposeTabelaPecas(IContainer container)
         {
             container.Table(table =>
             {
                 table.ColumnsDefinition(columns =>
                 {
-                    columns.RelativeColumn(3); /// Componente
-                    columns.RelativeColumn(3); /// VIN
-                    columns.RelativeColumn(2); /// Status
+                    columns.RelativeColumn(3); // Componente
+                    columns.RelativeColumn(3); // VIN
+                    columns.RelativeColumn(2); // Status
                 });
 
                 table.Header(header =>
                 {
-                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray).Text("Componente / Peça").SemiBold().FontColor(TextSecondary);
-                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray).Text("Chassi (VIN) Vinculado").SemiBold().FontColor(TextSecondary);
-                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray).Text("Status").SemiBold().FontColor(TextSecondary);
+                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray)
+                        .Text("Componente / Peça").SemiBold().FontColor(TextSecondary);
+                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray)
+                        .Text("Chassi (VIN) Vinculado").SemiBold().FontColor(TextSecondary);
+                    header.Cell().Background(BackgroundGray).Padding(5).BorderBottom(2).BorderColor(BorderGray)
+                        .Text("Status").SemiBold().FontColor(TextSecondary);
                 });
 
-                foreach (var p in _pecas)
+                if (_pecas.Count == 0)
                 {
-                    table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text(p.NomePeca);
-                    table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text(p.VinAssociado);
-                    table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text("Registrado").FontColor(AppleBlue).SemiBold();
+                    table.Cell().ColumnSpan(3).Padding(10).AlignCenter()
+                        .Text("Nenhuma peça vinculada no momento.").FontColor(TextSecondary).Italic();
+                }
+                else
+                {
+                    foreach (var p in _pecas)
+                    {
+                        table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text(p.NomePeca);
+                        table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text(p.VinAssociado);
+                        table.Cell().BorderBottom(1).BorderColor("#E5E5EA").Padding(5).Text("Registrado").FontColor(AppleBlue).SemiBold();
+                    }
                 }
             });
         }
 
-        /// <summary>
-        /// Compõe o rodapé do relatório (mensagem e numeração de páginas).
-        /// </summary>
         private void ComposeFooter(IContainer container)
         {
             container.AlignCenter().Column(col =>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuestPDF.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,11 +12,24 @@ using WpfIveco.DTO;
 
 namespace WpfIveco
 {
+    /// <summary>
+    /// Lógica de interação para App.xaml.
+    /// Gerencia logs globais, tratamento de exceções e configuração inicial da aplicação.
+    /// CORREÇÃO: Adicionada configuração da licença da QuestPDF no construtor.
+    /// </summary>
     public partial class App : Application
     {
+        // ============================================================
+        // CAMPOS ESTÁTICOS PARA LOG
+        // ============================================================
+
         private static readonly string LogFilePath;
         private static readonly string FallbackLogFilePath;
         private static readonly object LogLock = new object();
+
+        // ============================================================
+        // CONSTRUTOR ESTÁTICO (INICIALIZAÇÃO DOS CAMINHOS)
+        // ============================================================
 
         static App()
         {
@@ -58,37 +72,52 @@ namespace WpfIveco
 
             Debug.WriteLine($"[LOGGER] Arquivo de log principal: {LogFilePath}");
             Debug.WriteLine($"[LOGGER] Arquivo de log fallback: {FallbackLogFilePath}");
-
-        }
-
-        /// <summary>
-        /// Tenta encontrar a raiz do projeto WPF para salvar os logs.
-        /// </summary>
-        private static string ObterCaminhoLogPrincipal()
-        {
-            // 1. Tenta usar o diretório do executável e subir até encontrar a raiz do projeto
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string projectDir = baseDir;
-
-            for (int i = 0; i < 4; i++) // sobe até 4 níveis (ex: bin\Debug\net8.0-windows)
-            {
-                var parent = Directory.GetParent(projectDir);
-                if (parent == null) break;
-                projectDir = parent.FullName;
-            }
-
-            // Verifica se encontrou a raiz do projeto (procura pelo .csproj)
-            if (File.Exists(Path.Combine(projectDir, "WpfIveco.csproj")))
-            {
-                return Path.Combine(projectDir, "Logs", "logs.json");
-            }
-
-            // 2. Se não encontrou, tenta usar o diretório atual (pode ser a pasta do executável)
-            return Path.Combine(baseDir, "Logs", "logs.json");
         }
 
         // ============================================================
-        // MÉTODOS PÚBLICOS DE LOG
+        // CONSTRUTOR DA APLICAÇÃO (COM CORREÇÃO DA LICENÇA)
+        // ============================================================
+
+        public App()
+        {
+            // ============================================================
+            // CORREÇÃO: Define a licença da QuestPDF como Community (gratuita)
+            // Necessário para gerar relatórios PDF sem erro de licenciamento.
+            // Para TCC / uso acadêmico, a licença Community é suficiente.
+            // ============================================================
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            // ============================================================
+            // TRATAMENTO DE EXCEÇÕES GLOBAIS
+            // ============================================================
+
+            this.DispatcherUnhandledException += (s, e) =>
+            {
+                LogException($"Exceção não tratada na UI: {e.Exception.GetType().Name}", "UI");
+                e.Handled = true;
+                MessageBox.Show(
+                    "Ocorreu um erro inesperado na interface.\nO sistema tentará continuar.\n\n" +
+                    "Se o problema persistir, contacte o suporte.",
+                    "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            };
+
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+            {
+                if (e.ExceptionObject is Exception ex)
+                    LogException($"Exceção não tratada (APP): {ex.GetType().Name}", "APP");
+                else
+                    LogError($"Objeto não-Exception: {e.ExceptionObject}", "APP");
+            };
+
+            TaskScheduler.UnobservedTaskException += (s, e) =>
+            {
+                LogException($"Exceção não observada (TASK): {e.Exception.GetType().Name}", "TASK");
+                e.SetObserved();
+            };
+        }
+
+        // ============================================================
+        // MÉTODOS DE LOG PÚBLICOS
         // ============================================================
 
         public static void LogInfo(string message, string source = null)
@@ -187,7 +216,7 @@ namespace WpfIveco
             if (!escrito)
                 Debug.WriteLine("[LOGGER] Log não persistido (ambos os destinos falharam).");
 
-            // Tenta truncar
+            // Tenta truncar (manter os últimos 5000 registros)
             if (escrito)
             {
                 try { TruncateFile(LogFilePath); }
@@ -209,7 +238,7 @@ namespace WpfIveco
         }
 
         // ============================================================
-        // LEITURA DE LOGS (COM TRATAMENTO DE ERROS)
+        // LEITURA DE LOGS (PARA DIAGNÓSTICO)
         // ============================================================
 
         public static List<LogEntryDto> ReadLogs()
@@ -257,34 +286,18 @@ namespace WpfIveco
         }
 
         // ============================================================
-        // MANIPULADORES DE EXCEÇÃO GLOBAL
+        // MÉTODO AUXILIAR PARA OBTER O CAMINHO DO LOG
         // ============================================================
 
-        public App()
+        /// <summary>
+        /// Obtém o caminho para o arquivo de logs na pasta de dados locais do aplicativo.
+        /// CORREÇÃO: Usa LocalApplicationData para garantir permissões de escrita.
+        /// </summary>
+        private static string ObterCaminhoLogPrincipal()
         {
-            this.DispatcherUnhandledException += (s, e) =>
-            {
-                LogException($"Exceção não tratada na UI: {e.Exception.GetType().Name}", "UI");
-                e.Handled = true;
-                MessageBox.Show(
-                    "Ocorreu um erro inesperado na interface.\nO sistema tentará continuar.\n\n" +
-                    "Se o problema persistir, contacte o suporte.",
-                    "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
-            };
-
-            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
-            {
-                if (e.ExceptionObject is Exception ex)
-                    LogException($"Exceção não tratada (APP): {ex.GetType().Name}", "APP");
-                else
-                    LogError($"Objeto não-Exception: {e.ExceptionObject}", "APP");
-            };
-
-            TaskScheduler.UnobservedTaskException += (s, e) =>
-            {
-                LogException($"Exceção não observada (TASK): {e.Exception.GetType().Name}", "TASK");
-                e.SetObserved();
-            };
+            string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string appFolder = Path.Combine(appData, "IvecoGreenLedger");
+            return Path.Combine(appFolder, "logs.json");
         }
     }
 }
