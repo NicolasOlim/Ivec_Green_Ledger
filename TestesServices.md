@@ -323,4 +323,3 @@ A execução completa dos 9 métodos de teste resultou em 19 execuções individ
 
 *Projeto desenvolvido para fins educacionais no Curso Técnico em Desenvolvimento de Sistemas – SENAI / Escola de Programação e Robótica.*  
 *Última atualização: 26 de agosto de 2026.*
-
