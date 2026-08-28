@@ -15,24 +15,10 @@ using WpfIveco.ViewModels;
 
 namespace WpfIveco.ViewModel
 {
-    /// <summary>
-    /// ViewModel para a tela de gestão de peças e componentes.
-    /// Gerencia a lista de VINs, fornecedores, peças, e o registro de novas peças.
-    /// Possui fallback offline via SQLite.
-    /// CORREÇÃO: Validação de peso, envio de ID de lote nulo, logs detalhados.
-    /// </summary>
     public class PecasViewModel : ViewModelBase
     {
-        // ============================================================
-        // CAMPOS PRIVADOS
-        // ============================================================
-
         private readonly HttpClient _httpClient;
         private readonly LocalDatabaseService _localDb;
-
-        // ============================================================
-        // PROPRIEDADES (BINDINGS)
-        // ============================================================
 
         private ObservableCollection<string> _listaVins = new();
         public ObservableCollection<string> ListaVins
@@ -83,15 +69,7 @@ namespace WpfIveco.ViewModel
             set { _fornecedorSelecionado = value; OnPropertyChanged(nameof(FornecedorSelecionado)); }
         }
 
-        // ============================================================
-        // COMANDOS
-        // ============================================================
-
         public ICommand AdicionarPecaManualCommand { get; }
-
-        // ============================================================
-        // CONSTRUTOR
-        // ============================================================
 
         public PecasViewModel(HttpClient httpClient)
         {
@@ -100,10 +78,6 @@ namespace WpfIveco.ViewModel
             _localDb = new LocalDatabaseService();
             AdicionarPecaManualCommand = new RelayCommand(async p => await AdicionarPecaAsync());
         }
-
-        // ============================================================
-        // MÉTODOS PÚBLICOS (CARREGAMENTO COM FALLBACK)
-        // ============================================================
 
         public async Task CarregarVinsAsync()
         {
@@ -216,10 +190,6 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        // ============================================================
-        // MÉTODOS PRIVADOS (CARREGAMENTO LOCAL)
-        // ============================================================
-
         private async Task CarregarVinsLocaisAsync()
         {
             var veiculos = await _localDb.GetVeiculosAsync();
@@ -265,15 +235,6 @@ namespace WpfIveco.ViewModel
             }
         }
 
-        // ============================================================
-        // OPERAÇÃO DE ADIÇÃO (COM FALLBACK OFFLINE)
-        // ============================================================
-
-        /// <summary>
-        /// Registra uma nova peça associada a um VIN e fornecedor.
-        /// Tenta salvar na API; se falhar, salva localmente no SQLite.
-        /// CORREÇÃO: Validação de peso > 0 e envio de fk_LoteMateriaPrima_Id como null.
-        /// </summary>
         private async Task AdicionarPecaAsync()
         {
             App.LogInfo("AdicionarPecaAsync iniciado", "PECAS");
@@ -286,6 +247,13 @@ namespace WpfIveco.ViewModel
                 return;
             }
 
+            if (VinSelecionado.Length != 17)
+            {
+                App.LogWarning($"VIN inválido (tamanho {VinSelecionado.Length})", "PECAS");
+                MessageBox.Show("O VIN deve ter exatamente 17 caracteres.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(NovaPecaNome))
             {
                 App.LogWarning("Nome da peça vazio", "PECAS");
@@ -293,7 +261,6 @@ namespace WpfIveco.ViewModel
                 return;
             }
 
-            // CORREÇÃO: Validação de peso
             if (NovaPecaPesoKg <= 0)
             {
                 App.LogWarning($"Peso inválido: {NovaPecaPesoKg}", "PECAS");
@@ -318,13 +285,13 @@ namespace WpfIveco.ViewModel
 
             App.LogInfo($"Enviando peça: {NovaPecaNome} (VIN: {VinSelecionado}, Fornecedor: {FornecedorSelecionado.Nome})", "PECAS");
 
-            // CORREÇÃO: DTO para envio – permite que fk_LoteMateriaPrima_Id seja null
+            // CORREÇÃO: Enviar string vazia em vez de null
             var dtoEnvio = new
             {
                 Id = Guid.NewGuid().ToString().Substring(0, 8),
                 NomePeca = NovaPecaNome,
                 Fk_Veiculo_Vin = VinSelecionado,
-                Fk_LoteMateriaPrima_Id = (string)null, // CORREÇÃO: não obrigatório
+                Fk_LoteMateriaPrima_Id = string.Empty, // <-- ALTERADO de null para string.Empty
                 PesoKg = NovaPecaPesoKg,
                 Fk_Fornecedor_Id = FornecedorSelecionado.Id
             };
@@ -346,7 +313,9 @@ namespace WpfIveco.ViewModel
                 }
                 else
                 {
-                    App.LogWarning("API falhou. Salvando peça localmente.", "PECAS");
+                    var erroContent = await response.Content.ReadAsStringAsync();
+                    App.LogWarning($"API retornou erro: {response.StatusCode} - {erroContent}", "PECAS");
+                    // Tenta salvar offline
                     var salvouLocal = await _localDb.SalvarPecaOfflineAsync(novaPeca);
                     if (salvouLocal)
                     {
@@ -357,7 +326,7 @@ namespace WpfIveco.ViewModel
                     }
                     else
                     {
-                        MessageBox.Show("Erro ao salvar peça (online e offline).", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show($"Erro ao salvar peça (online: {response.StatusCode} - {erroContent})", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
             }
@@ -374,7 +343,7 @@ namespace WpfIveco.ViewModel
                 }
                 else
                 {
-                    MessageBox.Show("Erro de conexão. Não foi possível salvar (offline).", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Erro de conexão. Não foi possível salvar (offline). Detalhe: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

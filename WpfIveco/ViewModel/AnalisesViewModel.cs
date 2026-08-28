@@ -122,12 +122,24 @@ namespace WpfIveco.ViewModels
             try
             {
                 await CarregarTotalEmissoesAsync();
-                await Task.WhenAll(
+
+                var resultados = await Task.WhenAll(
                     CarregarPegadaMediaAsync(),
                     CarregarGraficoEmissoesAsync(),
                     CarregarAnalisesEsgAsync()
                 );
-                App.LogInfo("Todos os dados ESG carregados com sucesso.", "ANALISES");
+
+                // CORREÇÃO: antes esse log era incondicional. Como cada método acima
+                // trata a própria exceção e nunca deixa o Task.WhenAll lançar nada,
+                // ele aparecia mesmo quando um ou mais gráficos falhavam ao carregar.
+                if (resultados.All(sucesso => sucesso))
+                {
+                    App.LogInfo("Todos os dados ESG carregados com sucesso.", "ANALISES");
+                }
+                else
+                {
+                    App.LogWarning("ESG carregado parcialmente — um ou mais itens falharam (veja os logs acima).", "ANALISES");
+                }
             }
             catch (Exception ex)
             {
@@ -140,7 +152,7 @@ namespace WpfIveco.ViewModels
         // MÉTODOS DE CARREGAMENTO
         // ============================================================
 
-        private async Task CarregarPegadaMediaAsync()
+        private async Task<bool> CarregarPegadaMediaAsync()
         {
             App.LogInfo("GET pegada-media...", "ANALISES");
             try
@@ -155,20 +167,23 @@ namespace WpfIveco.ViewModels
                     PecasReaproveitadas = (int)(pegadaMedia * 0.05);
                     // A economia é calculada separadamente
                     App.LogInfo($"Pegada média: {pegadaMedia:N1}", "ANALISES");
+                    return true;
                 }
                 else
                 {
                     App.LogError($"Falha pegada-media: HTTP {response.StatusCode}", "ANALISES");
                     // Fallback: mantém valores existentes
+                    return false;
                 }
             }
             catch (Exception ex)
             {
-                App.LogError($"Erro em CarregarPegadaMediaAsync: {ex.Message}", "ANALISES");
+                App.LogError($"Erro em CarregarPegadaMediaAsync: {ex}", "ANALISES");
+                return false;
             }
         }
 
-        private async Task CarregarGraficoEmissoesAsync()
+        private async Task<bool> CarregarGraficoEmissoesAsync()
         {
             App.LogInfo("CarregarGraficoEmissoesAsync iniciado", "ANALISES");
             try
@@ -209,24 +224,28 @@ namespace WpfIveco.ViewModels
                             OnPropertyChanged(nameof(MesesLabels));
                             App.LogInfo("Gráfico de barras atualizado.", "ANALISES");
                         });
+                        return true;
                     }
                     else
                     {
                         App.LogWarning("Dados do gráfico vazios, usando placeholders.", "ANALISES");
+                        return false;
                     }
                 }
                 else
                 {
                     App.LogError($"Falha grafico-emissoes: {response.StatusCode}", "ANALISES");
+                    return false;
                 }
             }
             catch (Exception ex)
             {
-                App.LogError($"Erro em CarregarGraficoEmissoesAsync: {ex.Message}", "ANALISES");
+                App.LogError($"Erro em CarregarGraficoEmissoesAsync: {ex}", "ANALISES");
+                return false;
             }
         }
 
-        private async Task CarregarAnalisesEsgAsync()
+        private async Task<bool> CarregarAnalisesEsgAsync()
         {
             App.LogInfo("GET analises-esg...", "ANALISES");
             try
@@ -315,16 +334,22 @@ namespace WpfIveco.ViewModels
 
                             App.LogInfo($"ESG atualizado: Top={TopFornecedores.Count}, Tabela={UltimasAvaliacoes.Count}", "ANALISES");
                         });
+                        return true;
                     }
+
+                    App.LogWarning("Resposta de analises-esg veio vazia.", "ANALISES");
+                    return false;
                 }
                 else
                 {
                     App.LogError($"Falha analises-esg: {response.StatusCode}", "ANALISES");
+                    return false;
                 }
             }
             catch (Exception ex)
             {
-                App.LogError($"Erro em CarregarAnalisesEsgAsync: {ex.Message}", "ANALISES");
+                App.LogError($"Erro em CarregarAnalisesEsgAsync: {ex}", "ANALISES");
+                return false;
             }
         }
 

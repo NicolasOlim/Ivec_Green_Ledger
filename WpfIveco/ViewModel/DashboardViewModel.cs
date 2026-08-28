@@ -171,12 +171,17 @@ namespace WpfIveco.ViewModels
         {
             try
             {
+                // CORREÇÃO: CarregarUsoServidor lê ConsultasHoje logo na primeira linha,
+                // antes de qualquer await. Rodando dentro do mesmo Task.WhenAll que
+                // CarregarConsultasHoje, ele sempre lia o valor ANTIGO de ConsultasHoje
+                // (CarregarConsultasHoje só escreve o valor novo depois de 3 GETs
+                // sequenciais). Por isso saiu do WhenAll e passou a rodar depois.
                 await Task.WhenAll(
                     CarregarPegadaMedia(),
                     CarregarConsultasHoje(),
-                    CarregarTempoResposta(),
-                    CarregarUsoServidor()
+                    CarregarTempoResposta()
                 );
+                await CarregarUsoServidor();
                 return true;
             }
             catch

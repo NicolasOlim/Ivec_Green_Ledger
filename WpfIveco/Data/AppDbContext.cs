@@ -9,14 +9,13 @@ namespace WpfIveco.Data
     {
         public DbSet<VeiculoEntity> Veiculos { get; set; }
         public DbSet<FornecedorEntity> Fornecedores { get; set; }
-        public DbSet<PecaEntity> Pecas { get; set; }  // Corrigido: sem acento
+        public DbSet<PecaEntity> Pecas { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Caminho fixo para a raiz do projeto
-            string projectDirectory = @"C:\Users\Nicolas\source\repos\Ivec_Green_Ledger\WpfIveco";
-
-            string dbFolder = Path.Combine(projectDirectory, "Database");
+            // Pasta da aplicação (onde o .exe está a correr)
+            string appFolder = AppDomain.CurrentDomain.BaseDirectory;
+            string dbFolder = Path.Combine(appFolder, "Database");
             Directory.CreateDirectory(dbFolder);
 
             string dbPath = Path.Combine(dbFolder, "local.db");
@@ -25,7 +24,6 @@ namespace WpfIveco.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Índice único para VIN
             modelBuilder.Entity<VeiculoEntity>()
                 .HasIndex(v => v.Vin)
                 .IsUnique();
