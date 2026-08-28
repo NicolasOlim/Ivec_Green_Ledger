@@ -19,7 +19,7 @@
 
 ---
 
-  ## **Objetivo e Respónsabilidade dos Componentes:**
+  ## **Objetivo e Responsabilidade dos Componentes:**
 
   As classes de serviço centralizam as regras de negócio cruciais de segurança de acesso e integridade de dados na API do projeto.
 
