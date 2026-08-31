@@ -19,6 +19,7 @@ O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclu
 
 ## 📌 Sumário do Projeto
 
+### 📖 Conteúdo Geral
 - [Problema Encontrado](#problema-encontrado)
 - [Metodologia](#metodologia)
 - [Mini Mundo Da Demanda](#mini-mundo-da-demanda)
@@ -34,21 +35,24 @@ O projeto Iveco Green Ledger foi idealizado, modelado e implementado como conclu
 - [Diagramas](#diagramas)
 - [Regra de Negócio](#regra-de-negócio-detalhada)
 - [Plano de Implantação de Software](#plano-de-implantação-de-software)
-- [1. Planejamento Estratégico](#1--planejamento-estratégico)
-- [2. Cronograma Resumido de Implementação](#2--cronograma-resumido-de-implementação)
-- [3. Levantamento da Infraestrutura Necessária](#3--levantamento-da-infraestrutura-necessária)
-- [4. Plano de Validação do Sistema](#4--plano-de-validação-do-sistema)
-- [5. Plano de Contingência](#5--plano-de-contingência)
+  - [1. Planejamento Estratégico](#1--planejamento-estratégico)
+  - [2. Cronograma Resumido de Implementação](#2--cronograma-resumido-de-implementação)
+  - [3. Levantamento da Infraestrutura Necessária](#3--levantamento-da-infraestrutura-necessária)
+  - [4. Plano de Validação do Sistema](#4--plano-de-validação-do-sistema)
+  - [5. Plano de Contingência](#5--plano-de-contingência)
 - [Considerações Finais](#6--considerações-finais)
 - [Referências Bibliográficas](#referências-bibliográficas)
-- [Plano de Migração](./Migracao.md)
-- [Infraestrutura](./infraestrutura.md)
-- [Manual do Usuário](./Manual_do_Usuario.md)
-- [Guia de Instalação](./Guia_de_Instalação.md)
-- [Licenciamento](./Licenciamento.md)
-- [Plano de Testes do Sistema](./PlanoDeTestes.md)
-- [Termo de Uso](./Termos_de_Uso.txt)
 
+---
+
+### 📄 Arquivos e Documentos Externos
+-  [Plano de Migração](./Migracao.md)
+-  [Infraestrutura](./infraestrutura.md)
+-  [Manual do Usuário](./Manual_do_Usuario.md)
+-  [Guia de Instalação](./Guia_de_Instalação.md)
+-  [Licenciamento](./Licenciamento.md)
+-  [Plano de Testes do Sistema](./PlanoDeTestes.md)
+-  [Termo de Uso](./Termos_de_Uso.txt)
 ---
 
 <div align="center">
